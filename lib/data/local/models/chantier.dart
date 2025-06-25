@@ -2,12 +2,15 @@ import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../models/data/json_model.dart';
+
 part 'chantier.g.dart';
 
 @HiveType(typeId: 0)
 @JsonSerializable()
-class Chantier {
+class Chantier extends JsonModel {
   @HiveField(0)
+  @override
   final String id;
 
   @HiveField(1)
@@ -37,6 +40,7 @@ class Chantier {
   // JSON
   factory Chantier.fromJson(Map<String, dynamic> json) =>
       _$ChantierFromJson(json);
+  @override
   Map<String, dynamic> toJson() => _$ChantierToJson(this);
 
   // Firebase
@@ -54,4 +58,24 @@ class Chantier {
       dateFin: DateTime.now().add(const Duration(days: 60)),
     );
   }
+
+  @override
+  Chantier fromJson(Map<String, dynamic> json) => Chantier(
+    id: json['id'] ?? '',
+    nom: json['nom'] ?? '',
+    adresse: json['adresse'] ?? '',
+    clientId: json['clientId'] ?? '',
+    dateDebut: DateTime.parse(json['dateDebut']),
+    dateFin: json['dateFin'] != null ? DateTime.parse(json['dateFin']) : null,
+  );
+
+  @override
+  Chantier copyWithId(String? id) => Chantier(
+    id: id ?? this.id,
+    nom: nom,
+    adresse: adresse,
+    clientId: clientId,
+    dateDebut: dateDebut,
+    dateFin: dateFin,
+  );
 }

@@ -22,13 +22,18 @@ final interventionBoxProvider = Provider<Box<Intervention>>(
   (ref) => Hive.box<Intervention>('interventions'),
 );
 
-final chantierServiceProvider = Provider<ChantierService>(
-  (ref) => ChantierService(),
+final chantierServiceProvider = Provider<EntityService<Chantier>>(
+  (ref) => const EntityService('chantiers'),
 );
-final clientServiceProvider = Provider<ClientService>((ref) => ClientService());
-final technicienServiceProvider = Provider<TechnicienService>(
-  (ref) => TechnicienService(),
+
+final clientServiceProvider = Provider<EntityService<Client>>(
+  (ref) => const EntityService('clients'),
 );
-final interventionServiceProvider = Provider<InterventionService>(
-  (ref) => InterventionService(),
+
+final technicienServiceProvider = Provider<EntityService<Technicien>>(
+  (ref) => const EntityService('techniciens'),
+);
+
+final interventionServiceProvider = Provider<EntityService<Intervention>>(
+  (ref) => const EntityService('interventions'),
 );

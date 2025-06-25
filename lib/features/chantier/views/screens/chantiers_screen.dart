@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/providers/hive_provider.dart';
+import '../../../home/views/widgets/app_drawer.dart';
 
 class ChantiersScreen extends ConsumerWidget {
   const ChantiersScreen({super.key});
@@ -14,6 +15,7 @@ class ChantiersScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Chantiers')),
+      drawer: const AppDrawer(),
       body: FutureBuilder<List<Chantier>>(
         future: chantiers,
         builder: (context, snapshot) {
