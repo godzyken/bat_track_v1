@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../providers/responsive_provider.dart';
+import '../../../../core/responsive/wrapper/responsive_layout.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/home_content.dart';
 import '../widgets/side_menu.dart';

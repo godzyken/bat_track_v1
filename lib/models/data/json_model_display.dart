@@ -19,7 +19,46 @@ extension JsonModelDisplay on JsonModel {
         '';
   }
 
-  /// Renvoie une icône en fonction du type
+  /// Détails générés dynamiquement à partir de tous les champs pertinents
+  String get displayDetails {
+    final json = toJson();
+    final buffer = StringBuffer();
+    final skipKeys = {
+      'nom',
+      'titre',
+      'email',
+      'description',
+      'specialite',
+      'adresse',
+    };
+
+    for (final entry in json.entries) {
+      if (skipKeys.contains(entry.key)) continue;
+
+      final key = _prettifyKey(entry.key);
+      final value = _formatValue(entry.value);
+      if (value != null && value.length > 25) buffer.writeln('$key : $value');
+    }
+
+    return buffer.toString().trim();
+  }
+
+  /// Tags (chips) dynamiques pour les champs courts
+  List<String> get displayTags {
+    final json = toJson();
+    return json.entries
+        .where(
+          (e) =>
+              e.value != null &&
+              (e.value is String && (e.value as String).length < 25 ||
+                  e.value is num ||
+                  e.value is bool),
+        )
+        .map((e) => '${_prettifyKey(e.key)} : ${_formatValue(e.value)}')
+        .toList();
+  }
+
+  /// Icône en fonction du type
   IconData get displayIcon {
     final type = runtimeType.toString();
     return switch (type) {
@@ -27,7 +66,36 @@ extension JsonModelDisplay on JsonModel {
       'Technicien' => Icons.engineering,
       'Chantier' => Icons.construction,
       'Intervention' => Icons.build_circle,
-      _ => Icons.info,
+      _ => Icons.info_outline,
     };
+  }
+
+  String _prettifyKey(String key) {
+    // Convertit "lastInterventionDate" → "Last Intervention Date"
+    final buffer = StringBuffer();
+    for (var i = 0; i < key.length; i++) {
+      final char = key[i];
+      if (i == 0) {
+        buffer.write(char.toUpperCase());
+      } else if (char == char.toUpperCase() && char != '_') {
+        buffer.write(' $char');
+      } else if (char == '_') {
+        buffer.write(' ');
+      } else {
+        buffer.write(char);
+      }
+    }
+    return buffer.toString();
+  }
+
+  String? _formatValue(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) {
+      return '${value.day}/${value.month}/${value.year}';
+    } else if (value is bool) {
+      return value ? 'Oui' : 'Non';
+    } else {
+      return value.toString();
+    }
   }
 }

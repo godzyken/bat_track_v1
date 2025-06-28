@@ -16,6 +16,18 @@ class ClientListNotifier extends AsyncNotifier<List<Client>> {
     state = AsyncValue.data(await service.getAll());
   }
 
+  Future<void> save(Client client) async {
+    final service = ref.read(clientServiceProvider);
+    await service.save(client, client.id);
+    state = AsyncValue.data(await service.getAll());
+  }
+
+  Future<void> updateClient(Client client) async {
+    final service = ref.read(clientServiceProvider);
+    await service.update(client, client.id);
+    state = AsyncValue.data(await service.getAll());
+  }
+
   Future<void> delete(String id) async {
     final service = ref.read(clientServiceProvider);
     await service.delete(id);

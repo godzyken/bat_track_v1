@@ -20,6 +20,10 @@ class Technicien extends JsonModel {
   final List<String> competences;
   @HiveField(4)
   final String? specialite;
+  @HiveField(5)
+  bool disponible = true;
+  @HiveField(6)
+  String? localisation;
 
   Technicien({
     required this.id,
@@ -27,6 +31,8 @@ class Technicien extends JsonModel {
     required this.email,
     required this.competences,
     this.specialite,
+    this.disponible = true,
+    this.localisation,
   });
 
   @override
@@ -36,6 +42,8 @@ class Technicien extends JsonModel {
     specialite: json['specialite'],
     email: json['email'] ?? '',
     competences: List<String>.from(json['competences']),
+    disponible: json['disponible'] ?? true,
+    localisation: json['localisation'],
   );
 
   factory Technicien.fromJson(Map<String, dynamic> json) =>
@@ -55,6 +63,8 @@ class Technicien extends JsonModel {
     email: email,
     competences: competences,
     specialite: specialite,
+    disponible: disponible,
+    localisation: localisation,
   );
 
   factory Technicien.mock() => Technicien(
@@ -63,5 +73,7 @@ class Technicien extends JsonModel {
     email: 'tech@example.com',
     competences: ['Plomberie', 'Electricite'],
     specialite: 'Electricite',
+    disponible: true,
+    localisation: 'Paris',
   );
 }

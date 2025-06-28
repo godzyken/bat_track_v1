@@ -1,6 +1,7 @@
 import 'json_model.dart';
 
 class Client extends JsonModel {
+  @override
   final String? id;
   final String nom;
   final String? email;

@@ -90,4 +90,12 @@ class HiveService {
     }
     _boxes.clear();
   }
+
+  /// Ouvre une box typée en toute sécurité, avec cache si déjà ouverte
+  Future<Box<T>> getBox<T>(String boxName) async {
+    if (!Hive.isBoxOpen(boxName)) {
+      return await Hive.openBox<T>(boxName);
+    }
+    return Hive.box<T>(boxName);
+  }
 }

@@ -28,6 +28,9 @@ class Chantier extends JsonModel {
   @HiveField(5)
   final DateTime? dateFin;
 
+  @HiveField(6)
+  String? etat;
+
   Chantier({
     required this.id,
     required this.nom,
@@ -35,6 +38,7 @@ class Chantier extends JsonModel {
     required this.clientId,
     required this.dateDebut,
     this.dateFin,
+    this.etat,
   });
 
   // JSON
@@ -56,6 +60,7 @@ class Chantier extends JsonModel {
       clientId: 'client_001',
       dateDebut: DateTime.now(),
       dateFin: DateTime.now().add(const Duration(days: 60)),
+      etat: 'En cours',
     );
   }
 
@@ -67,6 +72,7 @@ class Chantier extends JsonModel {
     clientId: json['clientId'] ?? '',
     dateDebut: DateTime.parse(json['dateDebut']),
     dateFin: json['dateFin'] != null ? DateTime.parse(json['dateFin']) : null,
+    etat: json['etat'] ?? '',
   );
 
   @override
@@ -77,5 +83,6 @@ class Chantier extends JsonModel {
     clientId: clientId,
     dateDebut: dateDebut,
     dateFin: dateFin,
+    etat: etat,
   );
 }
