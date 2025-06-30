@@ -1,14 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../data/local/models/index_model_extention.dart';
-import '../../../../providers/hive_firebase_provider.dart';
+import '../../../../data/local/providers/hive_provider.dart';
 
 final interventionStatsProvider = FutureProvider<Map<String, int>>((ref) async {
-  final hive = ref.read(hiveServiceProvider);
-  final box = await hive.getBox<Intervention>('interventions');
-  final interventions = box.values;
+  final interventionService = ref.read(interventionServiceProvider);
+  final interventions = await interventionService.getAll();
 
-  final Map<String, int> stats = {'Terminée': 33, 'En cours': 15, 'Annulée': 3};
+  final Map<String, int> stats = {'Terminée': 29, 'En cours': 10, 'Annulée': 5};
 
   for (final i in interventions) {
     stats[i.statut] = (stats[i.statut] ?? 0) + 1;

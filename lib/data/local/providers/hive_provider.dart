@@ -21,6 +21,43 @@ final technicienBoxProvider = Provider<Box<Technicien>>(
 final interventionBoxProvider = Provider<Box<Intervention>>(
   (ref) => Hive.box<Intervention>('interventions'),
 );
+final chantierEtapeBoxProvider = Provider(
+  (ref) async => await Hive.openBox<ChantierEtape>('chantierEtapes'),
+);
+final pieceJointeBoxProvider = Provider<Box<PieceJointe>>(
+  (ref) => Hive.box<PieceJointe>('piecesJointes'),
+);
+
+final chantierProvider = Provider.family<Chantier?, String>((ref, id) {
+  final box = Hive.box<Chantier>('chantiers');
+  return box.get(id);
+});
+
+final clientProvider = Provider.family<Client?, String>((ref, id) {
+  final box = Hive.box<Client>('clients');
+  return box.get(id);
+});
+
+final technicienProvider = Provider.family<Technicien?, String>((ref, id) {
+  final box = Hive.box<Technicien>('techniciens');
+  return box.get(id);
+});
+
+final interventionProvider = Provider.family<Intervention?, String>((ref, id) {
+  final box = Hive.box<Intervention>('interventions');
+  return box.get(id);
+});
+
+final chantierEtapesProvider =
+    FutureProvider.family<List<ChantierEtape>, String>((ref, chantierId) async {
+      final box = await ref.watch(chantierEtapeBoxProvider);
+      return box.values.where((e) => e.id == chantierId).toList();
+    });
+
+final pieceJointeProvider = Provider.family<PieceJointe?, String>((ref, id) {
+  final box = Hive.box<PieceJointe>('piecesJointes');
+  return box.get(id);
+});
 
 final chantierServiceProvider = Provider<EntityService<Chantier>>(
   (ref) => const EntityService('chantiers'),
@@ -36,4 +73,12 @@ final technicienServiceProvider = Provider<EntityService<Technicien>>(
 
 final interventionServiceProvider = Provider<EntityService<Intervention>>(
   (ref) => const EntityService('interventions'),
+);
+
+final chantierEtapeServiceProvider = Provider<EntityService<ChantierEtape>>(
+  (ref) => const EntityService('chantierEtapes'),
+);
+
+final pieceJointeServiceProvider = Provider<EntityService<PieceJointe>>(
+  (ref) => const EntityService('piecesJointes'),
 );

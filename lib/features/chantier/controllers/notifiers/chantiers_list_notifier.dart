@@ -10,6 +10,24 @@ class ChantierListNotifier extends AsyncNotifier<List<Chantier>> {
     return service.getAll();
   }
 
+  Future<void> add(Chantier chantier) async {
+    final service = ref.read(chantierServiceProvider);
+    await service.add(chantier, chantier.id);
+    state = AsyncValue.data(await service.getAll());
+  }
+
+  Future<void> save(Chantier chantier) async {
+    final service = ref.read(chantierServiceProvider);
+    await service.save(chantier, chantier.id);
+    state = AsyncValue.data(await service.getAll());
+  }
+
+  Future<void> updateChantier(Chantier chantier) async {
+    final service = ref.read(chantierServiceProvider);
+    await service.update(chantier, chantier.id);
+    state = AsyncValue.data(await service.getAll());
+  }
+
   Future<void> deleteChantier(String id) async {
     final service = ref.read(chantierServiceProvider);
     await service.delete(id);

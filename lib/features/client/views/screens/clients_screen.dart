@@ -24,7 +24,6 @@ class ClientsScreen extends ConsumerWidget {
             (items) => EntityList<Client>(
               items,
               'clients',
-              info: info,
               onEdit: (client) {
                 showDialog(
                   context: context,
@@ -41,6 +40,7 @@ class ClientsScreen extends ConsumerWidget {
                       ),
                 );
               },
+              info: info,
             ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur: $e')),

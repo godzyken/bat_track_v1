@@ -1,9 +1,10 @@
-import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/responsive/wrapper/responsive_layout.dart';
 import 'data/local/providers/hive_provider.dart';
+import 'data/remote/providers/firebase_providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,18 +40,33 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final firebaseInit = ref.watch(firebaseInitializationProvider);
     setAuthRef(ref);
     final router = ref.watch(goRouterProvider);
-    return MaterialApp.router(
-      title: 'BatTrack',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData.dark(useMaterial3: true),
-      themeMode: ThemeMode.system,
-      routerConfig: router,
-      builder: (context, child) => ResponsiveObserver(child: child!),
+
+    return firebaseInit.when(
+      data:
+          (app) => MaterialApp.router(
+            title: 'BatTrack',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+              useMaterial3: true,
+            ),
+            darkTheme: ThemeData.dark(useMaterial3: true),
+            themeMode: ThemeMode.system,
+            routerConfig: router,
+            builder: (context, child) => ResponsiveObserver(child: child!),
+          ),
+      loading:
+          () => const MaterialApp(
+            home: Scaffold(body: Center(child: CircularProgressIndicator())),
+          ),
+      error:
+          (e, st) => MaterialApp(
+            home: Scaffold(
+              body: Center(child: Text('Erreur d\'initialisation Firebase')),
+            ),
+          ),
     );
   }
 }

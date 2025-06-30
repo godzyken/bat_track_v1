@@ -31,7 +31,6 @@ class HomeScreen extends ConsumerWidget {
         );
         break;
       case ScreenSize.mobile:
-      default:
         layout = const HomeContent();
         break;
     }

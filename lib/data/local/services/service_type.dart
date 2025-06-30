@@ -50,3 +50,5 @@ final chantierService = EntityService<Chantier>('chantiers');
 final clientService = EntityService<Client>('clients');
 final technicienService = EntityService<Technicien>('techniciens');
 final interventionService = EntityService<Intervention>('interventions');
+final chantierEtapeService = EntityService<ChantierEtape>('chantierEtapes');
+final pieceJointeService = EntityService<PieceJointe>('piecesJointes');

@@ -1,8 +1,15 @@
+import 'package:bat_track_v1/features/chantier/views/screens/chantier_details_screen.dart';
+import 'package:bat_track_v1/models/views/screens/entity_detail_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../data/local/models/index_model_extention.dart';
+import '../data/local/providers/hive_provider.dart';
 import '../features/about/views/screens/about_screen.dart';
 import '../features/auth/views/screens/login_screen.dart';
+import '../features/chantier/views/screens/chantier_etape_detail_screen.dart';
+import '../features/chantier/views/screens/chantier_etapes_screen.dart';
 import '../features/chantier/views/screens/chantiers_screen.dart';
 import '../features/client/views/screens/clients_screen.dart';
 import '../features/dashboard/views/screens/dashboard_screen.dart';
@@ -38,18 +45,128 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/clients',
         builder: (context, state) => const ClientsScreen(),
+        routes: [
+          GoRoute(
+            path: 'client/:id',
+            name: 'client-detail',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return Consumer(
+                builder: (context, ref, child) {
+                  final client = ref.watch(clientProvider(id));
+                  if (client == null) {
+                    return Scaffold(body: Text('Client introuvable'));
+                  }
+                  return EntityDetailScreen(entity: client);
+                },
+              );
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/techniciens',
         builder: (context, state) => const TechniciensScreen(),
+        routes: [
+          GoRoute(
+            path: 'technicien/:id',
+            name: 'technicien-detail',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return Consumer(
+                builder: (context, ref, child) {
+                  final technicien = ref.watch(technicienProvider(id));
+                  if (technicien == null) {
+                    return Scaffold(body: Text('Technicien introuvable'));
+                  }
+                  return EntityDetailScreen(entity: technicien);
+                },
+              );
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/chantiers',
         builder: (context, state) => const ChantiersScreen(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            name: 'chantier-detail',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return Consumer(
+                builder: (context, ref, child) {
+                  final chantier = ref.watch(chantierProvider(id));
+                  if (chantier == null) {
+                    return const Scaffold(
+                      body: Center(child: Text('Chantier introuvable')),
+                    );
+                  }
+                  return ChantierDetailScreen(chantier: chantier);
+                },
+              );
+            },
+            routes: [
+              // ✅ 1. Liste des étapes
+              GoRoute(
+                path: 'etapes',
+                name: 'chantier-etapes',
+                builder: (context, state) {
+                  final chantierId = state.pathParameters['id']!;
+                  return ChantierEtapesScreen(chantierId: chantierId);
+                },
+              ),
+              // ✅ 2. Détail d’une étape
+              GoRoute(
+                path: ':etapeId',
+                name: 'chantier-etape-detail',
+                builder: (context, state) {
+                  final extra = state.extra as Map<String, dynamic>?;
+
+                  if (extra == null) {
+                    return Scaffold(
+                      appBar: AppBar(title: const Text('Erreur')),
+                      body: const Center(
+                        child: Text('Aucune donnée reçue pour cette étape'),
+                      ),
+                    );
+                  }
+
+                  final chantier = extra['chantier'] as Chantier;
+                  final etape = extra['etape'] as ChantierEtape;
+
+                  return ChantierEtapeDetailScreen(
+                    chantier: chantier,
+                    etape: etape,
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: '/interventions',
         builder: (context, state) => const InterventionsScreen(),
+        routes: [
+          GoRoute(
+            path: 'intervention/:id',
+            name: 'intervention-detail',
+            builder: (context, state) {
+              final id = state.pathParameters['id'];
+              return Consumer(
+                builder: (context, ref, child) {
+                  final intervention = ref.watch(interventionProvider(id!));
+                  if (intervention == null) {
+                    return Scaffold(body: Text('Intervention introuvable'));
+                  }
+                  return EntityDetailScreen(entity: intervention);
+                },
+              );
+            },
+          ),
+        ],
       ),
       GoRoute(path: '/about', builder: (context, state) => const AboutScreen()),
     ],

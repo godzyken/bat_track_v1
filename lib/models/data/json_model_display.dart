@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/local/models/index_model_extention.dart';
 import 'json_model.dart';
 
 extension JsonModelDisplay on JsonModel {
@@ -90,10 +91,26 @@ extension JsonModelDisplay on JsonModel {
 
   String? _formatValue(dynamic value) {
     if (value == null) return null;
+
     if (value is DateTime) {
       return '${value.day}/${value.month}/${value.year}';
     } else if (value is bool) {
       return value ? 'Oui' : 'Non';
+    } else if (value is List) {
+      return value
+          .map((e) => _formatValue(e) ?? '')
+          .where((s) => s.isNotEmpty)
+          .join(', ');
+    } else if (value is ChantierEtape) {
+      return value.description;
+      // } else if (value is DocumentFichier) {
+      //   return '${value.type.toUpperCase()}: ${value.filename}';
+    } else if (value is Map<String, dynamic>) {
+      // Si c'est un document sous forme brute JSON
+      if (value['type'] != null && value['filename'] != null) {
+        return '${(value['type'] as String).toUpperCase()}: ${value['filename']}';
+      }
+      return value.keys.map((k) => '$k: ${value[k]}').join(', ');
     } else {
       return value.toString();
     }

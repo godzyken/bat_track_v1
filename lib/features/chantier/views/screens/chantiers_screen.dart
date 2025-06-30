@@ -1,58 +1,63 @@
+import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
-import '../../../../data/local/providers/hive_provider.dart';
+import '../../../../models/views/widgets/entity_form.dart';
+import '../../../../models/views/widgets/entity_list.dart';
 import '../../../home/views/widgets/app_drawer.dart';
+import '../../controllers/notifiers/chantiers_list_notifier.dart';
 
 class ChantiersScreen extends ConsumerWidget {
   const ChantiersScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chantierService = ref.watch(chantierServiceProvider);
-    final chantiers = chantierService.getAll();
+    final info = context.responsiveInfo(ref);
+    final chantierAsync = ref.watch(chantierListProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Chantiers')),
       drawer: const AppDrawer(),
-      body: FutureBuilder<List<Chantier>>(
-        future: chantiers,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final items = snapshot.data ?? [];
-
-          if (items.isEmpty) {
-            return const Center(child: Text('Aucun chantier'));
-          }
-
-          return ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final chantier = items[index];
-              return ListTile(
-                title: Text(chantier.nom),
-                subtitle: Text(chantier.adresse),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () async {
-                    await chantierService.delete(chantier.id);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Chantier supprimé')),
-                    );
-                  },
-                ),
-              );
-            },
-          );
-        },
+      body: chantierAsync.when(
+        data:
+            (items) => EntityList<Chantier>(
+              items,
+              'clients',
+              onEdit: (chantier) {
+                showDialog(
+                  context: context,
+                  builder:
+                      (_) => EntityForm<Chantier>(
+                        fromJson: (json) => Chantier.fromJson(json),
+                        initialValue: chantier,
+                        onSubmit: (updated) async {
+                          await ref
+                              .read(chantierListProvider.notifier)
+                              .updateChantier(updated);
+                        },
+                        createEmpty: () => Chantier.mock(),
+                      ),
+                );
+              },
+              info: info,
+            ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Erreur: $e')),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final mock = Chantier.mock();
-          await chantierService.add(mock, mock.id);
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder:
+                (_) => EntityForm<Chantier>(
+                  fromJson: (json) => Chantier.fromJson(json),
+                  onSubmit: (chantier) async {
+                    await ref.read(chantierListProvider.notifier).add(chantier);
+                  },
+                  createEmpty: () => Chantier.mock(),
+                ),
+          );
         },
         child: const Icon(Icons.add),
       ),

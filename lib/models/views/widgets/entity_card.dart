@@ -5,6 +5,7 @@ import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:bat_track_v1/models/views/widgets/paginated_tags_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../data/json_model.dart';
 import 'action_icon_button.dart';
@@ -101,6 +102,33 @@ class _EntityCardState<T extends JsonModel> extends ConsumerState<EntityCard<T>>
               clipBehavior: Clip.antiAlias,
               child: InkWell(
                 onTap: _toggleExpand,
+                onLongPress: () {
+                  if (T == Chantier) {
+                    final chantier = widget.entity as Chantier;
+                    context.goNamed(
+                      'chantier-detail',
+                      pathParameters: {'id': chantier.id},
+                    );
+                  } else if (T == Client) {
+                    final client = widget.entity as Client;
+                    context.goNamed(
+                      'client-detail',
+                      pathParameters: {'id': client.id},
+                    );
+                  } else if (T == Technicien) {
+                    final tech = widget.entity as Technicien;
+                    context.goNamed(
+                      'technicien-detail',
+                      pathParameters: {'id': tech.id},
+                    );
+                  } else if (T == Intervention) {
+                    final intervention = widget.entity as Intervention;
+                    context.goNamed(
+                      'intervention-detail',
+                      pathParameters: {'id': intervention.id},
+                    );
+                  }
+                },
                 child: AnimatedSize(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
@@ -122,8 +150,8 @@ class _EntityCardState<T extends JsonModel> extends ConsumerState<EntityCard<T>>
     final icon = entity.displayIcon;
     final title = entity.displayTitle;
     final subtitle = entity.displaySubtitle;
-    final details = entity.displayDetails ?? '';
-    final tags = entity.displayTags ?? [];
+    final details = entity.displayDetails;
+    final tags = entity.displayTags;
 
     final avatar = CircleAvatar(
       backgroundColor: Colors.indigo.shade100,
@@ -301,4 +329,12 @@ class _EntityCardState<T extends JsonModel> extends ConsumerState<EntityCard<T>>
       ),
     ];
   }
+
+  /*  void _navigateToDetail<T extends JsonModel>(BuildContext context, T entity) {
+    final entityType = T.toString().toLowerCase();
+    final id = entity.id;
+
+    final routeName = '$entityType-detail'; // ex: chantier-detail
+    context.goNamed(routeName, pathParameters: {'id': id});
+  }*/
 }

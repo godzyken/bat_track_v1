@@ -30,7 +30,7 @@ class HiveService {
     return box;
   }
 
-  /// Ajoute un objet avec une clé (PUT = create ou update)
+  /// Ajoute ou met à jour un objet avec une clé
   static Future<void> put<T>(String boxName, String key, T object) async {
     final box = await _openBox<T>(boxName);
     await box.put(key, object);
@@ -89,13 +89,5 @@ class HiveService {
       await box.close();
     }
     _boxes.clear();
-  }
-
-  /// Ouvre une box typée en toute sécurité, avec cache si déjà ouverte
-  Future<Box<T>> getBox<T>(String boxName) async {
-    if (!Hive.isBoxOpen(boxName)) {
-      return await Hive.openBox<T>(boxName);
-    }
-    return Hive.box<T>(boxName);
   }
 }
