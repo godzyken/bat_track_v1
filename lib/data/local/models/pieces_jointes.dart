@@ -21,11 +21,15 @@ class PieceJointe extends JsonModel {
   @HiveField(3)
   final String type;
 
+  @HiveField(4)
+  final int taille;
+
   PieceJointe({
     required this.id,
     required this.nom,
     required this.url,
     required this.type,
+    required this.taille,
   });
 
   // JSON serialization
@@ -46,8 +50,13 @@ class PieceJointe extends JsonModel {
   PieceJointe fromJson(Map<String, dynamic> json) => PieceJointe.fromJson(json);
 
   @override
-  PieceJointe copyWithId(String? id) =>
-      PieceJointe(id: id ?? this.id, nom: nom, url: url, type: type);
+  PieceJointe copyWithId(String? id) => PieceJointe(
+    id: id ?? this.id,
+    nom: nom,
+    url: url,
+    type: type,
+    taille: taille,
+  );
 
   // Mock
   factory PieceJointe.mock({
@@ -55,7 +64,14 @@ class PieceJointe extends JsonModel {
     String nom = 'document.pdf',
     String url = 'https://example.com/document.pdf',
     String type = 'pdf',
+    int taille = 1024,
   }) {
-    return PieceJointe(id: id ?? 'mock_pj_001', nom: nom, url: url, type: type);
+    return PieceJointe(
+      id: id ?? 'mock_pj_001',
+      nom: nom,
+      url: url,
+      type: type,
+      taille: 1024,
+    );
   }
 }

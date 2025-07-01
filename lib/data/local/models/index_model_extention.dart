@@ -3,7 +3,6 @@ export 'base/base_model.dart';
 export 'chantier.dart';
 export 'chantier_etapes.dart';
 export 'client.dart';
-export 'document.dart';
 export 'intervention.dart';
 export 'pieces_jointes.dart';
 export 'technicien.dart';

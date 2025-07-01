@@ -42,6 +42,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
           url: file.path!,
           nom: file.name,
           type: type,
+          taille: file.size,
         );
 
         await ref

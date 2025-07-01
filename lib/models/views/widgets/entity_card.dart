@@ -195,117 +195,110 @@ class _EntityCardState<T extends JsonModel> extends ConsumerState<EntityCard<T>>
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: IntrinsicHeight(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  size == ScreenSize.desktop
-                      ? Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              size == ScreenSize.desktop
+                  ? Row(
+                    children: [
+                      avatar,
+                      const SizedBox(width: 16),
+                      Expanded(child: titleSection),
+                      Wrap(spacing: 4, children: actionButtons),
+                      RotationTransition(
+                        turns: _iconRotation,
+                        child: const Icon(
+                          Icons.expand_more,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  )
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
                           avatar,
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 12),
                           Expanded(child: titleSection),
-                          Wrap(spacing: 4, children: actionButtons),
-                          RotationTransition(
-                            turns: _iconRotation,
-                            child: const Icon(
-                              Icons.expand_more,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      )
-                      : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              avatar,
-                              const SizedBox(width: 12),
-                              Expanded(child: titleSection),
-                              if (size == ScreenSize.mobile)
-                                RotationTransition(
-                                  turns: _iconRotation,
-                                  child: const Icon(
-                                    Icons.expand_more,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                            ],
-                          ),
-                          if (size != ScreenSize.mobile)
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Wrap(spacing: 4, children: actionButtons),
+                          if (size == ScreenSize.mobile)
+                            RotationTransition(
+                              turns: _iconRotation,
+                              child: const Icon(
+                                Icons.expand_more,
+                                color: Colors.grey,
+                              ),
                             ),
                         ],
                       ),
-                  const SizedBox(height: 8),
-                  AnimatedSize(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    alignment: Alignment.topCenter,
-                    child:
-                        _expanded
-                            ? ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: maxScrollHeight,
-                              ),
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 12),
-                                    if (details.isNotEmpty)
-                                      Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: Colors.indigo.shade50,
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          details,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.copyWith(height: 1.4),
-                                        ),
-                                      ),
-                                    const SizedBox(height: 12),
-                                    if (tags.isNotEmpty)
-                                      PaginatedTagsList(
-                                        tags: tags,
-                                        currentPage: _currentTagPage,
-                                        tagsPerPage: _tagsPerPage,
-                                        onPreviousPage: _previousTagPage,
-                                        onNextPage: () => _nextTagPage(tags),
-                                      ),
-                                    TextButton.icon(
-                                      onPressed: _toggleExpand,
-                                      icon: const Icon(Icons.expand_less),
-                                      label: const Text('Afficher moins'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                            : Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton.icon(
-                                onPressed: _toggleExpand,
-                                icon: const Icon(Icons.expand_more),
-                                label: const Text('Afficher plus'),
-                              ),
-                            ),
+                      if (size != ScreenSize.mobile)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Wrap(spacing: 4, children: actionButtons),
+                        ),
+                    ],
                   ),
-                ],
+              const SizedBox(height: 8),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                alignment: Alignment.topCenter,
+                child:
+                    _expanded
+                        ? ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight: maxScrollHeight,
+                          ),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 12),
+                                if (details.isNotEmpty)
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.indigo.shade50,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      details,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(height: 1.4),
+                                    ),
+                                  ),
+                                const SizedBox(height: 12),
+                                if (tags.isNotEmpty)
+                                  PaginatedTagsList(
+                                    tags: tags,
+                                    currentPage: _currentTagPage,
+                                    tagsPerPage: _tagsPerPage,
+                                    onPreviousPage: _previousTagPage,
+                                    onNextPage: () => _nextTagPage(tags),
+                                  ),
+                                TextButton.icon(
+                                  onPressed: _toggleExpand,
+                                  icon: const Icon(Icons.expand_less),
+                                  label: const Text('Afficher moins'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                        : Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            onPressed: _toggleExpand,
+                            icon: const Icon(Icons.expand_more),
+                            label: const Text('Afficher plus'),
+                          ),
+                        ),
               ),
-            ),
+            ],
           ),
         );
       },

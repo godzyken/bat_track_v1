@@ -20,9 +20,9 @@ class SyncEntityNotifier<T extends JsonModel> extends StateNotifier<T> {
   }) : super(initialState);
 
   /// Met à jour le contenu localement + déclenche la synchro différée
-  void update(T updated) {
+  Future<void> update(T updated) async {
     state = updated;
-    entityService.save(state, state.id!); // sauvegarde Hive immédiate
+    await entityService.save(state, state.id!); // sauvegarde Hive immédiate
 
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(minutes: 2), () async {

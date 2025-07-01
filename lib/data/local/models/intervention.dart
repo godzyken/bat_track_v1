@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/models/pieces_jointes.dart';
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -23,13 +24,11 @@ class Intervention extends JsonModel {
   @HiveField(5)
   final String statut;
   @HiveField(6)
-  final String? photo;
+  final List<PieceJointe>? document;
   @HiveField(7)
-  final String? video;
-  @HiveField(8)
-  final String? document;
-  @HiveField(9)
   final String? titre;
+  @HiveField(8)
+  final String? commentaire;
 
   Intervention({
     required this.id,
@@ -38,10 +37,9 @@ class Intervention extends JsonModel {
     required this.description,
     required this.date,
     required this.statut,
-    this.photo,
-    this.video,
-    this.document,
+    this.document = const [],
     this.titre,
+    this.commentaire,
   });
 
   factory Intervention.fromJson(Map<String, dynamic> json) =>
@@ -53,17 +51,47 @@ class Intervention extends JsonModel {
   factory Intervention.fromMap(Map<String, dynamic> map) =>
       Intervention.fromJson(map);
 
-  factory Intervention.mock() => Intervention(
-    id: const Uuid().v4(),
-    chantierId: 'chantier_001',
-    technicienId: 'technicien_001',
-    date: DateTime.now(),
-    statut: 'Planifiée',
-    description: 'Inspection de routine',
-    titre: 'Inspection',
-    photo: 'photo_001.jpg',
-    video: 'video_001.mp4',
-    document: 'document_001.pdf',
+  factory Intervention.mock({
+    String? id,
+    String? chantierId,
+    String? technicienId,
+    String? description,
+    DateTime? date,
+    String? statut,
+    List<PieceJointe>? document,
+    String? titre,
+    String? commentaire,
+  }) => Intervention(
+    id: id ?? const Uuid().v4(),
+    chantierId: chantierId ?? 'chantier_001',
+    technicienId: technicienId ?? 'technicien_001',
+    description: description ?? 'Inspection de routine',
+    date: date ?? DateTime.now(),
+    statut: statut ?? 'Planifiée',
+    document:
+        document ??
+        [
+          PieceJointe.mock(
+            id: 'pj_001',
+            nom: 'document_001.pdf',
+            url: 'https://exemple.com/document_001.pdf',
+            type: 'pdf',
+          ),
+          PieceJointe.mock(
+            id: 'pj_002',
+            nom: 'video_001.mp4',
+            url: 'https://exemple.com/video_001.mp4',
+            type: 'video',
+          ),
+          PieceJointe.mock(
+            id: 'pj_003',
+            nom: 'photo_001.jpg',
+            url: 'https://exemple.com/photo_001.jpg',
+            type: 'image',
+          ),
+        ],
+    titre: titre ?? 'Inspection',
+    commentaire: commentaire ?? 'RAS',
   );
 
   @override
@@ -74,10 +102,9 @@ class Intervention extends JsonModel {
     description: json['description'] ?? '',
     date: DateTime.parse(json['date']),
     statut: json['statut'] ?? '',
-    photo: json['photo'],
-    video: json['video'],
     document: json['document'],
     titre: json['titre'],
+    commentaire: json['commentaire'],
   );
 
   @override
@@ -88,9 +115,8 @@ class Intervention extends JsonModel {
     description: description,
     date: date,
     statut: statut,
-    photo: photo,
-    video: video,
     document: document,
     titre: titre,
+    commentaire: commentaire,
   );
 }

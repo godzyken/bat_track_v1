@@ -45,15 +45,20 @@ class ChantierEtape extends JsonModel {
     this.dateFin,
     this.terminee = false,
     this.chantierId,
-    List<PieceJointe>? piecesJointes,
+    this.piecesJointes = const [],
     this.timeline,
-  }) : piecesJointes = piecesJointes ?? [];
+  });
 
   factory ChantierEtape.fromJson(Map<String, dynamic> json) =>
       _$ChantierEtapeFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => _$ChantierEtapeToJson(this);
+  Map<String, dynamic> toJson() {
+    final json = _$ChantierEtapeToJson(this);
+    // s'assurer que piecesJointes est une liste de maps
+    json['piecesJointes'] = piecesJointes?.map((pj) => pj.toJson()).toList();
+    return json;
+  }
 
   @override
   ChantierEtape fromJson(Map<String, dynamic> json) =>

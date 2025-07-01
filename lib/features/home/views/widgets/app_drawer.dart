@@ -51,7 +51,7 @@ class AppDrawer extends ConsumerWidget {
                       ),
                 );
 
-                if (confirm == true) {
+                if (confirm == true && context.mounted) {
                   ref.read(authProvider.notifier).state = false;
                   context.go('/login'); // redirection après déconnexion
                 }
