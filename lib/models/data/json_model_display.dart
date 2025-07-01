@@ -103,8 +103,8 @@ extension JsonModelDisplay on JsonModel {
           .join(', ');
     } else if (value is ChantierEtape) {
       return value.description;
-      // } else if (value is DocumentFichier) {
-      //   return '${value.type.toUpperCase()}: ${value.filename}';
+    } else if (value is PieceJointe) {
+      return '${value.type.toUpperCase()}: ${value.url}';
     } else if (value is Map<String, dynamic>) {
       // Si c'est un document sous forme brute JSON
       if (value['type'] != null && value['filename'] != null) {
