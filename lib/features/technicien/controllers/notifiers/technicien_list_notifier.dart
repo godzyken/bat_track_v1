@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/services/hive_service.dart';
 
-final techniciensProvider =
+final techniciensListProvider =
     AsyncNotifierProvider<TechniciensNotifier, List<Technicien>>(
       TechniciensNotifier.new,
     );

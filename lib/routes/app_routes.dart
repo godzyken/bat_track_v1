@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../data/local/models/index_model_extention.dart';
 import '../data/local/providers/hive_provider.dart';
 import '../features/about/views/screens/about_screen.dart';
 import '../features/auth/views/screens/login_screen.dart';
@@ -116,31 +115,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                   final chantierId = state.pathParameters['id']!;
                   return ChantierEtapesScreen(chantierId: chantierId);
                 },
-              ),
-              // ✅ 2. Détail d’une étape
-              GoRoute(
-                path: ':etapeId',
-                name: 'chantier-etape-detail',
-                builder: (context, state) {
-                  final extra = state.extra as Map<String, dynamic>?;
-
-                  if (extra == null) {
-                    return Scaffold(
-                      appBar: AppBar(title: const Text('Erreur')),
-                      body: const Center(
-                        child: Text('Aucune donnée reçue pour cette étape'),
-                      ),
-                    );
-                  }
-
-                  final chantier = extra['chantier'] as Chantier;
-                  final etape = extra['etape'] as ChantierEtape;
-
-                  return ChantierEtapeDetailScreen(
-                    chantier: chantier,
-                    etape: etape,
-                  );
-                },
+                routes: [
+                  // ✅ 2. Détail d’une étape
+                  GoRoute(
+                    path: ':etapeId',
+                    name: 'chantier-etape-detail',
+                    builder: (context, state) {
+                      final chantierId = state.pathParameters['id']!;
+                      final etapeId = state.pathParameters['etapeId']!;
+                      return ChantierEtapeDetailScreen(
+                        chantierId: chantierId,
+                        etapeId: etapeId,
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

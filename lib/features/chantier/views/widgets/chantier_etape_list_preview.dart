@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
+import '../../../../data/local/providers/hive_provider.dart';
 
 class ChantiersEtapeListPreview extends ConsumerWidget {
   final List<ChantierEtape>? etapes;
@@ -48,12 +49,14 @@ class ChantiersEtapeListPreview extends ConsumerWidget {
               subtitle: Text(etape.description),
               trailing: const Icon(Icons.edit),
               onTap: () {
+                final chantier = ref.watch(chantierProvider(etape.chantierId!));
                 context.goNamed(
                   'chantier-etape-detail',
                   pathParameters: {
                     'id': etape.chantierId!,
                     'etapeId': etape.id!,
                   },
+                  extra: {'chantier': chantier, 'etape': etape},
                 );
               },
             ),

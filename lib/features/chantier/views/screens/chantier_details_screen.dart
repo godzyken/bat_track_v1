@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
@@ -482,6 +483,14 @@ class _ChantierDetailScreenState extends ConsumerState<ChantierDetailScreen> {
                     });
                   },
                 ),
+                onTap: () {
+                  // TODO: Ouvrir la page d'édition de l'étape
+                  context.goNamed(
+                    'chantier-etape-detail',
+                    pathParameters: {'id': _chantier.id, 'etapeId': etape.id!},
+                    extra: {'etape': etape, 'chantierId': _chantier.id},
+                  );
+                },
               ),
             );
           }).toList(),

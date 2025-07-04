@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/core/responsive/wrapper/responsive_card_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,34 +29,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Connexion")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _userCtrl,
-                decoration: const InputDecoration(labelText: 'Identifiant'),
-                validator:
-                    (value) => value == 'demo' ? null : 'Identifiant incorrect',
+      body: ResponsiveCardLayout(
+        spacing: 16,
+        children: [
+          ResponsiveCard(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextFormField(
+                      controller: _userCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Identifiant',
+                      ),
+                      validator:
+                          (value) =>
+                              value == 'demo' ? null : 'Identifiant incorrect',
+                    ),
+                    TextFormField(
+                      controller: _passCtrl,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Mot de passe',
+                      ),
+                      validator:
+                          (value) =>
+                              value == 'demo' ? null : 'Mot de passe incorrect',
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _login,
+                      child: const Text("Se connecter"),
+                    ),
+                  ],
+                ),
               ),
-              TextFormField(
-                controller: _passCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Mot de passe'),
-                validator:
-                    (value) =>
-                        value == 'demo' ? null : 'Mot de passe incorrect',
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _login,
-                child: const Text("Se connecter"),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

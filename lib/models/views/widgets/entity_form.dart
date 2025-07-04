@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/responsive/wrapper/responsive_layout.dart';
-import '../../../data/local/models/chantier_etapes.dart';
+import '../../../data/local/models/index_model_extention.dart';
 import '../../../features/chantier/views/widgets/chantier_etape_list_preview.dart';
 import '../../data/json_model.dart';
 import 'entity_etape_form.dart';
@@ -270,6 +270,10 @@ class _EntityFormState<T extends JsonModel>
                                       list.map((e) => e.toJson()).toList();
                                 });
                               },
+                              initialValue:
+                                  widget.initialValue as ChantierEtape?,
+                              client: widget.fromJson as Client,
+                              autresEtapes: _etapes,
                             ),
                       );
                     },

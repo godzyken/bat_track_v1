@@ -13,7 +13,7 @@ class TechniciensScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
-    final techniciensAsync = ref.watch(techniciensProvider);
+    final techniciensAsync = ref.watch(techniciensListProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Techniciens')),
@@ -26,7 +26,7 @@ class TechniciensScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ref.read(techniciensProvider.notifier).addMock();
+          ref.read(techniciensListProvider.notifier).addMock();
         },
         child: const Icon(Icons.add),
       ),

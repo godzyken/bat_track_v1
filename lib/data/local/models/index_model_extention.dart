@@ -6,3 +6,4 @@ export 'client.dart';
 export 'intervention.dart';
 export 'pieces_jointes.dart';
 export 'technicien.dart';
+export 'travaux.dart';

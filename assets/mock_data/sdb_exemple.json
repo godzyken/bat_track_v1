@@ -1,0 +1,33 @@
+{
+  "pieces": [
+    {
+      "nom": "Salle de bain",
+      "surface_m2": 8,
+      "materiaux": [
+        {
+          "nom": "Carrelage mural",
+          "prix_unitaire": 25,
+          "unite": "m2",
+          "coefficient_surface": 1.2
+        },
+        {
+          "nom": "Ciment colle",
+          "prix_unitaire": 10,
+          "unite": "sac",
+          "quantite_fixe": 4
+        }
+      ],
+      "main_oeuvre": {
+        "taux_horaire": 40,
+        "heures_estimees": 10
+      },
+      "materiel": [
+        {
+          "nom": "Location échafaudage",
+          "prix_unitaire": 60,
+          "quantite_fixe": 1
+        }
+      ]
+    }
+  ]
+}

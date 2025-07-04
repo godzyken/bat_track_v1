@@ -1,117 +1,197 @@
+import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/responsive/wrapper/responsive_card_layout.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../models/views/widgets/entity_form.dart';
+import '../../controllers/notifiers/chantier_notifier.dart';
+import '../widgets/etape_card.dart';
+import '../widgets/piece_card.dart';
 
-class ChantierEtapesScreen extends ConsumerStatefulWidget {
+class ChantierEtapesScreen extends ConsumerWidget {
   final String chantierId;
   const ChantierEtapesScreen({super.key, required this.chantierId});
 
-  @override
-  ConsumerState<ChantierEtapesScreen> createState() =>
-      _ChantierEtapesScreenState();
-}
-
-class _ChantierEtapesScreenState extends ConsumerState<ChantierEtapesScreen> {
-  List<ChantierEtape> etapes = [];
-
-  void _openForm({ChantierEtape? etape}) async {
+  void _openEtapeForm(
+    BuildContext context,
+    WidgetRef ref, {
+    ChantierEtape? etape,
+  }) {
     showDialog(
       context: context,
       builder:
           (_) => EntityForm<ChantierEtape>(
+            chantierId: chantierId,
             initialValue: etape,
-            createEmpty:
-                () => ChantierEtape(
-                  id: null,
-                  titre: '',
-                  description: '',
-                  dateDebut: DateTime.now(),
-                  dateFin: null,
-                  terminee: false,
-                  chantierId: widget.chantierId,
-                ),
+            createEmpty: () => ChantierEtape.mock(chantierId: chantierId),
             fromJson: (json) => ChantierEtape.fromJson(json),
-            chantierId: widget.chantierId,
             onSubmit: (updated) {
-              setState(() {
-                if (etape == null) {
-                  etapes.add(
-                    updated.copyWithId(
-                      DateTime.now().millisecondsSinceEpoch.toString(),
-                    ),
-                  );
-                } else {
-                  final index = etapes.indexWhere((e) => e.id == etape.id);
-                  if (index != -1) etapes[index] = updated;
-                }
-              });
+              final notifier = ref.read(
+                chantierAdvancedNotifierProvider(chantierId).notifier,
+              );
+              etape == null
+                  ? notifier.addEtape(updated)
+                  : notifier.updateEtape(updated);
             },
           ),
     );
   }
 
-  void _deleteEtape(ChantierEtape etape) {
-    setState(() {
-      etapes.removeWhere((e) => e.id == etape.id);
-    });
+  void _openPieceForm(BuildContext context, WidgetRef ref, {Piece? piece}) {
+    showDialog(
+      context: context,
+      builder:
+          (_) => EntityForm<Piece>(
+            chantierId: chantierId,
+            initialValue: piece,
+            createEmpty: () => Piece.mock(),
+            fromJson: (json) => Piece.fromJson(json),
+            onSubmit: (updated) {
+              final notifier = ref.read(
+                chantierAdvancedNotifierProvider(chantierId).notifier,
+              );
+              piece == null
+                  ? notifier.addPiece(updated)
+                  : notifier.updatePiece(updated);
+            },
+          ),
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final chantier = ref.watch(chantierAdvancedNotifierProvider(chantierId));
+    final info = context.responsiveInfo(ref);
+
+    if (chantier == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final etapes = chantier.etapes;
+    final pieces = chantier.etapes.expand((e) => e.pieces).toList();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Étapes du Chantier')),
-      body:
-          etapes.isEmpty
-              ? const Center(child: Text("Aucune étape pour l'instant"))
-              : ListView.builder(
-                itemCount: etapes.length,
-                itemBuilder: (context, index) {
-                  final etape = etapes[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    child: ListTile(
-                      title: Text(etape.titre),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(etape.description),
-                          if (etape.dateDebut != null)
-                            Text(
-                              'Début : ${etape.dateDebut!.toLocal().toString().split(' ')[0]}',
-                            ),
-                          if (etape.dateFin != null)
-                            Text(
-                              'Fin : ${etape.dateFin!.toLocal().toString().split(' ')[0]}',
-                            ),
-                          Text(etape.terminee ? '✅ Terminée' : '⏳ En cours'),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () => _openForm(etape: etape),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () => _deleteEtape(etape),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+      appBar: AppBar(title: const Text("Étapes & Pièces")),
+      body: ResponsiveCardLayout(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(12),
+            child: Text(
+              "📋 Étapes",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          if (etapes.isEmpty)
+            const Center(child: Text("Aucune étape pour l'instant"))
+          else if (info.isTablet || info.isDesktop)
+            Column(
+              children:
+                  etapes
+                      .map(
+                        (etape) => EtapeCard(
+                          etape: etape,
+                          onEdit:
+                              () => _openEtapeForm(context, ref, etape: etape),
+                          onDelete:
+                              () => ref
+                                  .read(
+                                    chantierAdvancedNotifierProvider(
+                                      chantierId,
+                                    ).notifier,
+                                  )
+                                  .deleteEtape(etape.id!),
+                        ),
+                      )
+                      .toList(),
+            )
+          else
+            ...etapes.map(
+              (etape) => EtapeCard(
+                etape: etape,
+                onEdit: () => _openEtapeForm(context, ref, etape: etape),
+                onDelete:
+                    () => ref
+                        .read(
+                          chantierAdvancedNotifierProvider(chantierId).notifier,
+                        )
+                        .deleteEtape(etape.id!),
               ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openForm(),
-        icon: const Icon(Icons.add),
-        label: const Text("Nouvelle étape"),
+            ),
+
+          const Padding(
+            padding: EdgeInsets.all(12),
+            child: Text(
+              "🧱 Pièces",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          if (pieces.isEmpty)
+            const Center(child: Text("Aucune pièce définie"))
+          else
+            GridView.count(
+              crossAxisCount: info.isTablet ? 2 : 1,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              childAspectRatio: 1.3,
+              children:
+                  pieces.map((piece) {
+                    return Stack(
+                      children: [
+                        PieceCard(piece: piece),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed:
+                                    () => _openPieceForm(
+                                      context,
+                                      ref,
+                                      piece: piece,
+                                    ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed:
+                                    () => ref
+                                        .read(
+                                          chantierAdvancedNotifierProvider(
+                                            chantierId,
+                                          ).notifier,
+                                        )
+                                        .deletePiece(piece.id!),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+            ),
+
+          const SizedBox(height: 20),
+        ],
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            heroTag: "addEtape",
+            onPressed: () => _openEtapeForm(context, ref),
+            icon: const Icon(Icons.playlist_add),
+            label: const Text("Ajouter une étape"),
+          ),
+          const SizedBox(height: 10),
+          FloatingActionButton.extended(
+            heroTag: "addPiece",
+            onPressed: () => _openPieceForm(context, ref),
+            icon: const Icon(Icons.add_home_work),
+            label: const Text("Ajouter une pièce"),
+          ),
+        ],
       ),
     );
   }

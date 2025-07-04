@@ -9,4 +9,8 @@ Future<void> registerHiveAdapters() async {
   Hive.registerAdapter(InterventionAdapter());
   Hive.registerAdapter(ChantierEtapeAdapter());
   Hive.registerAdapter(PieceJointeAdapter());
+  Hive.registerAdapter(PieceAdapter());
+  Hive.registerAdapter(MateriauAdapter());
+  Hive.registerAdapter(MaterielAdapter());
+  Hive.registerAdapter(MainOeuvreAdapter());
 }

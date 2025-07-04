@@ -24,12 +24,15 @@ class Technicien extends JsonModel {
   bool disponible = true;
   @HiveField(6)
   String? localisation;
+  @HiveField(7)
+  final double tauxHoraire;
 
   Technicien({
     required this.id,
     required this.nom,
     required this.email,
     required this.competences,
+    required this.tauxHoraire,
     this.specialite,
     this.disponible = true,
     this.localisation,
@@ -42,6 +45,7 @@ class Technicien extends JsonModel {
     specialite: json['specialite'],
     email: json['email'] ?? '',
     competences: List<String>.from(json['competences']),
+    tauxHoraire: json['tauxHoraire'] ?? 0,
     disponible: json['disponible'] ?? true,
     localisation: json['localisation'],
   );
@@ -63,6 +67,7 @@ class Technicien extends JsonModel {
     email: email,
     competences: competences,
     specialite: specialite,
+    tauxHoraire: tauxHoraire,
     disponible: disponible,
     localisation: localisation,
   );
@@ -73,6 +78,7 @@ class Technicien extends JsonModel {
     email: 'tech@example.com',
     competences: ['Plomberie', 'Electricite'],
     specialite: 'Electricite',
+    tauxHoraire: 40,
     disponible: true,
     localisation: 'Paris',
   );

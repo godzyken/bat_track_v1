@@ -185,7 +185,7 @@ class Chantier extends JsonModel {
       dateFin: dateFin ?? this.dateFin,
       etat: etat ?? this.etat,
       technicienIds: technicienIds ?? this.technicienIds,
-      documents: documents ?? this.documents,
+      documents: documents,
       etapes: etapes ?? this.etapes,
       commentaire: commentaire ?? this.commentaire,
       budgetPrevu: budgetPrevu ?? this.budgetPrevu,

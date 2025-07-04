@@ -1,4 +1,4 @@
-import 'package:bat_track_v1/data/local/models/pieces_jointes.dart';
+import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -10,32 +10,38 @@ part 'chantier_etapes.g.dart';
 @JsonSerializable()
 class ChantierEtape extends JsonModel {
   @override
-  @HiveField(5)
+  @HiveField(0)
   final String? id;
 
-  @HiveField(6)
+  @HiveField(1)
   final String? chantierId;
 
-  @HiveField(7)
+  @HiveField(2)
   final List<PieceJointe>? piecesJointes;
 
-  @HiveField(8)
+  @HiveField(3)
   final List<String>? timeline;
 
-  @HiveField(0)
+  @HiveField(4)
   late final String titre;
 
-  @HiveField(1)
+  @HiveField(5)
   late final String description;
 
-  @HiveField(2)
+  @HiveField(6)
   final DateTime? dateDebut;
 
-  @HiveField(3)
+  @HiveField(7)
   final DateTime? dateFin;
 
-  @HiveField(4)
-  late final bool terminee;
+  @HiveField(8)
+  final bool terminee;
+
+  @HiveField(9)
+  double? budget;
+
+  @HiveField(10)
+  final List<Piece> pieces;
 
   ChantierEtape({
     this.id, // Ne pas oublier ici aussi
@@ -47,6 +53,8 @@ class ChantierEtape extends JsonModel {
     this.chantierId,
     this.piecesJointes = const [],
     this.timeline,
+    this.budget,
+    this.pieces = const [],
   });
 
   factory ChantierEtape.fromJson(Map<String, dynamic> json) =>
@@ -56,6 +64,7 @@ class ChantierEtape extends JsonModel {
   Map<String, dynamic> toJson() {
     final json = _$ChantierEtapeToJson(this);
     // s'assurer que piecesJointes est une liste de maps
+    json['pieces'] = pieces.map((p) => p.toJson()).toList();
     json['piecesJointes'] = piecesJointes?.map((pj) => pj.toJson()).toList();
     return json;
   }
@@ -75,9 +84,13 @@ class ChantierEtape extends JsonModel {
     chantierId: chantierId,
     piecesJointes: piecesJointes,
     timeline: timeline,
+    budget: budget,
+    pieces: pieces,
   );
 
   ChantierEtape copyWith({
+    String? id,
+    String? chantierId,
     String? titre,
     String? description,
     bool? terminee,
@@ -85,6 +98,8 @@ class ChantierEtape extends JsonModel {
     DateTime? dateFin,
     List<PieceJointe>? piecesJointes,
     List<String>? timeline,
+    double? budget,
+    List<Piece>? pieces,
   }) {
     return ChantierEtape(
       id: id,
@@ -96,6 +111,8 @@ class ChantierEtape extends JsonModel {
       dateFin: dateFin ?? this.dateFin,
       piecesJointes: piecesJointes ?? this.piecesJointes,
       timeline: timeline ?? this.timeline,
+      budget: budget ?? this.budget,
+      pieces: pieces ?? this.pieces,
     );
   }
 
@@ -109,6 +126,8 @@ class ChantierEtape extends JsonModel {
     String? chantierId,
     List<PieceJointe>? piecesJointes,
     List<String>? timeline,
+    double? budget,
+    List<Piece>? pieces,
   }) {
     return ChantierEtape(
       id: id ?? 'mock_etape_001',
@@ -129,8 +148,16 @@ class ChantierEtape extends JsonModel {
             ),
             PieceJointe.mock(
               id: 'pj_002',
+              nom: 'construction_4.O.pdf',
+              url:
+                  'https://thewiw.com/wp-content/uploads/2019/02/building-BIM.jpg',
+              type: 'image',
+            ),
+            PieceJointe.mock(
+              id: 'pj_003',
               nom: 'photo_chantier.jpg',
-              url: 'https://exemple.com/photo_chantier.jpg',
+              url:
+                  'https://media.istockphoto.com/id/1316314394/fr/photo/client-avec-architecte-%C3%A9valuant-les-travaux-%C3%A0-lint%C3%A9rieur-dun-chantier-en-construction.jpg?s=1024x1024&w=is&k=20&c=Htegmb0NTdY7gTVId84r1s0qW0iBEtDeZUgvk1Gn4ok=',
               type: 'image',
             ),
           ],
@@ -142,6 +169,44 @@ class ChantierEtape extends JsonModel {
             'Contrôle qualité',
             'Fin de l\'étape',
           ],
+      budget: budget ?? 10200.0,
+      pieces:
+          pieces ??
+          [
+            Piece.mock(
+              id: 'p_001',
+              nom: 'Salle de bain',
+              surfaceM2: 54.00,
+              materiels: [Materiel.mock()],
+              mainOeuvre: MainOeuvre.mock(),
+              materiaux: [Materiau.mock()],
+            ),
+            Piece.mock(
+              id: 'p_002',
+              nom: 'Salle de réception',
+              surfaceM2: 500.0,
+              materiels: [Materiel.mock(), Materiel.mock()],
+              mainOeuvre: MainOeuvre.mock(),
+              materiaux: [Materiau.mock(), Materiau.mock(), Materiau.mock()],
+            ),
+            Piece.mock(
+              id: 'p_003',
+              nom: 'Salon',
+              surfaceM2: 20.0,
+              materiels: [Materiel.mock()],
+              mainOeuvre: MainOeuvre.mock(),
+              materiaux: [Materiau.mock()],
+            ),
+          ],
+    );
+  }
+}
+
+extension ChantierEtapeBudget on ChantierEtape {
+  double getBudgetTotal(List<Technicien> techniciens) {
+    return pieces.fold(
+      0.0,
+      (total, piece) => total + piece.getBudgetTotal(techniciens),
     );
   }
 }

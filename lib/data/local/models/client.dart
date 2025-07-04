@@ -40,6 +40,9 @@ class Client extends JsonModel {
   @HiveField(9)
   final String? contactName;
 
+  @HiveField(10)
+  final double? budgetPrevu;
+
   Client({
     required this.id,
     required this.nom,
@@ -51,6 +54,7 @@ class Client extends JsonModel {
     required this.status,
     required this.priority,
     this.contactName,
+    this.budgetPrevu,
   });
 
   /// Désérialisation sécurisée
@@ -68,6 +72,7 @@ class Client extends JsonModel {
     status: json['status'] ?? '',
     priority: json['priority'] ?? 'low',
     contactName: json['contactName'],
+    budgetPrevu: json['budgetPrevu'],
   );
 
   @override
@@ -91,6 +96,7 @@ class Client extends JsonModel {
     status: status,
     priority: priority,
     contactName: contactName,
+    budgetPrevu: budgetPrevu,
   );
 
   factory Client.mock() => Client(
@@ -104,5 +110,6 @@ class Client extends JsonModel {
     status: 'Actif',
     priority: 'Moyen',
     contactName: 'jhon',
+    budgetPrevu: 10000.0,
   );
 }
