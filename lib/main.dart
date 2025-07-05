@@ -1,13 +1,25 @@
 import 'package:bat_track_v1/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 
 import 'core/responsive/wrapper/responsive_layout.dart';
+import 'data/local/models/index_model_extention.dart';
 import 'data/local/providers/hive_provider.dart';
 import 'data/remote/providers/firebase_providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.openBox<Chantier>('chantiers');
+  await Hive.openBox<ChantierEtape>('chantierEtapes');
+  await Hive.openBox<Technicien>('techniciens');
+  await Hive.openBox<Client>('clients');
+  await Hive.openBox<Intervention>('interventions');
+  await Hive.openBox<Piece>('pieces');
+  await Hive.openBox<PieceJointe>('piecesJointes');
+  await Hive.openBox<Materiel>('materiels');
+  await Hive.openBox<Materiau>('materiau');
+  await Hive.openBox<MainOeuvre>('mainOeuvre');
 
   runApp(const ProviderScope(child: AppInitializer()));
 }

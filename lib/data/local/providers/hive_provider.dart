@@ -54,6 +54,11 @@ final chantierProvider = Provider.family<Chantier?, String>((ref, id) {
   return box.get(id);
 });
 
+final allChantiersProvider = Provider<List<Chantier>>((ref) {
+  final box = Hive.box<Chantier>('chantiers');
+  return box.values.toList();
+});
+
 final clientProvider = Provider.family<Client?, String>((ref, id) {
   final box = Hive.box<Client>('clients');
   return box.get(id);
@@ -74,6 +79,11 @@ final chantierEtapesProvider =
       final box = await ref.watch(chantierEtapeBoxProvider);
       return box.values.where((e) => e.id == chantierId).toList();
     });
+
+final allEtapesProvider = Provider<List<ChantierEtape>>((ref) {
+  final box = Hive.box<ChantierEtape>('chantier_etapes');
+  return box.values.toList();
+});
 
 final pieceJointeProvider = Provider.family<PieceJointe?, String>((ref, id) {
   final box = Hive.box<PieceJointe>('piecesJointes');

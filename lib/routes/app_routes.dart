@@ -14,7 +14,7 @@ import '../features/client/views/screens/clients_screen.dart';
 import '../features/dashboard/views/screens/dashboard_screen.dart';
 import '../features/home/views/screens/home_screen.dart';
 import '../features/intervention/views/screens/interventions_screen.dart';
-import '../features/technicien/views/screens/technitien_screen.dart';
+import '../features/technicien/views/screens/technitiens_screen.dart';
 import '../providers/auth_provider.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {

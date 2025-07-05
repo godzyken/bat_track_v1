@@ -26,6 +26,10 @@ class Technicien extends JsonModel {
   String? localisation;
   @HiveField(7)
   final double tauxHoraire;
+  @HiveField(8)
+  final List<String> chantiersAffectes;
+  @HiveField(9)
+  final List<String> etapesAffectees;
 
   Technicien({
     required this.id,
@@ -36,6 +40,8 @@ class Technicien extends JsonModel {
     this.specialite,
     this.disponible = true,
     this.localisation,
+    this.chantiersAffectes = const [],
+    this.etapesAffectees = const [],
   });
 
   @override
@@ -48,6 +54,8 @@ class Technicien extends JsonModel {
     tauxHoraire: json['tauxHoraire'] ?? 0,
     disponible: json['disponible'] ?? true,
     localisation: json['localisation'],
+    chantiersAffectes: List<String>.from(json['chantiersAffectes']),
+    etapesAffectees: List<String>.from(json['etapesAffectees']),
   );
 
   factory Technicien.fromJson(Map<String, dynamic> json) =>
@@ -70,6 +78,8 @@ class Technicien extends JsonModel {
     tauxHoraire: tauxHoraire,
     disponible: disponible,
     localisation: localisation,
+    chantiersAffectes: chantiersAffectes,
+    etapesAffectees: etapesAffectees,
   );
 
   factory Technicien.mock() => Technicien(
@@ -81,5 +91,7 @@ class Technicien extends JsonModel {
     tauxHoraire: 40,
     disponible: true,
     localisation: 'Paris',
+    chantiersAffectes: [],
+    etapesAffectees: [],
   );
 }
