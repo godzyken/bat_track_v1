@@ -119,4 +119,19 @@ class Intervention extends JsonModel {
     titre: titre,
     commentaire: commentaire,
   );
+
+  @override
+  Intervention fromDolibarrJson(Map<String, dynamic> json) {
+    return Intervention(
+      id: json['id'] ?? '',
+      chantierId: json['chantierId'] ?? '',
+      technicienId: json['technicienId'] ?? '',
+      description: json['description'] ?? '',
+      date: DateTime.parse(json['date']),
+      statut: json['statut'] ?? '',
+      document: json['document'],
+      titre: json['titre'],
+      commentaire: json['commentaire'],
+    );
+  }
 }

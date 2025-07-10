@@ -1,5 +1,6 @@
 export '../../../models/data/json_model_display.dart';
 export 'base/base_model.dart';
+export 'base/has_files.dart';
 export 'chantier.dart';
 export 'chantier_etapes.dart';
 export 'client.dart';

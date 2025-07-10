@@ -127,6 +127,23 @@ class Piece extends JsonModel {
     mainOeuvre:
         mainOeuvre ?? MainOeuvre(idTechnicien: 'tec_35', heuresEstimees: 10),
   );
+
+  @override
+  Piece fromDolibarrJson(Map<String, dynamic> json) {
+    return Piece(
+      id: json['id'] ?? '',
+      nom: json['nom'] ?? '',
+      surfaceM2: json['surfaceM2'] ?? 0,
+      materiaux: List<Materiau>.from(json['materiaux']),
+      materiels: List<Materiel>.from(json['materiels']),
+      mainOeuvre: MainOeuvre(
+        idTechnicien: json['mainOeuvre']['idTechnicien'] ?? '',
+        heuresEstimees: json['mainOeuvre']['heuresEstimees'] ?? 0,
+      ),
+    );
+  }
+
+  factory Piece.fromDolibarr(Map<String, dynamic> json) => Piece.fromJson(json);
 }
 
 @HiveType(typeId: 7)
@@ -194,6 +211,21 @@ class Materiau extends JsonModel {
     coefficientSurface: coefficientSurface ?? 2.5,
     quantiteFixe: quantiteFixe ?? 5.0,
   );
+
+  @override
+  Materiau fromDolibarrJson(Map<String, dynamic> json) {
+    return Materiau(
+      id: json['id'] ?? '',
+      nom: json['nom'] ?? '',
+      prixUnitaire: json['prixUnitaire'] ?? 0,
+      unite: json['unite'] ?? '',
+      coefficientSurface: json['coefficientSurface'],
+      quantiteFixe: json['quantiteFixe'],
+    );
+  }
+
+  factory Materiau.fromDolibarr(Map<String, dynamic> json) =>
+      Materiau.fromJson(json);
 }
 
 @HiveType(typeId: 8)
@@ -262,6 +294,21 @@ class Materiel extends JsonModel {
       prixLocation: prixLocation ?? 500,
     );
   }
+
+  @override
+  Materiel fromDolibarrJson(Map<String, dynamic> json) {
+    return Materiel(
+      id: json['id'] ?? '',
+      nom: json['nom'] ?? '',
+      prixUnitaire: json['prixUnitaire'] ?? 0,
+      quantiteFixe: json['quantiteFixe'] ?? 0,
+      joursLocation: json['joursLocation'],
+      prixLocation: json['prixLocation'],
+    );
+  }
+
+  factory Materiel.fromDolibarr(Map<String, dynamic> json) =>
+      Materiel.fromJson(json);
 }
 
 @HiveType(typeId: 9)
@@ -302,4 +349,15 @@ class MainOeuvre extends JsonModel {
 
   @override
   String? get id => Technicien.mock().id;
+
+  @override
+  MainOeuvre fromDolibarrJson(Map<String, dynamic> json) {
+    return MainOeuvre(
+      idTechnicien: json['idTechnicien'] ?? '',
+      heuresEstimees: json['heuresEstimees'] ?? 0,
+    );
+  }
+
+  factory MainOeuvre.fromDolibarr(Map<String, dynamic> json) =>
+      MainOeuvre.fromJson(json);
 }

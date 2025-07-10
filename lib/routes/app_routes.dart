@@ -12,6 +12,7 @@ import '../features/chantier/views/screens/chantier_etapes_screen.dart';
 import '../features/chantier/views/screens/chantiers_screen.dart';
 import '../features/client/views/screens/clients_screen.dart';
 import '../features/dashboard/views/screens/dashboard_screen.dart';
+import '../features/dolibarr/views/screens/dolibarr_import_client_screen.dart';
 import '../features/home/views/screens/home_screen.dart';
 import '../features/intervention/views/screens/interventions_screen.dart';
 import '../features/technicien/views/screens/technitiens_screen.dart';
@@ -158,6 +159,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(path: '/about', builder: (context, state) => const AboutScreen()),
+      GoRoute(
+        path: '/import-dolibarr',
+        builder: (context, state) => const DolibarrImportScreen(),
+      ),
     ],
   );
 });

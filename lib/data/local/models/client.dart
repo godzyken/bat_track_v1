@@ -112,4 +112,28 @@ class Client extends JsonModel {
     contactName: 'jhon',
     budgetPrevu: 10000.0,
   );
+
+  @override
+  Client fromDolibarrJson(Map<String, dynamic> json) {
+    return Client(
+      id: json['id'] ?? const Uuid().v4(),
+      nom: json['name'] ?? '',
+      email: json['email'] ?? '',
+      telephone: json['phone'] ?? '',
+      adresse: json['address'] ?? '',
+      interventionsCount: json['interventionsCount'] ?? 0,
+      lastInterventionDate:
+          json['lastInterventionDate'] != null
+              ? DateTime.tryParse(json['lastInterventionDate']) ??
+                  DateTime.now()
+              : DateTime.now(),
+      status: json['status'] ?? '',
+      priority: json['priority'] ?? 'low',
+      contactName: json['contactName'],
+      budgetPrevu: json['budgetPrevu'],
+    );
+  }
+
+  factory Client.fromDolibarr(Map<String, dynamic> json) =>
+      Client.fromJson(json);
 }

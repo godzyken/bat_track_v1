@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
+import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
 import '../../../home/views/widgets/app_drawer.dart';
 import '../../controllers/notifiers/technicien_list_notifier.dart';
@@ -20,7 +21,27 @@ class TechniciensScreen extends ConsumerWidget {
       drawer: const AppDrawer(),
       body: techniciensAsync.when(
         data:
-            (items) => EntityList<Technicien>(items, 'techniciens', info: info),
+            (items) => EntityList<Technicien>(
+              items,
+              'techniciens',
+              onEdit: (tech) {
+                showDialog(
+                  context: context,
+                  builder:
+                      (_) => EntityForm<Technicien>(
+                        fromJson: (json) => Technicien.fromJson(json),
+                        initialValue: tech,
+                        onSubmit: (updated) async {
+                          await ref
+                              .read(techniciensListProvider.notifier)
+                              .updateTechnicien(updated);
+                        },
+                        createEmpty: () => Technicien.mock(),
+                      ),
+                );
+              },
+              info: info,
+            ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erreur: $e')),
       ),

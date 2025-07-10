@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:bat_track_v1/data/local/models/base/has_files.dart';
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -7,7 +11,7 @@ part 'pieces_jointes.g.dart';
 
 @HiveType(typeId: 5)
 @JsonSerializable()
-class PieceJointe extends JsonModel {
+class PieceJointe extends JsonModel implements HasFile {
   @override
   @HiveField(0)
   final String id;
@@ -16,7 +20,7 @@ class PieceJointe extends JsonModel {
   final String nom;
 
   @HiveField(2)
-  final String url;
+  final String? url;
 
   @HiveField(3)
   final String type;
@@ -24,13 +28,28 @@ class PieceJointe extends JsonModel {
   @HiveField(4)
   final int taille;
 
+  @HiveField(5)
+  final String? path;
+
   PieceJointe({
     required this.id,
     required this.nom,
-    required this.url,
     required this.type,
     required this.taille,
+    this.url,
+    this.path,
   });
+
+  @override
+  File getFile() {
+    if (path == null) {
+      throw Exception('Path is null for PieceJointe $id');
+    }
+    return File(path!);
+  }
+
+  @override
+  Uint8List getUintList() => Uint8List(taille);
 
   // JSON serialization
   factory PieceJointe.fromJson(Map<String, dynamic> json) =>
@@ -72,6 +91,17 @@ class PieceJointe extends JsonModel {
       url: url,
       type: type,
       taille: 1024,
+    );
+  }
+
+  @override
+  PieceJointe fromDolibarrJson(Map<String, dynamic> json) {
+    return PieceJointe(
+      id: json['id'] ?? '',
+      nom: json['nom'] ?? '',
+      url: json['url'] ?? '',
+      type: json['type'] ?? '',
+      taille: json['taille'] ?? 0,
     );
   }
 }

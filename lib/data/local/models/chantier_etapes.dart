@@ -43,6 +43,9 @@ class ChantierEtape extends JsonModel {
   @HiveField(10)
   final List<Piece> pieces;
 
+  @HiveField(11)
+  final int ordre;
+
   ChantierEtape({
     this.id, // Ne pas oublier ici aussi
     required this.titre,
@@ -55,6 +58,7 @@ class ChantierEtape extends JsonModel {
     this.timeline,
     this.budget,
     this.pieces = const [],
+    this.ordre = 0,
   });
 
   factory ChantierEtape.fromJson(Map<String, dynamic> json) =>
@@ -86,6 +90,7 @@ class ChantierEtape extends JsonModel {
     timeline: timeline,
     budget: budget,
     pieces: pieces,
+    ordre: ordre,
   );
 
   ChantierEtape copyWith({
@@ -100,6 +105,7 @@ class ChantierEtape extends JsonModel {
     List<String>? timeline,
     double? budget,
     List<Piece>? pieces,
+    int? ordre,
   }) {
     return ChantierEtape(
       id: id,
@@ -113,6 +119,7 @@ class ChantierEtape extends JsonModel {
       timeline: timeline ?? this.timeline,
       budget: budget ?? this.budget,
       pieces: pieces ?? this.pieces,
+      ordre: ordre ?? this.ordre,
     );
   }
 
@@ -128,6 +135,7 @@ class ChantierEtape extends JsonModel {
     List<String>? timeline,
     double? budget,
     List<Piece>? pieces,
+    int? ordre,
   }) {
     return ChantierEtape(
       id: id ?? 'mock_etape_001',
@@ -198,6 +206,25 @@ class ChantierEtape extends JsonModel {
               materiaux: [Materiau.mock()],
             ),
           ],
+      ordre: ordre ?? 0,
+    );
+  }
+
+  @override
+  ChantierEtape fromDolibarrJson(Map<String, dynamic> json) {
+    return ChantierEtape(
+      id: json['id'] ?? '',
+      chantierId: json['chantierId'] ?? '',
+      titre: json['titre'] ?? '',
+      description: json['description'] ?? '',
+      dateDebut: DateTime.parse(json['dateDebut']),
+      dateFin: DateTime.parse(json['dateFin']),
+      terminee: json['terminee'] ?? false,
+      piecesJointes: List<PieceJointe>.from(json['piecesJointes']),
+      timeline: List<String>.from(json['timeline']),
+      budget: json['budget'] ?? 0,
+      pieces: List<Piece>.from(json['pieces']),
+      ordre: json['ordre'] ?? 0,
     );
   }
 }

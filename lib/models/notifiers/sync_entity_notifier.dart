@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 
@@ -7,8 +8,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/local/services/service_type.dart';
 import '../../data/remote/services/storage_service.dart';
 import '../data/json_model.dart';
+import '../data/state_wrapper/wrappers.dart';
 
-class SyncEntityNotifier<T extends JsonModel> extends StateNotifier<T> {
+class SyncEntityNotifier<T extends JsonModel>
+    extends StateNotifier<SyncedState<T>> {
   final EntityService<T> entityService;
   final StorageService storageService;
   Timer? _debounceTimer;
@@ -17,32 +20,36 @@ class SyncEntityNotifier<T extends JsonModel> extends StateNotifier<T> {
     required this.entityService,
     required this.storageService,
     required T initialState,
-  }) : super(initialState);
+  }) : super(SyncedState(data: initialState));
 
-  /// Met à jour le contenu localement + déclenche la synchro différée
   Future<void> update(T updated) async {
-    state = updated;
-    await entityService.save(state, state.id!); // sauvegarde Hive immédiate
+    state = state.copyWith(data: updated);
+    await entityService.save(updated, updated.id!);
 
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(minutes: 2), () async {
+    _debounceTimer = Timer(const Duration(seconds: 5), () async {
       await _uploadToFirebaseStorage();
     });
   }
 
-  /// Crée un fichier temporaire et envoie dans Firebase Storage
+  Future<void> syncNow() async {
+    _debounceTimer?.cancel();
+    await _uploadToFirebaseStorage();
+  }
+
   Future<void> _uploadToFirebaseStorage() async {
     try {
-      final file = await _saveToTempFile(state);
+      state = state.copyWith(isSyncing: true, hasError: false);
+      final file = await _saveToTempFile(state.data);
       final url = await storageService.uploadFile(
         file,
-        'sync/${state.id}.json',
+        'sync/${state.data.id}.json',
       );
-
-      // Si ton modèle a un champ `firebaseUrl`, tu peux l'ajouter ici
-      developer.log('✅ Upload réussi : $url');
+      state = state.copyWith(isSyncing: false, lastSynced: DateTime.now());
+      developer.log('✅ Sync réussie : $url');
     } catch (e) {
-      developer.log('❌ Erreur d\'upload : $e');
+      state = state.copyWith(isSyncing: false, hasError: true);
+      developer.log('❌ Erreur de sync : $e');
     }
   }
 
@@ -50,7 +57,7 @@ class SyncEntityNotifier<T extends JsonModel> extends StateNotifier<T> {
     final json = item.toJson();
     final tempDir = Directory.systemTemp;
     final file = File('${tempDir.path}/${item.id}.json');
-    await file.writeAsString(json.toString()); // ou jsonEncode(json)
+    await file.writeAsString(jsonEncode(json));
     return file;
   }
 

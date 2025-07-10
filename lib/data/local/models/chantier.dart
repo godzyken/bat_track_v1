@@ -192,4 +192,23 @@ class Chantier extends JsonModel {
       budgetReel: budgetReel ?? this.budgetReel,
     );
   }
+
+  @override
+  Chantier fromDolibarrJson(Map<String, dynamic> json) {
+    return Chantier(
+      id: json['id'] ?? '',
+      nom: json['nom'] ?? '',
+      adresse: json['adresse'] ?? '',
+      clientId: json['clientId'] ?? '',
+      dateDebut: DateTime.parse(json['dateDebut']),
+      dateFin: DateTime.parse(json['dateFin']),
+      etat: json['etat'] ?? '',
+      technicienIds: List<String>.from(json['technicienIds']),
+      documents: List<PieceJointe>.from(json['documents']),
+      etapes: List<ChantierEtape>.from(json['etapes']),
+      commentaire: json['commentaire'] ?? '',
+      budgetPrevu: json['budgetPrevu'] ?? 0,
+      budgetReel: json['budgetReel'] ?? 0,
+    );
+  }
 }

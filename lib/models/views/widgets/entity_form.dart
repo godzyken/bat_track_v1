@@ -1,16 +1,21 @@
 import 'dart:convert';
 
+import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../core/responsive/wrapper/responsive_layout.dart';
-import '../../../data/local/models/index_model_extention.dart';
-import '../../../features/chantier/views/widgets/chantier_etape_list_preview.dart';
 import '../../data/json_model.dart';
-import 'entity_etape_form.dart';
 
-typedef OnSubmit<T> = void Function(T entity);
+typedef OnSubmit<T extends JsonModel> = void Function(T entity);
+typedef FieldBuilder =
+    Widget? Function(
+      BuildContext context,
+      String key,
+      dynamic value,
+      TextEditingController? controller,
+      void Function(dynamic) onChanged,
+      bool expertMode,
+    );
 
 class EntityForm<T extends JsonModel> extends ConsumerStatefulWidget {
   final T? initialValue;
@@ -18,14 +23,16 @@ class EntityForm<T extends JsonModel> extends ConsumerStatefulWidget {
   final T Function(Map<String, dynamic>) fromJson;
   final T Function() createEmpty;
   final String? chantierId;
+  final FieldBuilder? customFieldBuilder;
 
   const EntityForm({
     super.key,
-    this.initialValue,
     required this.onSubmit,
     required this.fromJson,
     required this.createEmpty,
+    this.initialValue,
     this.chantierId,
+    this.customFieldBuilder,
   });
 
   @override
@@ -35,90 +42,40 @@ class EntityForm<T extends JsonModel> extends ConsumerStatefulWidget {
 class _EntityFormState<T extends JsonModel>
     extends ConsumerState<EntityForm<T>> {
   final _formKey = GlobalKey<FormState>();
+  late Map<String, dynamic> _json;
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, TextEditingController> _rawOverrides = {};
-  late Map<String, dynamic> _json;
   bool _expertMode = false;
-
-  List<ChantierEtape> get _etapes {
-    final raw = _json['etapes'];
-    if (raw is List) {
-      if (raw.isEmpty) return [];
-      final first = raw.first;
-      if (first is ChantierEtape) {
-        return List<ChantierEtape>.from(raw);
-      } else if (first is Map) {
-        return raw
-            .map((e) => ChantierEtape.fromJson(Map<String, dynamic>.from(e)))
-            .toList();
-      }
-    }
-    return [];
-  }
 
   @override
   void initState() {
     super.initState();
     final entity = widget.initialValue ?? widget.createEmpty();
     _json = entity.toJson();
-
-    if (widget.chantierId != null && !_json.containsKey('chantierId')) {
-      _json['chantierId'] = widget.chantierId;
-    }
-
-    if (!_json.containsKey('id') || _json['id'] == null) {
-      _json['id'] = UniqueKey().toString();
-    }
+    _json['id'] ??= entity.id;
 
     for (var entry in _json.entries) {
-      if (_isPrimitive(entry.value)) {
-        _controllers[entry.key] = TextEditingController(
-          text: entry.value?.toString() ?? '',
-        );
-      } else {
-        _rawOverrides[entry.key] = TextEditingController(
-          text: const JsonEncoder.withIndent('  ').convert(entry.value),
-        );
-      }
+      _controllers[entry.key] = TextEditingController(
+        text: entry.value?.toString() ?? '',
+      );
+      _rawOverrides[entry.key] = TextEditingController(
+        text: json.encode(entry.value),
+      );
     }
   }
 
   @override
   void dispose() {
-    for (var c in _controllers.values) {
-      c.dispose();
+    for (var controller in _controllers.values) {
+      controller.dispose();
     }
-    for (var c in _rawOverrides.values) {
-      c.dispose();
+    for (var controller in _rawOverrides.values) {
+      controller.dispose();
     }
     super.dispose();
   }
 
-  void _submit() {
-    if (!_formKey.currentState!.validate()) return;
-    final updatedJson = <String, dynamic>{};
-
-    _json.forEach((key, originalValue) {
-      if (_controllers.containsKey(key)) {
-        updatedJson[key] = _parseValue(key, _controllers[key]!.text);
-      } else if (_rawOverrides.containsKey(key)) {
-        try {
-          updatedJson[key] = json.decode(_rawOverrides[key]!.text);
-        } catch (_) {
-          updatedJson[key] = originalValue;
-        }
-      } else {
-        updatedJson[key] = originalValue;
-      }
-    });
-
-    final updatedEntity = widget.fromJson(updatedJson);
-    widget.onSubmit(updatedEntity);
-    context.pop();
-  }
-
-  dynamic _parseValue(String key, String value) {
-    final original = _json[key];
+  dynamic _parseValue(dynamic original, String value) {
     if (original is DateTime) return DateTime.tryParse(value);
     if (original is int) return int.tryParse(value);
     if (original is double) return double.tryParse(value);
@@ -127,202 +84,195 @@ class _EntityFormState<T extends JsonModel>
     return value;
   }
 
-  bool _isPrimitive(dynamic value) =>
-      value is String ||
-      value is num ||
-      value is bool ||
-      value is DateTime ||
-      value == null;
-
-  Widget _buildField(String key, dynamic value) {
+  Widget _defaultFieldBuilder({
+    required BuildContext context,
+    required String key,
+    required dynamic value,
+    required TextEditingController? controller,
+    required void Function(dynamic) onChanged,
+    bool expertMode = false,
+  }) {
     if (value is bool) {
       return SwitchListTile(
         title: Text(key),
-        value: _controllers[key]!.text.toLowerCase() == 'true',
+        value: controller?.text.toLowerCase() == 'true',
         onChanged: (val) {
-          _controllers[key]!.text = val.toString();
-          setState(() {});
+          controller?.text = val.toString();
+          onChanged(val);
         },
       );
     }
 
     if (value is DateTime || key.toLowerCase().contains('date')) {
-      return _buildDateTimeField(key, _controllers[key]!);
-    }
-
-    if (value is num || key.toLowerCase().contains('nombre')) {
       return TextFormField(
-        controller: _controllers[key],
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(labelText: key),
+        controller: controller,
+        readOnly: true,
+        decoration: InputDecoration(
+          labelText: key,
+          suffixIcon: const Icon(Icons.calendar_today),
+        ),
+        onTap: () async {
+          final initialDate =
+              DateTime.tryParse(controller?.text ?? '') ?? DateTime.now();
+          final picked = await showDatePicker(
+            context: context,
+            initialDate: initialDate,
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2100),
+          );
+          if (picked != null) {
+            controller?.text = picked.toIso8601String();
+            onChanged(picked);
+          }
+        },
       );
     }
 
-    if (value is List) {
+    if (value is List || key.toLowerCase().contains('liste')) {
       return TextFormField(
-        controller: _controllers[key],
-        decoration: InputDecoration(labelText: "$key (séparés par virgules)"),
+        controller: controller,
+        decoration: InputDecoration(labelText: "$key (séparés par virgule)"),
       );
     }
 
-    if (value is Map) {
+    if (value is Map || value is JsonModel) {
       return TextFormField(
-        controller: _rawOverrides[key],
-        maxLines: 4,
-        decoration: InputDecoration(labelText: "$key (Map JSON)"),
+        controller: controller,
+        decoration: InputDecoration(labelText: "$key (JSON)"),
         style: const TextStyle(fontFamily: 'monospace'),
+        maxLines: 4,
       );
     }
 
     return TextFormField(
-      controller: _controllers[key],
+      controller: controller,
       decoration: InputDecoration(labelText: key),
     );
   }
 
-  Widget _buildDateTimeField(String label, TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      decoration: InputDecoration(
-        labelText: label,
-        suffixIcon: const Icon(Icons.calendar_today),
-      ),
-      onTap: () async {
-        final initialDate =
-            DateTime.tryParse(controller.text) ?? DateTime.now();
-        final date = await showDatePicker(
-          context: context,
-          initialDate: initialDate,
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
-        );
-        if (date != null) {
-          controller.text = date.toIso8601String();
+  void _submit() {
+    if (!_formKey.currentState!.validate()) return;
+
+    final updatedJson = <String, dynamic>{};
+    for (final key in _json.keys) {
+      final originalValue = _json[key];
+      final raw = _rawOverrides[key]!.text;
+
+      if (_expertMode &&
+          (originalValue is Map ||
+              originalValue is List ||
+              originalValue is JsonModel)) {
+        try {
+          updatedJson[key] = json.decode(raw);
+        } catch (e) {
+          // Fallback
+          updatedJson[key] = _parseValue(
+            originalValue,
+            _controllers[key]!.text,
+          );
         }
-      },
-    );
+      } else {
+        updatedJson[key] = _parseValue(originalValue, _controllers[key]!.text);
+      }
+    }
+
+    final entity = widget.fromJson(updatedJson);
+    widget.onSubmit(entity);
+    Navigator.of(context).pop();
+  }
+
+  List<Widget> _buildFields() {
+    final fieldBuilder = widget.customFieldBuilder ?? _defaultFieldBuilder;
+    final responsive = context.responsiveInfo(ref);
+
+    return _json.keys.map((key) {
+      final value = _json[key];
+      final controller = _controllers[key];
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        child: fieldBuilder(
+          context: context,
+          key: key,
+          value: value,
+          controller: controller,
+          onChanged: (val) {
+            _json[key] = val;
+            _rawOverrides[key]?.text = json.encode(val);
+          },
+          expertMode: _expertMode,
+        ),
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildExpertFields() {
+    if (!_expertMode) return [];
+    return _json.keys
+        .where((key) {
+          final val = _json[key];
+          return val is Map || val is List || val is JsonModel;
+        })
+        .map((key) {
+          final controller = _rawOverrides[key];
+          return TextFormField(
+            controller: controller,
+            decoration: InputDecoration(labelText: "$key (JSON brut)"),
+            maxLines: 6,
+            style: const TextStyle(fontFamily: 'monospace'),
+            validator: (value) {
+              try {
+                json.decode(value ?? '');
+                return null;
+              } catch (_) {
+                return 'JSON invalide';
+              }
+            },
+          );
+        })
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = ref.watch(screenSizeProvider);
-    final isSmallScreen = screenSize == ScreenSize.mobile;
-    final mediaQuery = MediaQuery.of(context);
-    final height = mediaQuery.size.height;
-    final width = mediaQuery.size.width;
-
-    if (_expertMode) {
-      for (var entry in _json.entries) {
-        if (!_controllers.containsKey(entry.key) &&
-            !_rawOverrides.containsKey(entry.key)) {
-          _rawOverrides[entry.key] = TextEditingController(
-            text: const JsonEncoder.withIndent('  ').convert(entry.value),
-          );
-        }
-      }
-    }
+    final isWide = context.responsiveInfo(ref).isLandscape;
 
     return AlertDialog(
-      title: Row(
-        children: [
-          Expanded(
-            child: Text(widget.initialValue == null ? 'Créer' : 'Modifier'),
-          ),
-          IconButton(
-            icon: Icon(_expertMode ? Icons.visibility : Icons.code, size: 20),
-            tooltip: _expertMode ? 'Mode normal' : 'Mode expert',
-            onPressed: () => setState(() => _expertMode = !_expertMode),
-          ),
-        ],
+      title: Text(
+        widget.initialValue == null
+            ? "Créer ${T.toString()}"
+            : "Modifier ${T.toString()}",
       ),
-      content: Form(
-        key: _formKey,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: height * (isSmallScreen ? 0.7 : 0.8),
-            maxWidth: width * (isSmallScreen ? 0.9 : 0.6),
-          ),
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Wrap(
-              runSpacing: 12,
-              spacing: 16,
-              children: [
-                for (var entry in _controllers.entries)
-                  SizedBox(
-                    width: isSmallScreen ? double.infinity : 250,
-                    child: _buildField(entry.key, _json[entry.key]),
+      content: SizedBox(
+        width: isWide ? 600 : double.maxFinite,
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              ..._buildFields(),
+              if (_expertMode) ..._buildExpertFields(),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Checkbox(
+                    value: _expertMode,
+                    onChanged:
+                        (val) => setState(() => _expertMode = val ?? false),
                   ),
-                if (_json.containsKey('etapes')) ...[
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.add),
-                    label: const Text("Ajouter une étape"),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder:
-                            (_) => EntityEtapeForm(
-                              onSubmit: (etape) {
-                                setState(() {
-                                  final list = _etapes..add(etape);
-                                  _json['etapes'] =
-                                      list.map((e) => e.toJson()).toList();
-                                });
-                              },
-                              initialValue:
-                                  widget.initialValue as ChantierEtape?,
-                              client: widget.fromJson as Client,
-                              autresEtapes: _etapes,
-                            ),
-                      );
-                    },
-                  ),
-                  ChantiersEtapeListPreview(
-                    etapes: _etapes,
-                    onTap: (index) {
-                      final id = _json['id'];
-                      if (id != null) {
-                        context.push('/chantier/$id/etapes/$index');
-                      }
-                    },
-                  ),
+                  const Text("Mode expert"),
                 ],
-                if (_expertMode)
-                  for (var entry in _rawOverrides.entries)
-                    SizedBox(
-                      width: isSmallScreen ? double.infinity : 500,
-                      child: TextFormField(
-                        controller: entry.value,
-                        decoration: InputDecoration(
-                          labelText: '${entry.key} (JSON)',
-                          alignLabelWithHint: true,
-                          border: const OutlineInputBorder(),
-                        ),
-                        maxLines: 6,
-                        style: const TextStyle(fontFamily: 'monospace'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) return null;
-                          try {
-                            json.decode(value);
-                            return null;
-                          } catch (_) {
-                            return 'Format JSON invalide';
-                          }
-                        },
-                      ),
-                    ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
       actions: [
         TextButton(
-          onPressed: () => context.pop(),
-          child: const Text('Annuler'),
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text("Annuler"),
         ),
-        ElevatedButton(onPressed: _submit, child: const Text('Valider')),
+        ElevatedButton(onPressed: _submit, child: const Text("Valider")),
       ],
     );
   }

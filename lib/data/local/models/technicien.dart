@@ -94,4 +94,20 @@ class Technicien extends JsonModel {
     chantiersAffectes: [],
     etapesAffectees: [],
   );
+
+  @override
+  JsonModel fromDolibarrJson(Map<String, dynamic> json) {
+    return Technicien(
+      id: json['id'] ?? '',
+      nom: json['nom'] ?? '',
+      email: json['email'] ?? '',
+      competences: List<String>.from(json['competences']),
+      specialite: json['specialite'],
+      tauxHoraire: json['tauxHoraire'] ?? 0,
+      disponible: json['disponible'] ?? true,
+      localisation: json['localisation'],
+      chantiersAffectes: List<String>.from(json['chantiersAffectes']),
+      etapesAffectees: List<String>.from(json['etapesAffectees']),
+    );
+  }
 }

@@ -327,7 +327,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
     final size = info.isMobile ? 100.0 : 120.0;
 
     return GestureDetector(
-      onTap: () => OpenFilex.open(piece.url),
+      onTap: () => OpenFilex.open(piece.url!),
       child: ResponsiveCard(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -371,13 +371,13 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
       child:
           isWeb
               ? Image.network(
-                piece.url,
+                piece.url!,
                 width: size,
                 height: size,
                 fit: BoxFit.contain,
               )
               : Image.file(
-                File(piece.url),
+                File(piece.url!),
                 width: size,
                 height: size,
                 fit: BoxFit.contain,

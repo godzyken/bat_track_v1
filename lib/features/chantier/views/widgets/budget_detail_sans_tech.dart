@@ -27,6 +27,11 @@ class BudgetDetailSansTech extends ConsumerWidget {
             Expanded(child: _buildLegend(details, total)),
           ],
         ),
+        const SizedBox(height: 16),
+        Text(
+          "Total : ${total.toStringAsFixed(2)} €",
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
       ],
     );
   }
@@ -51,6 +56,8 @@ class BudgetDetailSansTech extends ConsumerWidget {
         sectionsSpace: 4,
         centerSpaceRadius: 30,
       ),
+      duration: const Duration(milliseconds: 800),
+      curve: Curves.easeInOut,
     );
   }
 
