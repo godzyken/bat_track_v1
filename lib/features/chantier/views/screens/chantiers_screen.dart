@@ -36,7 +36,7 @@ class ChantiersScreen extends ConsumerWidget {
                               .read(chantierListProvider.notifier)
                               .updateChantier(updated);
                         },
-                        createEmpty: () => Chantier.mock(),
+                        createEmpty: () => chantier,
                       ),
                 );
               },

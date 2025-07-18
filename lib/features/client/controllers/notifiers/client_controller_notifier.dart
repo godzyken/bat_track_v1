@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
 import '../../../../data/local/models/client.dart';
+import '../../../../data/remote/providers/dolibarr_config_provider.dart';
 import '../../../../data/remote/services/dolibarr_services.dart';
 
 class ClientController extends AsyncNotifier<void> {

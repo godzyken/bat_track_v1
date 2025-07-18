@@ -6,13 +6,6 @@ import 'package:http/http.dart' as http;
 import '../../local/models/index_model_extention.dart';
 import '../../local/providers/hive_provider.dart';
 
-final dolibarrApiProvider = Provider<DolibarrApiService>((ref) {
-  return DolibarrApiService(
-    baseUrl: 'https://your-dolibarr-url/api/index.php',
-    token: 'YOUR_TOKEN',
-  );
-});
-
 class DolibarrApiService {
   final String baseUrl;
   final String token;

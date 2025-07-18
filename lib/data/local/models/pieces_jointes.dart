@@ -9,7 +9,7 @@ import '../../../models/data/json_model.dart';
 
 part 'pieces_jointes.g.dart';
 
-@HiveType(typeId: 5)
+@HiveType(typeId: 5, adapterName: 'PieceJointeAdapter')
 @JsonSerializable()
 class PieceJointe extends JsonModel implements HasFile {
   @override
@@ -48,7 +48,6 @@ class PieceJointe extends JsonModel implements HasFile {
     return File(path!);
   }
 
-  @override
   Uint8List getUintList() => Uint8List(taille);
 
   // JSON serialization

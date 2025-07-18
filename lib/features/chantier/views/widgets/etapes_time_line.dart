@@ -58,7 +58,7 @@ class EtapesTimeline extends ConsumerWidget {
           }).toList(),
       currentStep: 0,
       controlsBuilder:
-          (_, __) => const SizedBox.shrink(), // pas de boutons natifs
+          (_, _) => const SizedBox.shrink(), // pas de boutons natifs
     );
   }
 }

@@ -1,0 +1,14 @@
+{
+  "instances": [
+    {
+      "name": "Prod",
+      "baseUrl": "https://prod.mon-dolibarr.com/api/index.php",
+      "apiKey": "CLE_API_PROD"
+    },
+    {
+      "name": "Test",
+      "baseUrl": "https://godzyken.mgc01.ma-gestion-cloud.fr/api/index.php/explorer",
+      "apiKey": "https://godzyken.mgc01.ma-gestion-cloud.fr/api/index.php/explorer/swagger.json?DOLAPIKEY=youruserapike"
+    }
+  ]
+}

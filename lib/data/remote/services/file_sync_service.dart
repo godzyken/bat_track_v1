@@ -6,7 +6,7 @@ import 'entity_sync_services.dart';
 
 /// Service de sync + upload pour les entités implémentant HasFile
 class FileSyncService<T extends JsonModel> extends EntitySyncService<T> {
-  FileSyncService(String boxName) : super(boxName);
+  FileSyncService(super.boxName);
 
   @override
   Future<void> save(T item, {String? id}) async {

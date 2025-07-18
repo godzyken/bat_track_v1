@@ -65,7 +65,7 @@ class EtapeTimeline extends ConsumerWidget {
                     : null,
           );
         },
-        connectorBuilder: (_, __, ___) => const SolidLineConnector(),
+        connectorBuilder: (_, _, _) => const SolidLineConnector(),
       ),
     );
   }

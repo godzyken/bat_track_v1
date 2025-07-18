@@ -1,4 +1,6 @@
+import 'package:bat_track_v1/data/local/models/base/safe_map_list.dart';
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
+import 'package:bat_track_v1/models/data/interface/doli_barr_adaptable.dart';
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -7,9 +9,10 @@ import '../../../models/data/json_model.dart';
 
 part 'chantier.g.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 0, adapterName: 'ChantierAdapter')
 @JsonSerializable()
-class Chantier extends JsonModel {
+class Chantier extends JsonModel<Chantier>
+    implements DolibarrAdaptable<Chantier> {
   @HiveField(0)
   @override
   final String id;
@@ -35,6 +38,7 @@ class Chantier extends JsonModel {
   @HiveField(7)
   List<String> technicienIds;
 
+  @JsonKey(fromJson: _documentsFromJson, toJson: _documentsToJson)
   @HiveField(8)
   List<PieceJointe> documents;
 
@@ -67,19 +71,34 @@ class Chantier extends JsonModel {
   });
 
   // JSON
-  factory Chantier.fromJson(Map<String, dynamic> json) =>
-      _$ChantierFromJson(json);
+  factory Chantier.fromJson(Map<String, dynamic> json) => Chantier(
+    id: json['id'],
+    nom: json['name'] ?? '',
+    adresse: json['adresse'] ?? '',
+    clientId: json['clientId'] ?? '',
+    dateDebut: DateTime.tryParse(json['debut'] ?? '') ?? DateTime.now(),
+    dateFin: json['fin'] != null ? DateTime.tryParse(json['fin']) : null,
+    etat: json['etat'],
+    technicienIds: List<String>.from(json['technicienIds'] ?? []),
+    documents: safeMapList(json['documents'], PieceJointe.fromJson),
+    etapes: safeMapList(json['etapes'], ChantierEtape.fromJson),
+    commentaire: json['commentaire'],
+    budgetPrevu: (json['budgetPrevu'] as num?)?.toDouble(),
+    budgetReel: (json['budgetReel'] as num?)?.toDouble(),
+  );
 
   @override
-  Map<String, dynamic> toJson() {
-    final json = _$ChantierToJson(this);
-
-    json['ChantierEtape'] = etapes.map((etape) => etape.toJson()).toList();
-    return json;
-  }
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'nom': nom,
+    'commentaire': commentaire,
+    'dateDebut': dateDebut.toIso8601String(),
+    'dateFin': dateFin?.toIso8601String(),
+  };
 
   // Firebase
   Map<String, dynamic> toMap() => toJson();
+
   factory Chantier.fromMap(Map<String, dynamic> map) => Chantier.fromJson(map);
 
   factory Chantier.mock({
@@ -193,22 +212,30 @@ class Chantier extends JsonModel {
     );
   }
 
+  // Dolibarr
   @override
-  Chantier fromDolibarrJson(Map<String, dynamic> json) {
-    return Chantier(
-      id: json['id'] ?? '',
-      nom: json['nom'] ?? '',
-      adresse: json['adresse'] ?? '',
-      clientId: json['clientId'] ?? '',
-      dateDebut: DateTime.parse(json['dateDebut']),
-      dateFin: DateTime.parse(json['dateFin']),
-      etat: json['etat'] ?? '',
-      technicienIds: List<String>.from(json['technicienIds']),
-      documents: List<PieceJointe>.from(json['documents']),
-      etapes: List<ChantierEtape>.from(json['etapes']),
-      commentaire: json['commentaire'] ?? '',
-      budgetPrevu: json['budgetPrevu'] ?? 0,
-      budgetReel: json['budgetReel'] ?? 0,
-    );
+  Map<String, dynamic> toDolibarrJson() => {
+    'ref': nom,
+    'note_private': commentaire ?? '',
+    'date_start': dateDebut.toIso8601String(),
+    'date_end': dateFin?.toIso8601String(),
+  };
+
+  @override
+  Chantier fromDolibarrJson(Map<String, dynamic> json) =>
+      Chantier.fromJson(json);
+
+  static List<PieceJointe> _documentsFromJson(List<dynamic>? json) {
+    if (json == null) return [];
+    return json
+        .whereType<Map<String, dynamic>>()
+        .map(PieceJointe.fromJson)
+        .toList();
+  }
+
+  static List<Map<String, dynamic>> _documentsToJson(
+    List<PieceJointe> documents,
+  ) {
+    return documents.map((doc) => doc.toJson()).toList();
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -6,7 +8,7 @@ import '../../../models/data/json_model.dart';
 
 part 'chantier_etapes.g.dart';
 
-@HiveType(typeId: 4)
+@HiveType(typeId: 4, adapterName: 'ChantierEtapeAdapter')
 @JsonSerializable()
 class ChantierEtape extends JsonModel {
   @override
@@ -69,7 +71,23 @@ class ChantierEtape extends JsonModel {
     final json = _$ChantierEtapeToJson(this);
     // s'assurer que piecesJointes est une liste de maps
     json['pieces'] = pieces.map((p) => p.toJson()).toList();
-    json['piecesJointes'] = piecesJointes?.map((pj) => pj.toJson()).toList();
+    json['piecesJointes'] =
+        (json['pieceJointes'] as List?)?.map((e) {
+          if (e is Map<String, dynamic>) {
+            return PieceJointe.fromJson(e);
+          } else if (e is String) {
+            try {
+              final decoded = jsonDecode(e);
+              if (decoded is Map<String, dynamic>) {
+                return PieceJointe.fromJson(decoded);
+              }
+            } catch (err) {
+              print('Erreur de décodage d’une PieceJointe : $err');
+            }
+          }
+          throw Exception('Format inattendu pour PieceJointe : $e');
+        }).toList() ??
+        [];
     return json;
   }
 

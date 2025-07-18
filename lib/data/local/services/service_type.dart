@@ -1,6 +1,7 @@
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../../../models/data/json_model.dart';
+import '../../../models/services/entity_service.dart';
 import '../../remote/services/firebase_service.dart';
 import '../../remote/services/storage_service.dart';
 import '../models/index_model_extention.dart';
@@ -8,50 +9,71 @@ import 'hive_service.dart';
 
 enum StorageMode { hive, firebase, supabase, cloudflare }
 
-class EntityService<T> {
+class EntityServices<T extends JsonModel> implements EntityService<T> {
   final String boxName;
   final StorageMode storageMode;
 
-  const EntityService(this.boxName, {this.storageMode = StorageMode.hive});
+  const EntityServices(this.boxName, {this.storageMode = StorageMode.hive});
 
   Future<void> add(T item, String id) async {
     if (storageMode == StorageMode.hive) {
       await HiveService.put<T>(boxName, id, item);
-    } else if (storageMode == StorageMode.firebase) {
+    } else if (storageMode == StorageMode.firebase ||
+        storageMode == StorageMode.cloudflare) {
       if (item is HasFile) {
         final storage = StorageService(FirebaseStorage.instance);
-        final path = '$boxName/$id/${item.getFile().path.split('/').last}';
-        await storage.uploadFile(item.getFile(), path);
+        final path =
+            '$boxName/$id/${(item as HasFile).getFile().path.split('/').last}';
+        await storage.uploadFile((item as HasFile).getFile(), path);
       }
+
       await FirestoreService.setData<T>(
         collectionPath: boxName,
         docId: id,
-        data: (item as JsonModel).toJson(),
-      );
-    } else if (storageMode == StorageMode.cloudflare) {
-      await FirestoreService.setData<T>(
-        collectionPath: boxName,
-        docId: id,
-        data: (item as JsonModel).toJson(),
+        data: item.toJson(),
       );
     } else {
       throw Exception('Invalid storage mode');
     }
   }
 
+  @override
   Future<void> update(T item, String id) =>
       HiveService.put<T>(boxName, id, item);
 
+  @override
   Future<void> delete(String id) => HiveService.delete<T>(boxName, id);
 
+  @override
+  Future<void> deleteByQuery(String queryStr) async {
+    final list = await query(queryStr);
+    for (final item in list) {
+      await delete(item.copyWithId(queryStr));
+    }
+  }
+
+  @override
+  Future<void> deleteAll() => HiveService.deleteAll<T>();
+
+  @override
   Future<List<T>> getAll() => HiveService.getAll<T>(boxName);
 
+  @override
+  T? getById(String id) {
+    // Attention : méthode synchrone basée sur cache local
+    return HiveService.getSync<T>(boxName, id);
+  }
+
+  @override
   Future<T?> get(String id) => HiveService.get<T>(boxName, id);
 
+  @override
   Future<bool> exists(String id) => HiveService.exists<T>(boxName, id);
 
+  @override
   Future<List<String>> getKeys() => HiveService.getKeys<T>(boxName);
 
+  @override
   Future<void> save(T item, String id) async {
     if (await exists(id)) {
       await update(item, id);
@@ -60,11 +82,13 @@ class EntityService<T> {
     }
   }
 
+  @override
   Future<List<T>> where(bool Function(T) test) async {
     final all = await getAll();
     return all.where(test).toList();
   }
 
+  @override
   Future<List<T>> sortedBy(
     Comparable Function(T) selector, {
     bool descending = false,
@@ -75,18 +99,36 @@ class EntityService<T> {
     );
     return list;
   }
+
+  @override
+  Future<List<T>> query(String query) async {
+    final all = await getAll();
+    return all.where((element) => element.toString().contains(query)).toList();
+  }
+
+  @override
+  Future<void> closeAll() => HiveService.closeAll();
+
+  @override
+  Future<void> open() => HiveService.box<T>(boxName);
+
+  @override
+  Future<void> init() => HiveService.init();
+
+  @override
+  Future<void> clear() => HiveService.clear();
 }
 
-final chantierService = EntityService<Chantier>('chantiers');
-final clientService = EntityService<Client>('clients');
-final technicienService = EntityService<Technicien>('techniciens');
-final interventionService = EntityService<Intervention>('interventions');
-final chantierEtapeService = EntityService<ChantierEtape>('chantierEtapes');
-final pieceJointeService = EntityService<PieceJointe>('piecesJointes');
-final pieceService = EntityService<Piece>('pieces');
-final materielService = EntityService<Materiel>('materiels');
-final materiauService = EntityService<Materiau>('materiau');
-final mainOeuvreService = EntityService<MainOeuvre>('mainOeuvre');
+final chantierService = EntityServices<Chantier>('chantiers');
+final clientService = EntityServices<Client>('clients');
+final technicienService = EntityServices<Technicien>('techniciens');
+final interventionService = EntityServices<Intervention>('interventions');
+final chantierEtapeService = EntityServices<ChantierEtape>('chantierEtapes');
+final pieceJointeService = EntityServices<PieceJointe>('piecesJointes');
+final pieceService = EntityServices<Piece>('pieces');
+final materielService = EntityServices<Materiel>('materiels');
+final materiauService = EntityServices<Materiau>('materiau');
+final mainOeuvreService = EntityServices<MainOeuvre>('mainOeuvre');
 
 final storageService = StorageService(FirebaseStorage.instance);
 //final factureService = EntityService<Facture>('factures');

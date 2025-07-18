@@ -39,6 +39,7 @@ class ChantierSyncNotifier extends StateNotifier<SyncedState<Chantier>> {
           etat: 'Synced',
           documents: [
             PieceJointe.mock(id: 'doc1', nom: 'Document 1', url: downloadUrl),
+            PieceJointe.mock(id: 'doc2', nom: 'Document 2', url: downloadUrl),
           ],
         ),
       );

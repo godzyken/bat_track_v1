@@ -1,6 +1,12 @@
+import 'dart:developer' as developer;
+import 'dart:typed_data';
+
+import 'package:flutter/cupertino.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
 
 import '../adapters/hive_adapters.dart';
+import '../models/index_model_extention.dart';
 
 class HiveService {
   static final Map<String, Box> _boxes = {};
@@ -90,4 +96,79 @@ class HiveService {
     }
     _boxes.clear();
   }
+
+  static Future<void> clear() async {
+    for (final box in _boxes.values) {
+      await box.clear();
+    }
+  }
+
+  static Future<void> deleteBox(String boxName) async {
+    final box = await _openBox(boxName);
+    await box.deleteFromDisk();
+  }
+
+  static Future<void> deleteBoxes() async {
+    for (final box in _boxes.values) {
+      await box.deleteFromDisk();
+    }
+  }
+
+  static Future<void> deleteAll<T>() async {
+    for (final box in _boxes.values) {
+      await box.clear();
+    }
+  }
+
+  static T? getSync<T>(String boxName, String key) {
+    final box = Hive.box<T>(boxName);
+    return box.get(key);
+  }
+
+  static Future<void> precachePieceJointe<T>(
+    BuildContext c,
+    String boxName,
+    T pj,
+  ) async {
+    if (pj is PieceJointe) {
+      if (pj.url == null) return;
+      final url = pj.url!;
+      if (pj.type == 'jpg' ||
+          pj.type == 'jpeg' ||
+          pj.type == 'png' ||
+          pj.type == 'webp') {
+        try {
+          final box = await _openBox<T>(boxName);
+          final image = NetworkImage(pj.url!);
+          await precacheImage(image, c);
+          await box.put(pj.id, pj);
+          developer.log('[✔] Image précachée: $url');
+        } catch (e) {
+          developer.log('[❌] Erreur lors de la pré-cache de l\'image: $url');
+          developer.log(e.toString());
+        }
+      } else {
+        // 📄 Cas document (PDF, etc.) → on télécharge pour cache en mémoire
+        try {
+          final response = await http.get(Uri.parse(url));
+          if (response.statusCode == 200) {
+            final Uint8List data = response.bodyBytes;
+            _cacheMap[url] = data;
+            debugPrint('[✔] Fichier téléchargé en cache: $url');
+          } else {
+            debugPrint('[⚠] Erreur téléchargement fichier ${pj.nom}');
+          }
+        } catch (e) {
+          debugPrint('[⚠] Exception téléchargement fichier: $e');
+        }
+      }
+    } else {
+      throw Exception('Type incorrect');
+    }
+  }
+
+  // Simple cache mémoire
+  static final Map<String, Uint8List> _cacheMap = {};
+
+  static Uint8List? getCachedData(String url) => _cacheMap[url];
 }

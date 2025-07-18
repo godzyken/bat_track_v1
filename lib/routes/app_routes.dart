@@ -1,4 +1,3 @@
-import 'package:bat_track_v1/features/chantier/views/screens/chantier_details_screen.dart';
 import 'package:bat_track_v1/models/views/screens/entity_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../data/local/providers/hive_provider.dart';
 import '../features/about/views/screens/about_screen.dart';
 import '../features/auth/views/screens/login_screen.dart';
+import '../features/chantier/views/screens/chantier_detail_loader.dart';
 import '../features/chantier/views/screens/chantier_etape_detail_screen.dart';
 import '../features/chantier/views/screens/chantier_etapes_screen.dart';
 import '../features/chantier/views/screens/chantiers_screen.dart';
@@ -95,17 +95,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             name: 'chantier-detail',
             builder: (context, state) {
               final id = state.pathParameters['id']!;
-              return Consumer(
-                builder: (context, ref, child) {
-                  final chantier = ref.watch(chantierProvider(id));
-                  if (chantier == null) {
-                    return const Scaffold(
-                      body: Center(child: Text('Chantier introuvable')),
-                    );
-                  }
-                  return ChantierDetailScreen(chantier: chantier);
-                },
-              );
+              return ChantierDetailLoader(chantierId: id);
             },
             routes: [
               // ✅ 1. Liste des étapes

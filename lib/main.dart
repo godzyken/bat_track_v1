@@ -1,13 +1,23 @@
 import 'package:bat_track_v1/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/responsive/wrapper/responsive_layout.dart';
 import 'data/local/providers/hive_provider.dart';
+import 'data/local/providers/shared_preferences_provider.dart';
 import 'data/remote/providers/firebase_providers.dart';
+import 'features/parametres/affichage/themes/theme.dart';
 
 void main() async {
-  runApp(const ProviderScope(child: AppInitializer()));
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = SharedPreferences.getInstance();
+  runApp(
+    ProviderScope(
+      overrides: [sharedPreferencesProvider.overrideWith((ref) => prefs)],
+      child: AppInitializer(),
+    ),
+  );
 }
 
 class AppInitializer extends ConsumerWidget {
@@ -18,16 +28,8 @@ class AppInitializer extends ConsumerWidget {
     final init = ref.watch(hiveInitProvider);
 
     return init.when(
-      loading:
-          () => const MaterialApp(
-            home: Scaffold(body: Center(child: CircularProgressIndicator())),
-          ),
-      error:
-          (err, stack) => MaterialApp(
-            home: Scaffold(
-              body: Center(child: Text('Erreur d\'init Hive: $err')),
-            ),
-          ),
+      loading: () => const LoadingApp(),
+      error: (err, stack) => ErrorApp(message: 'Erreur Hive: $err'),
       data: (_) => const MyApp(),
     );
   }
@@ -39,32 +41,45 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final firebaseInit = ref.watch(firebaseInitializationProvider);
-    setAuthRef(ref);
+    setAuthRef(
+      ref,
+    ); // 🔐 Explicite que ça initialise un contexte global Firebase
     final router = ref.watch(goRouterProvider);
 
     return firebaseInit.when(
       data:
-          (app) => MaterialApp.router(
+          (_) => MaterialApp.router(
             title: 'BatTrack',
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-              useMaterial3: true,
-            ),
-            darkTheme: ThemeData.dark(useMaterial3: true),
+            theme: lightTheme,
+            darkTheme: darkTheme,
             themeMode: ThemeMode.system,
             routerConfig: router,
             builder: (context, child) => ResponsiveObserver(child: child!),
           ),
-      loading:
-          () => const MaterialApp(
-            home: Scaffold(body: Center(child: CircularProgressIndicator())),
-          ),
-      error:
-          (e, st) => MaterialApp(
-            home: Scaffold(
-              body: Center(child: Text('Erreur d\'initialisation Firebase')),
-            ),
-          ),
+      loading: () => const LoadingApp(),
+      error: (e, st) => ErrorApp(message: 'Erreur Firebase: $e'),
     );
+  }
+}
+
+class LoadingApp extends StatelessWidget {
+  const LoadingApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: Scaffold(body: Center(child: CircularProgressIndicator())),
+    );
+  }
+}
+
+class ErrorApp extends StatelessWidget {
+  final String message;
+
+  const ErrorApp({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(home: Scaffold(body: Center(child: Text(message))));
   }
 }

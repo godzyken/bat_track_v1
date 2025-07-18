@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
+import '../../../models/data/json_model.dart';
 import '../../../models/notifiers/entity_notifier_provider.dart';
 import '../models/index_model_extention.dart';
 import '../services/hive_service.dart';
@@ -111,45 +112,70 @@ final mainOeuvreProvider = Provider.family<MainOeuvre?, String>((ref, id) {
 });
 
 ////Services for CRUD Operations
-final chantierServiceProvider = Provider<EntityService<Chantier>>(
-  (ref) => const EntityService('chantiers'),
+final chantierServiceProvider = Provider<EntityServices<Chantier>>(
+  (ref) => const EntityServices('chantiers'),
 );
 
-final clientServiceProvider = Provider<EntityService<Client>>(
-  (ref) => const EntityService('clients'),
+final clientServiceProvider = Provider<EntityServices<Client>>(
+  (ref) => const EntityServices('clients'),
 );
 
-final technicienServiceProvider = Provider<EntityService<Technicien>>(
-  (ref) => const EntityService('techniciens'),
+final technicienServiceProvider = Provider<EntityServices<Technicien>>(
+  (ref) => const EntityServices('techniciens'),
 );
 
-final interventionServiceProvider = Provider<EntityService<Intervention>>(
-  (ref) => const EntityService('interventions'),
+final interventionServiceProvider = Provider<EntityServices<Intervention>>(
+  (ref) => const EntityServices('interventions'),
 );
 
-final chantierEtapeServiceProvider = Provider<EntityService<ChantierEtape>>(
-  (ref) => const EntityService('chantierEtapes'),
+final chantierEtapeServiceProvider = Provider<EntityServices<ChantierEtape>>(
+  (ref) => const EntityServices('chantierEtapes'),
 );
 
-final pieceJointeServiceProvider = Provider<EntityService<PieceJointe>>(
-  (ref) => const EntityService('piecesJointes'),
+final pieceJointeServiceProvider = Provider<EntityServices<PieceJointe>>(
+  (ref) => const EntityServices('piecesJointes'),
 );
 
-final pieceServiceProvider = Provider<EntityService<Piece>>(
-  (ref) => const EntityService('pieces'),
+final pieceServiceProvider = Provider<EntityServices<Piece>>(
+  (ref) => const EntityServices('pieces'),
 );
 
-final materielServiceProvider = Provider<EntityService<Materiel>>(
-  (ref) => const EntityService('materiels'),
+final materielServiceProvider = Provider<EntityServices<Materiel>>(
+  (ref) => const EntityServices('materiels'),
 );
 
-final materiauServiceProvider = Provider<EntityService<Materiau>>(
-  (ref) => const EntityService('materiau'),
+final materiauServiceProvider = Provider<EntityServices<Materiau>>(
+  (ref) => const EntityServices('materiau'),
 );
 
-final mainOeuvreServiceProvider = Provider<EntityService<MainOeuvre>>(
-  (ref) => const EntityService('mainOeuvre'),
+final mainOeuvreServiceProvider = Provider<EntityServices<MainOeuvre>>(
+  (ref) => const EntityServices('mainOeuvre'),
 );
+
+////Providers for EntityServices
+Provider<EntityServices<T>> entityServiceProvider<T extends JsonModel>() {
+  return Provider<EntityServices<T>>((ref) {
+    final provider = _serviceRegistry[T];
+    if (provider == null) {
+      throw UnimplementedError('No service registered for $T');
+    }
+    return ref.watch(provider) as EntityServices<T>;
+  });
+}
+
+final _serviceRegistry = <Type, ProviderBase>{
+  Chantier: chantierServiceProvider,
+  Client: clientServiceProvider,
+  Technicien: technicienServiceProvider,
+  Intervention: interventionServiceProvider,
+  ChantierEtape: chantierEtapeServiceProvider,
+  PieceJointe: pieceJointeServiceProvider,
+  Piece: pieceServiceProvider,
+  Materiel: materielServiceProvider,
+  Materiau: materiauServiceProvider,
+  MainOeuvre: mainOeuvreServiceProvider,
+  // Ajoutez d'autres services ici
+};
 
 // Déclaration simplifiée du provider Chantier
 final chantierNotifierProvider = createEntityNotifierProvider<Chantier>(

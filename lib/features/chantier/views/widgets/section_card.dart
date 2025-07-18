@@ -5,7 +5,7 @@ class SectionCard extends ConsumerWidget {
   final String title;
   final Widget child;
 
-  const SectionCard({required this.title, required this.child});
+  const SectionCard({super.key, required this.title, required this.child});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

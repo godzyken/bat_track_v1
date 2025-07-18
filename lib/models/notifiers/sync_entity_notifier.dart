@@ -12,24 +12,34 @@ import '../data/state_wrapper/wrappers.dart';
 
 class SyncEntityNotifier<T extends JsonModel>
     extends StateNotifier<SyncedState<T>> {
-  final EntityService<T> entityService;
+  final EntityServices<T> entityService;
   final StorageService storageService;
+  final bool autoSync;
   Timer? _debounceTimer;
+  String? _lastJsonCache;
 
   SyncEntityNotifier({
     required this.entityService,
     required this.storageService,
     required T initialState,
+    this.autoSync = true,
   }) : super(SyncedState(data: initialState));
 
   Future<void> update(T updated) async {
     state = state.copyWith(data: updated);
-    await entityService.save(updated, updated.id!);
 
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(seconds: 5), () async {
-      await _uploadToFirebaseStorage();
-    });
+    if (updated.id == null) {
+      await entityService.save(updated, state.data.id!);
+    } else {
+      await entityService.update(updated, updated.id!);
+    }
+
+    if (autoSync) {
+      _debounceTimer?.cancel();
+      _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
+        await _uploadToFirebaseStorage();
+      });
+    }
   }
 
   Future<void> syncNow() async {
@@ -39,6 +49,14 @@ class SyncEntityNotifier<T extends JsonModel>
 
   Future<void> _uploadToFirebaseStorage() async {
     try {
+      final json = jsonEncode(state.data.toJson());
+
+      if (_lastJsonCache == json) {
+        state = state.copyWith(isSyncing: false);
+        return;
+      }
+      _lastJsonCache = json;
+
       state = state.copyWith(isSyncing: true, hasError: false);
       final file = await _saveToTempFile(state.data);
       final url = await storageService.uploadFile(
@@ -54,11 +72,15 @@ class SyncEntityNotifier<T extends JsonModel>
   }
 
   Future<File> _saveToTempFile(T item) async {
-    final json = item.toJson();
     final tempDir = Directory.systemTemp;
     final file = File('${tempDir.path}/${item.id}.json');
-    await file.writeAsString(jsonEncode(json));
+    await file.writeAsString(jsonEncode(item.toJson()));
     return file;
+  }
+
+  Future<void> clearCache() async {
+    _lastJsonCache = null;
+    await storageService.clearCache();
   }
 
   @override

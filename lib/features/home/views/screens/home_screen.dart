@@ -21,8 +21,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    detectScreenSizeOrientation();
+  }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    detectScreenSizeOrientation();
+    synchronisationProviders();
+  }
+
+  void synchronisationProviders() {
     Future.microtask(() async {
       try {
         await ref.read(syncAllProvider).call();

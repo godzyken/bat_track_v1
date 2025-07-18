@@ -24,7 +24,7 @@ class InterventionState {
 }
 
 class InterventionStateNotifier extends StateNotifier<InterventionState> {
-  final EntityService<Intervention> interventionService;
+  final EntityServices<Intervention> interventionService;
 
   InterventionStateNotifier(this.interventionService)
     : super(InterventionState()) {

@@ -7,7 +7,7 @@ class SyncedState<T> {
   final bool isSyncing;
   final bool hasError;
 
-  SyncedState({
+  const SyncedState({
     required this.data,
     this.lastSynced,
     this.isSyncing = false,

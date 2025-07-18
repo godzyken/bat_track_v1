@@ -205,7 +205,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildBudgetPartielCard(BuildContext context, ChantierEtape etape) {
-    final pieces = etape.pieces ?? [];
+    final pieces = etape.pieces;
     double totalMat = 0;
     double totalMateriel = 0;
 
@@ -229,13 +229,13 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
           if (pieces.isEmpty) const Text('Aucune pièce ajoutée à cette étape.'),
           if (pieces.isNotEmpty) ...[
             ...pieces.map((p) {
-              final partiel = p.getBudgetTotalSansMainOeuvre() ?? 0;
+              final partiel = p.getBudgetTotalSansMainOeuvre();
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(child: Text(p.nom ?? 'Pièce')),
+                    Expanded(child: Text(p.nom)),
                     Text(
                       '${partiel.toStringAsFixed(2)} €',
                       style: const TextStyle(fontWeight: FontWeight.bold),
@@ -381,7 +381,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
                 width: size,
                 height: size,
                 fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => _buildErrorImage(size),
+                errorBuilder: (_, _, _) => _buildErrorImage(size),
               ),
     );
   }

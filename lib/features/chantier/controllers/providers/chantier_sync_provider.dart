@@ -13,7 +13,7 @@ final chantierInitialProvider = FutureProvider.family<Chantier, String>((
   id,
 ) async {
   final chantierService = ref.watch(chantierServiceProvider);
-  final chantier = await chantierService.get(id);
+  final chantier = chantierService.getById(id);
 
   return chantier ??
       Chantier(
@@ -43,13 +43,13 @@ final chantierEtapesTempProvider = StateProvider.autoDispose
 
       return chantierAsync.when(
         data: (chantier) {
-          if (chantier == null || chantier.etapes.isEmpty) {
+          if (chantier.etapes.isEmpty) {
             return [ChantierEtape(titre: '', description: '')];
           }
           return List<ChantierEtape>.from(chantier.etapes);
         },
         loading: () => [],
-        error: (_, __) => [],
+        error: (_, _) => [],
       );
     });
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../data/remote/providers/dolibarr_config_provider.dart';
 import '../../../../data/remote/services/dolibarr_services.dart';
 
 class DolibarrImportScreen extends ConsumerStatefulWidget {
@@ -26,18 +27,14 @@ class _DolibarrImportScreenState extends ConsumerState<DolibarrImportScreen> {
     try {
       await importer.api.fetchAll('s');
       setState(() => _log = '✅ Importation terminée avec succès !');
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Importation réussie !')));
-      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Importation réussie !')));
     } catch (e) {
       setState(() => _log = '❌ Erreur : $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Erreur : $e')));
-      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur : $e')));
     } finally {
       setState(() => _isLoading = false);
     }

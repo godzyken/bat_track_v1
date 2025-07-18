@@ -75,7 +75,7 @@ class TechnicienDetailScreen extends ConsumerWidget {
         ...items.map(
           (e) => ListTile(
             title: Text(e.titre ?? e.nom ?? 'Sans nom'),
-            subtitle: e is ChantierEtape ? Text(e.description ?? '') : null,
+            subtitle: e is ChantierEtape ? Text(e.description) : null,
           ),
         ),
       ],

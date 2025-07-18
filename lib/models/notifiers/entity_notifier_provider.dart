@@ -10,7 +10,7 @@ final entityNotifierProviderFamily = <Type, dynamic>{};
 StateNotifierProviderFamily<EntityNotifier<T>, T?, String>
 createEntityNotifierProvider<T extends JsonModel>({
   required String hiveBoxName,
-  required EntityService<T> service,
+  required EntityServices<T> service,
 }) {
   final provider = StateNotifierProvider.family<EntityNotifier<T>, T?, String>((
     ref,

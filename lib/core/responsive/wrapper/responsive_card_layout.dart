@@ -46,7 +46,7 @@ class ResponsiveCardLayout extends ConsumerWidget {
       return ListView.separated(
         padding: EdgeInsets.all(spacing),
         itemCount: children.length,
-        separatorBuilder: (_, __) => SizedBox(height: spacing),
+        separatorBuilder: (_, _) => SizedBox(height: spacing),
         itemBuilder: (context, index) => children[index],
       );
     }

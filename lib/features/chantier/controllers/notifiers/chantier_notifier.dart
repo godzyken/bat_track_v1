@@ -11,10 +11,10 @@ class ChantierNotifier extends StateNotifier<Chantier?> {
   final Box<ChantierEtape> etapeBox;
   final Box<Piece> pieceBox;
   final Box<PieceJointe> pieceJointeBox;
-  final EntityService<Chantier> chantierService;
-  final EntityService<ChantierEtape> etapeService;
-  final EntityService<Piece> pieceService;
-  final EntityService<PieceJointe> pieceJointeService;
+  final EntityServices<Chantier> chantierService;
+  final EntityServices<ChantierEtape> etapeService;
+  final EntityServices<Piece> pieceService;
+  final EntityServices<PieceJointe> pieceJointeService;
 
   ChantierNotifier({
     required this.id,

@@ -183,7 +183,7 @@ class _EntityFormState<T extends JsonModel>
 
   List<Widget> _buildFields() {
     final fieldBuilder = widget.customFieldBuilder ?? _defaultFieldBuilder;
-    final responsive = context.responsiveInfo(ref);
+    final info = context.responsiveInfo(ref);
 
     return _json.keys.map((key) {
       final value = _json[key];

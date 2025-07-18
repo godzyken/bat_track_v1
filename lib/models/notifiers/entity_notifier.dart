@@ -7,7 +7,7 @@ import '../data/json_model.dart';
 class EntityNotifier<T extends JsonModel> extends StateNotifier<T?> {
   final String id;
   final Box<T> box;
-  final EntityService<T> service;
+  final EntityServices<T> service;
 
   EntityNotifier({required this.id, required this.box, required this.service})
     : super(box.get(id));

@@ -117,8 +117,7 @@ Widget? chantierFieldBuilder(
   final etapes =
       (value as List)
           .map((e) => e is ChantierEtape ? e : ChantierEtape.fromJson(e))
-          .toList() ??
-      [];
+          .toList();
 
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,

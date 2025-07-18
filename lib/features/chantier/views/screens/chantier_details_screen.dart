@@ -2,12 +2,16 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/features/chantier/views/widgets/budget_detail_sans_tech.dart';
 import 'package:bat_track_v1/features/chantier/views/widgets/chantier_etape_time_line_interactive.dart';
 import 'package:bat_track_v1/features/chantier/views/widgets/chantier_list_documents.dart';
+import 'package:bat_track_v1/models/data/state_wrapper/wrappers.dart';
+import 'package:bat_track_v1/models/notifiers/sync_entity_notifier.dart';
+import 'package:bat_track_v1/models/providers/synchrones/sync_entity_notifier_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
+import '../../../dashboard/views/widgets/dolibarr_section.dart';
 import '../../../dolibarr/views/widgets/sync_statu_bar.dart';
 import '../../controllers/providers/chantier_sync_provider.dart';
 import '../widgets/chantier_card_info.dart';
@@ -23,11 +27,34 @@ class ChantierDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final screen = context.responsiveInfo(ref);
     final dateFormat = DateFormat('dd/MM/yyyy');
-    final state = ref.watch(chantierSyncProvider(chantier));
+    final factory = GenericEntityProviderFactory.instance;
+    final state = ref.watch(
+      factory.getSyncEntityNotifierProvider<Chantier>(chantier.id),
+    );
     final notifier = ref.read(chantierSyncProvider(chantier).notifier);
 
     final totalBudget = computeTotalBudget(chantier.etapes);
 
+    return switch (state) {
+      SyncedState<Chantier>(data: final chantier) => buildPopScope(
+        notifier,
+        chantier,
+        state,
+        dateFormat,
+        totalBudget,
+        context,
+      ),
+    };
+  }
+
+  PopScope<Object> buildPopScope(
+    SyncEntityNotifier<Chantier> notifier,
+    Chantier chantier,
+    SyncedState<Chantier> state,
+    DateFormat dateFormat,
+    Map<String, double> totalBudget,
+    BuildContext context,
+  ) {
     return PopScope(
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
@@ -65,6 +92,15 @@ class ChantierDetailScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
+
+                      // Infos Dolibarrr
+                      SectionCard(
+                        title: "Connexion Dolibarr",
+                        child: DolibarrSection(
+                          onSync: () => notifier.syncNow(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
 
                       // Infos générales
                       SectionCard(
@@ -117,7 +153,7 @@ class ChantierDetailScreen extends ConsumerWidget {
                               chantier.copyWith(
                                 etapes:
                                     chantier.etapes
-                                        .where((e) => e.id != id)
+                                        .where((e) => e.id != id.toString())
                                         .toList(),
                               ),
                             );

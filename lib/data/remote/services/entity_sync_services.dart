@@ -1,13 +1,16 @@
-import 'package:bat_track_v1/data/local/models/base/has_files.dart';
+import 'dart:developer' as developer;
+
 import 'package:bat_track_v1/data/local/services/hive_service.dart';
 import 'package:bat_track_v1/data/remote/services/firebase_service.dart';
 import 'package:bat_track_v1/data/remote/services/storage_service.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../features/chantier/controllers/providers/chantier_sync_provider.dart';
+import '../../local/models/index_model_extention.dart';
 
 class EntitySyncService<T extends JsonModel> {
   final String boxName;
@@ -39,6 +42,13 @@ class EntitySyncService<T extends JsonModel> {
       final path = '$boxName/$docId/$fileName';
       await StorageService(storage).uploadFile(file, path);
     }
+
+    if (item is PieceJointe) {
+      // ⚠️ Nécessite un `BuildContext`, on ne peut pas précacher sans contexte ici
+      developer.log(
+        '💡 Note: Impossible de précacher ici sans BuildContext. Utilise plutôt precacheAllWithContext() après.',
+      );
+    }
   }
 
   /// 🗑 Supprimer sur Hive + Firestore
@@ -51,13 +61,17 @@ class EntitySyncService<T extends JsonModel> {
   Future<List<T>> getAll() => HiveService.getAll<T>(boxName);
 
   /// 🔄 Synchronisation depuis Firestore vers Hive
-  Future<void> syncFromFirestore() async {
+  Future<void> syncFromFirestore({BuildContext? context}) async {
     final snapshot = await firestore.collection(boxName).get();
     for (var doc in snapshot.docs) {
       final json = doc.data();
       final item = JsonModel.fromDynamic<T>(json);
       if (item != null) {
         await HiveService.put<T>(boxName, doc.id, item);
+
+        if (item is HasFile || item is PieceJointe && context != null) {
+          await HiveService.precachePieceJointe<T>(context!, boxName, item);
+        }
       }
     }
   }
@@ -83,6 +97,19 @@ class EntitySyncService<T extends JsonModel> {
   Future<bool> existsInFirestore(String id) async {
     final doc = await firestore.collection(boxName).doc(id).get();
     return doc.exists;
+  }
+
+  Future<void> precacheAllWithContext(BuildContext context) async {
+    final items = await HiveService.getAll<T>(boxName);
+    for (final item in items) {
+      if (item is PieceJointe) {
+        await HiveService.precachePieceJointe<PieceJointe>(
+          context,
+          boxName,
+          item,
+        );
+      }
+    }
   }
 }
 
