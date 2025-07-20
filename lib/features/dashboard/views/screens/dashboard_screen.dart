@@ -2,10 +2,10 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../dolibarr/views/widgets/dolibarr_section.dart';
 import '../../../intervention/controllers/providers/intervention_stats_provider.dart';
 import '../../../intervention/views/widgets/intervention_bar_chart.dart';
 import '../../../intervention/views/widgets/intervention_pie_chart.dart';
-import '../widgets/dolibarr_section.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});

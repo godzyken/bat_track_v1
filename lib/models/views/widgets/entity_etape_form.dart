@@ -82,6 +82,8 @@ class _EntityEtapeFormState<T> extends ConsumerState<EntityEtapeForm<T>> {
                       child: TextFormField(
                         controller: _controllers[key],
                         decoration: InputDecoration(labelText: key),
+                        keyboardType: TextInputType.name,
+                        autofillHints: const [AutofillHints.name],
                         validator:
                             (val) =>
                                 val == null || val.isEmpty

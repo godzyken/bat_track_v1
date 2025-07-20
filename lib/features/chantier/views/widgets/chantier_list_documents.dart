@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,17 +14,21 @@ class ChantierListDocuments extends ConsumerWidget {
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: chantier.documents.length,
+      cacheExtent: 500,
       itemBuilder:
           (context, index) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                chantier.documents[index].url!,
+              child: CachedNetworkImage(
+                imageUrl: chantier.documents[index].url!,
                 width: 120,
                 height: 120,
                 fit: BoxFit.cover,
-                errorBuilder:
+                placeholder:
+                    (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                errorWidget:
                     (context, _, stackTrace) => Container(
                       width: 120,
                       height: 120,

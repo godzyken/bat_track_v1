@@ -1,8 +1,10 @@
+import 'package:bat_track_v1/features/dolibarr/views/screens/dolibarr_explorer_screen.dart';
 import 'package:bat_track_v1/models/views/screens/entity_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../data/local/models/index_model_extention.dart';
 import '../data/local/providers/hive_provider.dart';
 import '../features/about/views/screens/about_screen.dart';
 import '../features/auth/views/screens/login_screen.dart';
@@ -94,8 +96,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: ':id',
             name: 'chantier-detail',
             builder: (context, state) {
-              final id = state.pathParameters['id']!;
-              return ChantierDetailLoader(chantierId: id);
+              final Chantier? passedChantier = state.extra as Chantier?;
+              final chantierId = state.pathParameters['id']!;
+              return ChantierDetailLoader(chantierId: chantierId);
             },
             routes: [
               // ✅ 1. Liste des étapes
@@ -152,6 +155,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/import-dolibarr',
         builder: (context, state) => const DolibarrImportScreen(),
+      ),
+      GoRoute(
+        path: '/explorer',
+        builder: (context, state) => DolibarrExplorerScreen(),
       ),
     ],
   );

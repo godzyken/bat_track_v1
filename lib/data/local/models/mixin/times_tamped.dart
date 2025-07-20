@@ -1,0 +1,3 @@
+mixin Timestamped {
+  DateTime? updatedAt;
+}

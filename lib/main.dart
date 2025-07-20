@@ -1,11 +1,13 @@
 import 'package:bat_track_v1/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/responsive/wrapper/responsive_layout.dart';
 import 'data/local/providers/hive_provider.dart';
 import 'data/local/providers/shared_preferences_provider.dart';
+import 'data/remote/providers/dolibarr_instance_provider.dart';
 import 'data/remote/providers/firebase_providers.dart';
 import 'features/parametres/affichage/themes/theme.dart';
 
@@ -26,6 +28,15 @@ class AppInitializer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final init = ref.watch(hiveInitProvider);
+    final instance = ref.watch(selectedInstanceProvider);
+
+    Future.microtask(() {
+      if (instance != null && context.mounted) {
+        context.go('/home');
+      } else {
+        if (context.mounted) context.go('/pick-instance');
+      }
+    });
 
     return init.when(
       loading: () => const LoadingApp(),

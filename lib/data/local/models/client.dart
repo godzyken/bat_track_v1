@@ -43,6 +43,9 @@ class Client extends JsonModel {
   @HiveField(10)
   final double? budgetPrevu;
 
+  @HiveField(11)
+  DateTime? _updatedAt;
+
   Client({
     required this.id,
     required this.nom,
@@ -55,30 +58,23 @@ class Client extends JsonModel {
     required this.priority,
     this.contactName,
     this.budgetPrevu,
-  });
+    DateTime? updatedAt,
+  }) : _updatedAt = updatedAt;
+
+  @override
+  DateTime? get updatedAt => _updatedAt;
+
+  @override
+  set updatedAt(DateTime? value) => _updatedAt = value;
 
   /// Désérialisation sécurisée
-  factory Client.fromJson(Map<String, dynamic> json) => Client(
-    id: json['id'] ?? const Uuid().v4(),
-    nom: json['nom'] ?? '',
-    email: json['email'] ?? '',
-    telephone: json['telephone'] ?? '',
-    adresse: json['adresse'] ?? '',
-    interventionsCount: json['interventionsCount'] ?? 0,
-    lastInterventionDate:
-        json['lastInterventionDate'] != null
-            ? DateTime.tryParse(json['lastInterventionDate']) ?? DateTime.now()
-            : DateTime.now(),
-    status: json['status'] ?? '',
-    priority: json['priority'] ?? 'low',
-    contactName: json['contactName'],
-    budgetPrevu: json['budgetPrevu'],
-  );
+  factory Client.fromJson(Map<String, dynamic> json) => _$ClientFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$ClientToJson(this);
 
   Map<String, dynamic> toMap() => toJson();
+
   factory Client.fromMap(Map<String, dynamic> map) => Client.fromJson(map);
 
   @override
@@ -97,6 +93,7 @@ class Client extends JsonModel {
     priority: priority,
     contactName: contactName,
     budgetPrevu: budgetPrevu,
+    updatedAt: updatedAt,
   );
 
   factory Client.mock() => Client(
@@ -111,6 +108,7 @@ class Client extends JsonModel {
     priority: 'Moyen',
     contactName: 'jhon',
     budgetPrevu: 10000.0,
+    updatedAt: DateTime.now(),
   );
 
   @override
@@ -131,6 +129,7 @@ class Client extends JsonModel {
       priority: json['priority'] ?? 'low',
       contactName: json['contactName'],
       budgetPrevu: json['budgetPrevu'],
+      updatedAt: DateTime.tryParse(json['updatedAt']) ?? DateTime.now(),
     );
   }
 

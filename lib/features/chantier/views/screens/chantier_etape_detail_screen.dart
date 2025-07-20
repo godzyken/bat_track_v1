@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bat_track_v1/features/documents/controllers/generator/calculator.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
@@ -49,6 +50,10 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
           nom: file.name,
           type: type,
           taille: file.size,
+          createdAt: DateTime.now(),
+          typeMime: '',
+          parentType: '',
+          parentId: '',
         );
 
         await ref
@@ -352,7 +357,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
             SizedBox(
               width: size,
               child: Text(
-                piece.nom,
+                piece.nom!,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 13),
@@ -370,8 +375,8 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
       borderRadius: BorderRadius.circular(12),
       child:
           isWeb
-              ? Image.network(
-                piece.url!,
+              ? CachedNetworkImage(
+                imageUrl: piece.url!,
                 width: size,
                 height: size,
                 fit: BoxFit.contain,

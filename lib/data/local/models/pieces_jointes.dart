@@ -15,37 +15,53 @@ class PieceJointe extends JsonModel implements HasFile {
   @override
   @HiveField(0)
   final String id;
-
   @HiveField(1)
-  final String nom;
-
+  final String? nom;
   @HiveField(2)
   final String? url;
-
   @HiveField(3)
-  final String type;
-
+  final String? typeMime;
   @HiveField(4)
+  final DateTime createdAt;
+  @HiveField(5)
+  final String? type; // exemple : 'facture', 'video', 'document'
+
+  @HiveField(6)
+  final String? parentType; // ex: Chantier, Intervention
+  @HiveField(7)
+  final String? parentId;
+
+  @HiveField(8)
   final int taille;
 
-  @HiveField(5)
-  final String? path;
+  @HiveField(9)
+  DateTime? _updatedAt;
 
   PieceJointe({
     required this.id,
-    required this.nom,
-    required this.type,
-    required this.taille,
+    this.nom,
     this.url,
-    this.path,
-  });
+    this.typeMime,
+    required this.createdAt,
+    this.type,
+    this.parentType,
+    this.parentId,
+    required this.taille,
+    DateTime? updatedAt,
+  }) : _updatedAt = updatedAt;
+
+  @override
+  DateTime? get updatedAt => _updatedAt;
+
+  @override
+  set updatedAt(DateTime? value) => _updatedAt = value;
 
   @override
   File getFile() {
-    if (path == null) {
+    if (url == null) {
       throw Exception('Path is null for PieceJointe $id');
     }
-    return File(path!);
+    return File(url!);
   }
 
   Uint8List getUintList() => Uint8List(taille);
@@ -73,7 +89,12 @@ class PieceJointe extends JsonModel implements HasFile {
     nom: nom,
     url: url,
     type: type,
+    createdAt: createdAt,
+    typeMime: typeMime,
+    parentType: parentType,
+    parentId: parentId,
     taille: taille,
+    updatedAt: updatedAt,
   );
 
   // Mock
@@ -81,8 +102,13 @@ class PieceJointe extends JsonModel implements HasFile {
     String? id,
     String nom = 'document.pdf',
     String url = 'https://example.com/document.pdf',
-    String type = 'pdf',
+    String type = 'facture',
+    String parentType = "Chantier",
+    String parentId = "ch_01",
+    String typeMime = "application/pdf",
+    DateTime? createAt,
     int taille = 1024,
+    DateTime? updatedAt,
   }) {
     return PieceJointe(
       id: id ?? 'mock_pj_001',
@@ -90,6 +116,11 @@ class PieceJointe extends JsonModel implements HasFile {
       url: url,
       type: type,
       taille: 1024,
+      createdAt: createAt!,
+      parentType: parentType,
+      parentId: parentId,
+      typeMime: typeMime,
+      updatedAt: updatedAt,
     );
   }
 
@@ -101,6 +132,13 @@ class PieceJointe extends JsonModel implements HasFile {
       url: json['url'] ?? '',
       type: json['type'] ?? '',
       taille: json['taille'] ?? 0,
+      createdAt:
+          json['createdAt'] ?? DateTime.tryParse(createdAt.toIso8601String()),
+      typeMime: json['typeMime'] ?? '',
+      parentType: json['parentType'] ?? '',
+      parentId: json['parentId'] ?? '',
+      updatedAt:
+          DateTime.tryParse(updatedAt!.toIso8601String()) ?? DateTime.now(),
     );
   }
 }

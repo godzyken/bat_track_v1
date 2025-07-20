@@ -11,10 +11,14 @@ class ChantierNotifier extends StateNotifier<Chantier?> {
   final Box<ChantierEtape> etapeBox;
   final Box<Piece> pieceBox;
   final Box<PieceJointe> pieceJointeBox;
+  final Box<FactureDraft> factureDraftBox;
+  final Box<Intervention> interventionBox;
+  final EntityServices<FactureDraft> factureDraftService;
   final EntityServices<Chantier> chantierService;
   final EntityServices<ChantierEtape> etapeService;
   final EntityServices<Piece> pieceService;
   final EntityServices<PieceJointe> pieceJointeService;
+  final EntityServices<Intervention> interventionService;
 
   ChantierNotifier({
     required this.id,
@@ -22,10 +26,14 @@ class ChantierNotifier extends StateNotifier<Chantier?> {
     required this.etapeBox,
     required this.pieceBox,
     required this.pieceJointeBox,
+    required this.factureDraftBox,
+    required this.interventionBox,
     required this.chantierService,
     required this.etapeService,
     required this.pieceService,
     required this.pieceJointeService,
+    required this.factureDraftService,
+    required this.interventionService,
   }) : super(chantierBox.get(id));
 
   List<ChantierEtape> get etapes =>
@@ -38,14 +46,21 @@ class ChantierNotifier extends StateNotifier<Chantier?> {
 
   /// Update Model
   Future<void> updateChantier(Chantier chantier) async {
+    final isNew = !chantierBox.containsKey(chantier.id);
+
     await chantierBox.put(chantier.id, chantier);
     await chantierService.save(chantier, chantier.id);
     state = chantier;
+
+    if (isNew) {
+      await createFactureDraft();
+    }
   }
 
   Future<void> updateEtape(ChantierEtape etape) async {
     await etapeBox.put(etape.id, etape);
     await etapeService.save(etape, etape.id!);
+    await recalculateFactureDraft();
   }
 
   Future<void> updatePiece(Piece piece) async {
@@ -107,6 +122,70 @@ class ChantierNotifier extends StateNotifier<Chantier?> {
     final updatedChantier = current.copyWith(etapes: updatedEtapes);
     state = updatedChantier;
   }
+
+  Future<void> createFactureDraft() async {
+    final chantier = chantierBox.get(id);
+    if (chantier == null) return;
+
+    final clientId = chantier.clientId;
+    final lignes = <CustomLigneFacture>[];
+
+    // Étapes (main d'œuvre)
+    final etapesChantier = etapeBox.values.where((e) => e.chantierId == id);
+    for (final e in etapesChantier) {
+      // Récupère les pièces associées à cette étape
+      final piecesEtape = pieceBox.values.where((p) => p.id == e.id);
+
+      // Calcule le coût total des pièces de l’étape
+      final montantPieces = piecesEtape.fold<double>(
+        0,
+        (total, p) => total + (p.getBudgetTotalSansMainOeuvre()),
+      );
+
+      lignes.add(
+        CustomLigneFacture(
+          description: 'Étape : ${e.description}',
+          montant: montantPieces,
+          quantite: 1,
+          total: montantPieces,
+        ),
+      );
+    }
+
+    // Interventions (matériel/supplémentaires)
+    final interventions = interventionBox.values.where(
+      (i) => i.chantierId == id,
+    );
+    for (final i in interventions) {
+      final montant = i.facture?.totalHT ?? 0;
+      lignes.add(
+        CustomLigneFacture(
+          description: 'Intervention : ${i.description}',
+          montant: montant,
+          quantite: 1,
+          total: montant,
+        ),
+      );
+    }
+
+    final facture = FactureDraft(
+      factureId: clientId,
+      chantierId: id,
+      lignesManuelles: lignes,
+      isFinalized: false,
+      dateDerniereModification: DateTime.now(),
+    );
+
+    await factureDraftBox.put(facture.id, facture);
+    await factureDraftService.save(facture, facture.id!);
+  }
+
+  Future<void> recalculateFactureDraft() async {
+    final existing = factureDraftBox.get(id);
+    if (existing != null && !existing.isFinalized) {
+      await createFactureDraft(); // Écrase avec nouvelle version recalculée
+    }
+  }
 }
 
 final chantierAdvancedNotifierProvider = StateNotifierProvider.autoDispose
@@ -117,6 +196,10 @@ final chantierAdvancedNotifierProvider = StateNotifierProvider.autoDispose
       final pieceBox = ref.watch(pieceNotifierProvider(id).notifier).box;
       final pieceJointeBox =
           ref.watch(pieceJointeNotifierProvider(id).notifier).box;
+      final factureDraftBox =
+          ref.watch(factureDraftNotifierProvider(id).notifier).box;
+      final interventionBox =
+          ref.watch(interventionNotifierProvider(id).notifier).box;
 
       return ChantierNotifier(
         id: id,
@@ -124,9 +207,13 @@ final chantierAdvancedNotifierProvider = StateNotifierProvider.autoDispose
         etapeBox: etapeBox,
         pieceBox: pieceBox,
         pieceJointeBox: pieceJointeBox,
+        factureDraftBox: factureDraftBox,
+        interventionBox: interventionBox,
         chantierService: chantierService,
         etapeService: chantierEtapeService,
         pieceService: pieceService,
         pieceJointeService: pieceJointeService,
+        factureDraftService: factureDraftService,
+        interventionService: interventionService,
       );
     });

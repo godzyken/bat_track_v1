@@ -51,6 +51,8 @@ Widget defaultFieldBuilder({
     return TextFormField(
       controller: controller,
       readOnly: true,
+      keyboardType: TextInputType.datetime,
+      autofillHints: const [AutofillHints.birthday],
       decoration: InputDecoration(
         labelText: key,
         suffixIcon: const Icon(Icons.calendar_today),
@@ -76,6 +78,7 @@ Widget defaultFieldBuilder({
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(labelText: "$key (séparés par virgule)"),
+      keyboardType: TextInputType.multiline,
     );
   }
 
@@ -85,11 +88,13 @@ Widget defaultFieldBuilder({
       decoration: InputDecoration(labelText: "$key (JSON)"),
       style: const TextStyle(fontFamily: 'monospace'),
       maxLines: 4,
+      keyboardType: TextInputType.multiline,
     );
   }
 
   return TextFormField(
     controller: controller,
     decoration: InputDecoration(labelText: key),
+    keyboardType: TextInputType.multiline,
   );
 }

@@ -154,12 +154,12 @@ class HiveService {
           if (response.statusCode == 200) {
             final Uint8List data = response.bodyBytes;
             _cacheMap[url] = data;
-            debugPrint('[✔] Fichier téléchargé en cache: $url');
+            developer.log('[✔] Fichier téléchargé en cache: $url');
           } else {
-            debugPrint('[⚠] Erreur téléchargement fichier ${pj.nom}');
+            developer.log('[⚠] Erreur téléchargement fichier ${pj.nom}');
           }
         } catch (e) {
-          debugPrint('[⚠] Exception téléchargement fichier: $e');
+          developer.log('[⚠] Exception téléchargement fichier: $e');
         }
       }
     } else {

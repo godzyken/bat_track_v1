@@ -11,7 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
-import '../../../dashboard/views/widgets/dolibarr_section.dart';
+import '../../../dolibarr/views/widgets/dolibarr_section.dart';
 import '../../../dolibarr/views/widgets/sync_statu_bar.dart';
 import '../../controllers/providers/chantier_sync_provider.dart';
 import '../widgets/chantier_card_info.dart';
@@ -25,7 +25,7 @@ class ChantierDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final screen = context.responsiveInfo(ref);
+    final info = context.responsiveInfo(ref);
     final dateFormat = DateFormat('dd/MM/yyyy');
     final factory = GenericEntityProviderFactory.instance;
     final state = ref.watch(

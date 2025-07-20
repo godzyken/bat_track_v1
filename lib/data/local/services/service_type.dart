@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../../../models/data/json_model.dart';
@@ -30,7 +32,7 @@ class EntityServices<T extends JsonModel> implements EntityService<T> {
       await FirestoreService.setData<T>(
         collectionPath: boxName,
         docId: id,
-        data: item.toJson(),
+        data: item,
       );
     } else {
       throw Exception('Invalid storage mode');
@@ -56,7 +58,19 @@ class EntityServices<T extends JsonModel> implements EntityService<T> {
   Future<void> deleteAll() => HiveService.deleteAll<T>();
 
   @override
-  Future<List<T>> getAll() => HiveService.getAll<T>(boxName);
+  Future<List<T>> getAll() async {
+    final sw = Stopwatch()..start();
+    developer.log('⏳ Sync cloud => $boxName');
+
+    final modelsFromHive = await HiveService.getAll<T>(boxName);
+
+    sw.stop();
+    developer.log(
+      '✅ $boxName sync terminé en ${sw.elapsedMilliseconds}ms (n=${modelsFromHive.length})',
+    );
+
+    return modelsFromHive;
+  }
 
   @override
   T? getById(String id) {
@@ -129,7 +143,9 @@ final pieceService = EntityServices<Piece>('pieces');
 final materielService = EntityServices<Materiel>('materiels');
 final materiauService = EntityServices<Materiau>('materiau');
 final mainOeuvreService = EntityServices<MainOeuvre>('mainOeuvre');
+final projetService = EntityServices<Projet>('projets');
+final factureService = EntityServices<Facture>('factures');
+final factureModelService = EntityServices<FactureModel>('factureModels');
+final factureDraftService = EntityServices<FactureDraft>('factureDrafts');
 
 final storageService = StorageService(FirebaseStorage.instance);
-//final factureService = EntityService<Facture>('factures');
-//final projetService = EntityService<Projet>('projets');

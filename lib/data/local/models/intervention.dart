@@ -4,6 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../models/data/json_model.dart';
+import 'facture_draft.dart';
 
 part 'intervention.g.dart';
 
@@ -29,6 +30,10 @@ class Intervention extends JsonModel {
   final String? titre;
   @HiveField(8)
   final String? commentaire;
+  @HiveField(9)
+  final FactureDraft? facture;
+  @HiveField(10)
+  DateTime? _updatedAt;
 
   Intervention({
     required this.id,
@@ -40,14 +45,24 @@ class Intervention extends JsonModel {
     this.document = const [],
     this.titre,
     this.commentaire,
-  });
+    this.facture,
+    DateTime? updatedAt,
+  }) : _updatedAt = updatedAt;
+
+  @override
+  DateTime? get updatedAt => _updatedAt;
+
+  @override
+  set updatedAt(DateTime? value) => _updatedAt = value;
 
   factory Intervention.fromJson(Map<String, dynamic> json) =>
       _$InterventionFromJson(json);
+
   @override
   Map<String, dynamic> toJson() => _$InterventionToJson(this);
 
   Map<String, dynamic> toMap() => toJson();
+
   factory Intervention.fromMap(Map<String, dynamic> map) =>
       Intervention.fromJson(map);
 
@@ -61,6 +76,8 @@ class Intervention extends JsonModel {
     List<PieceJointe>? document,
     String? titre,
     String? commentaire,
+    DateTime? updatedAt,
+    FactureDraft? draft,
   }) => Intervention(
     id: id ?? const Uuid().v4(),
     chantierId: chantierId ?? 'chantier_001',
@@ -92,6 +109,8 @@ class Intervention extends JsonModel {
         ],
     titre: titre ?? 'Inspection',
     commentaire: commentaire ?? 'RAS',
+    facture: draft,
+    updatedAt: updatedAt ?? DateTime.now(),
   );
 
   @override
@@ -105,6 +124,7 @@ class Intervention extends JsonModel {
     document: json['document'],
     titre: json['titre'],
     commentaire: json['commentaire'],
+    updatedAt: DateTime.parse(json['updatedAt']),
   );
 
   @override
@@ -118,6 +138,7 @@ class Intervention extends JsonModel {
     document: document,
     titre: titre,
     commentaire: commentaire,
+    updatedAt: updatedAt,
   );
 
   @override
@@ -132,6 +153,7 @@ class Intervention extends JsonModel {
       document: json['document'],
       titre: json['titre'],
       commentaire: json['commentaire'],
+      updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
 }

@@ -3,6 +3,10 @@ import '../../data/local/models/index_model_extention.dart';
 abstract class JsonModel<T> {
   String? get id;
 
+  DateTime? get updatedAt;
+
+  set updatedAt(DateTime? value);
+
   static T? fromDynamic<T>(Map<String, dynamic> json) {
     switch (T) {
       case Chantier _:
@@ -44,6 +48,11 @@ abstract class JsonModel<T> {
   T? fromDolibarrJson(Map<String, dynamic> json);
 }
 
+abstract class JsonModelWithTimestamp<T> extends JsonModel<T> {
+  @override
+  DateTime get updatedAt;
+}
+
 abstract class JsonModelWithUrl extends JsonModel {
   String? get firebaseUrl;
 
@@ -74,10 +83,10 @@ extension JsonModelFactory on JsonModel {
         return ChantierEtape.fromJson(json) as T;
       case Piece _:
         return Piece.fromJson(json) as T;
-      /*      case Facture:
-        return Facture.fromJson(json) as T;
-      case Projet:
-        return Projet.fromJson(json) as T;*/
+      case FactureDraft _:
+        return FactureDraft.fromJson(json) as T;
+      case Projet _:
+        return Projet.fromJson(json) as T;
       default:
         return null;
     }

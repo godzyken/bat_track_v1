@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:hive/hive.dart';
@@ -48,6 +49,9 @@ class ChantierEtape extends JsonModel {
   @HiveField(11)
   final int ordre;
 
+  @HiveField(12)
+  DateTime? _updatedAt;
+
   ChantierEtape({
     this.id, // Ne pas oublier ici aussi
     required this.titre,
@@ -61,7 +65,14 @@ class ChantierEtape extends JsonModel {
     this.budget,
     this.pieces = const [],
     this.ordre = 0,
-  });
+    DateTime? updatedAt,
+  }) : _updatedAt = updatedAt;
+
+  @override
+  DateTime? get updatedAt => _updatedAt;
+
+  @override
+  set updatedAt(DateTime? value) => _updatedAt = value;
 
   factory ChantierEtape.fromJson(Map<String, dynamic> json) =>
       _$ChantierEtapeFromJson(json);
@@ -82,7 +93,7 @@ class ChantierEtape extends JsonModel {
                 return PieceJointe.fromJson(decoded);
               }
             } catch (err) {
-              print('Erreur de décodage d’une PieceJointe : $err');
+              developer.log('Erreur de décodage d’une PieceJointe : $err');
             }
           }
           throw Exception('Format inattendu pour PieceJointe : $e');
@@ -109,6 +120,7 @@ class ChantierEtape extends JsonModel {
     budget: budget,
     pieces: pieces,
     ordre: ordre,
+    updatedAt: updatedAt,
   );
 
   ChantierEtape copyWith({
@@ -124,6 +136,7 @@ class ChantierEtape extends JsonModel {
     double? budget,
     List<Piece>? pieces,
     int? ordre,
+    DateTime? updatedAt,
   }) {
     return ChantierEtape(
       id: id,
@@ -138,6 +151,7 @@ class ChantierEtape extends JsonModel {
       budget: budget ?? this.budget,
       pieces: pieces ?? this.pieces,
       ordre: ordre ?? this.ordre,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -154,6 +168,7 @@ class ChantierEtape extends JsonModel {
     double? budget,
     List<Piece>? pieces,
     int? ordre,
+    DateTime? updatedAt,
   }) {
     return ChantierEtape(
       id: id ?? 'mock_etape_001',
@@ -225,6 +240,7 @@ class ChantierEtape extends JsonModel {
             ),
           ],
       ordre: ordre ?? 0,
+      updatedAt: updatedAt ?? DateTime.now(),
     );
   }
 
@@ -243,6 +259,7 @@ class ChantierEtape extends JsonModel {
       budget: json['budget'] ?? 0,
       pieces: List<Piece>.from(json['pieces']),
       ordre: json['ordre'] ?? 0,
+      updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
 }

@@ -136,3 +136,30 @@ final syncAllEntitiesProvider = FutureProvider<void>((ref) async {
   //await ref.read(factureSyncServiceProvider).syncFromFirestore();
   //await ref.read(projetSyncServiceProvider).syncFromFirestore();
 });
+
+final allDataStreamProvider = StreamProvider.autoDispose((ref) async* {
+  final clients =
+      await ref
+          .read(clientSyncServiceProvider)
+          .firestore
+          .collection('clients')
+          .get();
+  final techniciens =
+      await ref
+          .read(techSyncServiceProvider)
+          .firestore
+          .collection('techniciens')
+          .get();
+  final chantiers =
+      await ref
+          .read(chantierSyncServiceProvider)
+          .firestore
+          .collection('chantiers')
+          .get();
+
+  yield {
+    'clients': clients.docs,
+    'techniciens': techniciens.docs,
+    'chantiers': chantiers.docs,
+  };
+});

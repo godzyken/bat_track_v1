@@ -30,6 +30,8 @@ class Technicien extends JsonModel {
   final List<String> chantiersAffectes;
   @HiveField(9)
   final List<String> etapesAffectees;
+  @HiveField(10)
+  DateTime? _updatedAt;
 
   Technicien({
     required this.id,
@@ -42,7 +44,14 @@ class Technicien extends JsonModel {
     this.localisation,
     this.chantiersAffectes = const [],
     this.etapesAffectees = const [],
-  });
+    DateTime? updatedAt,
+  }) : _updatedAt = updatedAt;
+
+  @override
+  DateTime? get updatedAt => _updatedAt;
+
+  @override
+  set updatedAt(DateTime? value) => _updatedAt = value;
 
   @override
   Technicien fromJson(Map<String, dynamic> json) => Technicien(
@@ -56,6 +65,7 @@ class Technicien extends JsonModel {
     localisation: json['localisation'],
     chantiersAffectes: List<String>.from(json['chantiersAffectes']),
     etapesAffectees: List<String>.from(json['etapesAffectees']),
+    updatedAt: DateTime.tryParse(json['updatedAt'])!,
   );
 
   factory Technicien.fromJson(Map<String, dynamic> json) =>
@@ -65,6 +75,7 @@ class Technicien extends JsonModel {
   Map<String, dynamic> toJson() => _$TechnicienToJson(this);
 
   Map<String, dynamic> toMap() => toJson();
+
   factory Technicien.fromMap(Map<String, dynamic> map) =>
       Technicien.fromJson(map);
 
@@ -80,6 +91,7 @@ class Technicien extends JsonModel {
     localisation: localisation,
     chantiersAffectes: chantiersAffectes,
     etapesAffectees: etapesAffectees,
+    updatedAt: updatedAt,
   );
 
   factory Technicien.mock() => Technicien(
@@ -93,6 +105,7 @@ class Technicien extends JsonModel {
     localisation: 'Paris',
     chantiersAffectes: [],
     etapesAffectees: [],
+    updatedAt: DateTime.now(),
   );
 
   @override
@@ -108,6 +121,7 @@ class Technicien extends JsonModel {
       localisation: json['localisation'],
       chantiersAffectes: List<String>.from(json['chantiersAffectes']),
       etapesAffectees: List<String>.from(json['etapesAffectees']),
+      updatedAt: DateTime.tryParse(json['updateAt'])!,
     );
   }
 }

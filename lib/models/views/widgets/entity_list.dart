@@ -40,6 +40,7 @@ class EntityList<T extends JsonModel> extends StatelessWidget {
       return ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) => buildCard(items[index]),
+        cacheExtent: 500,
       );
     }
 

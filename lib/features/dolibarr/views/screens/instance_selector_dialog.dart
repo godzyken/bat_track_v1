@@ -30,8 +30,10 @@ class InstanceSelectorDialog extends ConsumerWidget {
                           await ref
                               .read(selectedInstanceProvider.notifier)
                               .selectInstance(instance);
-                          Navigator.pushReplacementNamed(context, '/home');
-                          Navigator.of(context).pop();
+                          if (context.mounted) {
+                            Navigator.pushReplacementNamed(context, '/home');
+                            Navigator.of(context).pop();
+                          }
                         },
                       ),
                     )

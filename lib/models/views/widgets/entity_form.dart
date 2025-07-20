@@ -84,6 +84,27 @@ class _EntityFormState<T extends JsonModel>
     return value;
   }
 
+  List<String>? _getAutofillHints(String key) {
+    final lowerKey = key.toLowerCase();
+
+    if (lowerKey.contains('email')) return [AutofillHints.email];
+    if (lowerKey.contains('name')) return [AutofillHints.name];
+    if (lowerKey.contains('prenom')) return [AutofillHints.givenName];
+    if (lowerKey.contains('nom')) return [AutofillHints.familyName];
+    if (lowerKey.contains('tel')) return [AutofillHints.telephoneNumber];
+    if (lowerKey.contains('address')) return [AutofillHints.fullStreetAddress];
+    if (lowerKey.contains('postal')) return [AutofillHints.postalCode];
+    if (lowerKey.contains('ville')) return [AutofillHints.addressCity];
+    if (lowerKey.contains('mdp') || lowerKey.contains('motdepasse')) {
+      return [AutofillHints.newPassword];
+    }
+    if (lowerKey.contains('username') || lowerKey.contains('identifiant')) {
+      return [AutofillHints.username];
+    }
+
+    return null;
+  }
+
   Widget _defaultFieldBuilder({
     required BuildContext context,
     required String key,
@@ -92,8 +113,11 @@ class _EntityFormState<T extends JsonModel>
     required void Function(dynamic) onChanged,
     bool expertMode = false,
   }) {
+    final autofill = _getAutofillHints(key);
+
     if (value is bool) {
       return SwitchListTile(
+        key: ValueKey(key),
         title: Text(key),
         value: controller?.text.toLowerCase() == 'true',
         onChanged: (val) {
@@ -107,8 +131,10 @@ class _EntityFormState<T extends JsonModel>
       return TextFormField(
         controller: controller,
         readOnly: true,
+        keyboardType: TextInputType.datetime,
         decoration: InputDecoration(
           labelText: key,
+          hintText: 'Entrez votre $key',
           suffixIcon: const Icon(Icons.calendar_today),
         ),
         onTap: () async {
@@ -125,6 +151,8 @@ class _EntityFormState<T extends JsonModel>
             onChanged(picked);
           }
         },
+        key: ValueKey(key),
+        autofillHints: autofill,
       );
     }
 
@@ -132,6 +160,9 @@ class _EntityFormState<T extends JsonModel>
       return TextFormField(
         controller: controller,
         decoration: InputDecoration(labelText: "$key (séparés par virgule)"),
+        keyboardType: TextInputType.multiline,
+        autofillHints: autofill,
+        key: ValueKey(key),
       );
     }
 
@@ -141,12 +172,18 @@ class _EntityFormState<T extends JsonModel>
         decoration: InputDecoration(labelText: "$key (JSON)"),
         style: const TextStyle(fontFamily: 'monospace'),
         maxLines: 4,
+        keyboardType: TextInputType.multiline,
+        autofillHints: autofill,
+        key: ValueKey(key),
       );
     }
 
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(labelText: key),
+      key: ValueKey(key),
+      keyboardType: TextInputType.text,
+      autofillHints: autofill,
     );
   }
 
@@ -228,6 +265,7 @@ class _EntityFormState<T extends JsonModel>
                 return 'JSON invalide';
               }
             },
+            autofillHints: _getAutofillHints(key),
           );
         })
         .toList();

@@ -72,6 +72,7 @@ class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
         if (etapeId != null && !technicien.etapesAffectees.contains(etapeId))
           etapeId,
       ],
+      updatedAt: technicien.updatedAt,
     );
 
     await HiveService.put('techniciens', updated.id, updated);
@@ -102,6 +103,7 @@ class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
       localisation: technicien.localisation,
       chantiersAffectes: [...technicien.chantiersAffectes..remove(chantierId)],
       etapesAffectees: [...technicien.etapesAffectees..remove(etapeId)],
+      updatedAt: technicien.updatedAt,
     );
 
     await HiveService.put('techniciens', updated.id, updated);

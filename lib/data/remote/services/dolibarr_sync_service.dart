@@ -42,11 +42,15 @@ class DolibarrSyncService {
       try {
         await sync();
       } catch (e) {
-        _showSnack(context, "Erreur pendant la synchro : $e");
+        if (context.mounted) {
+          _showSnack(context, "Erreur pendant la synchro : $e");
+        }
       }
     }
 
-    _showSnack(context, "Synchronisation complète !");
+    if (context.mounted) {
+      _showSnack(context, "Synchronisation complète !");
+    }
   }
 
   Future<void> _syncModel<T extends JsonModel>({
@@ -70,7 +74,12 @@ class DolibarrSyncService {
       await adapter.saveToHive(box, item as dynamic);
     }
 
-    _showSnack(context, "$collection : ${items.length} éléments synchronisés");
+    if (context.mounted) {
+      _showSnack(
+        context,
+        "$collection : ${items.length} éléments synchronisés",
+      );
+    }
   }
 
   void _showSnack(BuildContext context, String msg) {

@@ -13,4 +13,8 @@ Future<void> registerHiveAdapters() async {
   Hive.registerAdapter(MateriauAdapter());
   Hive.registerAdapter(MaterielAdapter());
   Hive.registerAdapter(MainOeuvreAdapter());
+  Hive.registerAdapter(ProjetAdapter());
+  Hive.registerAdapter(FactureAdapter());
+  Hive.registerAdapter(FactureDraftAdapter());
+  Hive.registerAdapter(FactureModelAdapter());
 }

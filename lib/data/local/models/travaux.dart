@@ -29,6 +29,9 @@ class Piece extends JsonModel {
   @HiveField(5)
   final MainOeuvre mainOeuvre;
 
+  @HiveField(6)
+  DateTime? _updatedAt;
+
   Piece({
     this.id,
     required this.nom,
@@ -36,7 +39,14 @@ class Piece extends JsonModel {
     required this.materiaux,
     required this.materiels,
     required this.mainOeuvre,
-  });
+    DateTime? updatedAt,
+  }) : _updatedAt = updatedAt;
+
+  @override
+  DateTime? get updatedAt => _updatedAt;
+
+  @override
+  set updatedAt(DateTime? value) => _updatedAt = value;
 
   double getBudgetTotal(List<Technicien> techniciens) {
     return BudgetGen.calculerTotal(
@@ -57,6 +67,7 @@ class Piece extends JsonModel {
   }
 
   factory Piece.fromJson(Map<String, dynamic> json) => _$PieceFromJson(json);
+
   @override
   Map<String, dynamic> toJson() => _$PieceToJson(this);
 
@@ -71,6 +82,7 @@ class Piece extends JsonModel {
     materiaux: materiaux,
     materiels: materiels,
     mainOeuvre: mainOeuvre,
+    updatedAt: updatedAt,
   );
 
   Piece copyWith({
@@ -80,6 +92,7 @@ class Piece extends JsonModel {
     List<Materiau>? materiaux,
     List<Materiel>? materiels,
     MainOeuvre? mainOeuvre,
+    DateTime? updatedAt,
   }) {
     return Piece(
       id: id ?? this.id,
@@ -88,6 +101,7 @@ class Piece extends JsonModel {
       materiaux: materiaux ?? this.materiaux,
       materiels: materiels ?? this.materiels,
       mainOeuvre: mainOeuvre ?? this.mainOeuvre,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -98,6 +112,7 @@ class Piece extends JsonModel {
     List<Materiau>? materiaux,
     List<Materiel>? materiels,
     MainOeuvre? mainOeuvre,
+    DateTime? updatedAt,
   }) => Piece(
     id: id ?? '1',
     nom: nom,
@@ -126,6 +141,7 @@ class Piece extends JsonModel {
         ],
     mainOeuvre:
         mainOeuvre ?? MainOeuvre(idTechnicien: 'tec_35', heuresEstimees: 10),
+    updatedAt: updatedAt ?? DateTime.now(),
   );
 
   @override
@@ -140,6 +156,7 @@ class Piece extends JsonModel {
         idTechnicien: json['mainOeuvre']['idTechnicien'] ?? '',
         heuresEstimees: json['mainOeuvre']['heuresEstimees'] ?? 0,
       ),
+      updatedAt: DateTime.tryParse(json['updatedAt']),
     );
   }
 
@@ -168,6 +185,9 @@ class Materiau extends JsonModel {
   @HiveField(5)
   final double? quantiteFixe;
 
+  @HiveField(6)
+  DateTime? _updatedAt;
+
   Materiau({
     required this.id,
     required this.nom,
@@ -175,7 +195,14 @@ class Materiau extends JsonModel {
     required this.unite,
     this.coefficientSurface,
     this.quantiteFixe,
-  });
+    DateTime? updatedAt,
+  }) : _updatedAt = updatedAt;
+
+  @override
+  DateTime? get updatedAt => _updatedAt;
+
+  @override
+  set updatedAt(DateTime? value) => _updatedAt = value;
 
   factory Materiau.fromJson(Map<String, dynamic> json) =>
       _$MateriauFromJson(json);
@@ -194,6 +221,7 @@ class Materiau extends JsonModel {
     unite: unite,
     coefficientSurface: coefficientSurface,
     quantiteFixe: quantiteFixe,
+    updatedAt: updatedAt,
   );
 
   factory Materiau.mock({
@@ -203,6 +231,7 @@ class Materiau extends JsonModel {
     String unite = 'm²',
     double? coefficientSurface,
     double? quantiteFixe,
+    DateTime? updatedAt,
   }) => Materiau(
     id: id ?? '1',
     nom: nom,
@@ -210,6 +239,7 @@ class Materiau extends JsonModel {
     unite: unite,
     coefficientSurface: coefficientSurface ?? 2.5,
     quantiteFixe: quantiteFixe ?? 5.0,
+    updatedAt: updatedAt,
   );
 
   @override
@@ -221,6 +251,7 @@ class Materiau extends JsonModel {
       unite: json['unite'] ?? '',
       coefficientSurface: json['coefficientSurface'],
       quantiteFixe: json['quantiteFixe'],
+      updatedAt: DateTime.tryParse(json['updatedAt']),
     );
   }
 
@@ -250,6 +281,9 @@ class Materiel extends JsonModel {
   @HiveField(5)
   final double? prixLocation;
 
+  @HiveField(6)
+  DateTime? _updatedAt;
+
   Materiel({
     required this.id,
     required this.nom,
@@ -257,10 +291,18 @@ class Materiel extends JsonModel {
     required this.quantiteFixe,
     this.joursLocation,
     this.prixLocation,
-  });
+    DateTime? updatedAt,
+  }) : _updatedAt = updatedAt;
+
+  @override
+  DateTime? get updatedAt => _updatedAt;
+
+  @override
+  set updatedAt(DateTime? value) => _updatedAt = value;
 
   factory Materiel.fromJson(Map<String, dynamic> json) =>
       _$MaterielFromJson(json);
+
   @override
   Map<String, dynamic> toJson() => _$MaterielToJson(this);
 
@@ -275,6 +317,7 @@ class Materiel extends JsonModel {
     quantiteFixe: quantiteFixe,
     joursLocation: joursLocation,
     prixLocation: prixLocation,
+    updatedAt: updatedAt,
   );
 
   factory Materiel.mock({
@@ -284,6 +327,7 @@ class Materiel extends JsonModel {
     double? quantiteFixe,
     double? joursLocation,
     double? prixLocation,
+    DateTime? updatedAt,
   }) {
     return Materiel(
       id: id ?? '1',
@@ -292,6 +336,7 @@ class Materiel extends JsonModel {
       quantiteFixe: quantiteFixe ?? 10,
       joursLocation: joursLocation ?? 5.0,
       prixLocation: prixLocation ?? 500,
+      updatedAt: updatedAt ?? DateTime.now(),
     );
   }
 
@@ -304,6 +349,7 @@ class Materiel extends JsonModel {
       quantiteFixe: json['quantiteFixe'] ?? 0,
       joursLocation: json['joursLocation'],
       prixLocation: json['prixLocation'],
+      updatedAt: DateTime.tryParse(json['updatedAt']),
     );
   }
 
@@ -320,10 +366,24 @@ class MainOeuvre extends JsonModel {
   @HiveField(1)
   final double heuresEstimees;
 
-  MainOeuvre({required this.idTechnicien, required this.heuresEstimees});
+  @HiveField(2)
+  DateTime? _updatedAt;
+
+  MainOeuvre({
+    required this.idTechnicien,
+    required this.heuresEstimees,
+    DateTime? updatedAt,
+  }) : _updatedAt = updatedAt;
+
+  @override
+  DateTime? get updatedAt => _updatedAt;
+
+  @override
+  set updatedAt(DateTime? value) => _updatedAt = value;
 
   factory MainOeuvre.fromJson(Map<String, dynamic> json) =>
       _$MainOeuvreFromJson(json);
+
   @override
   Map<String, dynamic> toJson() => _$MainOeuvreToJson(this);
 
@@ -331,21 +391,33 @@ class MainOeuvre extends JsonModel {
   MainOeuvre fromJson(Map<String, dynamic> json) => MainOeuvre.fromJson(json);
 
   @override
-  MainOeuvre copyWithId(String? id) =>
-      MainOeuvre(idTechnicien: idTechnicien, heuresEstimees: heuresEstimees);
+  MainOeuvre copyWithId(String? id) => MainOeuvre(
+    idTechnicien: idTechnicien,
+    heuresEstimees: heuresEstimees,
+    updatedAt: updatedAt,
+  );
 
-  MainOeuvre copyWith({String? idTechnicien, double? heuresEstimees}) {
+  MainOeuvre copyWith({
+    String? idTechnicien,
+    double? heuresEstimees,
+    DateTime? updatedAt,
+  }) {
     return MainOeuvre(
       idTechnicien: idTechnicien ?? this.idTechnicien,
       heuresEstimees: heuresEstimees ?? this.heuresEstimees,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
-  factory MainOeuvre.mock({String? idTechnicien, double? heuresEstimees}) =>
-      MainOeuvre(
-        idTechnicien: idTechnicien ?? 'demo-tech',
-        heuresEstimees: heuresEstimees ?? 10,
-      );
+  factory MainOeuvre.mock({
+    String? idTechnicien,
+    double? heuresEstimees,
+    DateTime? updatedAt,
+  }) => MainOeuvre(
+    idTechnicien: idTechnicien ?? 'demo-tech',
+    heuresEstimees: heuresEstimees ?? 10,
+    updatedAt: updatedAt ?? DateTime.now(),
+  );
 
   @override
   String? get id => Technicien.mock().id;
@@ -355,6 +427,7 @@ class MainOeuvre extends JsonModel {
     return MainOeuvre(
       idTechnicien: json['idTechnicien'] ?? '',
       heuresEstimees: json['heuresEstimees'] ?? 0,
+      updatedAt: DateTime.tryParse(json['updatedAt']),
     );
   }
 

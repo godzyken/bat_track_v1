@@ -51,6 +51,8 @@ class ChantierCardInfo extends ConsumerWidget {
               initialValue: chantier.nom,
               decoration: const InputDecoration(labelText: 'Nom'),
               onChanged: (value) => onChanged(chantier.copyWith(nom: value)),
+              keyboardType: TextInputType.name,
+              autofillHints: const [AutofillHints.name],
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -58,13 +60,19 @@ class ChantierCardInfo extends ConsumerWidget {
               decoration: const InputDecoration(labelText: 'Adresse'),
               onChanged:
                   (value) => onChanged(chantier.copyWith(adresse: value)),
+              keyboardType: TextInputType.streetAddress,
+              autofillHints: const [AutofillHints.fullStreetAddress],
             ),
             const SizedBox(height: 12),
+
+            /// Todo: client id a regler
             TextFormField(
               initialValue: chantier.clientId,
               decoration: const InputDecoration(labelText: 'Client ID'),
               onChanged:
                   (value) => onChanged(chantier.copyWith(clientId: value)),
+              keyboardType: TextInputType.name,
+              autofillHints: const [AutofillHints.name],
             ),
             const SizedBox(height: 12),
             GestureDetector(

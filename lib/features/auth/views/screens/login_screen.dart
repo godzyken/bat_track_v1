@@ -43,22 +43,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   children: [
                     TextFormField(
                       controller: _userCtrl,
+                      keyboardType: TextInputType.name,
                       decoration: const InputDecoration(
                         labelText: 'Identifiant',
                       ),
                       validator:
                           (value) =>
                               value == 'demo' ? null : 'Identifiant incorrect',
+                      autofillHints: const [AutofillHints.name],
                     ),
                     TextFormField(
                       controller: _passCtrl,
                       obscureText: true,
+                      keyboardType: TextInputType.visiblePassword,
                       decoration: const InputDecoration(
                         labelText: 'Mot de passe',
                       ),
                       validator:
                           (value) =>
                               value == 'demo' ? null : 'Mot de passe incorrect',
+                      autofillHints: const [AutofillHints.password],
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(

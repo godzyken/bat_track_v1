@@ -54,6 +54,12 @@ class Chantier extends JsonModel<Chantier>
   @HiveField(12)
   double? budgetReel;
 
+  @HiveField(13)
+  DateTime? _updatedAt;
+
+  @HiveField(14)
+  List<Intervention>? interventions;
+
   Chantier({
     required this.id,
     required this.nom,
@@ -68,7 +74,15 @@ class Chantier extends JsonModel<Chantier>
     this.commentaire,
     this.budgetPrevu,
     this.budgetReel,
-  });
+    this.interventions,
+    DateTime? updatedAt,
+  }) : _updatedAt = updatedAt;
+
+  @override
+  DateTime? get updatedAt => _updatedAt;
+
+  @override
+  set updatedAt(DateTime? value) => _updatedAt = value;
 
   // JSON
   factory Chantier.fromJson(Map<String, dynamic> json) => Chantier(
@@ -85,15 +99,26 @@ class Chantier extends JsonModel<Chantier>
     commentaire: json['commentaire'],
     budgetPrevu: (json['budgetPrevu'] as num?)?.toDouble(),
     budgetReel: (json['budgetReel'] as num?)?.toDouble(),
+    updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
   );
 
   @override
   Map<String, dynamic> toJson() => {
     'id': id,
     'nom': nom,
+    'adresse': adresse,
+    'clientId': clientId,
     'commentaire': commentaire,
     'dateDebut': dateDebut.toIso8601String(),
     'dateFin': dateFin?.toIso8601String(),
+    'etat': etat,
+    'technicienIds': technicienIds,
+    'documents': documents,
+    'etapes': etapes,
+    'budgetPrevu': budgetPrevu,
+    'budgetReel': budgetReel,
+    'updatedAt': updatedAt,
+    'interventions': interventions,
   };
 
   // Firebase
@@ -115,6 +140,8 @@ class Chantier extends JsonModel<Chantier>
     String? commentaire,
     double? budgetPrevu,
     double? budgetReel,
+    List<Intervention>? interventions,
+    DateTime? updatedAt,
   }) {
     return Chantier(
       id: id ?? const Uuid().v4(),
@@ -134,6 +161,10 @@ class Chantier extends JsonModel<Chantier>
               url: 'https://images.app.goo.gl/tjBoLaHSYnfsvPBZ8',
               type: 'pdf',
               taille: 1024,
+              createdAt: DateTime.now(),
+              parentId: '',
+              parentType: '',
+              typeMime: '',
             ),
             PieceJointe(
               id: 'doc_002',
@@ -141,6 +172,10 @@ class Chantier extends JsonModel<Chantier>
               url: 'https://images.app.goo.gl/FHWsUrpzTMUx5xFX8',
               type: 'pdf',
               taille: 2048,
+              createdAt: DateTime.now(),
+              parentId: '',
+              parentType: '',
+              typeMime: '',
             ),
           ],
       etapes:
@@ -152,6 +187,23 @@ class Chantier extends JsonModel<Chantier>
       commentaire: 'Urgence à traiter avant fin de mois',
       budgetPrevu: 15000.0,
       budgetReel: 12000.0,
+      updatedAt: updatedAt ?? DateTime.now(),
+      interventions:
+          interventions ??
+          [
+            Intervention.mock(
+              id: 'int_O1',
+              chantierId: id,
+              technicienId: technicienIds?.first,
+              date: dateDebut,
+              updatedAt: updatedAt,
+              commentaire:
+                  'entretient régulier négligée, programmer les rdvs client.',
+              description:
+                  'Chauffe-eau défectueux, problème identifier, présence accrue de tartre',
+              document: [PieceJointe.mock()],
+            ),
+          ],
     );
   }
 
@@ -159,21 +211,7 @@ class Chantier extends JsonModel<Chantier>
   Chantier fromJson(Map<String, dynamic> json) => Chantier.fromJson(json);
 
   @override
-  Chantier copyWithId(String? id) => Chantier(
-    id: id ?? this.id,
-    nom: nom,
-    adresse: adresse,
-    clientId: clientId,
-    dateDebut: dateDebut,
-    dateFin: dateFin,
-    etat: etat,
-    technicienIds: List<String>.from(technicienIds),
-    documents: List<PieceJointe>.from(documents),
-    etapes: List<ChantierEtape>.from(etapes),
-    commentaire: commentaire,
-    budgetPrevu: budgetPrevu,
-    budgetReel: budgetReel,
-  );
+  Chantier copyWithId(String? id) => copyWith(id: id ?? this.id);
 
   @override
   String toString() {
@@ -194,6 +232,7 @@ class Chantier extends JsonModel<Chantier>
     String? commentaire,
     double? budgetPrevu,
     double? budgetReel,
+    DateTime? updatedAt,
   }) {
     return Chantier(
       id: id ?? this.id,
@@ -209,6 +248,7 @@ class Chantier extends JsonModel<Chantier>
       commentaire: commentaire ?? this.commentaire,
       budgetPrevu: budgetPrevu ?? this.budgetPrevu,
       budgetReel: budgetReel ?? this.budgetReel,
+      updatedAt: updatedAt ?? _updatedAt,
     );
   }
 

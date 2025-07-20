@@ -108,24 +108,28 @@ class _EntityCardState<T extends JsonModel> extends ConsumerState<EntityCard<T>>
                     context.goNamed(
                       'chantier-detail',
                       pathParameters: {'id': chantier.id},
+                      extra: chantier,
                     );
                   } else if (T == Client) {
                     final client = widget.entity as Client;
                     context.goNamed(
                       'client-detail',
                       pathParameters: {'id': client.id},
+                      extra: client,
                     );
                   } else if (T == Technicien) {
                     final tech = widget.entity as Technicien;
                     context.goNamed(
                       'technicien-detail',
                       pathParameters: {'id': tech.id},
+                      extra: tech,
                     );
                   } else if (T == Intervention) {
                     final intervention = widget.entity as Intervention;
                     context.goNamed(
                       'intervention-detail',
                       pathParameters: {'id': intervention.id},
+                      extra: intervention,
                     );
                   }
                 },
