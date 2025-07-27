@@ -23,7 +23,7 @@ class TechnicienDetailScreen extends ConsumerWidget {
     final chantiersAffectes =
         chantiers
             .where(
-              (chantier) => technicien.chantiersAffectes.contains(chantier.id),
+              (chantier) => technicien.chantiersAffectees.contains(chantier.id),
             )
             .toList();
 
@@ -55,7 +55,7 @@ class TechnicienDetailScreen extends ConsumerWidget {
       children: [
         Text('📧 Email : ${tech.email}'),
         Text('📍 Localisation : ${tech.localisation ?? 'Non renseignée'}'),
-        Text('💼 Spécialité : ${tech.specialite ?? 'Aucune'}'),
+        Text('💼 Spécialité : ${tech.specialite}'),
         Text('💰 Taux horaire : ${tech.tauxHoraire} €/h'),
         Text('🔧 Compétences : ${tech.competences.join(', ')}'),
         Text('🟢 Disponible : ${tech.disponible ? 'Oui' : 'Non'}'),

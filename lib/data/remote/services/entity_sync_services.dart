@@ -29,7 +29,7 @@ class EntitySyncService<T extends JsonModel> {
     final docId = id ?? item.id;
 
     // ✅ Sauvegarde Hive locale
-    await HiveService.put<T>(boxName, docId!, item);
+    await HiveService.put<T>(boxName, docId, item);
 
     // ✅ Sauvegarde dans Firestore
     await FirestoreService.setData<T>(
@@ -77,7 +77,8 @@ class EntitySyncService<T extends JsonModel> {
     // 1. Récupère les entités depuis Firestore (avec filtre + limite)
     final modelsFromCloud = await FirestoreService.getAll(
       collectionPath: boxName,
-      fromJson: JsonModel.fromDynamic as T Function(Map<String, dynamic>),
+      fromJson:
+          JsonModelFactory.fromDynamic as T Function(Map<String, dynamic>),
       updatedAfter: DateTime.now().subtract(const Duration(days: 7)),
       limitTo: 100,
     );
@@ -86,7 +87,7 @@ class EntitySyncService<T extends JsonModel> {
     for (final model in modelsFromCloud) {
       final id = model.id;
 
-      await HiveService.put<T>(boxName, id!, model);
+      await HiveService.put<T>(boxName, id, model);
 
       if (model is HasFile) {
         final fileItem = model as HasFile; // ✅ Cast explicite
@@ -133,7 +134,7 @@ class EntitySyncService<T extends JsonModel> {
 
     for (var doc in snapshot.docs) {
       final json = doc.data();
-      final item = JsonModel.fromDynamic<T>(json);
+      final item = JsonModelFactory.fromDynamic<T>(json);
       if (item != null) {
         await HiveService.put<T>(boxName, doc.id, item);
         if ((item is HasFile || item is PieceJointe) &&
@@ -151,7 +152,7 @@ class EntitySyncService<T extends JsonModel> {
     final doc = await firestore.collection(boxName).doc(id).get();
     if (!doc.exists) return null;
     final data = doc.data()!;
-    final item = JsonModel.fromDynamic<T>(data);
+    final item = JsonModelFactory.fromDynamic<T>(data);
     if (item != null) {
       await HiveService.put<T>(boxName, id, item);
     }
@@ -207,6 +208,15 @@ class EntitySyncService<T extends JsonModel> {
     } catch (e) {
       return true; // Si doute, push
     }
+  }
+
+  /// Ecoute les changements en temps réel
+  Stream<List<T>> watchAll() async* {
+    final box = await HiveService.box<T>(boxName);
+    yield box.values.toList(); // première émission
+
+    // ensuite écoute les changements :
+    yield* box.watch().map((_) => box.values.toList());
   }
 }
 

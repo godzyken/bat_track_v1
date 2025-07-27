@@ -8,7 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/data/json_model.dart';
 import '../../../models/data/state_wrapper/wrappers.dart';
 
-mixin AutoSync<T extends JsonModel> on StateNotifier<SyncedState<T>> {
+mixin AutoSync<T extends JsonSerializableModel<T>, Serializable>
+    on StateNotifier<SyncedState<T>> {
   Timer? _debounceTimer;
   String? _lastJsonCache;
 

@@ -6,7 +6,6 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../data/remote/providers/dolibarr_instance_provider.dart';
-import '../interface/doli_barr_adaptable.dart';
 import '../json_model.dart';
 
 class TripleAdapter<T extends JsonModel> {
@@ -37,7 +36,7 @@ class TripleAdapter<T extends JsonModel> {
     final doc = FirebaseFirestore.instance
         .collection(collectionPath)
         .doc(model.id);
-    await doc.set(model.toJson());
+    await doc.set(model.copyWithId(model.id));
   }
 
   /// 🔹 Firebase: récupère la collection
@@ -45,7 +44,7 @@ class TripleAdapter<T extends JsonModel> {
     final snapshot =
         await FirebaseFirestore.instance.collection(collectionPath).get();
     return snapshot.docs
-        .map((doc) => factory().fromJson({...doc.data(), 'id': doc.id}) as T)
+        .map((doc) => factory().copyWithId(doc.id) as T)
         .toList();
   }
 
@@ -63,10 +62,7 @@ class TripleAdapter<T extends JsonModel> {
     if (res.statusCode == 200) {
       final data = jsonDecode(res.body);
       return (data as List)
-          .map(
-            (json) =>
-                (factory() as DolibarrAdaptable).fromDolibarrJson(json) as T,
-          )
+          .map((json) => (factory() as JsonModel).copyWithId(json) as T)
           .toList();
     } else {
       throw Exception('Erreur Dolibarr (${res.statusCode}) : ${res.body}');
@@ -86,7 +82,7 @@ class TripleAdapter<T extends JsonModel> {
       'Content-Type': 'application/json',
     };
 
-    final body = jsonEncode((model as DolibarrAdaptable).toDolibarrJson());
+    final body = jsonEncode((model as JsonModel).toString());
     final res = await http.post(Uri.parse(url), headers: headers, body: body);
 
     if (res.statusCode != 200 && res.statusCode != 201) {

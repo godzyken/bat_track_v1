@@ -150,7 +150,7 @@ class _EntityCardState<T extends JsonModel> extends ConsumerState<EntityCard<T>>
   }
 
   Widget _buildLayoutBySize(ScreenSize size, BuildContext context) {
-    final entity = widget.entity;
+    final entity = widget.entity as JsonSerializableModel;
     final icon = entity.displayIcon;
     final title = entity.displayTitle;
     final subtitle = entity.displaySubtitle;

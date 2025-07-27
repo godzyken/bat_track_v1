@@ -1,6 +1,6 @@
-import 'package:bat_track_v1/data/local/models/chantier_etapes.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/providers/hive_provider.dart';
 
 class ChantierEtapesListNotifier extends AsyncNotifier<List<ChantierEtape>> {
@@ -12,19 +12,19 @@ class ChantierEtapesListNotifier extends AsyncNotifier<List<ChantierEtape>> {
 
   Future<void> add(ChantierEtape etape) async {
     final service = ref.read(chantierEtapeServiceProvider);
-    await service.add(etape, etape.id!);
+    await service.add(etape, etape.id);
     state = AsyncValue.data(await service.getAll());
   }
 
   Future<void> save(ChantierEtape etape) async {
     final service = ref.read(chantierEtapeServiceProvider);
-    await service.save(etape, etape.id!);
+    await service.save(etape, etape.id);
     state = AsyncValue.data(await service.getAll());
   }
 
   Future<void> updateChantier(ChantierEtape etape) async {
     final service = ref.read(chantierEtapeServiceProvider);
-    await service.update(etape, etape.id!);
+    await service.update(etape, etape.id);
     state = AsyncValue.data(await service.getAll());
   }
 

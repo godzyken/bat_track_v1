@@ -1,0 +1,91 @@
+import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
+import 'package:bat_track_v1/models/data/hive_model.dart';
+import 'package:hive/hive.dart';
+
+part 'projet_entity.g.dart';
+
+@HiveType(typeId: 1)
+class ProjetEntity extends HiveObject implements HiveModel<Projet> {
+  @HiveField(0)
+  final String pid;
+
+  @HiveField(1)
+  final String nom;
+
+  @HiveField(2)
+  final String description;
+
+  @HiveField(3)
+  final DateTime dateDebut;
+
+  @HiveField(4)
+  final DateTime dateFin;
+
+  @HiveField(5)
+  final bool clientValide;
+
+  @HiveField(6)
+  final bool chefDeProjetValide;
+
+  @HiveField(7)
+  final bool techniciensValides;
+
+  @HiveField(8)
+  final bool superUtilisateurValide;
+
+  @HiveField(9)
+  final DateTime? pupdatedAt;
+
+  ProjetEntity({
+    required this.pid,
+    required this.nom,
+    required this.description,
+    required this.dateDebut,
+    required this.dateFin,
+    required this.clientValide,
+    required this.chefDeProjetValide,
+    required this.techniciensValides,
+    required this.superUtilisateurValide,
+    this.pupdatedAt,
+  });
+
+  // Constructeur à partir du modèle Projet
+  factory ProjetEntity.fromModel(Projet model) {
+    return ProjetEntity(
+      pid: model.id,
+      nom: model.nom,
+      description: model.description,
+      dateDebut: model.dateDebut,
+      dateFin: model.dateFin,
+      clientValide: model.clientValide,
+      chefDeProjetValide: model.chefDeProjetValide,
+      techniciensValides: model.techniciensValides,
+      superUtilisateurValide: model.superUtilisateurValide,
+      pupdatedAt: model.updatedAt,
+    );
+  }
+
+  @override
+  ProjetEntity fromModel(Projet model) => ProjetEntity.fromModel(model);
+
+  // Convertir en modèle Projet
+  @override
+  Projet toModel() => Projet(
+    id: id,
+    nom: nom,
+    description: description,
+    dateDebut: dateDebut,
+    dateFin: dateFin,
+    clientValide: clientValide,
+    chefDeProjetValide: chefDeProjetValide,
+    techniciensValides: techniciensValides,
+    superUtilisateurValide: superUtilisateurValide,
+    updatedAt: updatedAt,
+  );
+
+  @override
+  String get id => pid;
+
+  @override
+  DateTime? get updatedAt => pupdatedAt;
+}

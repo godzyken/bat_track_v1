@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../data/local/models/chantier.dart';
+import '../../../../data/local/models/index_model_extention.dart';
 
 class ChantierCardInfo extends ConsumerWidget {
   const ChantierCardInfo({
@@ -58,8 +58,8 @@ class ChantierCardInfo extends ConsumerWidget {
             TextFormField(
               initialValue: chantier.adresse,
               decoration: const InputDecoration(labelText: 'Adresse'),
-              onChanged:
-                  (value) => onChanged(chantier.copyWith(adresse: value)),
+              onChanged: (value) =>
+                  onChanged(chantier.copyWith(adresse: value)),
               keyboardType: TextInputType.streetAddress,
               autofillHints: const [AutofillHints.fullStreetAddress],
             ),
@@ -69,20 +69,18 @@ class ChantierCardInfo extends ConsumerWidget {
             TextFormField(
               initialValue: chantier.clientId,
               decoration: const InputDecoration(labelText: 'Client ID'),
-              onChanged:
-                  (value) => onChanged(chantier.copyWith(clientId: value)),
+              onChanged: (value) =>
+                  onChanged(chantier.copyWith(clientId: value)),
               keyboardType: TextInputType.name,
               autofillHints: const [AutofillHints.name],
             ),
             const SizedBox(height: 12),
             GestureDetector(
-              onTap:
-                  () => _selectDate(
-                    context,
-                    chantier.dateDebut,
-                    (newDate) =>
-                        onChanged(chantier.copyWith(dateDebut: newDate)),
-                  ),
+              onTap: () => _selectDate(
+                context,
+                chantier.dateDebut,
+                (newDate) => onChanged(chantier.copyWith(dateDebut: newDate)),
+              ),
               child: InputDecorator(
                 decoration: const InputDecoration(labelText: 'Date de début'),
                 child: Text(dateFormat.format(chantier.dateDebut)),
@@ -90,12 +88,11 @@ class ChantierCardInfo extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             GestureDetector(
-              onTap:
-                  () => _selectDate(
-                    context,
-                    chantier.dateFin ?? chantier.dateDebut,
-                    (newDate) => onChanged(chantier.copyWith(dateFin: newDate)),
-                  ),
+              onTap: () => _selectDate(
+                context,
+                chantier.dateFin ?? chantier.dateDebut,
+                (newDate) => onChanged(chantier.copyWith(dateFin: newDate)),
+              ),
               child: InputDecorator(
                 decoration: const InputDecoration(labelText: 'Date de fin'),
                 child: Text(
@@ -109,13 +106,12 @@ class ChantierCardInfo extends ConsumerWidget {
             DropdownButtonFormField<String>(
               value:
                   chantier.etat != null && etatOptions.contains(chantier.etat)
-                      ? chantier.etat
-                      : null,
+                  ? chantier.etat
+                  : null,
               decoration: const InputDecoration(labelText: 'État'),
-              items:
-                  etatOptions
-                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                      .toList(),
+              items: etatOptions
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
               onChanged: (value) {
                 if (value != null) {
                   onChanged(chantier.copyWith(etat: value));

@@ -1,11 +1,11 @@
 import 'package:bat_track_v1/features/dolibarr/views/screens/dolibarr_explorer_screen.dart';
+import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:bat_track_v1/models/views/screens/entity_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../data/local/models/index_model_extention.dart';
-import '../data/local/providers/hive_provider.dart';
 import '../features/about/views/screens/about_screen.dart';
 import '../features/auth/views/screens/login_screen.dart';
 import '../features/chantier/views/screens/chantier_detail_loader.dart';
@@ -18,6 +18,8 @@ import '../features/dolibarr/views/screens/dolibarr_import_client_screen.dart';
 import '../features/home/views/screens/home_screen.dart';
 import '../features/intervention/views/screens/interventions_screen.dart';
 import '../features/technicien/views/screens/technitiens_screen.dart';
+import '../models/data/state_wrapper/wrappers.dart';
+import '../models/notifiers/sync_entity_notifier.dart';
 import '../providers/auth_provider.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -53,13 +55,43 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             name: 'client-detail',
             builder: (context, state) {
               final id = state.pathParameters['id']!;
-              return Consumer(
-                builder: (context, ref, child) {
-                  final client = ref.watch(clientProvider(id));
-                  if (client == null) {
-                    return Scaffold(body: Text('Client introuvable'));
-                  }
-                  return EntityDetailScreen(entity: client);
+
+              return EntityDetailScreen<Client>(
+                id: id,
+                title: 'Détail client',
+                builder: (
+                  BuildContext context,
+                  Client client,
+                  SyncEntityNotifier<Client> notifier,
+                  SyncedState<Client> state,
+                ) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Nom : ${client.nom}',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text('Email : ${client.email}'),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            final updated = client.copyWithId(id);
+                            notifier.update(updated);
+                          },
+                          child: const Text('Modifier email'),
+                        ),
+                        if (state.isSyncing)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 16),
+                            child: LinearProgressIndicator(),
+                          ),
+                      ],
+                    ),
+                  );
                 },
               );
             },
@@ -75,13 +107,42 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             name: 'technicien-detail',
             builder: (context, state) {
               final id = state.pathParameters['id']!;
-              return Consumer(
-                builder: (context, ref, child) {
-                  final technicien = ref.watch(technicienProvider(id));
-                  if (technicien == null) {
-                    return Scaffold(body: Text('Technicien introuvable'));
-                  }
-                  return EntityDetailScreen(entity: technicien);
+              return EntityDetailScreen<Technicien>(
+                id: id,
+                title: 'Détail technicien',
+                builder: (
+                  BuildContext context,
+                  Technicien technicien,
+                  SyncEntityNotifier<Technicien> notifier,
+                  SyncedState<Technicien> state,
+                ) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Nom : ${technicien.nom}',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text('Email : ${technicien.email}'),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            final updated = technicien.copyWithId(id);
+                            notifier.update(updated);
+                          },
+                          child: const Text('Modifier email'),
+                        ),
+                        if (state.isSyncing)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 16),
+                            child: LinearProgressIndicator(),
+                          ),
+                      ],
+                    ),
+                  );
                 },
               );
             },
@@ -98,7 +159,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) {
               final Chantier? passedChantier = state.extra as Chantier?;
               final chantierId = state.pathParameters['id']!;
-              return ChantierDetailLoader(chantierId: chantierId);
+              return ChantierDetailLoader(
+                chantierId: chantierId,
+                initialData: passedChantier,
+              );
             },
             routes: [
               // ✅ 1. Liste des étapes
@@ -137,14 +201,45 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: 'intervention/:id',
             name: 'intervention-detail',
             builder: (context, state) {
-              final id = state.pathParameters['id'];
-              return Consumer(
-                builder: (context, ref, child) {
-                  final intervention = ref.watch(interventionProvider(id!));
-                  if (intervention == null) {
-                    return Scaffold(body: Text('Intervention introuvable'));
-                  }
-                  return EntityDetailScreen(entity: intervention);
+              final id = state.pathParameters['id']!;
+              return EntityDetailScreen<Intervention>(
+                id: id,
+                title: 'Détail intervention',
+                builder: (
+                  BuildContext context,
+                  Intervention intervention,
+                  SyncEntityNotifier<Intervention> notifier,
+                  SyncedState<Intervention> state,
+                ) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Titre : ${intervention.titre}',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Commentaire id : ${intervention.commentaire ?? "non renseigné"}',
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            final updated = intervention.copyWithId(id);
+                            notifier.update(updated);
+                          },
+                          child: const Text('Modifier commentaire'),
+                        ),
+                        if (state.isSyncing)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 16),
+                            child: LinearProgressIndicator(),
+                          ),
+                      ],
+                    ),
+                  );
                 },
               );
             },

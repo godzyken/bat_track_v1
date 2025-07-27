@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
+import '../../../technicien/controllers/providers/technicien_providers.dart';
 import '../../controllers/generator/calculator.dart';
 
 class BudgetTravauCard extends ConsumerStatefulWidget {
@@ -25,7 +26,6 @@ class BudgetTravauCard extends ConsumerStatefulWidget {
 
 class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
   late Piece piece;
-  late final List<Technicien> techniciens;
 
   @override
   void initState() {
@@ -33,95 +33,73 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
     piece = widget.piece;
   }
 
-  double get totalMateriaux => BudgetGen.calculerCoutMateriaux(
-    piece.materiaux,
-    surface: piece.surfaceM2,
-  );
-
-  double get totalMateriels => BudgetGen.calculerCoutMateriels(piece.materiels);
-
-  double get totalMainOeuvre =>
-      BudgetGen.calculerCoutMainOeuvre(piece.mainOeuvre, techniciens);
-
-  double get total => totalMateriaux + totalMateriels + totalMainOeuvre;
-
-  List<PieChartSectionData> _buildPieSections() {
-    final totalValue = total;
-    return [
-      PieChartSectionData(
-        value: totalMateriaux,
-        title: '${(totalMateriaux / totalValue * 100).toStringAsFixed(1)}%',
-        color: Colors.orange,
-        radius: 50,
-        titleStyle: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
+  void _editBudget(List<Technicien> techniciens) async {
+    final controllerMap = {
+      for (final mo in piece.mainOeuvre ?? [])
+        mo.idTechnicien: TextEditingController(
+          text: mo.heuresEstimees.toString(),
         ),
-      ),
-      PieChartSectionData(
-        value: totalMateriels,
-        title: '${(totalMateriels / totalValue * 100).toStringAsFixed(1)}%',
-        color: Colors.blue,
-        radius: 50,
-        titleStyle: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      ),
-      PieChartSectionData(
-        value: totalMainOeuvre,
-        title: '${(totalMainOeuvre / totalValue * 100).toStringAsFixed(1)}%',
-        color: Colors.green,
-        radius: 50,
-        titleStyle: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      ),
-    ];
-  }
+    };
 
-  void _editBudget() async {
-    final controller = TextEditingController(
-      text: piece.mainOeuvre.heuresEstimees.toString(),
-    );
-
-    final newHours = await showDialog<double>(
+    final newValues = await showDialog<Map<String, double>>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Modifier le budget main-d\'œuvre'),
-            content: TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Heures estimées'),
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Modifier les heures estimées"),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children:
+                  piece.mainOeuvre!.map((mo) {
+                    final tech = techniciens.firstWhere(
+                      (t) => t.id == mo.idTechnicien,
+                      orElse: () => Technicien.mock(),
+                    );
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: TextField(
+                        controller: controllerMap[mo.idTechnicien],
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: '${tech.nom} (heures)',
+                        ),
+                      ),
+                    );
+                  }).toList(),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  final hours = double.tryParse(controller.text);
-                  if (hours != null) {
-                    Navigator.pop(context, hours);
-                  }
-                },
-                child: const Text('Valider'),
-              ),
-            ],
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final result = <String, double>{};
+                for (final entry in controllerMap.entries) {
+                  final parsed = double.tryParse(entry.value.text);
+                  if (parsed != null) {
+                    result[entry.key] = parsed;
+                  }
+                }
+                Navigator.pop(context, result);
+              },
+              child: const Text('Valider'),
+            ),
+          ],
+        );
+      },
     );
 
-    if (newHours != null) {
+    if (newValues != null) {
+      final updatedMainOeuvre =
+          piece.mainOeuvre!.map((mo) {
+            final heures = newValues[mo.idTechnicien];
+            return heures != null ? mo.copyWith(heuresEstimees: heures) : mo;
+          }).toList();
+
       setState(() {
-        piece = piece.copyWith(
-          mainOeuvre: piece.mainOeuvre.copyWith(heuresEstimees: newHours),
-        );
+        piece = piece.copyWith(mainOeuvre: updatedMainOeuvre);
       });
       widget.onEdit?.call(piece);
     }
@@ -135,95 +113,161 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final formatCurrency = NumberFormat.simpleCurrency(locale: 'fr_FR');
+    final techniciensAsync = ref.watch(
+      techniciensStreamProvider,
+    ); // À adapter à ton provider réel
 
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.all(12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              piece.nom,
-              style: theme.textTheme.headlineSmall?.copyWith(
+    return techniciensAsync.when(
+      data: (techniciens) {
+        final totalMateriaux = BudgetGen.calculerCoutMateriaux(
+          piece.materiaux ?? [],
+          surface: piece.surface,
+        );
+        final totalMateriels = BudgetGen.calculerCoutMateriels(
+          piece.materiels ?? [],
+        );
+        final totalMainOeuvre = BudgetGen.estimationCoutTotalMainOeuvre(
+          piece.mainOeuvre ?? [],
+          techniciens,
+        );
+        final total = totalMateriaux + totalMateriels + totalMainOeuvre;
+
+        List<PieChartSectionData> buildPieSections() {
+          if (total == 0) return [];
+          return [
+            PieChartSectionData(
+              value: totalMateriaux,
+              title: '${(totalMateriaux / total * 100).toStringAsFixed(1)}%',
+              color: Colors.orange,
+              radius: 50,
+              titleStyle: const TextStyle(
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              "Surface : ${piece.surfaceM2} m²",
-              style: theme.textTheme.bodyMedium,
+            PieChartSectionData(
+              value: totalMateriels,
+              title: '${(totalMateriels / total * 100).toStringAsFixed(1)}%',
+              color: Colors.blue,
+              radius: 50,
+              titleStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
-            const Divider(height: 24),
-            _budgetLine(
-              "Matériaux",
-              totalMateriaux,
-              Icons.construction,
-              formatCurrency,
+            PieChartSectionData(
+              value: totalMainOeuvre,
+              title: '${(totalMainOeuvre / total * 100).toStringAsFixed(1)}%',
+              color: Colors.green,
+              radius: 50,
+              titleStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
-            _budgetLine(
-              "Matériel",
-              totalMateriels,
-              Icons.build,
-              formatCurrency,
-            ),
-            _budgetLine(
-              "Main-d'œuvre",
-              totalMainOeuvre,
-              Icons.handyman,
-              formatCurrency,
-            ),
-            const Divider(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ];
+        }
+
+        return Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          margin: const EdgeInsets.all(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Budget total :",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
                 Text(
-                  "${total.toStringAsFixed(2)} €",
-                  style: const TextStyle(
-                    fontSize: 16,
+                  piece.nom,
+                  style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.green,
                   ),
                 ),
+                const SizedBox(height: 8),
+                Text(
+                  "Surface : ${piece.surface} m²",
+                  style: theme.textTheme.bodyMedium,
+                ),
+                const Divider(height: 24),
+                _budgetLine(
+                  "Matériaux",
+                  totalMateriaux,
+                  Icons.construction,
+                  formatCurrency,
+                ),
+                _budgetLine(
+                  "Matériel",
+                  totalMateriels,
+                  Icons.build,
+                  formatCurrency,
+                ),
+                _budgetLine(
+                  "Main-d'œuvre",
+                  totalMainOeuvre,
+                  Icons.handyman,
+                  formatCurrency,
+                ),
+                const Divider(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Budget total :",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "${total.toStringAsFixed(2)} €",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  height: 200,
+                  child: PieChart(
+                    PieChartData(
+                      sections: buildPieSections(),
+                      centerSpaceRadius: 30,
+                      sectionsSpace: 2,
+                      borderData: FlBorderData(show: false),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => _editBudget(techniciens),
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Éditer'),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: _generatePdf,
+                      icon: const Icon(Icons.picture_as_pdf),
+                      label: const Text('PDF'),
+                    ),
+                  ],
+                ),
               ],
             ),
-            const SizedBox(height: 24),
-            SizedBox(
-              height: 200,
-              child: PieChart(
-                PieChartData(
-                  sections: _buildPieSections(),
-                  centerSpaceRadius: 30,
-                  sectionsSpace: 2,
-                  borderData: FlBorderData(show: false),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _editBudget,
-                  icon: const Icon(Icons.edit),
-                  label: const Text('Éditer'),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _generatePdf,
-                  icon: const Icon(Icons.picture_as_pdf),
-                  label: const Text('PDF'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Erreur de chargement : $e')),
     );
   }
 

@@ -1,3 +1,5 @@
+import 'package:bat_track_v1/data/local/models/chantiers/extensions_chantier.dart';
+
 import '../../../../data/local/models/index_model_extention.dart';
 
 class BudgetService {
@@ -14,18 +16,20 @@ class BudgetService {
   static double calculerBudgetEtape(
     ChantierEtape etape,
     List<Technicien> techniciens,
+    MainOeuvre mainOeuvre,
   ) {
-    return etape.getBudgetTotal(techniciens);
+    return etape.getBudgetTotalPrev(techniciens, mainOeuvre);
   }
 
   static double budgetRestant(
     Client client,
     List<ChantierEtape> etapes,
     List<Technicien> techniciens,
+    MainOeuvre mainOeuvre,
   ) {
     final totalConsomme = etapes.fold(
       0.0,
-      (total, e) => total + e.getBudgetTotal(techniciens),
+      (total, e) => total + e.getBudgetTotalReel(techniciens, mainOeuvre),
     );
     return client.budgetPrevu! - totalConsomme;
   }
@@ -35,13 +39,14 @@ class BudgetService {
     ChantierEtape nouvelleEtape,
     List<ChantierEtape>? autresEtapes,
     List<Technicien> techniciens,
+    MainOeuvre mainOeuvre,
   ) {
     final totalAvecNouvelle =
         autresEtapes!.fold(
           0.0,
-          (total, e) => total + e.getBudgetTotal(techniciens),
+          (total, e) => total + e.getBudgetTotalPrev(techniciens, mainOeuvre),
         ) +
-        nouvelleEtape.getBudgetTotal(techniciens);
+        nouvelleEtape.getBudgetTotalPrev(techniciens, mainOeuvre);
 
     return totalAvecNouvelle <= client.budgetPrevu!;
   }

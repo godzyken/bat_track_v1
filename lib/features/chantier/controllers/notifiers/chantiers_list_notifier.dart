@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../data/local/models/chantier.dart';
+import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/providers/hive_provider.dart';
 
 class ChantierListNotifier extends AsyncNotifier<List<Chantier>> {

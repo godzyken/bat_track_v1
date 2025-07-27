@@ -131,15 +131,15 @@ class HiveService {
     T pj,
   ) async {
     if (pj is PieceJointe) {
-      if (pj.url == null) return;
-      final url = pj.url!;
+      if (pj.url.isEmpty) return;
+      final url = pj.url;
       if (pj.type == 'jpg' ||
           pj.type == 'jpeg' ||
           pj.type == 'png' ||
           pj.type == 'webp') {
         try {
           final box = await _openBox<T>(boxName);
-          final image = NetworkImage(pj.url!);
+          final image = NetworkImage(pj.url);
           await precacheImage(image, c);
           await box.put(pj.id, pj);
           developer.log('[✔] Image précachée: $url');

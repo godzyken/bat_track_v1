@@ -16,6 +16,7 @@ typedef FieldBuilder =
       void Function(dynamic) onChanged,
       bool expertMode,
     );
+typedef FieldVisibility = bool Function(String key, dynamic value);
 
 class EntityForm<T extends JsonModel> extends ConsumerStatefulWidget {
   final T? initialValue;
@@ -24,6 +25,7 @@ class EntityForm<T extends JsonModel> extends ConsumerStatefulWidget {
   final T Function() createEmpty;
   final String? chantierId;
   final FieldBuilder? customFieldBuilder;
+  final FieldVisibility? fieldVisibility;
 
   const EntityForm({
     super.key,
@@ -33,6 +35,7 @@ class EntityForm<T extends JsonModel> extends ConsumerStatefulWidget {
     this.initialValue,
     this.chantierId,
     this.customFieldBuilder,
+    this.fieldVisibility,
   });
 
   @override
@@ -43,16 +46,15 @@ class _EntityFormState<T extends JsonModel>
     extends ConsumerState<EntityForm<T>> {
   final _formKey = GlobalKey<FormState>();
   late Map<String, dynamic> _json;
-  final Map<String, TextEditingController> _controllers = {};
-  final Map<String, TextEditingController> _rawOverrides = {};
+  final _controllers = <String, TextEditingController>{};
+  final _rawOverrides = <String, TextEditingController>{};
   bool _expertMode = false;
 
   @override
   void initState() {
     super.initState();
     final entity = widget.initialValue ?? widget.createEmpty();
-    _json = entity.toJson();
-    _json['id'] ??= entity.id;
+    _json = entity.copyWithId(entity.id)..putIfAbsent('id', () => entity.id);
 
     for (var entry in _json.entries) {
       _controllers[entry.key] = TextEditingController(
@@ -66,11 +68,11 @@ class _EntityFormState<T extends JsonModel>
 
   @override
   void dispose() {
-    for (var controller in _controllers.values) {
-      controller.dispose();
+    for (var c in _controllers.values) {
+      c.dispose();
     }
-    for (var controller in _rawOverrides.values) {
-      controller.dispose();
+    for (var c in _rawOverrides.values) {
+      c.dispose();
     }
     super.dispose();
   }
@@ -85,23 +87,21 @@ class _EntityFormState<T extends JsonModel>
   }
 
   List<String>? _getAutofillHints(String key) {
-    final lowerKey = key.toLowerCase();
-
-    if (lowerKey.contains('email')) return [AutofillHints.email];
-    if (lowerKey.contains('name')) return [AutofillHints.name];
-    if (lowerKey.contains('prenom')) return [AutofillHints.givenName];
-    if (lowerKey.contains('nom')) return [AutofillHints.familyName];
-    if (lowerKey.contains('tel')) return [AutofillHints.telephoneNumber];
-    if (lowerKey.contains('address')) return [AutofillHints.fullStreetAddress];
-    if (lowerKey.contains('postal')) return [AutofillHints.postalCode];
-    if (lowerKey.contains('ville')) return [AutofillHints.addressCity];
-    if (lowerKey.contains('mdp') || lowerKey.contains('motdepasse')) {
+    final k = key.toLowerCase();
+    if (k.contains('email')) return [AutofillHints.email];
+    if (k.contains('name')) return [AutofillHints.name];
+    if (k.contains('prenom')) return [AutofillHints.givenName];
+    if (k.contains('nom')) return [AutofillHints.familyName];
+    if (k.contains('tel')) return [AutofillHints.telephoneNumber];
+    if (k.contains('address')) return [AutofillHints.fullStreetAddress];
+    if (k.contains('postal')) return [AutofillHints.postalCode];
+    if (k.contains('ville')) return [AutofillHints.addressCity];
+    if (k.contains('mdp') || k.contains('motdepasse')) {
       return [AutofillHints.newPassword];
     }
-    if (lowerKey.contains('username') || lowerKey.contains('identifiant')) {
+    if (k.contains('username') || k.contains('identifiant')) {
       return [AutofillHints.username];
     }
-
     return null;
   }
 
@@ -114,7 +114,6 @@ class _EntityFormState<T extends JsonModel>
     bool expertMode = false,
   }) {
     final autofill = _getAutofillHints(key);
-
     if (value is bool) {
       return SwitchListTile(
         key: ValueKey(key),
@@ -126,9 +125,9 @@ class _EntityFormState<T extends JsonModel>
         },
       );
     }
-
     if (value is DateTime || key.toLowerCase().contains('date')) {
       return TextFormField(
+        key: ValueKey(key),
         controller: controller,
         readOnly: true,
         keyboardType: TextInputType.datetime,
@@ -138,11 +137,11 @@ class _EntityFormState<T extends JsonModel>
           suffixIcon: const Icon(Icons.calendar_today),
         ),
         onTap: () async {
-          final initialDate =
+          final initial =
               DateTime.tryParse(controller?.text ?? '') ?? DateTime.now();
           final picked = await showDatePicker(
             context: context,
-            initialDate: initialDate,
+            initialDate: initial,
             firstDate: DateTime(2000),
             lastDate: DateTime(2100),
           );
@@ -151,37 +150,33 @@ class _EntityFormState<T extends JsonModel>
             onChanged(picked);
           }
         },
-        key: ValueKey(key),
         autofillHints: autofill,
       );
     }
-
     if (value is List || key.toLowerCase().contains('liste')) {
       return TextFormField(
+        key: ValueKey(key),
         controller: controller,
         decoration: InputDecoration(labelText: "$key (séparés par virgule)"),
         keyboardType: TextInputType.multiline,
         autofillHints: autofill,
-        key: ValueKey(key),
       );
     }
-
     if (value is Map || value is JsonModel) {
       return TextFormField(
+        key: ValueKey(key),
         controller: controller,
         decoration: InputDecoration(labelText: "$key (JSON)"),
         style: const TextStyle(fontFamily: 'monospace'),
         maxLines: 4,
         keyboardType: TextInputType.multiline,
         autofillHints: autofill,
-        key: ValueKey(key),
       );
     }
-
     return TextFormField(
+      key: ValueKey(key),
       controller: controller,
       decoration: InputDecoration(labelText: key),
-      key: ValueKey(key),
       keyboardType: TextInputType.text,
       autofillHints: autofill,
     );
@@ -189,53 +184,37 @@ class _EntityFormState<T extends JsonModel>
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-
-    final updatedJson = <String, dynamic>{};
+    final result = <String, dynamic>{};
     for (final key in _json.keys) {
-      final originalValue = _json[key];
+      final original = _json[key];
       final raw = _rawOverrides[key]!.text;
-
-      if (_expertMode &&
-          (originalValue is Map ||
-              originalValue is List ||
-              originalValue is JsonModel)) {
-        try {
-          updatedJson[key] = json.decode(raw);
-        } catch (e) {
-          // Fallback
-          updatedJson[key] = _parseValue(
-            originalValue,
-            _controllers[key]!.text,
-          );
-        }
-      } else {
-        updatedJson[key] = _parseValue(originalValue, _controllers[key]!.text);
-      }
+      result[key] =
+          (_expertMode &&
+                  (original is Map ||
+                      original is List ||
+                      original is JsonModel))
+              ? json.decode(raw)
+              : _parseValue(original, _controllers[key]!.text);
     }
-
-    final entity = widget.fromJson(updatedJson);
-    widget.onSubmit(entity);
+    widget.onSubmit(widget.fromJson(result));
     Navigator.of(context).pop();
   }
 
   List<Widget> _buildFields() {
-    final fieldBuilder = widget.customFieldBuilder ?? _defaultFieldBuilder;
-    final info = context.responsiveInfo(ref);
-
+    final builder = widget.customFieldBuilder ?? _defaultFieldBuilder;
     return _json.keys.map((key) {
-      final value = _json[key];
-      final controller = _controllers[key];
-
+      final val = _json[key];
+      final ctl = _controllers[key];
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: fieldBuilder(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: builder(
           context: context,
           key: key,
-          value: value,
-          controller: controller,
-          onChanged: (val) {
-            _json[key] = val;
-            _rawOverrides[key]?.text = json.encode(val);
+          value: val,
+          controller: ctl,
+          onChanged: (v) {
+            _json[key] = v;
+            _rawOverrides[key]?.text = json.encode(v);
           },
           expertMode: _expertMode,
         ),
@@ -251,15 +230,16 @@ class _EntityFormState<T extends JsonModel>
           return val is Map || val is List || val is JsonModel;
         })
         .map((key) {
-          final controller = _rawOverrides[key];
+          final ctl = _rawOverrides[key];
           return TextFormField(
-            controller: controller,
+            key: ValueKey('expert_$key'),
+            controller: ctl,
             decoration: InputDecoration(labelText: "$key (JSON brut)"),
             maxLines: 6,
             style: const TextStyle(fontFamily: 'monospace'),
-            validator: (value) {
+            validator: (v) {
               try {
-                json.decode(value ?? '');
+                json.decode(v ?? '');
                 return null;
               } catch (_) {
                 return 'JSON invalide';
@@ -274,12 +254,11 @@ class _EntityFormState<T extends JsonModel>
   @override
   Widget build(BuildContext context) {
     final isWide = context.responsiveInfo(ref).isLandscape;
-
     return AlertDialog(
       title: Text(
         widget.initialValue == null
-            ? "Créer ${T.toString()}"
-            : "Modifier ${T.toString()}",
+            ? 'Créer ${T.toString()}'
+            : 'Modifier ${T.toString()}',
       ),
       content: SizedBox(
         width: isWide ? 600 : double.maxFinite,
@@ -289,14 +268,13 @@ class _EntityFormState<T extends JsonModel>
             shrinkWrap: true,
             children: [
               ..._buildFields(),
-              if (_expertMode) ..._buildExpertFields(),
+              ..._buildExpertFields(),
               const SizedBox(height: 16),
               Row(
                 children: [
                   Checkbox(
                     value: _expertMode,
-                    onChanged:
-                        (val) => setState(() => _expertMode = val ?? false),
+                    onChanged: (v) => setState(() => _expertMode = v ?? false),
                   ),
                   const Text("Mode expert"),
                 ],

@@ -82,8 +82,9 @@ class DolibarrImporter {
 
   Future<void> _importClients() async {
     final clientsJson = await api.fetchClients();
-    final clients =
-        clientsJson.map<Client>((json) => Client.fromDolibarr(json)).toList();
+    final clients = clientsJson
+        .map<Client>((json) => Client.fromJson(json))
+        .toList();
 
     final service = ref.read(clientServiceProvider);
     for (final client in clients) {
@@ -93,10 +94,9 @@ class DolibarrImporter {
 
   Future<void> _importProducts() async {
     final productsJson = await api.fetchProducts();
-    final products =
-        productsJson
-            .map<Materiau>((json) => Materiau.fromDolibarr(json))
-            .toList();
+    final products = productsJson
+        .map<Materiau>((json) => Materiau.fromJson(json))
+        .toList();
 
     final service = ref.read(materiauServiceProvider);
     for (final product in products) {

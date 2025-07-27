@@ -39,7 +39,7 @@ class FacturePdfGenerator {
               _buildChantierSection(chantier),
               pw.SizedBox(height: 20),
               pw.Text(
-                'Date de facture : ${formatter.format(facture.dateDerniereModification)}',
+                'Date de facture : ${formatter.format(facture.dateDerniereModification!)}',
               ),
               pw.SizedBox(height: 20),
               _buildLignesFacture(facture),
@@ -48,8 +48,7 @@ class FacturePdfGenerator {
               pw.SizedBox(height: 24),
               if (piecesJointes != null && piecesJointes.isNotEmpty)
                 _buildPiecesJointes(piecesJointes),
-              if (facture.signature != null)
-                _buildSignature(facture.signature!),
+              _buildSignature(facture.signature),
             ],
       ),
     );
@@ -77,12 +76,10 @@ class FacturePdfGenerator {
                   if (intervention.facture!.isFinalized)
                     pw.Text("Facture FINALISÉE"),
                 ],
-                if ((intervention.document ?? []).isNotEmpty) ...[
+                if ((intervention.document).isNotEmpty) ...[
                   pw.SizedBox(height: 16),
                   pw.Text("Documents joints :"),
-                  ...(intervention.document ?? []).map(
-                    (p) => pw.Text("- ${p.nom}"),
-                  ),
+                  ...(intervention.document).map((p) => pw.Text("- ${p.nom}")),
                 ],
               ],
             ),

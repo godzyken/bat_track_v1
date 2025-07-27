@@ -16,6 +16,10 @@ class SyncedState<T> {
 
   /// Factory pratique pour créer un état initial
   factory SyncedState.initial(T data) => SyncedState(data: data);
+  factory SyncedState.error(T data) =>
+      SyncedState(data: data, isSyncing: false, hasError: true);
+  factory SyncedState.loading(T data) =>
+      SyncedState(data: data, isSyncing: true, hasError: false);
 
   SyncedState<T> copyWith({
     T? data,

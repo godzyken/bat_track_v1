@@ -21,7 +21,7 @@ class ChantierListDocuments extends ConsumerWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: CachedNetworkImage(
-                imageUrl: chantier.documents[index].url!,
+                imageUrl: chantier.documents[index].url,
                 width: 120,
                 height: 120,
                 fit: BoxFit.cover,

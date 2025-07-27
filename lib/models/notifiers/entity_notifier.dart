@@ -14,7 +14,7 @@ class EntityNotifier<T extends JsonModel> extends StateNotifier<T?> {
 
   /// Met à jour l'entité localement + Firestore + Hive
   Future<void> update(T updated) async {
-    await service.update(updated, updated.id!);
+    await service.update(updated, updated.id);
     await box.put(id, updated);
     state = updated;
   }

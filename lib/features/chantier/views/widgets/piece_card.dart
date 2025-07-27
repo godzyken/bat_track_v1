@@ -61,7 +61,7 @@ class PieceCard extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              Text('Surface : ${piece.surfaceM2.toStringAsFixed(1)} m²'),
+              Text('Surface : ${piece.surface.toStringAsFixed(1)} m²'),
               const SizedBox(height: 8),
 
               // Budget
@@ -79,8 +79,9 @@ class PieceCard extends ConsumerWidget {
               const SizedBox(height: 12),
               // Matériaux
               _buildSectionTitle(context, 'Matériaux'),
-              ...piece.materiaux.map(
+              ...piece.materiaux!.map(
                 (m) => _buildBullet(
+                  Icon(Icons.paid_outlined),
                   '${m.nom} - ${m.prixUnitaire} €/ ${m.unite}'
                   '${m.coefficientSurface != null ? ', coef: ${m.coefficientSurface}' : ''}'
                   '${m.quantiteFixe != null ? ', fixe: ${m.quantiteFixe}' : ''}',
@@ -90,8 +91,9 @@ class PieceCard extends ConsumerWidget {
               const SizedBox(height: 8),
               // Matériels
               _buildSectionTitle(context, 'Matériels'),
-              ...piece.materiels.map(
+              ...piece.materiels!.map(
                 (m) => _buildBullet(
+                  Icon(Icons.paid_sharp),
                   '${m.nom} - ${m.prixUnitaire} € x ${m.quantiteFixe}'
                   '${m.joursLocation != null ? ', ${m.joursLocation}j loc. à ${m.prixLocation} €' : ''}',
                 ),
@@ -102,13 +104,21 @@ class PieceCard extends ConsumerWidget {
               _buildSectionTitle(context, 'Main-d’œuvre'),
               techniciens.maybeWhen(
                 data: (list) {
-                  final tech = list.firstWhere(
-                    (t) => t.id == piece.mainOeuvre.idTechnicien,
-                    orElse: () => Technicien.mock(),
-                  );
-                  return _buildBullet(
-                    '${tech.nom} - ${piece.mainOeuvre.heuresEstimees} h',
-                  );
+                  final moList = piece.mainOeuvre ?? [];
+
+                  final mainOeuvreWidgets =
+                      moList.map((e) {
+                        final tech = list.firstWhere(
+                          (t) => t.id == e.idTechnicien,
+                          orElse: () => Technicien.mock(),
+                        );
+                        return _buildBullet(
+                          Icon(Icons.engineering),
+                          '${tech.nom} - ${e.heuresEstimees} h',
+                        );
+                      }).toList();
+
+                  return Column(children: mainOeuvreWidgets);
                 },
                 orElse: () => const Text('Chargement...'),
               ),
@@ -132,7 +142,7 @@ class PieceCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildBullet(String text) {
+  Widget _buildBullet(Icon icon, String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(

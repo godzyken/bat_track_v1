@@ -28,10 +28,10 @@ class SyncEntityNotifier<T extends JsonModel>
   Future<void> update(T updated) async {
     state = state.copyWith(data: updated);
 
-    if (updated.id == null) {
-      await entityService.save(updated, state.data.id!);
+    if (updated.id.isEmpty) {
+      await entityService.save(updated, state.data.id);
     } else {
-      await entityService.update(updated, updated.id!);
+      await entityService.update(updated, updated.id);
     }
 
     if (autoSync) {
@@ -49,7 +49,7 @@ class SyncEntityNotifier<T extends JsonModel>
 
   Future<void> _uploadToFirebaseStorage() async {
     try {
-      final json = jsonEncode(state.data.toJson());
+      final json = jsonEncode((state.data as JsonSerializableModel).toJson());
 
       if (_lastJsonCache == json) {
         state = state.copyWith(isSyncing: false);
@@ -74,7 +74,7 @@ class SyncEntityNotifier<T extends JsonModel>
   Future<File> _saveToTempFile(T item) async {
     final tempDir = Directory.systemTemp;
     final file = File('${tempDir.path}/${item.id}.json');
-    await file.writeAsString(jsonEncode(item.toJson()));
+    await file.writeAsString(jsonEncode(item as JsonSerializableModel));
     return file;
   }
 

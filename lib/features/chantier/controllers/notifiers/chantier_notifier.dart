@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:bat_track_v1/data/local/providers/hive_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/services/service_type.dart';
@@ -59,13 +62,13 @@ class ChantierNotifier extends StateNotifier<Chantier?> {
 
   Future<void> updateEtape(ChantierEtape etape) async {
     await etapeBox.put(etape.id, etape);
-    await etapeService.save(etape, etape.id!);
+    await etapeService.save(etape, etape.id);
     await recalculateFactureDraft();
   }
 
   Future<void> updatePiece(Piece piece) async {
     await pieceBox.put(piece.id, piece);
-    await pieceService.save(piece, piece.id!);
+    await pieceService.save(piece, piece.id);
   }
 
   Future<void> updatePieceJointe(PieceJointe piece) async {
@@ -76,12 +79,12 @@ class ChantierNotifier extends StateNotifier<Chantier?> {
   /// Add Model
   Future<void> addEtape(ChantierEtape etape) async {
     await etapeBox.put(etape.id, etape);
-    await etapeService.save(etape, etape.id!);
+    await etapeService.save(etape, etape.id);
   }
 
   Future<void> addPiece(Piece piece) async {
     await pieceBox.put(piece.id, piece);
-    await pieceService.save(piece, piece.id!);
+    await pieceService.save(piece, piece.id);
   }
 
   Future<void> addPieceJointe(String s, PieceJointe piece) async {
@@ -115,7 +118,7 @@ class ChantierNotifier extends StateNotifier<Chantier?> {
             return e.copyWith(terminee: !e.terminee);
           }
           etapeBox.put(e.id, e);
-          etapeService.save(e, e.id!);
+          etapeService.save(e, e.id);
           return e;
         }).toList();
 
@@ -144,10 +147,12 @@ class ChantierNotifier extends StateNotifier<Chantier?> {
 
       lignes.add(
         CustomLigneFacture(
+          ctlId: const Uuid().v4(),
           description: 'Étape : ${e.description}',
           montant: montantPieces,
           quantite: 1,
           total: montantPieces,
+          ctlUpdatedAt: e.updatedAt,
         ),
       );
     }
@@ -160,24 +165,30 @@ class ChantierNotifier extends StateNotifier<Chantier?> {
       final montant = i.facture?.totalHT ?? 0;
       lignes.add(
         CustomLigneFacture(
+          ctlId: const Uuid().v4(),
           description: 'Intervention : ${i.description}',
           montant: montant,
           quantite: 1,
           total: montant,
+          ctlUpdatedAt: i.updatedAt,
         ),
       );
     }
 
     final facture = FactureDraft(
-      factureId: clientId,
-      chantierId: id,
+      factureId: id,
+      chantierId: chantier.id,
+      clientId: clientId,
       lignesManuelles: lignes,
       isFinalized: false,
       dateDerniereModification: DateTime.now(),
+      tauxTVA: 1.20,
+      remise: 20,
+      signature: Uint8List.fromList([0, 1, 2, 3]),
     );
 
     await factureDraftBox.put(facture.id, facture);
-    await factureDraftService.save(facture, facture.id!);
+    await factureDraftService.save(facture, facture.id);
   }
 
   Future<void> recalculateFactureDraft() async {

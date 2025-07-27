@@ -61,10 +61,10 @@ class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
       tauxHoraire: technicien.tauxHoraire,
       disponible: technicien.disponible,
       localisation: technicien.localisation,
-      chantiersAffectes: [
-        ...technicien.chantiersAffectes,
+      chantiersAffectees: [
+        ...technicien.chantiersAffectees,
         if (chantierId != null &&
-            !technicien.chantiersAffectes.contains(chantierId))
+            !technicien.chantiersAffectees.contains(chantierId))
           chantierId,
       ],
       etapesAffectees: [
@@ -101,7 +101,9 @@ class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
       tauxHoraire: technicien.tauxHoraire,
       disponible: technicien.disponible,
       localisation: technicien.localisation,
-      chantiersAffectes: [...technicien.chantiersAffectes..remove(chantierId)],
+      chantiersAffectees: [
+        ...technicien.chantiersAffectees..remove(chantierId),
+      ],
       etapesAffectees: [...technicien.etapesAffectees..remove(etapeId)],
       updatedAt: technicien.updatedAt,
     );

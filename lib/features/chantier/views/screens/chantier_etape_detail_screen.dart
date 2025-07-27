@@ -45,11 +45,11 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
             (file.extension?.toLowerCase() ?? '') == 'pdf' ? 'pdf' : 'image';
 
         final piece = PieceJointe(
-          id: etape.id!,
+          id: etape.id,
           url: file.path!,
           nom: file.name,
           type: type,
-          taille: file.size,
+          taille: file.size.toDouble(),
           createdAt: DateTime.now(),
           typeMime: '',
           parentType: '',
@@ -58,7 +58,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
 
         await ref
             .read(chantierAdvancedNotifierProvider(chantierId).notifier)
-            .addPieceJointe(etape.id!, piece);
+            .addPieceJointe(etape.id, piece);
       }
     } catch (_) {
       if (context.mounted) {
@@ -107,7 +107,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
                   : Icons.radio_button_unchecked,
               color: etape.terminee ? Colors.green : null,
             ),
-            onPressed: () => _toggleTerminee(ref, etape.id!),
+            onPressed: () => _toggleTerminee(ref, etape.id),
           ),
         ],
       ),
@@ -152,8 +152,8 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
             context.goNamed(
               'chantier-etape-detail',
               pathParameters: {
-                'id': selected.chantierId ?? '',
-                'etapeId': selected.id!,
+                'id': selected.chantierId,
+                'etapeId': selected.id,
               },
             );
           }
@@ -167,7 +167,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     ChantierEtape etape,
   ) {
-    final pieces = etape.piecesJointes ?? [];
+    final pieces = etape.piecesJointes;
     final info = context.responsiveInfo(ref);
 
     return ResponsiveCard(
@@ -216,10 +216,10 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
 
     for (final p in pieces) {
       final mat = BudgetGen.calculerCoutMateriaux(
-        p.materiaux,
-        surface: p.surfaceM2,
+        p.materiaux!,
+        surface: p.surface,
       );
-      final materiel = BudgetGen.calculerCoutMateriels(p.materiels);
+      final materiel = BudgetGen.calculerCoutMateriels(p.materiels!);
       totalMat += mat;
       totalMateriel += materiel;
     }
@@ -332,7 +332,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
     final size = info.isMobile ? 100.0 : 120.0;
 
     return GestureDetector(
-      onTap: () => OpenFilex.open(piece.url!),
+      onTap: () => OpenFilex.open(piece.url),
       child: ResponsiveCard(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -357,7 +357,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
             SizedBox(
               width: size,
               child: Text(
-                piece.nom!,
+                piece.nom,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 13),
@@ -376,13 +376,13 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
       child:
           isWeb
               ? CachedNetworkImage(
-                imageUrl: piece.url!,
+                imageUrl: piece.url,
                 width: size,
                 height: size,
                 fit: BoxFit.contain,
               )
               : Image.file(
-                File(piece.url!),
+                File(piece.url),
                 width: size,
                 height: size,
                 fit: BoxFit.contain,

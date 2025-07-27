@@ -44,7 +44,7 @@ final chantierEtapesTempProvider = StateProvider.autoDispose
       return chantierAsync.when(
         data: (chantier) {
           if (chantier.etapes.isEmpty) {
-            return [ChantierEtape(titre: '', description: '')];
+            return [ChantierEtape.mock()];
           }
           return List<ChantierEtape>.from(chantier.etapes);
         },
@@ -138,24 +138,21 @@ final syncAllEntitiesProvider = FutureProvider<void>((ref) async {
 });
 
 final allDataStreamProvider = StreamProvider.autoDispose((ref) async* {
-  final clients =
-      await ref
-          .read(clientSyncServiceProvider)
-          .firestore
-          .collection('clients')
-          .get();
-  final techniciens =
-      await ref
-          .read(techSyncServiceProvider)
-          .firestore
-          .collection('techniciens')
-          .get();
-  final chantiers =
-      await ref
-          .read(chantierSyncServiceProvider)
-          .firestore
-          .collection('chantiers')
-          .get();
+  final clients = await ref
+      .read(clientSyncServiceProvider)
+      .firestore
+      .collection('clients')
+      .get();
+  final techniciens = await ref
+      .read(techSyncServiceProvider)
+      .firestore
+      .collection('techniciens')
+      .get();
+  final chantiers = await ref
+      .read(chantierSyncServiceProvider)
+      .firestore
+      .collection('chantiers')
+      .get();
 
   yield {
     'clients': clients.docs,

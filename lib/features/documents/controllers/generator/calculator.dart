@@ -5,12 +5,15 @@ class BudgetGen {
     required double surface,
     required List<Materiau> materiaux,
     required List<Materiel> materiels,
-    required MainOeuvre mainOeuvre,
+    required List<MainOeuvre> mainOeuvre,
     required List<Technicien> techniciens,
   }) {
     final totalMateriaux = calculerCoutMateriaux(materiaux, surface: surface);
     final totalMateriels = calculerCoutMateriels(materiels);
-    final totalMainOeuvre = calculerCoutMainOeuvre(mainOeuvre, techniciens);
+    final totalMainOeuvre = estimationCoutTotalMainOeuvre(
+      mainOeuvre,
+      techniciens,
+    );
 
     return totalMateriaux + totalMateriels + totalMainOeuvre;
   }
@@ -19,14 +22,14 @@ class BudgetGen {
     required double surface,
     required List<Materiau> materiaux,
     required List<Materiel> materiels,
-    required MainOeuvre? mainOeuvre,
+    required List<MainOeuvre>? mainOeuvre,
     required List<Technicien> techniciens,
   }) {
     final totalMateriaux = calculerCoutMateriaux(materiaux, surface: surface);
     final totalMateriels = calculerCoutMateriels(materiels);
     final totalMainOeuvre =
         mainOeuvre != null
-            ? calculerCoutMainOeuvre(mainOeuvre, techniciens)
+            ? estimationCoutTotalMainOeuvre(mainOeuvre, techniciens)
             : 0.0;
 
     return {
@@ -69,20 +72,56 @@ class BudgetGen {
   }
 
   static double calculerCoutMateriels(List<Materiel> materiels) {
+    return materiels.fold(0.0, (sum, m) {
+      if (m.joursLocation == 0) {
+        return sum + (m.prixUnitaire * m.quantiteFixe);
+      }
+      return calculerCoutLocationMateriels(materiels);
+    });
+  }
+
+  static double calculerCoutLocationMateriels(List<Materiel> materiels) {
     return materiels.fold(
       0.0,
       (sum, m) => sum + (m.prixLocation! * m.joursLocation!),
     );
   }
 
-  static double calculerCoutMainOeuvre(
-    MainOeuvre mainOeuvre,
+  static double estimationCoutTotalMainOeuvre(
+    List<MainOeuvre> mainOeuvres,
     List<Technicien> techniciens,
   ) {
-    final tech = techniciens.firstWhere(
-      (t) => t.id == mainOeuvre.idTechnicien,
-      orElse: () => throw Exception('Technicien introuvable'),
-    );
-    return tech.tauxHoraire * mainOeuvre.heuresEstimees;
+    return mainOeuvres.fold(0.0, (total, mo) {
+      final tech = techniciens.firstWhere(
+        (t) => t.id == mo.idTechnicien,
+        orElse:
+            () =>
+                throw Exception(
+                  'Technicien introuvable pour ${mo.idTechnicien}',
+                ),
+      );
+      return total + (tech.tauxHoraire * mo.heuresEstimees);
+    });
+  }
+
+  static double calculerTotalMulti({
+    required double surface,
+    required List<Materiau> materiaux,
+    required List<Materiel> materiels,
+    required List<MainOeuvre> mainOeuvre,
+    required List<Technicien> techniciens,
+  }) {
+    final totalMateriaux = calculerCoutMateriaux(materiaux, surface: surface);
+    final totalMateriels = calculerCoutMateriels(materiels);
+
+    final totalMainOeuvre = mainOeuvre.fold(0.0, (sum, m) {
+      final tech = techniciens.firstWhere(
+        (t) => t.id == m.idTechnicien,
+        orElse: () => Technicien.mock(),
+      );
+      return sum + (m.heuresEstimees * tech.tauxHoraire);
+    });
+
+    return totalMateriaux + totalMateriels + totalMainOeuvre;
   }
 }

@@ -43,7 +43,7 @@ class PdfCreatorService {
       type: 'facture',
       parentType: 'Chantier',
       parentId: chantier.id,
-      taille: bytes.lengthInBytes,
+      taille: bytes.lengthInBytes.toDouble(),
     );
   }
 
@@ -78,7 +78,7 @@ class PdfCreatorService {
       type: 'facture',
       parentType: 'Intervention',
       parentId: intervention.id,
-      taille: bytes.lengthInBytes,
+      taille: bytes.lengthInBytes.toDouble(),
     );
   }
 }

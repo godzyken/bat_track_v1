@@ -18,7 +18,7 @@ class FirestoreService {
     await _db
         .collection(collectionPath)
         .doc(docId)
-        .set(data.toJson(), SetOptions(merge: true));
+        .set(data.copyWithId(docId), SetOptions(merge: true));
 
     sw.stop();
     log('✅ setData terminé en ${sw.elapsedMilliseconds}ms');

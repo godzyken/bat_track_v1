@@ -59,8 +59,8 @@ class ChantiersEtapeListPreview extends ConsumerWidget {
                         Text(etape.description),
                         if (etape.dateDebut != null && etape.dateFin != null)
                           Text(
-                            'Du ${etape.dateDebut!.toLocal().toString().split(' ').first} '
-                            'au ${etape.dateFin!.toLocal().toString().split(' ').first}',
+                            'Du ${etape.dateDebut.toLocal().toString().split(' ').first} '
+                            'au ${etape.dateFin.toLocal().toString().split(' ').first}',
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey[600],
@@ -81,13 +81,13 @@ class ChantiersEtapeListPreview extends ConsumerWidget {
                     ),
                     onTap: () {
                       final chantier = ref.read(
-                        chantierProvider(etape.chantierId!),
+                        chantierProvider(etape.chantierId),
                       );
                       context.goNamed(
                         'chantier-etape-detail',
                         pathParameters: {
-                          'id': etape.chantierId!,
-                          'etapeId': etape.id!,
+                          'id': etape.chantierId,
+                          'etapeId': etape.id,
                         },
                         extra: {'chantier': chantier, 'etape': etape},
                       );
@@ -155,8 +155,8 @@ Widget? chantierFieldBuilder(
           context.goNamed(
             'chantier-etape-detail',
             pathParameters: {
-              'id': etapes[i].chantierId!,
-              'etapeId': etapes[i].id!,
+              'id': etapes[i].chantierId,
+              'etapeId': etapes[i].id,
             },
             extra: {'chantier': chantier, 'etape': etapes[i]},
           );

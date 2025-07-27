@@ -37,7 +37,7 @@ class EtapeTimeline extends ConsumerWidget {
             title: Text(current.titre),
             subtitle: Text(
               current.dateDebut != null
-                  ? 'Début : ${current.dateDebut!.toLocal().toString().split(' ').first}'
+                  ? 'Début : ${current.dateDebut.toLocal().toString().split(' ').first}'
                   : 'Pas de date',
             ),
             tileColor:

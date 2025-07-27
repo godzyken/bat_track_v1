@@ -1,7 +1,5 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
-import 'package:bat_track_v1/features/chantier/views/widgets/budget_detail_sans_tech.dart';
-import 'package:bat_track_v1/features/chantier/views/widgets/chantier_etape_time_line_interactive.dart';
-import 'package:bat_track_v1/features/chantier/views/widgets/chantier_list_documents.dart';
+import 'package:bat_track_v1/features/chantier/views/widgets/chantier_extensions_widgets.dart';
 import 'package:bat_track_v1/models/data/state_wrapper/wrappers.dart';
 import 'package:bat_track_v1/models/notifiers/sync_entity_notifier.dart';
 import 'package:bat_track_v1/models/providers/synchrones/sync_entity_notifier_provider.dart';
@@ -14,9 +12,6 @@ import '../../../../data/local/models/index_model_extention.dart';
 import '../../../dolibarr/views/widgets/dolibarr_section.dart';
 import '../../../dolibarr/views/widgets/sync_statu_bar.dart';
 import '../../controllers/providers/chantier_sync_provider.dart';
-import '../widgets/chantier_card_info.dart';
-import '../widgets/chantier_discription.dart';
-import '../widgets/section_card.dart';
 
 class ChantierDetailScreen extends ConsumerWidget {
   final Chantier chantier;
@@ -27,10 +22,7 @@ class ChantierDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
     final dateFormat = DateFormat('dd/MM/yyyy');
-    final factory = GenericEntityProviderFactory.instance;
-    final state = ref.watch(
-      factory.getSyncEntityNotifierProvider<Chantier>(chantier.id),
-    );
+    final state = ref.watch(ref.syncEntity<Chantier>(chantier.id));
     final notifier = ref.read(chantierSyncProvider(chantier).notifier);
 
     final totalBudget = computeTotalBudget(chantier.etapes);
@@ -141,7 +133,7 @@ class ChantierDetailScreen extends ConsumerWidget {
                       // Étapes avec timeline interactive
                       SectionCard(
                         title: "Étapes du chantier",
-                        child: ChantiersEtapeTimelineInteractive(
+                        child: ChantiersEtapeKanbanInteractive(
                           etapes: chantier.etapes,
                           onReorder: (reordered) {
                             notifier.update(
@@ -151,10 +143,9 @@ class ChantierDetailScreen extends ConsumerWidget {
                           onDelete: (id) {
                             notifier.update(
                               chantier.copyWith(
-                                etapes:
-                                    chantier.etapes
-                                        .where((e) => e.id != id.toString())
-                                        .toList(),
+                                etapes: chantier.etapes
+                                    .where((e) => e.id != id.toString())
+                                    .toList(),
                               ),
                             );
                           },
