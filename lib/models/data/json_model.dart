@@ -2,12 +2,15 @@ import '../../data/local/models/index_model_extention.dart';
 
 mixin JsonModel<T> {
   String get id;
+
   DateTime? get updatedAt;
 }
 
 mixin JsonSerializableModel<T> on JsonModel<T> {
   static T? copyWithId<T>(String? id) => throw UnimplementedError();
+
   Map<String, dynamic> toJson();
+
   static T? fromJson<T>(Map<String, dynamic> json) =>
       throw UnimplementedError();
 }
@@ -47,10 +50,17 @@ extension JsonModelCopyWith<T> on JsonModel<T> {
       return (this as ChantierEtape).copyWith(id: newId) as T;
     }
     if (this is Piece) return (this as Piece).copyWith(id: newId) as T;
+    if (this is Facture) {
+      return (this as Facture).copyWith(id: newId) as T;
+    }
     if (this is FactureDraft) {
       return (this as FactureDraft).copyWith(factureId: newId) as T;
     }
+    if (this is FactureModel) {
+      return (this as FactureModel).copyWith(id: newId) as T;
+    }
     if (this is Projet) return (this as Projet).copyWith(id: newId) as T;
+    if (this is UserModel) return (this as UserModel).copyWith(id: newId) as T;
 
     throw UnimplementedError('copyWithId non implémenté pour $T');
   }
@@ -80,10 +90,16 @@ extension JsonModelFactory on JsonModel {
         return ChantierEtape.fromJson(json) as T;
       case Piece _:
         return Piece.fromJson(json) as T;
+      case Facture _:
+        return Facture.fromJson(json) as T;
       case FactureDraft _:
         return FactureDraft.fromJson(json) as T;
+      case FactureModel _:
+        return FactureModel.fromJson(json) as T;
       case Projet _:
         return Projet.fromJson(json) as T;
+      case UserModel _:
+        return UserModel.fromJson(json) as T;
       default:
         return null;
     }

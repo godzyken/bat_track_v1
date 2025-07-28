@@ -11,7 +11,7 @@ import 'package:bat_track_v1/data/local/models/entities/piece_entity.dart';
 import 'package:bat_track_v1/data/local/models/entities/pieces_jointes_entity.dart';
 import 'package:bat_track_v1/data/local/models/entities/projet_entity.dart';
 import 'package:bat_track_v1/data/local/models/entities/technicien_entity.dart';
-import 'package:bat_track_v1/features/auth/data/model/user.dart';
+import 'package:bat_track_v1/data/local/models/entities/user_entity.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 Future<void> registerHiveAdapters() async {
@@ -31,5 +31,5 @@ Future<void> registerHiveAdapters() async {
   Hive.registerAdapter(FactureDraftEntityAdapter());
   Hive.registerAdapter(FactureModelEntityAdapter());
   Hive.registerAdapter(UserAdapter());
-  Hive.registerAdapter(UserRoleAdapter());
+  Hive.registerAdapter(UserRoleEntityAdapter());
 }

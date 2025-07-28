@@ -44,6 +44,8 @@ class SelectedInstanceNotifier extends StateNotifier<DolibarrInstance?> {
     state = null;
     final prefs = await ref.read(sharedPreferencesProvider.future);
 
-    await prefs.remove('selectedInstance');
+    await prefs.remove('dolibarr_name');
+    await prefs.remove('dolibarr_baseUrl');
+    await prefs.remove('dolibarr_apiKey');
   }
 }

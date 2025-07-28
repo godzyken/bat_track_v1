@@ -95,15 +95,17 @@ final chantierEtapeSyncServiceProvider =
       (ref) => EntitySyncService<ChantierEtape>('chantierEtapes'),
     );
 
-/*final factureSyncServiceProvider =
-    Provider<EntitySyncService<Facture>>(²
-      (ref) => const EntitySyncService<Facture>('factures'),
-    );
+final factureSyncServiceProvider = Provider<EntitySyncService<Facture>>(
+  (ref) => EntitySyncService<Facture>('factures'),
+);
 
-final projetSyncServiceProvider =
-    Provider<EntitySyncService<Projet>>(
-      (ref) => const EntitySyncService<Projet>('projets'),
-    );*/
+final projetSyncServiceProvider = Provider<EntitySyncService<Projet>>(
+  (ref) => EntitySyncService<Projet>('projets'),
+);
+
+final userSyncServiceProvider = Provider<EntitySyncService<UserModel>>(
+  (ref) => EntitySyncService<UserModel>('users'),
+);
 
 final syncAllProvider = Provider(
   (ref) => () async {
@@ -117,8 +119,9 @@ final syncAllProvider = Provider(
     await ref.read(interventionSyncServiceProvider).syncFromFirestore();
     await ref.read(pieceSyncServiceProvider).syncFromFirestore();
     await ref.read(chantierEtapeSyncServiceProvider).syncFromFirestore();
-    //await ref.read(factureSyncServiceProvider).syncFromFirestore();
-    //await ref.read(projetSyncServiceProvider).syncFromFirestore();
+    await ref.read(factureSyncServiceProvider).syncFromFirestore();
+    await ref.read(projetSyncServiceProvider).syncFromFirestore();
+    await ref.read(userSyncServiceProvider).syncFromFirestore();
   },
 );
 
@@ -133,26 +136,30 @@ final syncAllEntitiesProvider = FutureProvider<void>((ref) async {
   await ref.read(interventionSyncServiceProvider).syncFromFirestore();
   await ref.read(pieceSyncServiceProvider).syncFromFirestore();
   await ref.read(chantierEtapeSyncServiceProvider).syncFromFirestore();
-  //await ref.read(factureSyncServiceProvider).syncFromFirestore();
-  //await ref.read(projetSyncServiceProvider).syncFromFirestore();
+  await ref.read(factureSyncServiceProvider).syncFromFirestore();
+  await ref.read(projetSyncServiceProvider).syncFromFirestore();
+  await ref.read(userSyncServiceProvider).syncFromFirestore();
 });
 
 final allDataStreamProvider = StreamProvider.autoDispose((ref) async* {
-  final clients = await ref
-      .read(clientSyncServiceProvider)
-      .firestore
-      .collection('clients')
-      .get();
-  final techniciens = await ref
-      .read(techSyncServiceProvider)
-      .firestore
-      .collection('techniciens')
-      .get();
-  final chantiers = await ref
-      .read(chantierSyncServiceProvider)
-      .firestore
-      .collection('chantiers')
-      .get();
+  final clients =
+      await ref
+          .read(clientSyncServiceProvider)
+          .firestore
+          .collection('clients')
+          .get();
+  final techniciens =
+      await ref
+          .read(techSyncServiceProvider)
+          .firestore
+          .collection('techniciens')
+          .get();
+  final chantiers =
+      await ref
+          .read(chantierSyncServiceProvider)
+          .firestore
+          .collection('chantiers')
+          .get();
 
   yield {
     'clients': clients.docs,

@@ -61,6 +61,9 @@ final factureBoxProvider = Provider<Box<Facture>>(
 final projetBoxProvider = Provider<Box<Projet>>(
   (ref) => Hive.box<Projet>('projet'),
 );
+final userBoxProvider = Provider<Box<UserModel>>(
+  (ref) => Hive.box<UserModel>('UserModel'),
+);
 
 ////Providers Family for CRUD Operations
 
@@ -122,6 +125,10 @@ final projetProvider = Provider.family<Projet?, String>((ref, id) {
   final box = Hive.box<Projet>('projet');
   return box.get(id);
 });
+final userProvider = Provider.family<UserModel?, String>((ref, id) {
+  final box = Hive.box<UserModel>('user');
+  return box.get(id);
+});
 
 ////Liste tout les hiveProvider list
 final allChantiersProvider = Provider<List<Chantier>>((ref) {
@@ -136,6 +143,11 @@ final allEtapesProvider = Provider<List<ChantierEtape>>((ref) {
 
 final allTechniciensProvider = Provider<List<Technicien>>((ref) {
   final box = Hive.box<Technicien>('technicien');
+  return box.values.toList();
+});
+
+final allUsersProvider = Provider<List<UserModel>>((ref) {
+  final box = Hive.box<UserModel>('user');
   return box.values.toList();
 });
 
@@ -182,6 +194,9 @@ final factureServiceProvider = Provider<EntityServices<Facture>>(
 final projetServiceProvider = Provider<EntityServices<Projet>>(
   (ref) => const EntityServices('projet'),
 );
+final userServiceProvider = Provider<EntityServices<UserModel>>(
+  (ref) => const EntityServices('user'),
+);
 
 ////Providers for EntityServices
 Provider<EntityServices<T>> entityServiceProvider<T extends JsonModel>() {
@@ -209,6 +224,7 @@ final _serviceRegistry = <Type, ProviderBase>{
   FactureModel: factureModelServiceProvider,
   Facture: factureServiceProvider,
   Projet: projetServiceProvider,
+  UserModel: userServiceProvider,
 };
 
 // Déclaration simplifiée du provider Chantier
@@ -280,4 +296,8 @@ final factureDraftNotifierProvider = createEntityNotifierProvider<FactureDraft>(
 final factureModelNotifierProvider = createEntityNotifierProvider<FactureModel>(
   hiveBoxName: 'factureModels',
   service: factureModelService,
+);
+final userNotifierProvider = createEntityNotifierProvider<UserModel>(
+  hiveBoxName: 'user',
+  service: userService,
 );

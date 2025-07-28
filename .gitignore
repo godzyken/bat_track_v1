@@ -50,3 +50,6 @@ app.*.map.json
 /android/app/google-services.json
 /firebase.json
 /devtools_options.yaml
+
+# FVM Version Cache
+.fvm/

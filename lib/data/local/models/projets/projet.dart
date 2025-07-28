@@ -23,15 +23,6 @@ class Projet with _$Projet implements JsonModel<Projet> {
 
   factory Projet.fromJson(Map<String, dynamic> json) => _$ProjetFromJson(json);
 
-  /* @override
-  Projet fromJson(Map<String, dynamic> json) => Projet.fromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$ProjetToJson(this);
-
-  @override
-  Projet copyWithId(String? id) => copyWith(id: id ?? this.id);*/
-
   factory Projet.mock() => Projet(
     id: const Uuid().v4(),
     nom: 'Categate',

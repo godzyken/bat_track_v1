@@ -4,7 +4,7 @@ import 'package:hive/hive.dart';
 
 part 'facture_entity.g.dart';
 
-@HiveType(typeId: 10)
+@HiveType(typeId: 12)
 class FactureEntity extends HiveObject implements HiveModel<Facture> {
   @HiveField(0)
   final String fId;

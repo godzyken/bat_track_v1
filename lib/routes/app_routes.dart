@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../data/local/models/index_model_extention.dart';
+import '../data/remote/providers/dolibarr_instance_provider.dart';
 import '../features/about/views/screens/about_screen.dart';
 import '../features/auth/views/screens/login_screen.dart';
 import '../features/chantier/views/screens/chantier_detail_loader.dart';
@@ -16,6 +17,7 @@ import '../features/client/views/screens/clients_screen.dart';
 import '../features/dashboard/views/screens/dashboard_screen.dart';
 import '../features/dolibarr/views/screens/dolibarr_import_client_screen.dart';
 import '../features/home/views/screens/home_screen.dart';
+import '../features/home/views/screens/pick_instance_screen.dart';
 import '../features/intervention/views/screens/interventions_screen.dart';
 import '../features/technicien/views/screens/technitiens_screen.dart';
 import '../models/data/state_wrapper/wrappers.dart';
@@ -23,21 +25,27 @@ import '../models/notifiers/sync_entity_notifier.dart';
 import '../providers/auth_provider.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
+  final hasInstance = ref.watch(selectedInstanceProvider) != null;
   return GoRouter(
     initialLocation: '/',
     //refreshListenable: GoRouterRefreshStream(authStateChanges),
     redirect: (context, state) {
       final isLoggedIn = authState;
-      final isLoggingIn = state.uri.toString() == '/login';
+      final isLoggingIn = state.uri.path == '/login';
 
       if (!isLoggedIn && !isLoggingIn) return '/login';
       if (isLoggedIn && isLoggingIn) return '/';
+      final isRoot = state.uri.path == '/';
+
+      if (isRoot) {
+        return hasInstance ? '/home' : '/pick-instance';
+      }
       return null;
     },
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
-        path: '/',
+        path: '/home',
         builder: (context, state) => const HomeScreen(),
         routes: [
           GoRoute(
@@ -45,6 +53,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const DashboardScreen(),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/pick-instance',
+        builder: (context, state) => const PickInstanceScreen(),
       ),
       GoRoute(
         path: '/clients',
