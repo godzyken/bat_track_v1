@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/features/dolibarr/views/screens/dolibarr_explorer_screen.dart';
+import 'package:bat_track_v1/features/equipement/views/screens/equipement_list_screen.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:bat_track_v1/models/views/screens/entity_detail_screen.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const HomeScreen(),
         routes: [
           GoRoute(
-            path: '/dashboard',
+            path: 'dashboard',
+            name: 'dashboard',
             builder: (context, state) => const DashboardScreen(),
           ),
         ],
@@ -57,6 +59,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/pick-instance',
         builder: (context, state) => const PickInstanceScreen(),
+      ),
+      GoRoute(
+        path: '/equipements',
+        builder: (context, state) => const EquipementScreen(),
       ),
       GoRoute(
         path: '/clients',

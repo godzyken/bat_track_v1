@@ -5,7 +5,7 @@ import '../chantiers/main_oeuvre.dart';
 
 part 'main_oeuvre_entity.g.dart';
 
-@HiveType(typeId: 5)
+@HiveType(typeId: 10)
 class MainOeuvreEntity extends HiveObject implements HiveModel<MainOeuvre> {
   @HiveField(0)
   final String moId;

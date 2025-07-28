@@ -148,5 +148,6 @@ final factureService = EntityServices<Facture>('factures');
 final factureModelService = EntityServices<FactureModel>('factureModels');
 final factureDraftService = EntityServices<FactureDraft>('factureDrafts');
 final userService = EntityServices<UserModel>('users');
+final equipementService = EntityServices<Equipement>('equipements');
 
 final storageService = StorageService(FirebaseStorage.instance);

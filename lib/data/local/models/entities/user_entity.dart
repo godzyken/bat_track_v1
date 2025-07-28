@@ -5,7 +5,7 @@ import '../../../../models/data/hive_model.dart';
 
 part 'user_entity.g.dart';
 
-@HiveType(typeId: 10, adapterName: 'UserAdapter')
+@HiveType(typeId: 15, adapterName: 'UserAdapter')
 class UserEntity extends HiveObject implements HiveModel<UserModel> {
   @HiveField(0)
   final String uid;

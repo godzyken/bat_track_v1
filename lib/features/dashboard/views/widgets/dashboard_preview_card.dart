@@ -13,7 +13,7 @@ class DashboardPreviewCard extends ConsumerWidget {
     final statsAsync = ref.watch(interventionStatsProvider);
 
     return InkWell(
-      onTap: () => context.go('/dashboard'),
+      onTap: () => context.goNamed('dashboard'),
       borderRadius: BorderRadius.circular(16),
       child: Card(
         elevation: 4,
@@ -47,7 +47,7 @@ class DashboardPreviewCard extends ConsumerWidget {
                       height: 100,
                       child: InterventionPieChart(
                         data: stats,
-                        isCompact: true, // ajoute ce paramètre pour mini chart
+                        isCompact: true, // paramètre pour mini chart
                       ),
                     ),
                     const SizedBox(height: 8),

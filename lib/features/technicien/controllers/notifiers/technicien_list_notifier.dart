@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/providers/hive_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
@@ -11,7 +12,8 @@ final techniciensListProvider =
 class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
   @override
   Future<List<Technicien>> build() async {
-    return HiveService.getAll<Technicien>('techniciens');
+    final service = ref.read(technicienServiceProvider);
+    return service.getAll();
   }
 
   Future<void> addMock() async {
@@ -23,22 +25,15 @@ class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
   }
 
   Future<void> updateTechnicien(Technicien updated) async {
-    final existing = await HiveService.get<Technicien>(
-      'techniciens',
-      updated.id,
-    );
-    if (existing == updated) return; // pas de changement
-    await HiveService.put('techniciens', updated.id, updated);
-    state = AsyncValue.data(
-      await HiveService.getAll<Technicien>('techniciens'),
-    );
+    final service = ref.read(technicienServiceProvider);
+    await service.update(updated, updated.id);
+    state = AsyncValue.data(await service.getAll());
   }
 
   Future<void> delete(String id) async {
-    await HiveService.delete<Technicien>('techniciens', id);
-    state = AsyncValue.data(
-      await HiveService.getAll<Technicien>('techniciens'),
-    );
+    final service = ref.read(technicienServiceProvider);
+    await service.delete(id);
+    state = AsyncValue.data(await service.getAll());
   }
 
   Future<void> assignToChantierOrEtape({
@@ -46,7 +41,9 @@ class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
     String? chantierId,
     String? etapeId,
   }) async {
-    final list = await HiveService.getAll<Technicien>('techniciens');
+    final service = ref.read(technicienServiceProvider);
+
+    final list = await service.getAll();
     final index = list.indexWhere((t) => t.id == technicienId);
     if (index == -1) return;
 
@@ -75,10 +72,8 @@ class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
       updatedAt: technicien.updatedAt,
     );
 
-    await HiveService.put('techniciens', updated.id, updated);
-    state = AsyncValue.data(
-      await HiveService.getAll<Technicien>('techniciens'),
-    );
+    await service.update(updated, updated.id);
+    state = AsyncValue.data(await service.getAll());
   }
 
   Future<void> unassignFromChantierOrEtape({
@@ -86,7 +81,9 @@ class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
     String? chantierId,
     String? etapeId,
   }) async {
-    final list = await HiveService.getAll<Technicien>('techniciens');
+    final service = ref.read(technicienServiceProvider);
+
+    final list = await service.getAll();
     final index = list.indexWhere((t) => t.id == technicienId);
     if (index == -1) return;
 
@@ -108,9 +105,7 @@ class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
       updatedAt: technicien.updatedAt,
     );
 
-    await HiveService.put('techniciens', updated.id, updated);
-    state = AsyncValue.data(
-      await HiveService.getAll<Technicien>('techniciens'),
-    );
+    await service.update(updated, updated.id);
+    state = AsyncValue.data(await service.getAll());
   }
 }

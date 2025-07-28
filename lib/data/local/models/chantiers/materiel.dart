@@ -28,15 +28,6 @@ class Materiel
   factory Materiel.fromJson(Map<String, dynamic> json) =>
       _$MaterielFromJson(json);
 
-  /*  @override
-  Materiel fromJson(Map<String, dynamic> json) => Materiel.fromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$MaterielToJson(this);
-
-  @override
-  Materiel copyWithId(String? id) => copyWith(id: id ?? this.id);*/
-
   factory Materiel.mock() => Materiel(
     id: const Uuid().v4(),
     nom: 'Mini-Pelle',

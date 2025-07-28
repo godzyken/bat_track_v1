@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/models/chantiers/equipement.dart';
 import 'package:bat_track_v1/data/local/models/entities/chantier_entity.dart';
 import 'package:bat_track_v1/data/local/models/entities/client_entity.dart';
 import 'package:bat_track_v1/data/local/models/entities/facture_draft_entity.dart';
@@ -19,7 +20,6 @@ Future<void> registerHiveAdapters() async {
   Hive.registerAdapter(ClientEntityAdapter());
   Hive.registerAdapter(TechnicienEntityAdapter());
   Hive.registerAdapter(InterventionEntityAdapter());
-  Hive.registerAdapter(ChantierEntityAdapter());
   Hive.registerAdapter(PieceJointeAdapter());
   Hive.registerAdapter(PieceEntityAdapter());
   Hive.registerAdapter(MateriauEntityAdapter());
@@ -32,4 +32,5 @@ Future<void> registerHiveAdapters() async {
   Hive.registerAdapter(FactureModelEntityAdapter());
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(UserRoleEntityAdapter());
+  Hive.registerAdapter(EquipementAdapter());
 }

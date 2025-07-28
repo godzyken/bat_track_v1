@@ -64,6 +64,9 @@ final projetBoxProvider = Provider<Box<Projet>>(
 final userBoxProvider = Provider<Box<UserModel>>(
   (ref) => Hive.box<UserModel>('UserModel'),
 );
+final equipementBoxProvider = Provider<Box<Equipement>>(
+  (ref) => Hive.box<Equipement>('Equipement'),
+);
 
 ////Providers Family for CRUD Operations
 
@@ -83,7 +86,7 @@ final interventionProvider = Provider.family<Intervention?, String>((ref, id) {
   final box = Hive.box<Intervention>('interventions');
   return box.get(id);
 });
-final chantierEtapesProvider =
+final chantierEtapesListFutureProvider =
     FutureProvider.family<List<ChantierEtape>, String>((ref, chantierId) async {
       final box = await ref.watch(chantierEtapeBoxProvider);
       return box.values.where((e) => e.id == chantierId).toList();
@@ -129,6 +132,10 @@ final userProvider = Provider.family<UserModel?, String>((ref, id) {
   final box = Hive.box<UserModel>('user');
   return box.get(id);
 });
+final equipementProvider = Provider.family<Equipement?, String>((ref, id) {
+  final box = Hive.box<Equipement>('equipement');
+  return box.get(id);
+});
 
 ////Liste tout les hiveProvider list
 final allChantiersProvider = Provider<List<Chantier>>((ref) {
@@ -148,6 +155,11 @@ final allTechniciensProvider = Provider<List<Technicien>>((ref) {
 
 final allUsersProvider = Provider<List<UserModel>>((ref) {
   final box = Hive.box<UserModel>('user');
+  return box.values.toList();
+});
+
+final allEquipementsProvider = Provider<List<Equipement>>((ref) {
+  final box = Hive.box<Equipement>('equipement');
   return box.values.toList();
 });
 
@@ -197,6 +209,9 @@ final projetServiceProvider = Provider<EntityServices<Projet>>(
 final userServiceProvider = Provider<EntityServices<UserModel>>(
   (ref) => const EntityServices('user'),
 );
+final equipementServiceProvider = Provider<EntityServices<Equipement>>(
+  (ref) => const EntityServices('equipement'),
+);
 
 ////Providers for EntityServices
 Provider<EntityServices<T>> entityServiceProvider<T extends JsonModel>() {
@@ -225,6 +240,7 @@ final _serviceRegistry = <Type, ProviderBase>{
   Facture: factureServiceProvider,
   Projet: projetServiceProvider,
   UserModel: userServiceProvider,
+  Equipement: equipementServiceProvider,
 };
 
 // Déclaration simplifiée du provider Chantier
@@ -300,4 +316,8 @@ final factureModelNotifierProvider = createEntityNotifierProvider<FactureModel>(
 final userNotifierProvider = createEntityNotifierProvider<UserModel>(
   hiveBoxName: 'user',
   service: userService,
+);
+final equipementNotifierProvider = createEntityNotifierProvider<Equipement>(
+  hiveBoxName: 'equipement',
+  service: equipementService,
 );

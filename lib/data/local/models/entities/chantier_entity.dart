@@ -8,7 +8,7 @@ import '../chantiers/chantier.dart';
 
 part 'chantier_entity.g.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 0, adapterName: 'ChantierEntityAdapter')
 class ChantierEntity extends HiveObject implements HiveModel<Chantier> {
   @HiveField(0)
   final String chId;

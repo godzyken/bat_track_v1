@@ -1,0 +1,67 @@
+import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
+import 'package:bat_track_v1/features/equipement/controllers/notifiers/equipements_list_notifier.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../data/local/models/index_model_extention.dart';
+import '../../../../models/views/widgets/entity_form.dart';
+import '../../../../models/views/widgets/entity_list.dart';
+import '../../../home/views/widgets/app_drawer.dart';
+
+class EquipementScreen extends ConsumerWidget {
+  const EquipementScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final info = context.responsiveInfo(ref);
+    final equipementAsync = ref.watch(equipementListProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Équipements')),
+      drawer: const AppDrawer(),
+      body: equipementAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Erreur: $e')),
+        data:
+            (items) => EntityList<Equipement>(
+              items,
+              'equipements',
+              onEdit: (equipement) {
+                showDialog(
+                  context: context,
+                  builder:
+                      (_) => EntityForm<Equipement>(
+                        fromJson: (json) => Equipement.fromJson(json),
+                        initialValue: equipement,
+                        onSubmit: (updated) async {
+                          await ref
+                              .read(equipementListProvider.notifier)
+                              .updateEntity(updated);
+                        },
+                        createEmpty: () => equipement,
+                      ),
+                );
+              },
+              info: info,
+            ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showForm(context, ref),
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _showForm(BuildContext context, WidgetRef ref, {Equipement? initial}) {
+    showDialog(
+      context: context,
+      builder:
+          (_) => EntityForm<Equipement>(
+            initialValue: initial,
+            fromJson: (json) => Equipement.fromJson(json),
+            createEmpty: () => Equipement.mock(),
+            onSubmit: (e) => ref.read(equipementListProvider.notifier).add(e),
+          ),
+    );
+  }
+}
