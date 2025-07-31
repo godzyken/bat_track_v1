@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../models/data/json_model.dart';
+import '../../adapters/signture_converter.dart';
 import '../index_model_extention.dart';
 
 part 'chantier_etapes.freezed.dart';
@@ -13,6 +14,8 @@ class ChantierEtape
         _$ChantierEtape,
         JsonModel<ChantierEtape>,
         JsonSerializableModel<ChantierEtape> {
+  const ChantierEtape._();
+
   const factory ChantierEtape({
     required String id,
     required String chantierId,
@@ -20,28 +23,18 @@ class ChantierEtape
     List<String>? timeline,
     required String titre,
     required String description,
-    required DateTime dateDebut,
-    required DateTime dateFin,
+    @DateTimeIsoConverter() required DateTime dateDebut,
+    @DateTimeIsoConverter() required DateTime dateFin,
     required bool terminee,
     double? budget,
     required List<Piece> pieces,
     required int ordre,
-    DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? updatedAt,
     required String statut,
   }) = _ChantierEtape;
 
   factory ChantierEtape.fromJson(Map<String, dynamic> json) =>
       _$ChantierEtapeFromJson(json);
-
-  /*  @override
-  ChantierEtape fromJson(Map<String, dynamic> json) =>
-      ChantierEtape.fromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$ChantierEtapeToJson(this);
-
-  @override
-  ChantierEtape copyWithId(String? id) => copyWith(id: id ?? this.id);*/
 
   factory ChantierEtape.mock() => ChantierEtape(
     id: const Uuid().v4(),
@@ -56,4 +49,7 @@ class ChantierEtape
     ordre: 2,
     statut: 'A Faire',
   );
+
+  @override
+  bool get isUpdated => updatedAt != null;
 }

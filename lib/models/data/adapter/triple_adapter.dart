@@ -92,3 +92,15 @@ class TripleAdapter<T extends JsonModel> {
     }
   }
 }
+
+extension TripleAdapterExtension<T extends JsonModel> on TripleAdapter<T> {
+  Future<void> importFromDolibarr() async {
+    final items = await fetchFromDolibarr();
+    final box = await getHiveBox();
+
+    for (final item in items) {
+      await saveToHive(box, item);
+      await saveToFirebase(item);
+    }
+  }
+}

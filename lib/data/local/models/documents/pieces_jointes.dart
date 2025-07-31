@@ -65,14 +65,8 @@ class PieceJointe
   @override
   File getFile() => File(url);
 
-  /*  @override
-  PieceJointe fromJson(Map<String, dynamic> json) => PieceJointe.fromJson(json);
-
   @override
-  Map<String, dynamic> toJson() => _$PieceJointeToJson(this);
-
-  @override
-  PieceJointe copyWithId(String? newId) => copyWith(id: newId ?? id);*/
+  bool get isUpdated => updatedAt != null;
 }
 
 // Extension personnalisée

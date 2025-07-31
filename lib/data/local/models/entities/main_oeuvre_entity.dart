@@ -19,11 +19,19 @@ class MainOeuvreEntity extends HiveObject implements HiveModel<MainOeuvre> {
   @HiveField(3)
   final DateTime? moUpdatedAt;
 
+  @HiveField(4)
+  final DateTime dateCreate;
+
+  @HiveField(5)
+  final bool? isActive;
+
   MainOeuvreEntity({
     required this.moId,
     required this.idTechnicien,
     required this.heuresEstimees,
     this.moUpdatedAt,
+    required this.dateCreate,
+    this.isActive = false,
   });
 
   factory MainOeuvreEntity.fromModel(MainOeuvre model) {
@@ -32,6 +40,8 @@ class MainOeuvreEntity extends HiveObject implements HiveModel<MainOeuvre> {
       idTechnicien: model.idTechnicien!,
       heuresEstimees: model.heuresEstimees,
       moUpdatedAt: model.updatedAt,
+      dateCreate: model.dateDebut,
+      isActive: model.isActive,
     );
   }
 
@@ -44,7 +54,10 @@ class MainOeuvreEntity extends HiveObject implements HiveModel<MainOeuvre> {
     id: id,
     idTechnicien: idTechnicien,
     heuresEstimees: heuresEstimees,
+    dateDebut: dateCreate,
+    passedTime: moUpdatedAt,
     updatedAt: updatedAt,
+    isActive: true,
   );
 
   @override

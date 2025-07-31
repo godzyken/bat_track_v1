@@ -50,7 +50,7 @@ class InterventionEntity extends HiveObject implements HiveModel<Intervention> {
       chantierId: model.chantierId,
       technicienId: model.technicienId,
       description: model.description,
-      date: model.date,
+      date: model.create,
       statut: model.statut,
       document:
           model.document.map((e) => PieceJointeEntity.fromModel(e)).toList(),
@@ -71,7 +71,7 @@ class InterventionEntity extends HiveObject implements HiveModel<Intervention> {
     chantierId: chantierId,
     technicienId: technicienId,
     description: description,
-    date: date,
+    create: date,
     statut: statut,
     document: document.map((e) => PieceJointe.fromJson(e as dynamic)).toList(),
     titre: titre,

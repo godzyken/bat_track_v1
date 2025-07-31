@@ -1,5 +1,3 @@
-import 'dart:developer' as developer;
-
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../../../models/data/json_model.dart';
@@ -11,75 +9,94 @@ import 'hive_service.dart';
 
 enum StorageMode { hive, firebase, supabase, cloudflare }
 
-class EntityServices<T extends JsonModel> implements EntityService<T> {
+mixin StorageHandlerMixin<T extends JsonModel> on Object {
+  String get boxName;
+
+  StorageMode get storageMode => StorageMode.hive;
+
+  StorageService get storage => StorageService(FirebaseStorage.instance);
+
+  Future<void> put(String id, T item) async {
+    switch (storageMode) {
+      case StorageMode.hive:
+        await HiveService.put<T>(boxName, id, item);
+        break;
+      case StorageMode.firebase:
+      case StorageMode.cloudflare:
+        if (item is HasFile) {
+          final file = (item as HasFile).getFile();
+          final path = '$boxName/$id/${file.path.split('/').last}';
+          await storage.uploadFile(file, path);
+        }
+        await FirestoreService.setData<T>(
+          collectionPath: boxName,
+          docId: id,
+          data: item,
+        );
+        break;
+      case StorageMode.supabase:
+        throw UnimplementedError('Supabase not yet implemented');
+    }
+  }
+
+  Future<void> remove(String id) async {
+    switch (storageMode) {
+      case StorageMode.hive:
+        await HiveService.delete<T>(boxName, id);
+        break;
+      case StorageMode.firebase:
+      case StorageMode.cloudflare:
+        await FirestoreService.deleteData(collectionPath: boxName, docId: id);
+        break;
+      case StorageMode.supabase:
+        throw UnimplementedError('Supabase not yet implemented');
+    }
+  }
+
+  Future<List<T>> fetchAll({T Function(Map<String, dynamic>)? fromJson}) async {
+    switch (storageMode) {
+      case StorageMode.hive:
+        return HiveService.getAll<T>(boxName);
+      case StorageMode.firebase:
+      case StorageMode.cloudflare:
+        return FirestoreService.getAll<T>(
+          collectionPath: boxName,
+          fromJson: fromJson!,
+        );
+      case StorageMode.supabase:
+        throw UnimplementedError('Supabase not yet implemented');
+    }
+  }
+}
+
+class EntityServices<T extends JsonModel>
+    with StorageHandlerMixin<T>
+    implements EntityService<T> {
+  @override
   final String boxName;
+
+  @override
   final StorageMode storageMode;
 
   const EntityServices(this.boxName, {this.storageMode = StorageMode.hive});
 
-  Future<void> add(T item, String id) async {
-    if (storageMode == StorageMode.hive) {
-      await HiveService.put<T>(boxName, id, item);
-    } else if (storageMode == StorageMode.firebase ||
-        storageMode == StorageMode.cloudflare) {
-      if (item is HasFile) {
-        final storage = StorageService(FirebaseStorage.instance);
-        final path =
-            '$boxName/$id/${(item as HasFile).getFile().path.split('/').last}';
-        await storage.uploadFile((item as HasFile).getFile(), path);
-      }
-
-      await FirestoreService.setData<T>(
-        collectionPath: boxName,
-        docId: id,
-        data: item,
-      );
-    } else {
-      throw Exception('Invalid storage mode');
-    }
-  }
+  @override
+  Future<void> save(T item, [String? id]) => put(id ?? item.id, item);
 
   @override
-  Future<void> update(T item, String id) =>
-      HiveService.put<T>(boxName, id, item);
+  Future<void> update(T item, String id) => put(id, item);
 
   @override
-  Future<void> delete(String id) => HiveService.delete<T>(boxName, id);
+  Future<void> delete(String id) => remove(id);
 
   @override
-  Future<void> deleteByQuery(String queryStr) async {
-    final list = await query(queryStr);
-    for (final item in list) {
-      await delete(item.copyWithId(queryStr));
-    }
-  }
-
-  @override
-  Future<void> deleteAll() => HiveService.deleteAll<T>();
-
-  @override
-  Future<List<T>> getAll() async {
-    final sw = Stopwatch()..start();
-    developer.log('⏳ Sync cloud => $boxName');
-
-    final modelsFromHive = await HiveService.getAll<T>(boxName);
-
-    sw.stop();
-    developer.log(
-      '✅ $boxName sync terminé en ${sw.elapsedMilliseconds}ms (n=${modelsFromHive.length})',
-    );
-
-    return modelsFromHive;
-  }
-
-  @override
-  T? getById(String id) {
-    // Attention : méthode synchrone basée sur cache local
-    return HiveService.getSync<T>(boxName, id);
-  }
+  Future<List<T>> getAll() => fetchAll();
 
   @override
   Future<T?> get(String id) => HiveService.get<T>(boxName, id);
+
+  @override
+  T? getById(String id) => HiveService.getSync<T>(boxName, id);
 
   @override
   Future<bool> exists(String id) => HiveService.exists<T>(boxName, id);
@@ -88,13 +105,19 @@ class EntityServices<T extends JsonModel> implements EntityService<T> {
   Future<List<String>> getKeys() => HiveService.getKeys<T>(boxName);
 
   @override
-  Future<void> save(T item, String id) async {
-    if (await exists(id)) {
-      await update(item, id);
-    } else {
-      await add(item, id);
-    }
-  }
+  Future<void> deleteAll() => HiveService.deleteAll<T>();
+
+  @override
+  Future<void> clear() => HiveService.clear();
+
+  @override
+  Future<void> open() => HiveService.box<T>(boxName);
+
+  @override
+  Future<void> init() => HiveService.init();
+
+  @override
+  Future<void> closeAll() => HiveService.closeAll();
 
   @override
   Future<List<T>> where(bool Function(T) test) async {
@@ -117,20 +140,16 @@ class EntityServices<T extends JsonModel> implements EntityService<T> {
   @override
   Future<List<T>> query(String query) async {
     final all = await getAll();
-    return all.where((element) => element.toString().contains(query)).toList();
+    return all.where((e) => e.toString().contains(query)).toList();
   }
 
   @override
-  Future<void> closeAll() => HiveService.closeAll();
-
-  @override
-  Future<void> open() => HiveService.box<T>(boxName);
-
-  @override
-  Future<void> init() => HiveService.init();
-
-  @override
-  Future<void> clear() => HiveService.clear();
+  Future<void> deleteByQuery(String queryStr) async {
+    final list = await query(queryStr);
+    for (final item in list) {
+      await delete(item.id);
+    }
+  }
 }
 
 final chantierService = EntityServices<Chantier>('chantiers');

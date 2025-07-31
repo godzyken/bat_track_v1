@@ -57,15 +57,14 @@ class ChantiersEtapeListPreview extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(etape.description),
-                        if (etape.dateDebut != null && etape.dateFin != null)
-                          Text(
-                            'Du ${etape.dateDebut.toLocal().toString().split(' ').first} '
-                            'au ${etape.dateFin.toLocal().toString().split(' ').first}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
+                        Text(
+                          'Du ${etape.dateDebut.toLocal().toString().split(' ').first} '
+                          'au ${etape.dateFin.toLocal().toString().split(' ').first}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
                           ),
+                        ),
                       ],
                     ),
                     trailing: Row(

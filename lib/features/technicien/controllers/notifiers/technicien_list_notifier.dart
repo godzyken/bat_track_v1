@@ -1,15 +1,16 @@
-import 'package:bat_track_v1/data/local/providers/hive_provider.dart';
+import 'package:bat_track_v1/models/notifiers/entity_list_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
-import '../../../../data/local/services/hive_service.dart';
 
 final techniciensListProvider =
     AsyncNotifierProvider<TechniciensNotifier, List<Technicien>>(
       TechniciensNotifier.new,
     );
 
-class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
+class TechniciensNotifier extends EntityListNotifier<Technicien> {}
+
+/*{
   @override
   Future<List<Technicien>> build() async {
     final service = ref.read(technicienServiceProvider);
@@ -108,4 +109,4 @@ class TechniciensNotifier extends AsyncNotifier<List<Technicien>> {
     await service.update(updated, updated.id);
     state = AsyncValue.data(await service.getAll());
   }
-}
+}*/

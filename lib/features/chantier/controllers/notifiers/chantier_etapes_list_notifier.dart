@@ -1,9 +1,11 @@
+import 'package:bat_track_v1/models/notifiers/entity_list_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
-import '../../../../data/local/providers/hive_provider.dart';
 
-class ChantierEtapesListNotifier extends AsyncNotifier<List<ChantierEtape>> {
+class ChantierEtapesListNotifier extends EntityListNotifier<ChantierEtape> {}
+
+/*AsyncNotifier<List<ChantierEtape>> {
   @override
   Future<List<ChantierEtape>> build() async {
     final service = ref.read(chantierEtapeServiceProvider);
@@ -33,7 +35,7 @@ class ChantierEtapesListNotifier extends AsyncNotifier<List<ChantierEtape>> {
     await service.delete(id);
     state = AsyncValue.data(await service.getAll());
   }
-}
+}*/
 
 final chantierEtapesListProvider =
     AsyncNotifierProvider<ChantierEtapesListNotifier, List<ChantierEtape>>(

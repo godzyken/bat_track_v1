@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/adapters/signture_converter.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -11,6 +12,8 @@ class Technicien
         _$Technicien,
         JsonModel<Technicien>,
         JsonSerializableModel<Technicien> {
+  const Technicien._();
+
   const factory Technicien({
     required String id,
     required String nom,
@@ -22,20 +25,13 @@ class Technicien
     required double tauxHoraire,
     required List<String> chantiersAffectees,
     required List<String> etapesAffectees,
-    DateTime? updatedAt,
+    @DateTimeIsoConverter() required DateTime createdAt,
+    @NullableDateTimeIsoConverter() DateTime? dateDelete,
+    @NullableDateTimeIsoConverter() DateTime? updatedAt,
   }) = _Technicien;
 
   factory Technicien.fromJson(Map<String, dynamic> json) =>
       _$TechnicienFromJson(json);
-
-  /*  @override
-  Technicien fromJson(Map<String, dynamic> json) => Technicien.fromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$TechnicienToJson(this);
-
-  @override
-  Technicien copyWithId(String? id) => copyWith(id: id ?? this.id);*/
 
   factory Technicien.mock() => Technicien(
     id: const Uuid().v4(),
@@ -47,5 +43,9 @@ class Technicien
     tauxHoraire: 13.85,
     chantiersAffectees: ['chId_0004', 'chId_0023'],
     etapesAffectees: ['etape_Salle de bain', 'etape_Cuisine'],
+    createdAt: DateTime.now(),
   );
+
+  @override
+  bool get isUpdated => updatedAt != null;
 }

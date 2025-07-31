@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../models/data/json_model.dart';
+import '../../adapters/signture_converter.dart';
 
 part 'equipement.freezed.dart';
 part 'equipement.g.dart';
@@ -17,14 +18,17 @@ class Equipement with _$Equipement implements JsonModel {
     @HiveField(1) required String nom,
     @HiveField(2) required String type, // extincteur, détecteur, etc.
     @HiveField(3) String? localisation,
-    @HiveField(4) DateTime? dateInstallation,
-    @HiveField(5) DateTime? dateProchaineVerification,
+    @HiveField(4) @DateTimeIsoConverter() required DateTime dateInstallation,
+    @HiveField(5)
+    @NullableDateTimeIsoConverter()
+    DateTime? dateProchaineVerification,
     @HiveField(6)
     @Default(false)
     bool enService, // actif, hors service, à vérifier
     @HiveField(7) String? homologation,
     @HiveField(8) String? commentaire,
-    @HiveField(9) DateTime? updatedAt,
+    @HiveField(9) @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    int? count,
   }) = _Equipement;
 
   factory Equipement.fromJson(Map<String, dynamic> json) =>
@@ -42,4 +46,7 @@ class Equipement with _$Equipement implements JsonModel {
     commentaire: 'Sans fluor, 6 litres 9,3 kg. 0°C à +60°C',
     updatedAt: DateTime.now(),
   );
+
+  @override
+  bool get isUpdated => updatedAt != null;
 }

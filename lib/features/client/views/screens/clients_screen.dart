@@ -34,7 +34,7 @@ class ClientsScreen extends ConsumerWidget {
                         onSubmit: (updated) async {
                           await ref
                               .read(clientListProvider.notifier)
-                              .updateClient(updated);
+                              .updateEntity(updated);
                         },
                         createEmpty: () => Client.mock(),
                       ),

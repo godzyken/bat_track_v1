@@ -16,6 +16,8 @@ class UserModel
     required String email,
     required UserRole role,
     bool? isDolibarrValidated,
+    @DateTimeIsoConverter() required DateTime createAt,
+    @NullableDateTimeIsoConverter() DateTime? lastTimeConnect,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
     @Default(false) bool isCloudOnly,
     String? instanceId,
@@ -26,12 +28,21 @@ class UserModel
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
 
-  @override
-  String get id => id;
+  factory UserModel.mock() => UserModel(
+    id: 'mock-user-id',
+    name: 'Jean Dupont',
+    email: 'jean.dupont@example.com',
+    role: UserRole.technicien,
+    isDolibarrValidated: true,
+    createAt: DateTime(2024, 1, 1),
+    lastTimeConnect: DateTime(2025, 7, 31),
+    updatedAt: DateTime.now(),
+    isCloudOnly: false,
+    instanceId: 'instance-1234',
+  );
 
   @override
-  // TODO: implement updatedAt
-  DateTime? get updatedAt => updatedAt;
+  bool get isUpdated => updatedAt != null;
 }
 
 enum UserRole { client, chefDeProjet, technicien, superUtilisateur }

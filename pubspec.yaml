@@ -65,6 +65,7 @@ dependencies:
   shared_preferences: ^2.5.3
   dio: ^5.8.0+1
   cached_network_image: ^3.4.1
+  sentry_flutter: ^9.5.0
 
 dev_dependencies:
   flutter_test:
@@ -75,6 +76,7 @@ dev_dependencies:
   json_serializable: ^6.6.2
   dwds: ^24.4.0
   freezed: ^2.4.6
+  sentry_dart_plugin: ^3.1.1
 
 flutter:
 

@@ -37,20 +37,14 @@ final chantierSyncProvider = StateNotifierProvider.autoDispose
       );
     });
 
-final chantierEtapesTempProvider = StateProvider.autoDispose
-    .family<List<ChantierEtape>, String>((ref, id) {
-      final chantierAsync = ref.watch(chantierInitialProvider(id));
+final chantierEtapesTempProvider = FutureProvider.autoDispose
+    .family<List<ChantierEtape>, String>((ref, id) async {
+      final chantier = await ref.watch(chantierInitialProvider(id).future);
 
-      return chantierAsync.when(
-        data: (chantier) {
-          if (chantier.etapes.isEmpty) {
-            return [ChantierEtape.mock()];
-          }
-          return List<ChantierEtape>.from(chantier.etapes);
-        },
-        loading: () => [],
-        error: (_, _) => [],
-      );
+      if (chantier.etapes.isEmpty) {
+        return [ChantierEtape.mock()];
+      }
+      return List<ChantierEtape>.from(chantier.etapes);
     });
 
 final chantierSyncServiceProvider = Provider<EntitySyncService<Chantier>>(

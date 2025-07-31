@@ -27,6 +27,10 @@ class TechnicienEntity extends HiveObject implements HiveModel<Technicien> {
   @HiveField(9)
   final List<String> etapesAffectees;
   @HiveField(10)
+  final DateTime createdAt;
+  @HiveField(11)
+  final DateTime? deletedAt;
+  @HiveField(12)
   final DateTime? tUpdatedAt;
 
   TechnicienEntity({
@@ -40,6 +44,8 @@ class TechnicienEntity extends HiveObject implements HiveModel<Technicien> {
     required this.tauxHoraire,
     required this.chantiersAffectees,
     required this.etapesAffectees,
+    required this.createdAt,
+    this.deletedAt,
     this.tUpdatedAt,
   });
 
@@ -55,6 +61,8 @@ class TechnicienEntity extends HiveObject implements HiveModel<Technicien> {
       tauxHoraire: model.tauxHoraire,
       chantiersAffectees: model.chantiersAffectees,
       etapesAffectees: model.etapesAffectees,
+      createdAt: model.createdAt,
+      deletedAt: model.dateDelete,
       tUpdatedAt: model.updatedAt,
     );
   }
@@ -74,6 +82,8 @@ class TechnicienEntity extends HiveObject implements HiveModel<Technicien> {
     tauxHoraire: tauxHoraire,
     chantiersAffectees: chantiersAffectees,
     etapesAffectees: etapesAffectees,
+    createdAt: createdAt,
+    dateDelete: deletedAt,
     updatedAt: updatedAt,
   );
 

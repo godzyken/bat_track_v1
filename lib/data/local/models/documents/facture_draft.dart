@@ -25,6 +25,8 @@ class FactureDraft
     required double remise,
     required double tauxTVA,
     @NullableDateTimeIsoConverter() DateTime? dateDerniereModification,
+    @NullableDateTimeIsoConverter() DateTime? signedAt,
+    @Default(false) bool? isSigned,
   }) = _FactureDraft;
 
   const FactureDraft._();
@@ -52,26 +54,22 @@ class FactureDraft
   @override
   DateTime? get updatedAt => dateDerniereModification;
 
-  /*  @override
-  FactureDraft copyWithId(String? id) => copyWith(factureId: id ?? factureId);
-
-  @override
-  Map<String, dynamic> toJson() => _$FactureDraftToJson(this);
-
-  @override
-  FactureDraft fromJson(Map<String, dynamic> json) =>
-      FactureDraft.fromJson(json);*/
-
   factory FactureDraft.mock() => FactureDraft(
     chantierId: 'ch_006',
     clientId: 'cl_007',
     lignesManuelles: [CustomLigneFacture.mock(), CustomLigneFacture.mock()],
     signature: Uint8List.fromList([0, 1, 2, 3]),
     isFinalized: false,
+    signedAt: DateTime.now(),
+    dateDerniereModification: DateTime.now(),
+    isSigned: true,
     factureId: 'factureId',
     remise: 20,
     tauxTVA: 1.20,
   );
+
+  @override
+  bool get isUpdated => updatedAt != null;
 }
 
 @freezed
@@ -92,16 +90,6 @@ class CustomLigneFacture
   factory CustomLigneFacture.fromJson(Map<String, dynamic> json) =>
       _$CustomLigneFactureFromJson(json);
 
-  /*  @override
-  Map<String, dynamic> toJson() => _$CustomLigneFactureToJson(this);
-
-  @override
-  CustomLigneFacture copyWithId(String? id) => copyWith(ctlId: id ?? ctlId);
-
-  @override
-  CustomLigneFacture fromJson(Map<String, dynamic> json) =>
-      CustomLigneFacture.fromJson(json);*/
-
   const CustomLigneFacture._();
 
   @override
@@ -116,5 +104,6 @@ class CustomLigneFacture
     montant: 300,
     quantite: 2,
     total: 600,
+    ctlUpdatedAt: DateTime.now(),
   );
 }

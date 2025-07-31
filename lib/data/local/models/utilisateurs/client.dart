@@ -7,6 +7,8 @@ part 'client.g.dart';
 
 @freezed
 class Client with _$Client, JsonModel<Client> {
+  const Client._();
+
   const factory Client({
     required String id,
     required String nom,
@@ -25,15 +27,6 @@ class Client with _$Client, JsonModel<Client> {
   /// JSON & Hive
   factory Client.fromJson(Map<String, dynamic> json) => _$ClientFromJson(json);
 
-  /*  @override
-  Client fromJson(Map<String, dynamic> json) => Client.fromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$ClientToJson(this);
-
-  @override
-  Client copyWithId(String? id) => copyWith(id: id ?? this.id);*/
-
   factory Client.mock() => Client(
     id: const Uuid().v4(),
     nom: 'Jhoanna Marie',
@@ -44,5 +37,11 @@ class Client with _$Client, JsonModel<Client> {
     lastInterventionDate: DateTime(2000, 03, 21),
     status: 'A Faire',
     priority: 'Urgent',
+    updatedAt: DateTime.now(),
+    contactName: 'howard Starks',
+    budgetPrevu: 35000,
   );
+
+  @override
+  bool get isUpdated => updatedAt != null;
 }

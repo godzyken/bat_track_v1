@@ -8,6 +8,7 @@ import '../../notifiers/sync_entity_notifier.dart';
 
 class GenericEntityProviderFactory {
   GenericEntityProviderFactory._();
+
   static final instance = GenericEntityProviderFactory._();
 
   final Map<String, dynamic> _providerCache = {};
@@ -37,7 +38,7 @@ class GenericEntityProviderFactory {
         return SyncEntityNotifier<T>(
           entityService: service,
           storageService: storage,
-          initialState: initialData!.createEmptyEntity(id),
+          initialState: initialData!.copyWithId(id),
           autoSync: false,
         );
       }

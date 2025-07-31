@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../data/local/providers/hive_provider.dart';
 import '../data/json_model.dart';
@@ -15,11 +16,20 @@ abstract class EntityListNotifier<T extends JsonModel>
   }
 
   Future<void> add(T entity) async {
-    if (await service.exists(entity.id) == false) {
-      await service.save(entity, entity.id);
+    // 🔐 Vérification de l'id
+    final isIdEmpty = entity.id.isEmpty;
+    final id = isIdEmpty ? const Uuid().v4() : entity.id;
+
+    // 🧬 Création d'une entité avec id corrigé si nécessaire
+    final safeEntity = isIdEmpty ? entity.copyWithId(id) : entity;
+
+    final alreadyExists = await service.exists(id);
+    if (alreadyExists) {
+      await service.update(safeEntity, id);
     } else {
-      await service.update(entity, entity.id);
+      await service.save(safeEntity, id);
     }
+
     state = AsyncValue.data(await service.getAll());
   }
 

@@ -1,8 +1,9 @@
+import 'package:bat_track_v1/data/remote/notifiers/auto_sync_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/remote/providers/dolibarr_config_provider.dart';
-import '../../../../data/remote/services/dolibarr_services.dart';
+import '../../../../models/data/dolibarr/dolibarr_impoter.dart';
 
 class DolibarrImportScreen extends ConsumerStatefulWidget {
   const DolibarrImportScreen({super.key});
@@ -22,10 +23,13 @@ class _DolibarrImportScreenState extends ConsumerState<DolibarrImportScreen> {
       _log = 'Démarrage de l’importation...';
     });
 
-    final importer = DolibarrImporter(ref.read(dolibarrApiProvider), ref);
+    final importer = DolibarrImporter(
+      ref.read(dolibarrApiProvider),
+      ref.refresh(autoSyncProvider.notifier).ref,
+    );
 
     try {
-      await importer.api.fetchAll('s');
+      await importer.api.fetch('/explorer');
       setState(() => _log = '✅ Importation terminée avec succès !');
       ScaffoldMessenger.of(
         context,

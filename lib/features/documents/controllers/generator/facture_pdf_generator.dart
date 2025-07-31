@@ -69,7 +69,7 @@ class FacturePdfGenerator {
               children: [
                 pw.Text("Facture pour l'intervention : ${intervention.titre}"),
                 pw.Text("Technicien : ${intervention.technicienId}"),
-                pw.Text("Date : ${intervention.date.toIso8601String()}"),
+                pw.Text("Date : ${intervention.create.toIso8601String()}"),
                 if (intervention.facture != null) ...[
                   pw.Text("Montant HT : ${intervention.facture!.totalHT}"),
                   pw.Text("Montant TTC : ${intervention.facture!.totalTTC}"),

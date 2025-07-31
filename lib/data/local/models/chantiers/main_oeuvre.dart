@@ -1,6 +1,8 @@
 import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../adapters/signture_converter.dart';
+
 part 'main_oeuvre.freezed.dart';
 part 'main_oeuvre.g.dart';
 
@@ -10,25 +12,29 @@ class MainOeuvre
         _$MainOeuvre,
         JsonModel<MainOeuvre>,
         JsonSerializableModel<MainOeuvre> {
+  const MainOeuvre._();
+
   const factory MainOeuvre({
     required String id,
     String? idTechnicien,
     required double heuresEstimees,
-    DateTime? updatedAt,
+    @DateTimeIsoConverter() required DateTime dateDebut,
+    @NullableDateTimeIsoConverter() DateTime? passedTime,
+    @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @Default(false) bool isActive,
   }) = _MainOeuvre;
 
   /// JSON local
   factory MainOeuvre.fromJson(Map<String, dynamic> json) =>
       _$MainOeuvreFromJson(json);
 
-  /*  @override
-  MainOeuvre fromJson(Map<String, dynamic> json) => MainOeuvre.fromJson(json);
+  factory MainOeuvre.mock() => MainOeuvre(
+    id: 'moId_0012',
+    heuresEstimees: 35,
+    dateDebut: DateTime.now(),
+    isActive: true,
+  );
 
   @override
-  Map<String, dynamic> toJson() => _$MainOeuvreToJson(this);
-
-  @override
-  MainOeuvre copyWithId(String? id) => copyWith(id: id ?? this.id);*/
-
-  factory MainOeuvre.mock() => MainOeuvre(id: 'moId_0012', heuresEstimees: 35);
+  bool get isUpdated => updatedAt != null;
 }

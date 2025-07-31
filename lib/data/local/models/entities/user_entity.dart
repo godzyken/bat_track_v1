@@ -18,17 +18,20 @@ class UserEntity extends HiveObject implements HiveModel<UserModel> {
   @HiveField(4)
   bool? isDolibarrValidated;
   @HiveField(5)
-  DateTime? userUpdatedAt;
+  final DateTime createdAt;
   @HiveField(6)
   bool isCloudOnly;
   @HiveField(7)
   String? instanceId;
+  @HiveField(8)
+  DateTime? userUpdatedAt;
 
   UserEntity({
     required this.uid,
     required this.name,
     required this.email,
     required this.role,
+    required this.createdAt,
     this.isDolibarrValidated,
     this.isCloudOnly = false,
     this.userUpdatedAt,
@@ -41,6 +44,7 @@ class UserEntity extends HiveObject implements HiveModel<UserModel> {
       name: model.name,
       email: model.email,
       role: model.role.toEntity(),
+      createdAt: model.createAt,
       isDolibarrValidated: model.isDolibarrValidated,
       isCloudOnly: model.isCloudOnly,
       userUpdatedAt: model.updatedAt,
@@ -61,6 +65,7 @@ class UserEntity extends HiveObject implements HiveModel<UserModel> {
     isCloudOnly: isCloudOnly,
     instanceId: instanceId,
     updatedAt: updatedAt,
+    createAt: createdAt,
   );
 
   @override

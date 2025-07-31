@@ -16,6 +16,8 @@ class FactureModel
         _$FactureModel,
         JsonModel<FactureModel>,
         JsonSerializableModel<FactureModel> {
+  const FactureModel._();
+
   const factory FactureModel({
     required String id,
     required String chantierId,
@@ -23,7 +25,8 @@ class FactureModel
     required List<CustomLigneFacture> lignes,
     required double montant,
     required String clientId,
-    @DateTimeIsoConverter() required DateTime date,
+    @DateTimeIsoConverter() required DateTime createdAt,
+    @NullableDateTimeIsoConverter() DateTime? signedAt,
     @Uint8ListBase64Converter() Uint8List? signature,
     required FactureStatus status,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
@@ -31,16 +34,6 @@ class FactureModel
 
   factory FactureModel.fromJson(Map<String, dynamic> json) =>
       _$FactureModelFromJson(json);
-
-  /* @override
-  FactureModel fromJson(Map<String, dynamic> json) =>
-      FactureModel.fromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$FactureModelToJson(this);
-
-  @override
-  FactureModel copyWithId(String? id) => copyWith(id: id ?? this.id);*/
 
   factory FactureModel.mock() => FactureModel(
     id: const Uuid().v4(),
@@ -64,7 +57,7 @@ class FactureModel
     ],
     montant: 1540,
     clientId: 'cl_001',
-    date: DateTime.now(),
+    createdAt: DateTime.now(),
     status: FactureStatus.brouillon,
     signature: Uint8List.fromList([0, 1, 2, 3]),
     updatedAt: DateTime.now(),
@@ -77,10 +70,15 @@ class FactureModel
     lignes: draft.lignesManuelles,
     montant: draft.lignesManuelles.fold(0.0, (sum, l) => sum + l.total),
     clientId: draft.clientId,
-    date: draft.dateDerniereModification ?? DateTime.now(),
+    createdAt: draft.dateDerniereModification ?? DateTime.now(),
+    signature: draft.signature,
+    signedAt: draft.signedAt,
     status: FactureStatus.brouillon,
     updatedAt: draft.updatedAt ?? DateTime.now(),
   );
+
+  @override
+  bool get isUpdated => updatedAt != null;
 }
 
 enum FactureStatus { brouillon, validee, envoyee, payee }

@@ -34,7 +34,7 @@ class TechniciensScreen extends ConsumerWidget {
                         onSubmit: (updated) async {
                           await ref
                               .read(techniciensListProvider.notifier)
-                              .updateTechnicien(updated);
+                              .updateEntity(updated);
                         },
                         createEmpty: () => Technicien.mock(),
                       ),
@@ -47,7 +47,7 @@ class TechniciensScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ref.read(techniciensListProvider.notifier).addMock();
+          ref.read(techniciensListProvider.notifier).add(Technicien.mock());
         },
         child: const Icon(Icons.add),
       ),

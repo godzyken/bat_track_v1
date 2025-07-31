@@ -4,6 +4,34 @@ mixin JsonModel<T> {
   String get id;
 
   DateTime? get updatedAt;
+
+  static DateTime? parseDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    try {
+      return DateTime.parse(value.toString());
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static DateTime parseDateTimeNonNull(dynamic value) {
+    final result = parseDateTime(value);
+    if (result == null) {
+      throw FormatException('Date invalide : $value');
+    }
+    return result;
+  }
+
+  static String? toJsonDateTime(DateTime? date) => date?.toIso8601String();
+
+  /// Méthode utilitaire : true si updatedAt est non nul
+  bool get isUpdated => updatedAt != null;
+}
+
+mixin class Serializable {
+  Map<String, dynamic> toJson() =>
+      throw UnimplementedError('toJson() non implémenté');
 }
 
 mixin JsonSerializableModel<T> on JsonModel<T> {
@@ -13,13 +41,6 @@ mixin JsonSerializableModel<T> on JsonModel<T> {
 
   static T? fromJson<T>(Map<String, dynamic> json) =>
       throw UnimplementedError();
-}
-
-mixin class Serializable {
-  Map<String, dynamic> toJson() {
-    // TODO: implement toJson
-    throw UnimplementedError();
-  }
 }
 
 abstract class JsonModelWithUrl implements JsonModel {
@@ -67,50 +88,53 @@ extension JsonModelCopyWith<T> on JsonModel<T> {
 }
 
 extension JsonModelFactory on JsonModel {
-  static T? fromDynamic<T>(Map<String, dynamic> json) {
+  static T fromDynamic<T>(dynamic data) {
+    if (data is T) return data;
+    if (data is! Map<String, dynamic>) {
+      throw ArgumentError('Donnée non valide pour fromDynamic<$T>: $data');
+    }
+
+    final map = Map<String, dynamic>.from(data);
+
     switch (T) {
-      case Chantier _:
-        return Chantier.fromJson(json) as T;
-      case Client _:
-        return Client.fromJson(json) as T;
-      case PieceJointe _:
-        return PieceJointe.fromJson(json) as T;
-      // ajoute ici les autres modèle
-      case Materiel _:
-        return Materiel.fromJson(json) as T;
-      case Materiau _:
-        return Materiau.fromJson(json) as T;
-      case MainOeuvre _:
-        return MainOeuvre.fromJson(json) as T;
-      case Technicien _:
-        return Technicien.fromJson(json) as T;
-      case Intervention _:
-        return Intervention.fromJson(json) as T;
-      case ChantierEtape _:
-        return ChantierEtape.fromJson(json) as T;
-      case Piece _:
-        return Piece.fromJson(json) as T;
-      case Facture _:
-        return Facture.fromJson(json) as T;
-      case FactureDraft _:
-        return FactureDraft.fromJson(json) as T;
-      case FactureModel _:
-        return FactureModel.fromJson(json) as T;
-      case Projet _:
-        return Projet.fromJson(json) as T;
-      case UserModel _:
-        return UserModel.fromJson(json) as T;
+      case Chantier:
+        return Chantier.fromJson(map) as T;
+      case Client:
+        return Client.fromJson(map) as T;
+      case PieceJointe:
+        return PieceJointe.fromJson(map) as T;
+      case Materiel:
+        return Materiel.fromJson(map) as T;
+      case Materiau:
+        return Materiau.fromJson(map) as T;
+      case MainOeuvre:
+        return MainOeuvre.fromJson(map) as T;
+      case Technicien:
+        return Technicien.fromJson(map) as T;
+      case Intervention:
+        return Intervention.fromJson(map) as T;
+      case ChantierEtape:
+        return ChantierEtape.fromJson(map) as T;
+      case Piece:
+        return Piece.fromJson(map) as T;
+      case Facture:
+        return Facture.fromJson(map) as T;
+      case FactureDraft:
+        return FactureDraft.fromJson(map) as T;
+      case FactureModel:
+        return FactureModel.fromJson(map) as T;
+      case Projet:
+        return Projet.fromJson(map) as T;
+      case UserModel:
+        return UserModel.fromJson(map) as T;
       default:
-        return null;
+        throw UnimplementedError('fromDynamic non implémenté pour $T');
     }
   }
 
-  T createEmptyEntity<T extends JsonModel>(String id) {
-    final model = JsonModelFactory.fromDynamic<T>({'id': id});
-    if (model == null) {
-      throw Exception('Impossible de créer une instance vide pour $T');
-    }
-    return model.copyWithId(id)!;
+  static T createEmptyEntity<T extends JsonModel>(String id) {
+    final empty = fromDynamic<T>({'id': id});
+    return empty.copyWithId(id) as T;
   }
 }
 

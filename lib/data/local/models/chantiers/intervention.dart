@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../models/data/json_model.dart';
+import '../../adapters/signture_converter.dart';
 import '../index_model_extention.dart';
 
 part 'intervention.freezed.dart';
@@ -13,40 +14,37 @@ class Intervention
         _$Intervention,
         JsonModel<Intervention>,
         JsonSerializableModel<Intervention> {
+  const Intervention._();
+
   const factory Intervention({
     required String id,
     required String chantierId,
     required String technicienId,
     required String description,
-    required DateTime date,
+    @DateTimeIsoConverter() required DateTime create,
+    @NullableDateTimeIsoConverter() DateTime? datePassed,
     required String statut,
     required List<PieceJointe> document,
     String? titre,
     String? commentaire,
     FactureDraft? facture,
-    DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    int? count,
   }) = _Intervention;
 
   factory Intervention.fromJson(Map<String, dynamic> json) =>
       _$InterventionFromJson(json);
-
-  /*  @override
-  Intervention? fromJson(Map<String, dynamic> json) =>
-      Intervention.fromJson(json);*/
-
-  /*  @override
-  Map<String, dynamic> toJson() => _$InterventionToJson(this);*/
-
-  /*  @override
-  Intervention copyWithId(String? id) => copyWith(id: id ?? this.id);*/
 
   factory Intervention.mock() => Intervention(
     id: const Uuid().v4(),
     chantierId: 'chId_006',
     technicienId: 'tId_0056',
     description: 'Depose du murre coté baie',
-    date: DateTime.now(),
+    create: DateTime.now(),
     statut: 'En Cours',
     document: [PieceJointe.mock(), PieceJointe.mock()],
   );
+
+  @override
+  bool get isUpdated => updatedAt != null;
 }

@@ -1,5 +1,6 @@
 import 'package:bat_track_v1/data/local/models/chantiers/equipement.dart';
 import 'package:bat_track_v1/data/local/models/entities/chantier_entity.dart';
+import 'package:bat_track_v1/data/local/models/entities/chantier_etapes_entity.dart';
 import 'package:bat_track_v1/data/local/models/entities/client_entity.dart';
 import 'package:bat_track_v1/data/local/models/entities/facture_draft_entity.dart';
 import 'package:bat_track_v1/data/local/models/entities/facture_entity.dart';
@@ -17,6 +18,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 Future<void> registerHiveAdapters() async {
   Hive.registerAdapter(ChantierEntityAdapter());
+  Hive.registerAdapter(ChantierEtapesEntityAdapter());
   Hive.registerAdapter(ClientEntityAdapter());
   Hive.registerAdapter(TechnicienEntityAdapter());
   Hive.registerAdapter(InterventionEntityAdapter());

@@ -8,6 +8,8 @@ part 'projet.g.dart';
 
 @freezed
 class Projet with _$Projet implements JsonModel<Projet> {
+  const Projet._();
+
   const factory Projet({
     required String id,
     required String nom,
@@ -18,6 +20,7 @@ class Projet with _$Projet implements JsonModel<Projet> {
     required bool chefDeProjetValide,
     required bool techniciensValides,
     required bool superUtilisateurValide,
+    @NullableDateTimeIsoConverter() DateTime? deadLine,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
   }) = _Projet;
 
@@ -34,5 +37,9 @@ class Projet with _$Projet implements JsonModel<Projet> {
     chefDeProjetValide: true,
     techniciensValides: true,
     superUtilisateurValide: false,
+    updatedAt: DateTime.now(),
   );
+
+  @override
+  bool get isUpdated => updatedAt != null;
 }

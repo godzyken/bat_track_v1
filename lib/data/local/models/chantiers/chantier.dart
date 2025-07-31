@@ -3,19 +3,23 @@ import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../adapters/signture_converter.dart';
+
 part 'chantier.freezed.dart';
 part 'chantier.g.dart';
 
 @freezed
 class Chantier
     with _$Chantier, JsonModel<Chantier>, JsonSerializableModel<Chantier> {
+  const Chantier._();
+
   const factory Chantier({
     required String id,
     required String nom,
     required String adresse,
     required String clientId,
-    required DateTime dateDebut,
-    DateTime? dateFin,
+    @DateTimeIsoConverter() required DateTime dateDebut,
+    @NullableDateTimeIsoConverter() DateTime? dateFin,
     String? etat,
     @Default([]) List<String> technicienIds,
     @Default([]) List<PieceJointe> documents,
@@ -25,7 +29,7 @@ class Chantier
     double? budgetReel,
     @Default([]) List<Intervention> interventions,
     String? chefDeProjetId,
-    DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? updatedAt,
     @Default(false) bool clientValide,
     @Default(false) bool chefDeProjetValide,
     @Default(false) bool techniciensValides,
@@ -35,15 +39,6 @@ class Chantier
 
   factory Chantier.fromJson(Map<String, dynamic> json) =>
       _$ChantierFromJson(json);
-  /*
-  @override
-  Chantier fromJson(Map<String, dynamic> json) => Chantier.fromJson(json);*/
-
-  /*  @override
-  Map<String, dynamic> toJson() => _$ChantierToJson(this);*/
-
-  /*@override
-  Chantier copyWithId(String? id) => copyWith(id: id ?? this.id);*/
 
   factory Chantier.mock() => Chantier(
     id: const Uuid().v4(),
@@ -52,4 +47,7 @@ class Chantier
     clientId: 'clId_009',
     dateDebut: DateTime.now(),
   );
+
+  @override
+  bool get isUpdated => updatedAt != null;
 }

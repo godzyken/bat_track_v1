@@ -53,8 +53,9 @@ class _EntityFormState<T extends JsonModel>
   @override
   void initState() {
     super.initState();
-    final entity = widget.initialValue ?? widget.createEmpty();
-    _json = entity.copyWithId(entity.id)..putIfAbsent('id', () => entity.id);
+    final baseEntity = widget.initialValue ?? widget.createEmpty();
+    final entityWithId = baseEntity.copyWithId(baseEntity.id);
+    _json = entityWithId.toJson();
 
     for (var entry in _json.entries) {
       _controllers[entry.key] = TextEditingController(
