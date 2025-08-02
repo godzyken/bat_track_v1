@@ -2,6 +2,7 @@ import 'package:bat_track_v1/features/documents/controllers/notifiers/document_l
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/local/models/index_model_extention.dart';
+import '../../../features/auth/data/providers/auth_state_provider.dart';
 import '../../../features/chantier/controllers/notifiers/chantier_etapes_list_notifier.dart';
 import '../../../features/chantier/controllers/notifiers/chantiers_list_notifier.dart';
 import '../../../features/client/controllers/notifiers/clients_list_notifier.dart';
@@ -22,4 +23,14 @@ final entityListProvider = Provider.family<
   //if (type == Piece) return pieceListProvider;
   if (type == Technicien) return techniciensListProvider;
   throw UnimplementedError('Pas de provider pour $type');
+});
+
+final entityListStreamProvider = StreamProvider<List<Projet>>((ref) {
+  return ref
+      .watch(firestoreProvider)
+      .collection('projects')
+      .snapshots()
+      .map(
+        (snap) => snap.docs.map((doc) => Projet.fromJson(doc.data())).toList(),
+      );
 });

@@ -1,6 +1,12 @@
+import 'package:bat_track_v1/data/remote/providers/catch_error_provider.dart';
+import 'package:bat_track_v1/features/auth/data/notifiers/auth_notifier.dart';
+import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
+import 'package:bat_track_v1/features/auth/views/screens/register_screen.dart';
 import 'package:bat_track_v1/features/dolibarr/views/screens/dolibarr_explorer_screen.dart';
 import 'package:bat_track_v1/features/equipement/views/screens/equipement_list_screen.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
+import 'package:bat_track_v1/models/data/state_wrapper/wrappers_errors.dart';
+import 'package:bat_track_v1/models/providers/observers/logging_navigator_observer.dart';
 import 'package:bat_track_v1/models/views/screens/entity_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,17 +15,20 @@ import 'package:go_router/go_router.dart';
 import '../data/local/models/index_model_extention.dart';
 import '../data/remote/providers/dolibarr_instance_provider.dart';
 import '../features/about/views/screens/about_screen.dart';
+import '../features/auth/views/screens/admin_home_screen.dart';
 import '../features/auth/views/screens/login_screen.dart';
 import '../features/chantier/views/screens/chantier_detail_loader.dart';
 import '../features/chantier/views/screens/chantier_etape_detail_screen.dart';
 import '../features/chantier/views/screens/chantier_etapes_screen.dart';
 import '../features/chantier/views/screens/chantiers_screen.dart';
+import '../features/client/views/screens/client_home_screen.dart';
 import '../features/client/views/screens/clients_screen.dart';
 import '../features/dashboard/views/screens/dashboard_screen.dart';
 import '../features/dolibarr/views/screens/dolibarr_import_client_screen.dart';
 import '../features/home/views/screens/home_screen.dart';
 import '../features/home/views/screens/pick_instance_screen.dart';
 import '../features/intervention/views/screens/interventions_screen.dart';
+import '../features/technicien/views/screens/tech_home_screen.dart';
 import '../features/technicien/views/screens/technitiens_screen.dart';
 import '../models/data/state_wrapper/wrappers.dart';
 import '../models/notifiers/sync_entity_notifier.dart';
@@ -27,24 +36,61 @@ import '../providers/auth_provider.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final hasInstance = ref.watch(selectedInstanceProvider) != null;
+  final authState = ref.watch(authStateChangesProvider);
+  final userProfile = ref.watch(userProfileProvider);
+  final userStateNotifier = ref.watch(authNotifierProvider);
+  final logger = ref.read(loggerProvider);
+  final observer = LoggingNavigatorObserver(logger: AppLogger());
+
+  Route route;
+  Route? previousRoute;
   return GoRouter(
     initialLocation: '/',
-    //refreshListenable: GoRouterRefreshStream(authStateChanges),
+    refreshListenable: userStateNotifier,
     redirect: (context, state) {
-      final isLoggedIn = authState;
-      final isLoggingIn = state.uri.path == '/login';
+      final user = authState.asData?.value;
+      final profile = userProfile.asData?.value;
 
-      if (!isLoggedIn && !isLoggingIn) return '/login';
-      if (isLoggedIn && isLoggingIn) return '/';
-      final isRoot = state.uri.path == '/';
+      final isLoggingIn = state.path == '/login' || state.path == '/register';
 
-      if (isRoot) {
-        return hasInstance ? '/home' : '/pick-instance';
+      if (user == null) return isLoggingIn ? null : '/login';
+
+      if (profile == null) return null; // En attente du chargement
+
+      if (state.path == '/' || isLoggingIn) {
+        switch (profile.role) {
+          case UserRole.client:
+            return '/client';
+          case UserRole.chefDeProjet:
+            return '/client';
+          case UserRole.technicien:
+            return '/tech';
+          case UserRole.superUtilisateur:
+            return '/admin';
+        }
       }
-      return null;
+
+      return null; //
     },
+    observers: [observer],
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/admin',
+        builder: (context, state) => const AdminHomeScreen(),
+      ),
+      GoRoute(
+        path: '/tech',
+        builder: (context, state) => const TechHomeScreen(),
+      ),
+      GoRoute(
+        path: '/client',
+        builder: (context, state) => const ClientHomeScreen(),
+      ),
       GoRoute(
         path: '/home',
         builder: (context, state) => const HomeScreen(),

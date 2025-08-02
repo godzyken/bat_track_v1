@@ -19,7 +19,7 @@ class ChantierSyncNotifier extends StateNotifier<SyncedState<Chantier>> {
 
   Future<void> syncNow() async {
     final chantier = state.data;
-    final storageService = ref.read(storageServiceProvider); // ✅ accès ici
+    final storageService = ref.read(storageServiceProvider);
 
     try {
       state = state.copyWith(isSyncing: true, hasError: false);

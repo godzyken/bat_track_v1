@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/remote/providers/catch_error_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
@@ -15,15 +16,19 @@ class ClientController extends AsyncNotifier<void> {
   }
 
   Future<void> importClients() async {
-    final clientsJson = await api.fetchClients();
-    final clients = clientsJson.map(Client.fromJson).toList();
+    try {
+      final clientsJson = await api.fetchClients();
+      final clients = clientsJson.map(Client.fromJson).toList();
 
-    for (var client in clients) {
-      await Hive.box<Client>('clients').put(client.id, client);
-      await FirebaseFirestore.instance
-          .collection('clients')
-          .doc(client.id)
-          .set(client.toJson());
+      for (var client in clients) {
+        await Hive.box<Client>('clients').put(client.id, client);
+        await FirebaseFirestore.instance
+            .collection('clients')
+            .doc(client.id)
+            .set(client.toJson());
+      }
+    } catch (e, st) {
+      ref.read(errorLoggerProvider).logError(e, st, context: 'import Clients');
     }
   }
 }

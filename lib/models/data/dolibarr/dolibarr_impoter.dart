@@ -146,7 +146,7 @@ class DolibarrImporter {
   }
 
   Future<int> _importChantiers() async {
-    final list = await api.fetchChantiers();
+    final list = await api.fetch('chantiers');
     final items = list.map((e) => Chantier.fromJson(e)).toList();
     final service = ref.read(chantierSyncServiceProvider);
     for (final item in items) {

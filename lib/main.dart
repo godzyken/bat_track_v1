@@ -1,11 +1,15 @@
+import 'dart:ui';
+
 import 'package:bat_track_v1/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/responsive/wrapper/responsive_layout.dart';
 import 'data/local/providers/hive_provider.dart';
 import 'data/local/providers/shared_preferences_provider.dart';
+import 'data/remote/providers/catch_error_provider.dart';
 import 'data/remote/providers/firebase_providers.dart';
 import 'features/parametres/affichage/themes/theme.dart';
 
@@ -18,6 +22,24 @@ void main() async {
       child: AppInitializer(),
     ),
   );
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    final container = ProviderContainer();
+    final logger = container.read(
+      loggerProvider,
+    ); // container = ProviderContainer
+    logger.e(
+      'Flutter Error',
+      error: details.exception,
+      stackTrace: details.stack,
+    );
+    Sentry.captureException(details.exception, stackTrace: details.stack);
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    Sentry.captureException(error, stackTrace: stack);
+    return true;
+  };
 }
 
 class AppInitializer extends ConsumerWidget {

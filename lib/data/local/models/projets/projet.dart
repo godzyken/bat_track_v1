@@ -22,6 +22,8 @@ class Projet with _$Projet implements JsonModel<Projet> {
     required bool superUtilisateurValide,
     @NullableDateTimeIsoConverter() DateTime? deadLine,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    required String createdBy,
+    required List<String> members,
   }) = _Projet;
 
   factory Projet.fromJson(Map<String, dynamic> json) => _$ProjetFromJson(json);
@@ -38,6 +40,9 @@ class Projet with _$Projet implements JsonModel<Projet> {
     techniciensValides: true,
     superUtilisateurValide: false,
     updatedAt: DateTime.now(),
+    createdBy: 'Penelope',
+    members: [],
+    deadLine: DateTime.now().add(Duration(days: 365)),
   );
 
   @override

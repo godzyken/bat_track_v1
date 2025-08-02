@@ -21,5 +21,8 @@ extension ProjetUtils on Projet {
     chefDeProjetValide: true,
     techniciensValides: true,
     superUtilisateurValide: false,
+    members: [],
+    createdBy: 'Nickholos',
+    deadLine: DateTime(1),
   );
 }

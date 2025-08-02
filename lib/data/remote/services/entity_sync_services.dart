@@ -4,6 +4,7 @@ import 'package:bat_track_v1/data/local/services/hive_service.dart';
 import 'package:bat_track_v1/data/remote/services/firebase_service.dart';
 import 'package:bat_track_v1/data/remote/services/storage_service.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
+import 'package:bat_track_v1/models/providers/synchrones/facture_sync_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -235,8 +236,9 @@ Future<void> syncAllEntitiesFromFirestore(Ref ref) async {
     ref.read(clientSyncServiceProvider).syncFromFirestore(),
     ref.read(interventionSyncServiceProvider).syncFromFirestore(),
     ref.read(pieceSyncServiceProvider).syncFromFirestore(),
-    // ref.read(factureSyncServiceProvider).syncFromFirestore(),
-    // ref.read(projetSyncServiceProvider).syncFromFirestore(),
+    ref.read(factureSyncServiceProvider).syncFromFirestore(),
+    ref.read(projetSyncServiceProvider).syncFromFirestore(),
+    ref.read(invoiceSyncServiceProvider).syncFromFirestore(),
   ];
 
   await Future.wait(syncs);

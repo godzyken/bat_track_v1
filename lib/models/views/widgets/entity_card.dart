@@ -326,12 +326,4 @@ class _EntityCardState<T extends JsonModel> extends ConsumerState<EntityCard<T>>
       ),
     ];
   }
-
-  /*  void _navigateToDetail<T extends JsonModel>(BuildContext context, T entity) {
-    final entityType = T.toString().toLowerCase();
-    final id = entity.id;
-
-    final routeName = '$entityType-detail'; // ex: chantier-detail
-    context.goNamed(routeName, pathParameters: {'id': id});
-  }*/
 }

@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
+import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
 import 'package:bat_track_v1/features/equipement/controllers/notifiers/equipements_list_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,32 +20,35 @@ class EquipementScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Équipements')),
       drawer: const AppDrawer(),
-      body: equipementAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur: $e')),
-        data:
-            (items) => EntityList<Equipement>(
-              items,
-              'equipements',
-              onEdit: (equipement) {
-                showDialog(
-                  context: context,
-                  builder:
-                      (_) => EntityForm<Equipement>(
-                        fromJson: (json) => Equipement.fromJson(json),
-                        initialValue: equipement,
-                        onSubmit: (updated) async {
-                          await ref
-                              .read(equipementListProvider.notifier)
-                              .updateEntity(updated);
-                        },
-                        createEmpty: () => equipement,
-                      ),
-                );
-              },
-              info: info,
-            ),
+      body: EntityList<Equipement>(
+        items: equipementAsync,
+        boxName: 'equipements',
+        onEdit: (equipement) {
+          showDialog(
+            context: context,
+            builder:
+                (_) => EntityForm<Equipement>(
+                  fromJson: (json) => Equipement.fromJson(json),
+                  initialValue: equipement,
+                  onSubmit: (updated) async {
+                    await ref
+                        .read(equipementListProvider.notifier)
+                        .updateEntity(updated);
+                  },
+                  createEmpty: () => equipement,
+                ),
+          );
+        },
+        onDelete: (id) async {
+          await ref
+              .read(firestoreProvider)
+              .collection('equipements')
+              .doc(id)
+              .delete();
+        },
+        infoOverride: info,
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showForm(context, ref),
         child: const Icon(Icons.add),

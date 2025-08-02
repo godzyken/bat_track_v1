@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../adapters/signture_converter.dart';
+import '../base/import_log.dart';
 
 part 'chantier.freezed.dart';
 part 'chantier.g.dart';
@@ -47,6 +48,59 @@ class Chantier
     clientId: 'clId_009',
     dateDebut: DateTime.now(),
   );
+
+  factory Chantier.fromJsonSafe(Map<String, dynamic> json, {ImportLog? log}) {
+    try {
+      return Chantier(
+        id: json['id'] ?? const Uuid().v4(),
+        nom: json['nom'] ?? 'Chantier sans nom',
+        adresse: json['adresse'] ?? '',
+        clientId: json['clientId'] ?? '',
+        dateDebut:
+            tryParseDate(
+              json['dateDebut'],
+              log: log,
+              context: 'Chantier.dateDebut',
+            ) ??
+            DateTime.now(),
+        dateFin: tryParseDate(
+          json['dateFin'],
+          log: log,
+          context: 'Chantier.dateFin',
+        ),
+        updatedAt: tryParseDate(
+          json['updatedAt'],
+          log: log,
+          context: 'Chantier.updatedAt',
+        ),
+        etat: json['etat'],
+        technicienIds: List<String>.from(json['technicienIds'] ?? []),
+        documents: [],
+        // à parser si nécessaire
+        etapes: [],
+        // à parser si nécessaire
+        commentaire: json['commentaire'],
+        budgetPrevu:
+            (json['budgetPrevu'] is num)
+                ? (json['budgetPrevu'] as num).toDouble()
+                : null,
+        budgetReel:
+            (json['budgetReel'] is num)
+                ? (json['budgetReel'] as num).toDouble()
+                : null,
+        interventions: [],
+        chefDeProjetId: json['chefDeProjetId'],
+        clientValide: json['clientValide'] ?? false,
+        chefDeProjetValide: json['chefDeProjetValide'] ?? false,
+        techniciensValides: json['techniciensValides'] ?? false,
+        superUtilisateurValide: json['superUtilisateurValide'] ?? false,
+        isCloudOnly: json['isCloudOnly'] ?? false,
+      );
+    } catch (e) {
+      log?.addError('Erreur de parsing Chantier: $e');
+      rethrow;
+    }
+  }
 
   @override
   bool get isUpdated => updatedAt != null;

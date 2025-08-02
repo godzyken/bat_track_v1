@@ -1,9 +1,12 @@
+import 'package:bat_track_v1/models/services/firestore_entity_service.dart';
+import 'package:bat_track_v1/models/services/logged_entity_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../models/data/json_model.dart';
 import '../../../models/notifiers/entity_notifier_provider.dart';
+import '../../../models/services/entity_service.dart';
 import '../models/index_model_extention.dart';
 import '../services/hive_service.dart';
 import '../services/service_type.dart';
@@ -112,32 +115,43 @@ final mainOeuvreProvider = Provider.family<MainOeuvre?, String>((ref, id) {
   final box = Hive.box<MainOeuvre>('mainOeuvre');
   return box.get(id);
 });
+
 final factureDraftProvider = Provider.family<FactureDraft?, String>((ref, id) {
   final box = Hive.box<FactureDraft>('factureDraft');
   return box.get(id);
 });
+
 final factureModelProvider = Provider.family<FactureModel?, String>((ref, id) {
   final box = Hive.box<FactureModel>('factureModel');
   return box.get(id);
 });
+
 final factureProvider = Provider.family<Facture?, String>((ref, id) {
   final box = Hive.box<Facture>('facture');
   return box.get(id);
 });
+
 final projetProvider = Provider.family<Projet?, String>((ref, id) {
   final box = Hive.box<Projet>('projet');
   return box.get(id);
 });
+
 final userProvider = Provider.family<UserModel?, String>((ref, id) {
   final box = Hive.box<UserModel>('user');
   return box.get(id);
 });
+
 final equipementProvider = Provider.family<Equipement?, String>((ref, id) {
   final box = Hive.box<Equipement>('equipement');
   return box.get(id);
 });
 
 ////Liste tout les hiveProvider list
+final allProjectsProvider = Provider<List<Projet>>((ref) {
+  final box = Hive.box<Projet>('projets');
+  return box.values.toList();
+});
+
 final allChantiersProvider = Provider<List<Chantier>>((ref) {
   final box = Hive.box<Chantier>('chantiers');
   return box.values.toList();
@@ -163,54 +177,156 @@ final allEquipementsProvider = Provider<List<Equipement>>((ref) {
   return box.values.toList();
 });
 
+final allInterventionsProvider = Provider<List<Intervention>>((ref) {
+  final box = Hive.box<Intervention>('interventions');
+  return box.values.toList();
+});
+
 ////Services for CRUD Operations
-final chantierServiceProvider = Provider<EntityServices<Chantier>>(
-  (ref) => const EntityServices('chantiers'),
+final chantierServiceProvider = Provider<EntityService<Chantier>>(
+  (ref) => LoggedEntityService<Chantier>(
+    FirestoreEntityService<Chantier>(
+      collectionPath: 'chantiers',
+      fromJson: (json) => Chantier.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final clientServiceProvider = Provider<EntityServices<Client>>(
-  (ref) => const EntityServices('clients'),
+final clientServiceProvider = Provider<EntityService<Client>>(
+  (ref) => LoggedEntityService<Client>(
+    FirestoreEntityService<Client>(
+      collectionPath: 'clients',
+      fromJson: (json) => Client.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final technicienServiceProvider = Provider<EntityServices<Technicien>>(
-  (ref) => const EntityServices('techniciens'),
+final technicienServiceProvider = Provider<EntityService<Technicien>>(
+  (ref) => LoggedEntityService<Technicien>(
+    FirestoreEntityService<Technicien>(
+      collectionPath: 'techniciens',
+      fromJson: (json) => Technicien.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final interventionServiceProvider = Provider<EntityServices<Intervention>>(
-  (ref) => const EntityServices('interventions'),
+final interventionServiceProvider = Provider<EntityService<Intervention>>(
+  (ref) => LoggedEntityService<Intervention>(
+    FirestoreEntityService<Intervention>(
+      collectionPath: 'interventions',
+      fromJson: (json) => Intervention.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final chantierEtapeServiceProvider = Provider<EntityServices<ChantierEtape>>(
-  (ref) => const EntityServices('chantierEtapes'),
+final chantierEtapeServiceProvider = Provider<EntityService<ChantierEtape>>(
+  (ref) => LoggedEntityService<ChantierEtape>(
+    FirestoreEntityService<ChantierEtape>(
+      collectionPath: 'etapes',
+      fromJson: (json) => ChantierEtape.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final pieceJointeServiceProvider = Provider<EntityServices<PieceJointe>>(
-  (ref) => const EntityServices('piecesJointes'),
+
+final pieceJointeServiceProvider = Provider<EntityService<PieceJointe>>(
+  (ref) => LoggedEntityService<PieceJointe>(
+    FirestoreEntityService<PieceJointe>(
+      collectionPath: 'pieceJointes',
+      fromJson: (json) => PieceJointe.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final pieceServiceProvider = Provider<EntityServices<Piece>>(
-  (ref) => const EntityServices('pieces'),
+final pieceServiceProvider = Provider<EntityService<Piece>>(
+  (ref) => LoggedEntityService<Piece>(
+    FirestoreEntityService<Piece>(
+      collectionPath: 'pieces',
+      fromJson: (json) => Piece.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final materielServiceProvider = Provider<EntityServices<Materiel>>(
-  (ref) => const EntityServices('materiels'),
+final materielServiceProvider = Provider<EntityService<Materiel>>(
+  (ref) => LoggedEntityService<Materiel>(
+    FirestoreEntityService<Materiel>(
+      collectionPath: 'materiels',
+      fromJson: (json) => Materiel.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final materiauServiceProvider = Provider<EntityServices<Materiau>>(
-  (ref) => const EntityServices('materiau'),
+final materiauServiceProvider = Provider<EntityService<Materiau>>(
+  (ref) => LoggedEntityService<Materiau>(
+    FirestoreEntityService<Materiau>(
+      collectionPath: 'materiaux',
+      fromJson: (json) => Materiau.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final mainOeuvreServiceProvider = Provider<EntityServices<MainOeuvre>>(
-  (ref) => const EntityServices('mainOeuvre'),
+final mainOeuvreServiceProvider = Provider<EntityService<MainOeuvre>>(
+  (ref) => LoggedEntityService<MainOeuvre>(
+    FirestoreEntityService<MainOeuvre>(
+      collectionPath: 'intervenants',
+      fromJson: (json) => MainOeuvre.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final factureDraftServiceProvider = Provider<EntityServices<FactureDraft>>(
-  (ref) => const EntityServices('factureDraft'),
+final factureDraftServiceProvider = Provider<EntityService<FactureDraft>>(
+  (ref) => LoggedEntityService<FactureDraft>(
+    FirestoreEntityService<FactureDraft>(
+      collectionPath: 'factureDrafts',
+      fromJson: (json) => FactureDraft.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final factureModelServiceProvider = Provider<EntityServices<FactureModel>>(
-  (ref) => const EntityServices('factureModel'),
+final factureModelServiceProvider = Provider<EntityService<FactureModel>>(
+  (ref) => LoggedEntityService<FactureModel>(
+    FirestoreEntityService<FactureModel>(
+      collectionPath: 'factureModel',
+      fromJson: (json) => FactureModel.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final factureServiceProvider = Provider<EntityServices<Facture>>(
-  (ref) => const EntityServices('facture'),
+final factureServiceProvider = Provider<EntityService<Facture>>(
+  (ref) => LoggedEntityService<Facture>(
+    FirestoreEntityService<Facture>(
+      collectionPath: 'factures',
+      fromJson: (json) => Facture.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final projetServiceProvider = Provider<EntityServices<Projet>>(
-  (ref) => const EntityServices('projet'),
+final projetServiceProvider = Provider<EntityService<Projet>>(
+  (ref) => LoggedEntityService<Projet>(
+    FirestoreEntityService<Projet>(
+      collectionPath: 'projets',
+      fromJson: (json) => Projet.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final userServiceProvider = Provider<EntityServices<UserModel>>(
-  (ref) => const EntityServices('user'),
+final userServiceProvider = Provider<EntityService<UserModel>>(
+  (ref) => LoggedEntityService<UserModel>(
+    FirestoreEntityService<UserModel>(
+      collectionPath: 'userModel',
+      fromJson: (json) => UserModel.fromJson(json),
+    ),
+    ref,
+  ),
 );
-final equipementServiceProvider = Provider<EntityServices<Equipement>>(
-  (ref) => const EntityServices('equipement'),
+final equipementServiceProvider = Provider<EntityService<Equipement>>(
+  (ref) => LoggedEntityService<Equipement>(
+    FirestoreEntityService<Equipement>(
+      collectionPath: 'equipements',
+      fromJson: (json) => Equipement.fromJson(json),
+    ),
+    ref,
+  ),
 );
 
 ////Providers for EntityServices

@@ -5,14 +5,14 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/local/services/service_type.dart';
 import '../../data/remote/services/storage_service.dart';
 import '../data/json_model.dart';
 import '../data/state_wrapper/wrappers.dart';
+import '../services/entity_service.dart';
 
 class SyncEntityNotifier<T extends JsonModel>
     extends StateNotifier<SyncedState<T>> {
-  final EntityServices<T> entityService;
+  final EntityService<T> entityService;
   final StorageService storageService;
   final bool autoSync;
   Timer? _debounceTimer;

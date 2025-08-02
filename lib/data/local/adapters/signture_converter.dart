@@ -1,7 +1,29 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:typed_data';
 
+import 'package:bat_track_v1/data/local/models/base/import_log.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+DateTime? tryParseDate(
+  dynamic value, {
+  DateTime? fallback,
+  String? context,
+  ImportLog? log,
+}) {
+  if (value == null || value.toString().trim().isEmpty) return fallback;
+  try {
+    return DateTime.parse(value.toString());
+  } catch (e) {
+    final msg = 'Date invalide "$value"${context != null ? ' ($context)' : ''}';
+    if (log != null) {
+      log.addWarning(msg);
+    } else {
+      developer.log('⛔ $msg');
+    }
+    return fallback;
+  }
+}
 
 class Uint8ListBase64Converter implements JsonConverter<Uint8List, String> {
   const Uint8ListBase64Converter();
@@ -28,11 +50,12 @@ class NullableDateTimeIsoConverter
   const NullableDateTimeIsoConverter();
 
   @override
-  DateTime? fromJson(String? json) =>
-      json == null ? null : DateTime.parse(json);
+  String? toJson(DateTime? object) => object?.toIso8601String();
 
   @override
-  String? toJson(DateTime? object) => object?.toIso8601String();
+  DateTime? fromJson(dynamic json) {
+    return tryParseDate(json);
+  }
 }
 
 class DurationSecondsConverter implements JsonConverter<Duration, int> {

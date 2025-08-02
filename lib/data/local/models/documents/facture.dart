@@ -24,15 +24,6 @@ class Facture
   /// Génération standard JSON via json_serializable
   factory Facture.fromJson(Map<String, dynamic> json) =>
       _$FactureFromJson(json);
-  /*
-  @override
-  Facture fromJson(Map<String, dynamic> json) => Facture.fromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$FactureToJson(this);
-
-  @override
-  Facture copyWithId(String? id) => copyWith(id: id ?? this.id);*/
 
   /// Création à partir d'un Draft (exemple)
   factory Facture.fromDraft(
@@ -55,4 +46,12 @@ class Facture
       updatedAt: updatedAt ?? DateTime.now(),
     );
   }
+
+  factory Facture.mock() => Facture(
+    id: const Uuid().v4(),
+    reference: 'reference',
+    montant: 2340,
+    clientId: 'clientId',
+    date: DateTime.now(),
+  );
 }

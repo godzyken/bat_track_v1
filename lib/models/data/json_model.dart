@@ -25,6 +25,11 @@ mixin JsonModel<T> {
 
   static String? toJsonDateTime(DateTime? date) => date?.toIso8601String();
 
+  Map<String, dynamic> toJson() {
+    // TODO: implement toJson
+    throw UnimplementedError();
+  }
+
   /// Méthode utilitaire : true si updatedAt est non nul
   bool get isUpdated => updatedAt != null;
 }
@@ -97,35 +102,35 @@ extension JsonModelFactory on JsonModel {
     final map = Map<String, dynamic>.from(data);
 
     switch (T) {
-      case Chantier:
+      case Chantier _:
         return Chantier.fromJson(map) as T;
-      case Client:
+      case Client _:
         return Client.fromJson(map) as T;
-      case PieceJointe:
+      case PieceJointe _:
         return PieceJointe.fromJson(map) as T;
-      case Materiel:
+      case Materiel _:
         return Materiel.fromJson(map) as T;
-      case Materiau:
+      case Materiau _:
         return Materiau.fromJson(map) as T;
-      case MainOeuvre:
+      case MainOeuvre _:
         return MainOeuvre.fromJson(map) as T;
-      case Technicien:
+      case Technicien _:
         return Technicien.fromJson(map) as T;
-      case Intervention:
+      case Intervention _:
         return Intervention.fromJson(map) as T;
-      case ChantierEtape:
+      case ChantierEtape _:
         return ChantierEtape.fromJson(map) as T;
-      case Piece:
+      case Piece _:
         return Piece.fromJson(map) as T;
-      case Facture:
+      case Facture _:
         return Facture.fromJson(map) as T;
-      case FactureDraft:
+      case FactureDraft _:
         return FactureDraft.fromJson(map) as T;
-      case FactureModel:
+      case FactureModel _:
         return FactureModel.fromJson(map) as T;
-      case Projet:
+      case Projet _:
         return Projet.fromJson(map) as T;
-      case UserModel:
+      case UserModel _:
         return UserModel.fromJson(map) as T;
       default:
         throw UnimplementedError('fromDynamic non implémenté pour $T');

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../data/json_model.dart';
 import '../../data/state_wrapper/wrappers.dart';
@@ -44,5 +45,18 @@ class EntityDetailScreen<T extends JsonModel> extends ConsumerWidget {
         ),
       ),
     };
+  }
+}
+
+class JsonModelRouter {
+  static void navigateToDetail<T extends JsonModel>(
+    BuildContext context,
+    T entity,
+  ) {
+    final entityType = T.toString().toLowerCase();
+    final id = entity.id;
+
+    final routeName = '$entityType-detail'; // ex: chantier-detail
+    context.goNamed(routeName, pathParameters: {'id': id}, extra: entity);
   }
 }

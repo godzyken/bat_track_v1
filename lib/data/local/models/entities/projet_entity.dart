@@ -34,7 +34,13 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
   final bool superUtilisateurValide;
 
   @HiveField(9)
-  final DateTime? pupdatedAt;
+  final String createBy;
+
+  @HiveField(10)
+  final List<String> members;
+
+  @HiveField(11)
+  DateTime? pupdatedAt;
 
   ProjetEntity({
     required this.pid,
@@ -46,6 +52,8 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
     required this.chefDeProjetValide,
     required this.techniciensValides,
     required this.superUtilisateurValide,
+    required this.createBy,
+    required this.members,
     this.pupdatedAt,
   });
 
@@ -61,6 +69,8 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
       chefDeProjetValide: model.chefDeProjetValide,
       techniciensValides: model.techniciensValides,
       superUtilisateurValide: model.superUtilisateurValide,
+      createBy: model.createdBy,
+      members: model.members,
       pupdatedAt: model.updatedAt,
     );
   }
@@ -81,6 +91,8 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
     updatedAt: updatedAt,
+    createdBy: createBy,
+    members: members,
   );
 
   @override

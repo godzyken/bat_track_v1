@@ -21,6 +21,7 @@ class UserModel
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
     @Default(false) bool isCloudOnly,
     String? instanceId,
+    String? company,
   }) = _UserModel;
 
   const UserModel._();
@@ -39,6 +40,7 @@ class UserModel
     updatedAt: DateTime.now(),
     isCloudOnly: false,
     instanceId: 'instance-1234',
+    company: 'Egote + RMC service',
   );
 
   @override

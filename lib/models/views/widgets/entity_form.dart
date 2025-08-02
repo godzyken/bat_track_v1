@@ -4,6 +4,9 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../features/auth/data/providers/auth_state_provider.dart';
+import '../../../features/auth/views/widgets/multi_user_dropdown_field.dart';
+import '../../../features/auth/views/widgets/user_dropdown_field.dart';
 import '../../data/json_model.dart';
 
 typedef OnSubmit<T extends JsonModel> = void Function(T entity);
@@ -115,6 +118,27 @@ class _EntityFormState<T extends JsonModel>
     bool expertMode = false,
   }) {
     final autofill = _getAutofillHints(key);
+    // 👤 Champs utilisateurs spécifiques par rôle
+    if (key == 'clientId') {
+      return UserDropdownField(
+        role: 'client',
+        label: 'Client assigné',
+        selectedUserId: controller?.text,
+        onChanged: (newId) {
+          controller?.text = newId ?? '';
+          onChanged(newId);
+        },
+      );
+    }
+    if (key == 'technicienIds' && value is List) {
+      return MultiUserDropdownField(
+        selectedUserIds: List<String>.from(value),
+        onChanged: (newList) => onChanged(newList),
+        role: 'technicien',
+        companyId: ref.watch(currentUserProvider).value?.company,
+      );
+    }
+
     if (value is bool) {
       return SwitchListTile(
         key: ValueKey(key),
