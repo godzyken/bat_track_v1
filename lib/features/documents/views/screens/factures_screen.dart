@@ -27,6 +27,7 @@ class FacturesScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.picture_as_pdf),
+            tooltip: 'Imprimer un pdf',
             onPressed: () async {
               final factures =
                   await ref.read(factureSyncServiceProvider).getAll();

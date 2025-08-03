@@ -54,8 +54,16 @@ class EtapeCard extends ConsumerWidget {
         trailing: Wrap(
           spacing: 4,
           children: [
-            IconButton(icon: const Icon(Icons.edit), onPressed: onEdit),
-            IconButton(icon: const Icon(Icons.delete), onPressed: onDelete),
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: onEdit,
+              tooltip: 'editer',
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: onDelete,
+              tooltip: 'supprimer',
+            ),
           ],
         ),
       ),

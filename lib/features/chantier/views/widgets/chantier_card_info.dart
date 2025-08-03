@@ -76,33 +76,42 @@ class ChantierCardInfo extends ConsumerWidget {
               autofillHints: const [AutofillHints.name],
             ),
             const SizedBox(height: 12),
-            GestureDetector(
-              onTap:
-                  () => _selectDate(
-                    context,
-                    chantier.dateDebut,
-                    (newDate) =>
-                        onChanged(chantier.copyWith(dateDebut: newDate)),
-                  ),
-              child: InputDecorator(
-                decoration: const InputDecoration(labelText: 'Date de début'),
-                child: Text(dateFormat.format(chantier.dateDebut)),
+            Semantics(
+              label: 'Date de début',
+              button: true,
+              child: GestureDetector(
+                onTap:
+                    () => _selectDate(
+                      context,
+                      chantier.dateDebut,
+                      (newDate) =>
+                          onChanged(chantier.copyWith(dateDebut: newDate)),
+                    ),
+                child: InputDecorator(
+                  decoration: const InputDecoration(labelText: 'Date de début'),
+                  child: Text(dateFormat.format(chantier.dateDebut)),
+                ),
               ),
             ),
             const SizedBox(height: 12),
-            GestureDetector(
-              onTap:
-                  () => _selectDate(
-                    context,
-                    chantier.dateFin ?? chantier.dateDebut,
-                    (newDate) => onChanged(chantier.copyWith(dateFin: newDate)),
+            Semantics(
+              label: 'Date de fin',
+              button: true,
+              child: GestureDetector(
+                onTap:
+                    () => _selectDate(
+                      context,
+                      chantier.dateFin ?? chantier.dateDebut,
+                      (newDate) =>
+                          onChanged(chantier.copyWith(dateFin: newDate)),
+                    ),
+                child: InputDecorator(
+                  decoration: const InputDecoration(labelText: 'Date de fin'),
+                  child: Text(
+                    chantier.dateFin != null
+                        ? dateFormat.format(chantier.dateFin!)
+                        : 'Non définie',
                   ),
-              child: InputDecorator(
-                decoration: const InputDecoration(labelText: 'Date de fin'),
-                child: Text(
-                  chantier.dateFin != null
-                      ? dateFormat.format(chantier.dateFin!)
-                      : 'Non définie',
                 ),
               ),
             ),

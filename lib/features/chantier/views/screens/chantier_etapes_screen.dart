@@ -20,40 +20,42 @@ class ChantierEtapesScreen extends ConsumerWidget {
   }) {
     showDialog(
       context: context,
-      builder: (_) => EntityForm(
-        chantierId: chantierId,
-        initialValue: etape,
-        createEmpty: () => ChantierEtape.mock(),
-        fromJson: (json) => ChantierEtape.fromJson(json),
-        onSubmit: (updated) {
-          final notifier = ref.read(
-            chantierAdvancedNotifierProvider(chantierId).notifier,
-          );
-          etape == null
-              ? notifier.addEtape(updated)
-              : notifier.updateEtape(updated);
-        },
-      ),
+      builder:
+          (_) => EntityForm(
+            chantierId: chantierId,
+            initialValue: etape,
+            createEmpty: () => ChantierEtape.mock(),
+            fromJson: (json) => ChantierEtape.fromJson(json),
+            onSubmit: (updated) {
+              final notifier = ref.read(
+                chantierAdvancedNotifierProvider(chantierId).notifier,
+              );
+              etape == null
+                  ? notifier.addEtape(updated)
+                  : notifier.updateEtape(updated);
+            },
+          ),
     );
   }
 
   void _openPieceForm(BuildContext context, WidgetRef ref, {Piece? piece}) {
     showDialog(
       context: context,
-      builder: (_) => EntityForm<Piece>(
-        chantierId: chantierId,
-        initialValue: piece,
-        createEmpty: () => Piece.mock(),
-        fromJson: (json) => Piece.fromJson(json),
-        onSubmit: (updated) {
-          final notifier = ref.read(
-            chantierAdvancedNotifierProvider(chantierId).notifier,
-          );
-          piece == null
-              ? notifier.addPiece(updated)
-              : notifier.updatePiece(updated);
-        },
-      ),
+      builder:
+          (_) => EntityForm<Piece>(
+            chantierId: chantierId,
+            initialValue: piece,
+            createEmpty: () => Piece.mock(),
+            fromJson: (json) => Piece.fromJson(json),
+            onSubmit: (updated) {
+              final notifier = ref.read(
+                chantierAdvancedNotifierProvider(chantierId).notifier,
+              );
+              piece == null
+                  ? notifier.addPiece(updated)
+                  : notifier.updatePiece(updated);
+            },
+          ),
     );
   }
 
@@ -84,30 +86,36 @@ class ChantierEtapesScreen extends ConsumerWidget {
             const Center(child: Text("Aucune étape pour l'instant"))
           else if (info.isTablet || info.isDesktop)
             Column(
-              children: models
-                  .map(
-                    (etape) => EtapeCard(
-                      etape: etape,
-                      onEdit: () => _openEtapeForm(context, ref, etape: etape),
-                      onDelete: () => ref
-                          .read(
-                            chantierAdvancedNotifierProvider(
-                              chantierId,
-                            ).notifier,
-                          )
-                          .deleteEtape(etape.id),
-                    ),
-                  )
-                  .toList(),
+              children:
+                  models
+                      .map(
+                        (etape) => EtapeCard(
+                          etape: etape,
+                          onEdit:
+                              () => _openEtapeForm(context, ref, etape: etape),
+                          onDelete:
+                              () => ref
+                                  .read(
+                                    chantierAdvancedNotifierProvider(
+                                      chantierId,
+                                    ).notifier,
+                                  )
+                                  .deleteEtape(etape.id),
+                        ),
+                      )
+                      .toList(),
             )
           else
             ...models.map(
               (etape) => EtapeCard(
                 etape: etape,
                 onEdit: () => _openEtapeForm(context, ref, etape: etape),
-                onDelete: () => ref
-                    .read(chantierAdvancedNotifierProvider(chantierId).notifier)
-                    .deleteEtape(etape.id),
+                onDelete:
+                    () => ref
+                        .read(
+                          chantierAdvancedNotifierProvider(chantierId).notifier,
+                        )
+                        .deleteEtape(etape.id),
               ),
             ),
 
@@ -126,36 +134,44 @@ class ChantierEtapesScreen extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               childAspectRatio: 1.3,
-              children: pieces.map((piece) {
-                return Stack(
-                  children: [
-                    PieceCard(piece: piece),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () =>
-                                _openPieceForm(context, ref, piece: piece),
+              children:
+                  pieces.map((piece) {
+                    return Stack(
+                      children: [
+                        PieceCard(piece: piece),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed:
+                                    () => _openPieceForm(
+                                      context,
+                                      ref,
+                                      piece: piece,
+                                    ),
+                                tooltip: 'editer',
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed:
+                                    () => ref
+                                        .read(
+                                          chantierAdvancedNotifierProvider(
+                                            chantierId,
+                                          ).notifier,
+                                        )
+                                        .deletePiece(piece.id),
+                                tooltip: 'supprimer',
+                              ),
+                            ],
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () => ref
-                                .read(
-                                  chantierAdvancedNotifierProvider(
-                                    chantierId,
-                                  ).notifier,
-                                )
-                                .deletePiece(piece.id),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
+                        ),
+                      ],
+                    );
+                  }).toList(),
             ),
 
           const SizedBox(height: 20),

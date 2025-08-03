@@ -27,102 +27,116 @@ class PieceCard extends ConsumerWidget {
       orElse: () => '...',
     );
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        elevation: 3,
-        margin: const EdgeInsets.all(8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    piece.nom,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: onEdit,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: onDelete,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text('Surface : ${piece.surface.toStringAsFixed(1)} m²'),
-              const SizedBox(height: 8),
-
-              // Budget
-              Row(
-                children: [
-                  const Icon(Icons.attach_money, size: 20),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Budget total : $budget €',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-              // Matériaux
-              _buildSectionTitle(context, 'Matériaux'),
-              ...piece.materiaux!.map(
-                (m) => _buildBullet(
-                  Icon(Icons.paid_outlined),
-                  '${m.nom} - ${m.prixUnitaire} €/ ${m.unite}'
-                  '${m.coefficientSurface != null ? ', coef: ${m.coefficientSurface}' : ''}'
-                  '${m.quantiteFixe != null ? ', fixe: ${m.quantiteFixe}' : ''}',
+    return Semantics(
+      label:
+          'Pièce ${piece.nom}, surface ${piece.surface.toStringAsFixed(1)} mètres carrés, budget estimé $budget euros',
+      button: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Card(
+          elevation: 3,
+          margin: const EdgeInsets.all(8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      piece.nom,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: onEdit,
+                          tooltip: 'editer',
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: onDelete,
+                          tooltip: 'supprimer',
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: 8),
+                Text('Surface : ${piece.surface.toStringAsFixed(1)} m²'),
+                const SizedBox(height: 8),
 
-              const SizedBox(height: 8),
-              // Matériels
-              _buildSectionTitle(context, 'Matériels'),
-              ...piece.materiels!.map(
-                (m) => _buildBullet(
-                  Icon(Icons.paid_sharp),
-                  '${m.nom} - ${m.prixUnitaire} € x ${m.quantiteFixe}'
-                  '${m.joursLocation != null ? ', ${m.joursLocation}j loc. à ${m.prixLocation} €' : ''}',
+                // Budget
+                Row(
+                  children: [
+                    const Icon(Icons.attach_money, size: 20),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Budget total : $budget €',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ],
                 ),
-              ),
 
-              const SizedBox(height: 8),
-              // Main d'œuvre
-              _buildSectionTitle(context, 'Main-d’œuvre'),
-              techniciens.maybeWhen(
-                data: (list) {
-                  final moList = piece.mainOeuvre ?? [];
+                const SizedBox(height: 12),
+                // Matériaux
+                _buildSectionTitle(context, 'Matériaux'),
+                ...piece.materiaux!.map(
+                  (m) => _buildBullet(
+                    Icon(Icons.paid_outlined, semanticLabel: ''),
+                    '${m.nom} - ${m.prixUnitaire} €/ ${m.unite}'
+                    '${m.coefficientSurface != null ? ', coef: ${m.coefficientSurface}' : ''}'
+                    '${m.quantiteFixe != null ? ', fixe: ${m.quantiteFixe}' : ''}',
+                  ),
+                ),
 
-                  final mainOeuvreWidgets =
-                      moList.map((e) {
-                        final tech = list.firstWhere(
-                          (t) => t.id == e.idTechnicien,
-                          orElse: () => Technicien.mock(),
-                        );
-                        return _buildBullet(
-                          Icon(Icons.engineering),
-                          '${tech.nom} - ${e.heuresEstimees} h',
-                        );
-                      }).toList();
+                const SizedBox(height: 8),
+                // Matériels
+                _buildSectionTitle(context, 'Matériels'),
+                ...piece.materiels!.map(
+                  (m) => _buildBullet(
+                    Icon(Icons.paid_sharp),
+                    '${m.nom} - ${m.prixUnitaire} € x ${m.quantiteFixe}'
+                    '${m.joursLocation != null ? ', ${m.joursLocation}j loc. à ${m.prixLocation} €' : ''}',
+                  ),
+                ),
 
-                  return Column(children: mainOeuvreWidgets);
-                },
-                orElse: () => const Text('Chargement...'),
-              ),
-            ],
+                const SizedBox(height: 8),
+                // Main d'œuvre
+                _buildSectionTitle(context, 'Main-d’œuvre'),
+                techniciens.maybeWhen(
+                  data: (list) {
+                    final moList = piece.mainOeuvre ?? [];
+
+                    final mainOeuvreWidgets =
+                        moList.map((e) {
+                          final tech = list.firstWhere(
+                            (t) => t.id == e.idTechnicien,
+                            orElse: () => Technicien.mock(),
+                          );
+                          return _buildBullet(
+                            Icon(Icons.engineering),
+                            '${tech.nom} - ${e.heuresEstimees} h',
+                          );
+                        }).toList();
+
+                    return Column(children: mainOeuvreWidgets);
+                  },
+                  orElse:
+                      () => Semantics(
+                        label: 'Chargement des techniciens...',
+                        child: Text('Chargement...'),
+                      ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

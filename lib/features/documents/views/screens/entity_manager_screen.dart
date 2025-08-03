@@ -46,6 +46,7 @@ class EntityManagerScreen<T extends JsonModel> extends ConsumerWidget {
               final bytes = await generatePdf(items);
               await Printing.layoutPdf(onLayout: (_) => bytes);
             },
+            tooltip: 'imprimer un pdf',
           ),
         ],
       ),

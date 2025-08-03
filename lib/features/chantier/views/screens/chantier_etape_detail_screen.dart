@@ -331,39 +331,43 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
 
     final size = info.isMobile ? 100.0 : 120.0;
 
-    return GestureDetector(
-      onTap: () => OpenFilex.open(piece.url),
-      child: ResponsiveCard(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            isImage
-                ? _buildClipRRect(piece, size)
-                : Container(
-                  width: size,
-                  height: size,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
+    return Semantics(
+      label: 'Pièce jointe',
+      button: true,
+      child: GestureDetector(
+        onTap: () => OpenFilex.open(piece.url),
+        child: ResponsiveCard(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              isImage
+                  ? _buildClipRRect(piece, size)
+                  : Container(
+                    width: size,
+                    height: size,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.picture_as_pdf,
+                      size: 48,
+                      color: Colors.red,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.picture_as_pdf,
-                    size: 48,
-                    color: Colors.red,
-                  ),
+              const SizedBox(height: 6),
+              SizedBox(
+                width: size,
+                child: Text(
+                  piece.nom,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 13),
                 ),
-            const SizedBox(height: 6),
-            SizedBox(
-              width: size,
-              child: Text(
-                piece.nom,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 13),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

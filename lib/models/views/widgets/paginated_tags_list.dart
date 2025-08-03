@@ -44,11 +44,13 @@ class PaginatedTagsList extends ConsumerWidget {
               IconButton(
                 icon: const Icon(Icons.chevron_left),
                 onPressed: currentPage > 0 ? onPreviousPage : null,
+                tooltip: 'precédent',
               ),
               Text('Page ${currentPage + 1} / $totalPages'),
               IconButton(
                 icon: const Icon(Icons.chevron_right),
                 onPressed: currentPage < totalPages - 1 ? onNextPage : null,
+                tooltip: 'suivant',
               ),
             ],
           ),

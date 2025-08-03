@@ -26,6 +26,7 @@ class _LogConsoleState extends ConsumerState<LogConsole> {
             onPressed: () {
               ref.read(loggerNotifierProvider.notifier).clear();
             },
+            tooltip: 'effacer le journal',
           ),
         ],
       ),

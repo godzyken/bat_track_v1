@@ -148,6 +148,7 @@ class ChantiersEtapeKanbanInteractive extends ConsumerWidget {
                                                             },
                                                           );
                                                         },
+                                                        tooltip: 'editer',
                                                       ),
                                                       if (onDelete != null)
                                                         IconButton(
@@ -159,6 +160,7 @@ class ChantiersEtapeKanbanInteractive extends ConsumerWidget {
                                                               () => onDelete!(
                                                                 item,
                                                               ),
+                                                          tooltip: 'effacer',
                                                         ),
                                                     ],
                                                   ),
