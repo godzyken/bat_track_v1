@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/projets/projet.dart';
+import '../../../../main.dart';
 import '../../../../models/views/widgets/entity_card.dart';
 import '../../../auth/data/providers/auth_state_provider.dart';
 
@@ -49,7 +50,7 @@ class ProjectListScreen extends ConsumerWidget {
               },
             ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, st) => Center(child: Text('Erreur : $e')),
+        error: (e, st) => ErrorApp(message: 'Erreur in Projet : $e'),
       ),
     );
   }

@@ -24,6 +24,14 @@ class AppUser with _$AppUser implements JsonModel {
   factory AppUser.fromJson(Map<String, dynamic> json) =>
       _$AppUserFromJson(json);
 
+  factory AppUser.empty() => AppUser(
+    uid: '',
+    name: '',
+    email: '',
+    role: '',
+    createdAt: tryParseDate('')!,
+  );
+
   @override
   String get id => uid;
 

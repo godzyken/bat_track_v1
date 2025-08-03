@@ -31,7 +31,7 @@ class LoggingNavigatorObserver extends NavigatorObserver {
         previousRoute?.settings.name ?? previousRoute?.settings.toString();
 
     final message = '$action: from [$oldRouteName] to [$newRouteName]';
-    logger.info(message);
+    logger.logAction(message);
 
     // Envoie aussi à Sentry, optionnel
     Sentry.addBreadcrumb(

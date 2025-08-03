@@ -1,12 +1,12 @@
-import 'package:bat_track_v1/data/remote/services/file_sync_service.dart';
+import 'package:bat_track_v1/models/services/file_sync_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/providers/hive_provider.dart';
 import '../../../../data/local/services/service_type.dart';
-import '../../../../data/remote/services/entity_sync_services.dart';
 import '../../../../models/data/state_wrapper/wrappers.dart';
 import '../../../../models/notifiers/sync_entity_notifier.dart';
+import '../../../../models/services/entity_sync_services.dart';
 
 final chantierInitialProvider = FutureProvider.family<Chantier, String>((
   ref,

@@ -6,16 +6,16 @@ enum LogLevel { debug, info, warning, error }
 class AppLogger {
   const AppLogger();
 
-  void log(
+  static void log(
     String message, {
     LogLevel level = LogLevel.info,
     Object? error,
     StackTrace? stackTrace,
   }) {
     final prefix = switch (level) {
-      LogLevel.debug => '[DEBUG]',
-      LogLevel.info => '[INFO]',
-      LogLevel.warning => '[WARNING]',
+      LogLevel.debug => '[DEBUG]🛑',
+      LogLevel.info => '[INFO]ℹ️',
+      LogLevel.warning => '[WARNING]⚠️',
       LogLevel.error => '[ERROR]',
     };
 
@@ -33,18 +33,22 @@ class AppLogger {
     }
   }
 
-  void debug(String message) => log(message, level: LogLevel.debug);
+  static void debug(String message) => log(message, level: LogLevel.debug);
 
-  void info(String message) => log(message, level: LogLevel.info);
+  static void info(String message) => log(message, level: LogLevel.info);
 
-  void warning(String message, {Object? error, StackTrace? stackTrace}) => log(
+  static void warning(
+    String message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) => log(
     message,
     level: LogLevel.warning,
     error: error,
     stackTrace: stackTrace,
   );
 
-  void error(String message, {Object? error, StackTrace? stackTrace}) =>
+  static void error(String message, {Object? error, StackTrace? stackTrace}) =>
       log(message, level: LogLevel.error, error: error, stackTrace: stackTrace);
 }
 

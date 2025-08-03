@@ -10,8 +10,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../features/chantier/controllers/providers/chantier_sync_provider.dart';
-import '../../local/models/index_model_extention.dart';
+import '../../data/local/models/index_model_extention.dart';
+import '../../features/chantier/controllers/providers/chantier_sync_provider.dart';
 
 class EntitySyncService<T extends JsonModel> {
   static final _cacheTimestamps = <String, DateTime>{};

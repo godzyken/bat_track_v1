@@ -25,6 +25,8 @@ mixin JsonModel<T> {
 
   static String? toJsonDateTime(DateTime? date) => date?.toIso8601String();
 
+  static T empty<T>() => throw UnimplementedError('empty<T> not impl.');
+
   Map<String, dynamic> toJson() {
     // TODO: implement toJson
     throw UnimplementedError();

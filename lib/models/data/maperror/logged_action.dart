@@ -43,39 +43,54 @@ mixin LoggedAction {
 
   void logEvent({
     required String name,
-    Map<String, dynamic>? data,
+    dynamic data,
+    String? target,
     bool captureToSentry = true,
   }) {
-    final message = '[EVENT] $name';
-    debugPrint(message);
+    final message = LogEntry(
+      timestamp: DateTime.now(),
+      data: data,
+      action: name,
+      target: target!,
+    );
+
+    debugPrint("LOGGED EVENT: ${jsonEncode(message)}");
 
     if (captureToSentry) {
       Sentry.captureEvent(
         SentryEvent(
-          message: SentryMessage(message),
+          message: SentryMessage(message.toString()),
           unknown: data,
           tags: {'event_type': 'business'},
         ),
       );
     }
+    _ref.read(loggerNotifierProvider.notifier).log(message);
   }
 
   void logError({
     required String name,
-    Map<String, dynamic>? data,
+    dynamic data,
+    String? target,
     bool captureToSentry = true,
   }) {
-    final message = '[ERROR] $name';
-    debugPrint(message);
+    final message = LogEntry(
+      timestamp: DateTime.now(),
+      data: data,
+      action: name,
+      target: target!,
+    );
+    debugPrint("LOGGED ERROR: ${jsonEncode(message)}");
 
     if (captureToSentry) {
-      Sentry.captureEvent(
+      Sentry.captureException(
         SentryEvent(
-          message: SentryMessage(message),
+          message: SentryMessage(message.toString()),
           unknown: data,
           tags: {'event_type': 'business'},
         ),
       );
     }
+    _ref.read(loggerNotifierProvider.notifier).log(message);
   }
 }

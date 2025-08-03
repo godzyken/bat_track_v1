@@ -3,7 +3,7 @@ import 'dart:developer' as developer;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../services/entity_sync_services.dart';
+import '../../../models/services/entity_sync_services.dart';
 
 class AutoSyncNotifier extends StateNotifier<void> {
   AutoSyncNotifier(this.ref) : super(null) {

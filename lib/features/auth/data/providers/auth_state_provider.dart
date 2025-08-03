@@ -14,8 +14,22 @@ final authStateChangesProvider = StreamProvider<User?>((ref) {
 });
 
 /// Optionnel : l'utilisateur courant (value ou null)
-final authStateProvider = Provider<User?>((ref) {
-  return ref.watch(authStateChangesProvider).asData?.value;
+final authStateProvider = Provider<AsyncValue<User>>((ref) {
+  final stream = ref.watch(authStateChangesProvider);
+
+  return stream.when(
+    data: (user) {
+      if (user == null) {
+        return AsyncValue.error(
+          Exception('Utilisateur non connecté'),
+          StackTrace.current,
+        );
+      }
+      return AsyncValue.data(user);
+    },
+    loading: () => const AsyncValue.loading(),
+    error: (e, st) => AsyncValue.error(e, st),
+  );
 });
 
 /// Charge son profil Firestore
@@ -35,13 +49,13 @@ final userProfileProvider = FutureProvider<UserModel?>((ref) async {
 /// 🔑 Récupère le AppUser (depuis Firestore) pour l'utilisateur connecté
 final appUserProvider = FutureProvider<AppUser?>((ref) async {
   final user = ref.watch(authStateProvider);
-  if (user == null) return null;
+  if (user.value == null) return null;
 
   final snapshot =
       await ref
           .watch(firestoreProvider)
           .collection('users')
-          .doc(user.uid)
+          .doc(user.value?.uid)
           .get();
 
   if (!snapshot.exists) return null;

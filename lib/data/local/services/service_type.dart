@@ -134,7 +134,7 @@ class EntityServices<T extends JsonModel>
     list.sort(
       (a, b) => selector(a).compareTo(selector(b)) * (descending ? -1 : 1),
     );
-    return list;
+    return list ?? [];
   }
 
   @override

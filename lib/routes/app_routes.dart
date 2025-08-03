@@ -1,4 +1,3 @@
-import 'package:bat_track_v1/data/remote/providers/catch_error_provider.dart';
 import 'package:bat_track_v1/features/auth/data/notifiers/auth_notifier.dart';
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
 import 'package:bat_track_v1/features/auth/views/screens/register_screen.dart';
@@ -39,28 +38,33 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateChangesProvider);
   final userProfile = ref.watch(userProfileProvider);
   final userStateNotifier = ref.watch(authNotifierProvider);
-  final logger = ref.read(loggerProvider);
   final observer = LoggingNavigatorObserver(logger: AppLogger());
 
-  Route route;
-  Route? previousRoute;
   return GoRouter(
     initialLocation: '/',
     refreshListenable: userStateNotifier,
     redirect: (context, state) {
-      final user = authState.asData?.value;
+      final isLoggingIn =
+          state.matchedLocation == '/login' ||
+          state.matchedLocation == '/register';
+
+      final userAsync = authState;
+      final user = userAsync.asData?.value;
       final profile = userProfile.asData?.value;
 
-      final isLoggingIn = state.path == '/login' || state.path == '/register';
+      // 1. Attente du chargement (évite redirections prématurées)
+      if (userAsync.isLoading || userAsync.hasError) return null;
 
+      // 2. Non connecté
       if (user == null) return isLoggingIn ? null : '/login';
 
-      if (profile == null) return null; // En attente du chargement
+      // 3. Connecté mais pas de profil encore chargé
+      if (profile == null) return null;
 
-      if (state.path == '/' || isLoggingIn) {
+      // 4. Rediriger en fonction du rôle
+      if (state.matchedLocation == '/' || isLoggingIn) {
         switch (profile.role) {
           case UserRole.client:
-            return '/client';
           case UserRole.chefDeProjet:
             return '/client';
           case UserRole.technicien:
@@ -70,29 +74,38 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         }
       }
 
-      return null; //
+      return null;
     },
     observers: [observer],
     routes: [
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
+      ),
       GoRoute(
         path: '/register',
+        name: 'register',
         builder: (context, state) => const RegisterScreen(),
       ),
       GoRoute(
         path: '/admin',
+        name: 'admin',
         builder: (context, state) => const AdminHomeScreen(),
       ),
       GoRoute(
         path: '/tech',
+        name: 'tech',
         builder: (context, state) => const TechHomeScreen(),
       ),
       GoRoute(
         path: '/client',
+        name: 'client',
         builder: (context, state) => const ClientHomeScreen(),
       ),
       GoRoute(
         path: '/home',
+        name: 'Home',
         builder: (context, state) => const HomeScreen(),
         routes: [
           GoRoute(
@@ -104,14 +117,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/pick-instance',
+        name: 'pick-instance',
         builder: (context, state) => const PickInstanceScreen(),
       ),
       GoRoute(
         path: '/equipements',
+        name: 'equipements',
         builder: (context, state) => const EquipementScreen(),
       ),
       GoRoute(
         path: '/clients',
+        name: 'clients',
         builder: (context, state) => const ClientsScreen(),
         routes: [
           GoRoute(
@@ -164,6 +180,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/techniciens',
+        name: 'techniciens',
         builder: (context, state) => const TechniciensScreen(),
         routes: [
           GoRoute(
@@ -215,6 +232,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/chantiers',
+        name: 'chantiers',
         builder: (context, state) => const ChantiersScreen(),
         routes: [
           GoRoute(
@@ -259,6 +277,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/interventions',
+        name: 'interventions',
         builder: (context, state) => const InterventionsScreen(),
         routes: [
           GoRoute(
@@ -310,13 +329,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      GoRoute(path: '/about', builder: (context, state) => const AboutScreen()),
+      GoRoute(
+        path: '/about',
+        name: 'about',
+        builder: (context, state) => const AboutScreen(),
+      ),
       GoRoute(
         path: '/import-dolibarr',
+        name: 'import-dolibarr',
         builder: (context, state) => const DolibarrImportScreen(),
       ),
       GoRoute(
         path: '/explorer',
+        name: 'explorer',
         builder: (context, state) => DolibarrExplorerScreen(),
       ),
     ],
