@@ -20,6 +20,10 @@ class PieceEntity extends HiveObject implements HiveModel<Piece> {
   final List<MainOeuvre>? mainOeuvre;
   @HiveField(6)
   final DateTime? pcUpdatedAt;
+  @HiveField(7)
+  final String addBy;
+  @HiveField(8)
+  final bool? validatedBy;
 
   PieceEntity({
     required this.pcId,
@@ -28,7 +32,9 @@ class PieceEntity extends HiveObject implements HiveModel<Piece> {
     required this.materiaux,
     required this.materiels,
     required this.mainOeuvre,
+    required this.addBy,
     this.pcUpdatedAt,
+    this.validatedBy,
   });
 
   factory PieceEntity.fromModel(Piece model) {
@@ -40,6 +46,8 @@ class PieceEntity extends HiveObject implements HiveModel<Piece> {
       materiels: model.materiels,
       mainOeuvre: model.mainOeuvre,
       pcUpdatedAt: model.updatedAt,
+      addBy: model.addedBy,
+      validatedBy: model.validatedByTech,
     );
   }
 
@@ -55,6 +63,8 @@ class PieceEntity extends HiveObject implements HiveModel<Piece> {
     materiels: materiels,
     mainOeuvre: mainOeuvre,
     updatedAt: updatedAt,
+    addedBy: addBy,
+    validatedByTech: validatedBy,
   );
 
   @override

@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -40,8 +41,12 @@ class InstanceSelectorDialog extends ConsumerWidget {
                     .toList(),
           );
         },
-        loading: () => const CircularProgressIndicator(),
-        error: (err, stack) => Text('Erreur : $err'),
+        loading: () => const LoadingApp(),
+        error:
+            (err, _) => ErrorApp(
+              message:
+                  "Erreur lors de la connection au profile administrateur : $err",
+            ),
       ),
       actions: [
         TextButton(

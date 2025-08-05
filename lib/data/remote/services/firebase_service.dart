@@ -44,6 +44,30 @@ class FirestoreService {
     return null;
   }
 
+  /// 📡 STREAM un document par query
+  static Stream<List<T>> watchCollection<T>({
+    required String collectionPath,
+    required T Function(Map<String, dynamic>) fromJson,
+    Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>> query)?
+    queryBuilder,
+  }) {
+    Query<Map<String, dynamic>> query = FirebaseFirestore.instance.collection(
+      collectionPath,
+    );
+
+    if (queryBuilder != null) {
+      query = queryBuilder(query);
+    }
+
+    return query.snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return fromJson(data);
+      }).toList();
+    });
+  }
+
   /// 🔁 READ tous les documents, avec filtrage
   static Future<List<T>> getAll<T>({
     required String collectionPath,

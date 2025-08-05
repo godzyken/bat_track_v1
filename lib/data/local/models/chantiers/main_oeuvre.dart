@@ -16,6 +16,7 @@ class MainOeuvre
 
   const factory MainOeuvre({
     required String id,
+    required String chantierId,
     String? idTechnicien,
     required double heuresEstimees,
     @DateTimeIsoConverter() required DateTime dateDebut,
@@ -30,6 +31,7 @@ class MainOeuvre
 
   factory MainOeuvre.mock() => MainOeuvre(
     id: 'moId_0012',
+    chantierId: 'ch_023',
     heuresEstimees: 35,
     dateDebut: DateTime.now(),
     isActive: true,

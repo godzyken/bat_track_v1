@@ -1,9 +1,9 @@
 import 'package:bat_track_v1/features/projet/views/screens/projet_form_screen.dart';
+import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/projets/projet.dart';
-import '../../../../main.dart';
 import '../../../../models/views/widgets/entity_card.dart';
 import '../../../auth/data/providers/auth_state_provider.dart';
 
@@ -50,8 +50,8 @@ class ProjectListScreen extends ConsumerWidget {
                 );
               },
             ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, st) => ErrorApp(message: 'Erreur in Projet : $e'),
+        loading: () => const LoadingApp(),
+        error: (e, st) => ErrorApp(message: 'Erreur in Projet List: $e'),
       ),
     );
   }

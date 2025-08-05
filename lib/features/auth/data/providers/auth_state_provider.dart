@@ -34,7 +34,7 @@ final authStateProvider = Provider<AsyncValue<User>>((ref) {
 
 /// Charge son profil Firestore
 final userProfileProvider = FutureProvider<UserModel?>((ref) async {
-  final user = ref.watch(authStateChangesProvider).value;
+  final user = ref.watch(appUserProvider).value;
   if (user == null) return null;
   final doc =
       await ref
@@ -47,20 +47,15 @@ final userProfileProvider = FutureProvider<UserModel?>((ref) async {
 });
 
 /// 🔑 Récupère le AppUser (depuis Firestore) pour l'utilisateur connecté
-final appUserProvider = FutureProvider<AppUser?>((ref) async {
-  final user = ref.watch(authStateProvider);
-  if (user.value == null) return null;
+final appUserProvider = StreamProvider<AppUser?>((ref) {
+  final auth = ref.watch(authStateChangesProvider).value;
+  if (auth == null) return Stream.value(null);
 
-  final snapshot =
-      await ref
-          .watch(firestoreProvider)
-          .collection('users')
-          .doc(user.value?.uid)
-          .get();
-
-  if (!snapshot.exists) return null;
-
-  return AppUser.fromJson(snapshot.data()!);
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(auth.uid)
+      .snapshots()
+      .map((snap) => AppUser.fromJson(snap.data()!));
 });
 
 final allUsersProfileProvider = StreamProvider<List<UserModel>>((ref) {
@@ -78,17 +73,4 @@ final usersByRoleProvider = FutureProvider.family<List<UserModel>, String>((
   final query =
       await firestore.collection('users').where('role', isEqualTo: role).get();
   return query.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
-});
-
-final currentUserProvider = StreamProvider<AppUser?>((ref) {
-  final auth = FirebaseAuth.instance;
-  return auth.authStateChanges().asyncMap((user) async {
-    if (user == null) return null;
-    final doc =
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
-    return doc.exists ? AppUser.fromJson(doc.data()!) : null;
-  });
 });

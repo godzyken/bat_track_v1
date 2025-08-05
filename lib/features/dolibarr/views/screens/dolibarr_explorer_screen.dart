@@ -173,7 +173,9 @@ class _DolibarrExplorerScreenState
                             () => const Center(
                               child: CircularProgressIndicator.adaptive(),
                             ),
-                        error: (err, _) => Center(child: Text('Erreur : $err')),
+                        error:
+                            (err, _) =>
+                                Center(child: ErrorWidget('Erreur : $err')),
                       ),
             ),
           ],

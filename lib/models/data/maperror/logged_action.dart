@@ -1,15 +1,15 @@
 import 'dart:convert';
 
+import 'package:bat_track_v1/data/remote/providers/catch_error_provider.dart';
 import 'package:bat_track_v1/models/data/maperror/log_entry.dart';
 import 'package:bat_track_v1/models/notifiers/logged_notifier.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 mixin LoggedAction {
-  late Ref _ref;
+  late Reader _ref;
 
-  void initLogger(Ref ref) {
+  void initLogger(Reader ref) {
     _ref = ref;
   }
 
@@ -38,7 +38,7 @@ mixin LoggedAction {
       );
     }
 
-    _ref.read(loggerNotifierProvider.notifier).log(message);
+    _ref(loggerNotifierProvider.notifier).log(message);
   }
 
   void logEvent({
@@ -65,7 +65,7 @@ mixin LoggedAction {
         ),
       );
     }
-    _ref.read(loggerNotifierProvider.notifier).log(message);
+    _ref(loggerNotifierProvider.notifier).log(message);
   }
 
   void logError({
@@ -91,6 +91,6 @@ mixin LoggedAction {
         ),
       );
     }
-    _ref.read(loggerNotifierProvider.notifier).log(message);
+    _ref(loggerNotifierProvider.notifier).log(message);
   }
 }

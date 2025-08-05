@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,10 +24,11 @@ class ChantierDetailLoader extends ConsumerWidget {
             : ref.watch(chantierFutureProvider(chantierId));
 
     return chantierAsync.when(
-      loading:
-          () =>
-              const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) => Scaffold(body: Center(child: Text('Erreur : $e'))),
+      loading: () => const LoadingApp(),
+      error:
+          (e, _) => ErrorApp(
+            message: "Erreur lors du chargement des détails du chantier : $e",
+          ),
       data: (chantier) {
         if (chantier == null) {
           return const Scaffold(

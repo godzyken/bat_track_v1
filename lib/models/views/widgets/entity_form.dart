@@ -4,6 +4,7 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../features/auth/data/notifiers/auth_notifier.dart';
 import '../../../features/auth/data/providers/auth_state_provider.dart';
 import '../../../features/auth/views/widgets/multi_user_dropdown_field.dart';
 import '../../../features/auth/views/widgets/user_dropdown_field.dart';
@@ -94,6 +95,7 @@ class _EntityFormState<T extends JsonModel>
     final k = key.toLowerCase();
     if (k.contains('email')) return [AutofillHints.email];
     if (k.contains('name')) return [AutofillHints.name];
+    if (k.contains('newname')) return [AutofillHints.newUsername];
     if (k.contains('prenom')) return [AutofillHints.givenName];
     if (k.contains('nom')) return [AutofillHints.familyName];
     if (k.contains('tel')) return [AutofillHints.telephoneNumber];
@@ -101,6 +103,9 @@ class _EntityFormState<T extends JsonModel>
     if (k.contains('postal')) return [AutofillHints.postalCode];
     if (k.contains('ville')) return [AutofillHints.addressCity];
     if (k.contains('mdp') || k.contains('motdepasse')) {
+      return [AutofillHints.password];
+    }
+    if (k.contains('nouveaumdp') || k.contains('nouveaumotdepasse')) {
       return [AutofillHints.newPassword];
     }
     if (k.contains('username') || k.contains('identifiant')) {
@@ -119,7 +124,7 @@ class _EntityFormState<T extends JsonModel>
   }) {
     final autofill = _getAutofillHints(key);
     // 👤 Champs utilisateurs spécifiques par rôle
-    if (key == 'clientId') {
+    if (key == 'clientId' && T.toString() != 'AppUser') {
       return UserDropdownField(
         role: 'client',
         label: 'Client assigné',
@@ -130,12 +135,12 @@ class _EntityFormState<T extends JsonModel>
         },
       );
     }
-    if (key == 'technicienIds' && value is List) {
+    if (key == 'technicienIds' && value is List && T.toString() != 'AppUser') {
       return MultiUserDropdownField(
         selectedUserIds: List<String>.from(value),
         onChanged: (newList) => onChanged(newList),
         role: 'technicien',
-        companyId: ref.watch(currentUserProvider).value?.company,
+        companyId: ref.watch(appUserProvider).value?.company,
       );
     }
 
@@ -198,6 +203,19 @@ class _EntityFormState<T extends JsonModel>
         autofillHints: autofill,
       );
     }
+    if (key.toLowerCase().contains('motdepasse') || key == 'motDePasse') {
+      return TextFormField(
+        key: ValueKey(key),
+        controller: controller,
+        decoration: const InputDecoration(labelText: 'Mot de passe'),
+        obscureText: true,
+        validator: (v) {
+          if ((v ?? '').length < 6) return 'Mot de passe trop court';
+          return null;
+        },
+      );
+    }
+
     return TextFormField(
       key: ValueKey(key),
       controller: controller,
@@ -207,7 +225,7 @@ class _EntityFormState<T extends JsonModel>
     );
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final result = <String, dynamic>{};
     for (final key in _json.keys) {
@@ -220,6 +238,48 @@ class _EntityFormState<T extends JsonModel>
                       original is JsonModel))
               ? json.decode(raw)
               : _parseValue(original, _controllers[key]!.text);
+    }
+    // 🔐 Création spécifique Firebase pour AppUser
+    if (T.toString() == 'AppUser') {
+      try {
+        final email = result['email'] as String?;
+        final password = result['motDePasse'] as String?;
+        if (email == null || password == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Email et mot de passe requis")),
+          );
+          return;
+        }
+
+        // Enregistrement dans Firebase Auth
+        final userCredential = await ref
+            .read(authStateNotifierProvider.notifier)
+            .signUpWithEmail(
+              email: email,
+              password: password,
+              name: '',
+              role: '',
+              company: '',
+            );
+
+        if (userCredential == null || userCredential.user == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Échec de création de l'utilisateur")),
+          );
+          return;
+        }
+
+        // Injecter l’UID dans les données
+        result['uid'] = userCredential.user!.uid;
+
+        // Enlever le mot de passe (ne doit pas être sauvegardé)
+        result.remove('motDePasse');
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Erreur : ${e.toString()}")));
+        return;
+      }
     }
     widget.onSubmit(widget.fromJson(result));
     Navigator.of(context).pop();

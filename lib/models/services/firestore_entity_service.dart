@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,16 +14,19 @@ class FirestoreEntityService<T extends JsonModel>
     implements EntityService<T> {
   final String collectionPath;
   final T Function(Map<String, dynamic>) fromJson;
-  final Ref ref;
+
+  late Ref ref;
   Function(dynamic query)? queryBuilder;
 
   FirestoreEntityService({
     required this.collectionPath,
     required this.fromJson,
-    required this.ref,
     this.queryBuilder,
-  }) {
-    initSafeAsync(ref);
+  });
+
+  void initWithRef(Ref ref) {
+    this.ref = ref;
+    initSafeAsync(ref.read);
   }
 
   @override
@@ -120,4 +125,23 @@ class FirestoreEntityService<T extends JsonModel>
 
   @override
   Future<List<T>> where(bool Function(T p1)) => throw UnimplementedError();
+
+  @override
+  Stream<List<T>> watchByChantier(String chantierId) {
+    return FirestoreService.watchCollection<T>(
+      collectionPath: collectionPath,
+      fromJson: fromJson,
+      queryBuilder: (query) => query.where('chantierId', isEqualTo: chantierId),
+    );
+  }
+}
+
+class FirestoreEntityServiceConfig<T extends JsonModel> {
+  final String collectionPath;
+  final T Function(Map<String, dynamic>) fromJson;
+
+  const FirestoreEntityServiceConfig({
+    required this.collectionPath,
+    required this.fromJson,
+  });
 }

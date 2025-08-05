@@ -1,6 +1,6 @@
+import 'package:bat_track_v1/data/remote/providers/catch_error_provider.dart';
 import 'package:bat_track_v1/models/data/adapter/safe_async_mixin.dart';
 import 'package:bat_track_v1/models/data/maperror/fallback_factory.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/json_model.dart';
 import '../data/maperror/exceptions.dart';
@@ -12,7 +12,7 @@ class LoggedEntityService<T extends JsonModel>
     implements EntityService<T> {
   final EntityService<T> _delegate;
 
-  LoggedEntityService(this._delegate, Ref ref) {
+  LoggedEntityService(this._delegate, Reader ref) {
     initLogger(ref);
     initSafeAsync(ref);
   }
@@ -179,5 +179,19 @@ class LoggedEntityService<T extends JsonModel>
   Future<void> init() async {
     await safeVoid(() => _delegate.init(), context: 'init<$T>');
     logAction(action: 'init', target: '$T');
+  }
+
+  @override
+  Stream<List<T>> watchByChantier(String chantierId) {
+    final result = _delegate.watchByChantier(chantierId);
+
+    return result.map((list) {
+      logAction(
+        action: 'watchByChantier',
+        target: '$T/$chantierId',
+        data: list.map((e) => e.toJson()).toList(),
+      );
+      return list;
+    });
   }
 }

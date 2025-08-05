@@ -32,7 +32,7 @@ class EntityList<T extends JsonModel> extends ConsumerWidget {
 
     return items.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) => Center(child: Text('Erreur : $e')),
+      error: (e, st) => Center(child: ErrorWidget('Erreur : $e')),
       data: (list) {
         if (list.isEmpty) {
           return const Center(child: Text('Aucun élément'));

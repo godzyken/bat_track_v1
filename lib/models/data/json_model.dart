@@ -44,6 +44,7 @@ mixin class Serializable {
 mixin JsonSerializableModel<T> on JsonModel<T> {
   static T? copyWithId<T>(String? id) => throw UnimplementedError();
 
+  @override
   Map<String, dynamic> toJson();
 
   static T? fromJson<T>(Map<String, dynamic> json) =>

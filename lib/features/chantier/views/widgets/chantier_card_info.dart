@@ -49,11 +49,19 @@ class ChantierCardInfo extends ConsumerWidget {
           children: [
             TextFormField(
               initialValue: chantier.nom,
-              decoration: const InputDecoration(labelText: 'Nom'),
+              decoration: const InputDecoration(
+                labelText: 'Nom',
+                hintText: 'Nom du chantier',
+              ),
               onChanged: (value) => onChanged(chantier.copyWith(nom: value)),
               keyboardType: TextInputType.name,
               autofillHints: const [AutofillHints.name],
-              validator: (value) {},
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Le nom est obligatoire';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -66,7 +74,6 @@ class ChantierCardInfo extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
 
-            /// Todo: client id a regler
             TextFormField(
               initialValue: chantier.clientId,
               decoration: const InputDecoration(labelText: 'Client ID'),

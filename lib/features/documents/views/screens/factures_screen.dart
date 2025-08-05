@@ -27,16 +27,23 @@ class FacturesScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.picture_as_pdf),
-            tooltip: 'Imprimer un pdf',
+            tooltip: 'Exporter les factures en pdf',
             onPressed: () async {
-              final factures =
-                  await ref.read(factureSyncServiceProvider).getAll();
-              // Utilise le service ou provider PDF correct ici
-              final service = ref.read(pdfGeneratorProvider);
-              final pdfDoc = await service.generatePdfDocument(factures);
-              final bytes = await pdfDoc.save();
-
-              await Printing.layoutPdf(onLayout: (_) => bytes);
+              try {
+                final factures =
+                    await ref.read(factureSyncServiceProvider).getAll();
+                final service = ref.read(pdfGeneratorProvider);
+                final pdfDoc = await service.generatePdfDocument(factures);
+                final bytes = await pdfDoc.save();
+                await Printing.layoutPdf(onLayout: (_) => bytes);
+              } catch (e, st) {
+                debugPrint('Erreur PDF : $e\n$st');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Erreur lors de la génération du PDF'),
+                  ),
+                );
+              }
             },
           ),
         ],
@@ -60,7 +67,33 @@ class FacturesScreen extends ConsumerWidget {
                     onChanged,
                     expertMode,
                   ) {
-                    // Optionnel : personnalise ici si besoin
+                    // Options a personnaliser ici
+                    switch (key) {
+                      case 'numero':
+                        return TextFormField(
+                          controller: controller,
+                          decoration: const InputDecoration(
+                            labelText: 'Numéro de facture',
+                          ),
+                          onChanged: onChanged,
+                          validator:
+                              (value) =>
+                                  value == null || value.isEmpty
+                                      ? 'Champs requis'
+                                      : null,
+                        );
+                      case 'total':
+                        return TextFormField(
+                          controller: controller,
+                          decoration: const InputDecoration(
+                            labelText: 'Total (€)',
+                          ),
+                          onChanged: onChanged,
+                          keyboardType: TextInputType.number,
+                        );
+                      default:
+                        return null;
+                    }
                   },
                   onSubmit: (updated) async {
                     await ref.read(invoiceSyncServiceProvider).syncOne(updated);

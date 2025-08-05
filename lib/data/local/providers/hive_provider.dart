@@ -181,14 +181,19 @@ final filteredAppUserServiceProvider = Provider<LoggedEntityService<AppUser>>((
 ) {
   final authUser = ref.watch(appUserProvider).value;
   final delegate = FirestoreEntityService<AppUser>(
-    ref: ref,
     collectionPath: 'users',
     fromJson: AppUser.fromJson,
     queryBuilder:
         (query) => query.where('company', isEqualTo: authUser?.company),
   );
-  return LoggedEntityService(delegate, ref);
+  return LoggedEntityService(delegate, ref.read);
 });
+
+final watchPiecesByChantierProvider = StreamProvider.autoDispose
+    .family<List<Piece>, String>((ref, chantierId) {
+      final service = ref.watch(pieceServiceProvider);
+      return service.watchByChantier(chantierId);
+    });
 
 final chantierServiceProvider = buildEntityServiceProvider<Chantier>(
   collectionPath: 'chantiers',

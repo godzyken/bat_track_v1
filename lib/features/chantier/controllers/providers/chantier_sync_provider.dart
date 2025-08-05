@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/features/chantier/controllers/notifiers/chantiers_list_notifier.dart';
 import 'package:bat_track_v1/models/services/file_sync_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +8,7 @@ import '../../../../data/local/services/service_type.dart';
 import '../../../../models/data/state_wrapper/wrappers.dart';
 import '../../../../models/notifiers/sync_entity_notifier.dart';
 import '../../../../models/services/entity_sync_services.dart';
+import '../../../auth/data/providers/auth_state_provider.dart';
 
 final chantierInitialProvider = FutureProvider.family<Chantier, String>((
   ref,
@@ -100,6 +102,36 @@ final projetSyncServiceProvider = Provider<EntitySyncService<Projet>>(
 final userSyncServiceProvider = Provider<EntitySyncService<UserModel>>(
   (ref) => EntitySyncService<UserModel>('users'),
 );
+
+final filteredChantiersProvider = Provider<AsyncValue<List<Chantier>>>((ref) {
+  final chantierAsync = ref.watch(chantierListProvider);
+  final userAsync = ref.watch(appUserProvider);
+
+  if (userAsync.isLoading) return const AsyncValue.loading();
+  if (userAsync.hasError)
+    return AsyncValue.error(userAsync.error!, StackTrace.current);
+
+  final user = userAsync.value;
+
+  if (user == null) {
+    return const AsyncValue.data([]);
+  }
+
+  final isAdmin = user.role == 'admin';
+  final isClient = user.role == 'client';
+  final isTechnicien = user.role == 'technicien';
+
+  return chantierAsync.whenData((list) {
+    if (isAdmin) return list;
+    if (isClient) {
+      return list.where((c) => c.clientId == user.uid).toList();
+    }
+    if (isTechnicien) {
+      return list.where((c) => c.technicienIds.contains(user.uid)).toList();
+    }
+    return [];
+  });
+});
 
 final syncAllProvider = Provider(
   (ref) => () async {

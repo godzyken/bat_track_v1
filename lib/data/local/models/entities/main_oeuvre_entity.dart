@@ -25,8 +25,12 @@ class MainOeuvreEntity extends HiveObject implements HiveModel<MainOeuvre> {
   @HiveField(5)
   final bool? isActive;
 
+  @HiveField(6)
+  final String chantierId;
+
   MainOeuvreEntity({
     required this.moId,
+    required this.chantierId,
     required this.idTechnicien,
     required this.heuresEstimees,
     this.moUpdatedAt,
@@ -37,6 +41,7 @@ class MainOeuvreEntity extends HiveObject implements HiveModel<MainOeuvre> {
   factory MainOeuvreEntity.fromModel(MainOeuvre model) {
     return MainOeuvreEntity(
       moId: model.id,
+      chantierId: model.chantierId,
       idTechnicien: model.idTechnicien!,
       heuresEstimees: model.heuresEstimees,
       moUpdatedAt: model.updatedAt,
@@ -52,6 +57,7 @@ class MainOeuvreEntity extends HiveObject implements HiveModel<MainOeuvre> {
   @override
   MainOeuvre toModel() => MainOeuvre(
     id: id,
+    chantierId: chantierId,
     idTechnicien: idTechnicien,
     heuresEstimees: heuresEstimees,
     dateDebut: dateCreate,

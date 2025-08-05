@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,8 +23,11 @@ class UserDropdownField extends ConsumerWidget {
     final usersAsync = ref.watch(usersByRoleProvider(role));
 
     return usersAsync.when(
-      loading: () => const CircularProgressIndicator(),
-      error: (e, _) => Text("Erreur: $e"),
+      loading: () => const LoadingApp(),
+      error:
+          (e, _) => ErrorApp(
+            message: "Erreur lors de la selection d'utilisateur : $e",
+          ),
       data: (users) {
         return DropdownButtonFormField<String>(
           value: selectedUserId?.isEmpty ?? true ? null : selectedUserId,

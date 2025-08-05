@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
+import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,8 +19,11 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Dashboard')),
       body: statsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        loading: () => const LoadingApp(),
+        error:
+            (e, _) => ErrorApp(
+              message: "Erreur lors de la connection au dashboard : $e",
+            ),
         data: (stats) {
           final pie = InterventionPieChart(data: stats);
           final bar = InterventionBarChart(data: stats);

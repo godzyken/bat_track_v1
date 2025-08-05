@@ -11,10 +11,9 @@ Provider<LoggedEntityService<T>> buildEntityServiceProvider<
 >({required String collectionPath, required FromJson<T> fromJson}) {
   return Provider<LoggedEntityService<T>>((ref) {
     final delegate = FirestoreEntityService<T>(
-      ref: ref,
       collectionPath: collectionPath,
       fromJson: fromJson,
     );
-    return LoggedEntityService(delegate, ref);
+    return LoggedEntityService(delegate, ref.read);
   });
 }

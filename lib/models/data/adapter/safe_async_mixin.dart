@@ -1,17 +1,19 @@
+import 'package:bat_track_v1/data/remote/providers/catch_error_provider.dart';
 import 'package:bat_track_v1/models/data/maperror/logged_action.dart';
 import 'package:bat_track_v1/models/data/state_wrapper/analitics/crashlytics_wrapper.dart';
 import 'package:bat_track_v1/models/data/state_wrapper/wrappers_errors.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../data/remote/notifiers/erreur_handling.dart';
 
 mixin SafeAsyncMixin<T> on LoggedAction {
-  late Ref ref;
+  late Reader _ref;
 
-  void initSafeAsync(Ref ref) {
-    this.ref = ref;
+  void initSafeAsync(Reader ref) {
+    this._ref = ref;
     initLogger(ref);
   }
 
-  /// Safe call for any Future<T>
+  /// Safe call for any Future T
   Future<R> safeAsync<R>(
     Future<R> Function() callback, {
     String? context,
@@ -27,7 +29,7 @@ mixin SafeAsyncMixin<T> on LoggedAction {
     }
   }
 
-  /// Safe call for Future<void>
+  /// Safe call for Future void
   Future<void> safeVoid(
     Future<void> Function() callback, {
     String? context,
@@ -57,6 +59,19 @@ mixin SafeAsyncMixin<T> on LoggedAction {
       );
     }
 
-    await CrashlyticsWrapper.captureException(error, stack, hint: label);
+    await CrashlyticsWrapper.captureException(error, stack, _ref);
+    await SentryWrapper.captureException(error, stack, hint: label);
+  }
+
+  Future<R?> catchAsync<R>(Future<R> Function() fn, {String? context}) async {
+    final logger = _ref(loggerProvider);
+    final ui = _ref(uiFeedbackProvider);
+    try {
+      return await fn();
+    } catch (error, stack) {
+      logger.e('Erreur $context', error: error, stackTrace: stack);
+      ui.showError('Erreur : $context');
+      return null;
+    }
   }
 }

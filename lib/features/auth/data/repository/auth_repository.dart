@@ -33,8 +33,8 @@ class AuthRepository {
       await firestore.collection('users').doc(user.uid).set({
         'uid': user.uid,
         'name': name,
-        'société': societe,
-        'rôle': 'tech', // par défaut
+        'company': societe,
+        'role': 'tech', // par défaut
         'createdAt': FieldValue.serverTimestamp(),
       });
     }
@@ -48,11 +48,25 @@ class AuthRepository {
       await doc.set({
         'uid': user.uid,
         'name': user.email?.split('@').first ?? '',
-        'société': '',
-        'rôle': 'tech',
+        'company': '',
+        'role': 'tech',
         'createdAt': FieldValue.serverTimestamp(),
       });
     }
+  }
+
+  Future<void> updateUserProfile({
+    required String uid,
+    String? name,
+    String? company,
+    String? role,
+  }) async {
+    final data = <String, dynamic>{};
+    if (name != null) data['name'] = name;
+    if (company != null) data['company'] = company;
+    if (role != null) data['role'] = role;
+
+    await firestore.collection('users').doc(uid).update(data);
   }
 
   Future<void> signOut() async => auth.signOut();

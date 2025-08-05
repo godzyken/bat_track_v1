@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../data/local/models/utilisateurs/user.dart';
 import '../../../../models/views/widgets/entity_form.dart';
-import '../../data/providers/auth_state_provider.dart';
+import '../../data/repository/auth_repository.dart';
 
-class RegisterScreen extends ConsumerWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
+  String? error;
+
+  @override
+  Widget build(BuildContext context) {
+    final passwordCtrl = TextEditingController();
+
     return Scaffold(
       appBar: AppBar(title: const Text("Créer un compte")),
       body: Center(
@@ -18,48 +28,48 @@ class RegisterScreen extends ConsumerWidget {
           onPressed: () {
             showDialog(
               context: context,
-              builder:
-                  (_) => EntityForm<UserModel>(
-                    fromJson: UserModel.fromJson,
-                    createEmpty:
-                        () => UserModel(
-                          id: '',
-                          name: '',
-                          email: '',
-                          role: UserRole.values.byName('tech'),
-                          createAt: DateTime.now(),
-                        ),
-                    onSubmit: (user) async {
-                      try {
-                        final auth = ref.read(firebaseAuthProvider);
-                        final firestore = ref.read(firestoreProvider);
-
-                        // Crée compte Firebase Auth
-                        final cred = await auth.createUserWithEmailAndPassword(
-                          email: user.email,
-                          password:
-                              'MotDePasseTemporaire1!', // Tu peux demander un champ "mdp" aussi
-                        );
-
-                        // Enregistre le profil dans Firestore
-                        await firestore
-                            .collection('users')
-                            .doc(cred.user!.uid)
-                            .set(user.copyWith(id: cred.user!.uid).toJson());
-
-                        // Redirection ou message
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Compte créé avec succès"),
-                          ),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text("Erreur : $e")));
-                      }
-                    },
+              builder: (_) {
+                return AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      EntityForm<UserModel>(
+                        fromJson: UserModel.fromJson,
+                        createEmpty:
+                            () => UserModel(
+                              id: '',
+                              name: '',
+                              email: '',
+                              role: UserRole.technicien,
+                              createAt: DateTime.now(),
+                            ),
+                        onSubmit: (user) async {
+                          try {
+                            await ref
+                                .read(authRepositoryProvider)
+                                .register(
+                                  user.email,
+                                  passwordCtrl.text.trim(),
+                                  user.name,
+                                  user.company ?? '',
+                                );
+                            if (context.mounted) {
+                              context.pop(); // Ferme le dialog
+                            }
+                            if (context.mounted) {
+                              context.pushReplacementNamed('/');
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Erreur: $e')),
+                            );
+                          }
+                        },
+                      ),
+                    ],
                   ),
+                );
+              },
             );
           },
         ),

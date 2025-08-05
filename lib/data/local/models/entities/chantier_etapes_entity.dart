@@ -35,6 +35,8 @@ class ChantierEtapesEntity extends HiveObject
   final DateTime? ceUpdatedAt;
   @HiveField(13)
   final String statut;
+  @HiveField(14)
+  final List<String>? techniciens;
 
   ChantierEtapesEntity({
     required this.ceId,
@@ -51,6 +53,7 @@ class ChantierEtapesEntity extends HiveObject
     required this.budget,
     required this.terminee,
     required this.ceUpdatedAt,
+    this.techniciens,
   });
 
   factory ChantierEtapesEntity.fromModel(ChantierEtape model) {
@@ -69,6 +72,7 @@ class ChantierEtapesEntity extends HiveObject
       budget: model.budget,
       terminee: model.terminee,
       ceUpdatedAt: model.updatedAt,
+      techniciens: model.techniciens,
     );
   }
 
@@ -92,6 +96,7 @@ class ChantierEtapesEntity extends HiveObject
     updatedAt: updatedAt,
     timeline: timeline,
     budget: budget,
+    techniciens: techniciens,
   );
 
   @override

@@ -16,26 +16,23 @@ class Piece with _$Piece, JsonModel<Piece>, JsonSerializableModel<Piece> {
     required String id,
     required String nom,
     required double surface,
+    required String addedBy,
     List<Materiau>? materiaux,
     List<Materiel>? materiels,
     List<MainOeuvre>? mainOeuvre,
     DateTime? updatedAt,
+    bool? validatedByTech,
   }) = _Piece;
 
   /// Factory JSON corrigée pour forcer la présence de 'id'
   factory Piece.fromJson(Map<String, dynamic> json) => _$PieceFromJson(json);
 
-  /*  @override
-  Piece fromJson(Map<String, dynamic> json) => Piece.fromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$PieceToJson(this);
-
-  @override
-  Piece copyWithId(String? id) => copyWith(id: id ?? this.id);*/
-
-  factory Piece.mock() =>
-      Piece(id: const Uuid().v4(), nom: 'Cuisine', surface: 32.60);
+  factory Piece.mock() => Piece(
+    id: const Uuid().v4(),
+    nom: 'Cuisine',
+    surface: 32.60,
+    addedBy: 'Sarl Company Dugazon',
+  );
 
   double getBudgetTotal(List<Technicien> techniciens) {
     return BudgetGen.calculerTotalMulti(

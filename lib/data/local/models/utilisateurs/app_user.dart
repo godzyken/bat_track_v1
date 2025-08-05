@@ -16,6 +16,7 @@ class AppUser with _$AppUser implements JsonModel {
     required String email,
     required String role,
     String? company,
+    @JsonKey(includeFromJson: false, includeToJson: false) String? motDePasse,
     @DateTimeIsoConverter() required DateTime createdAt,
     @NullableDateTimeIsoConverter() DateTime? appUpdatedAt,
     @Default(false) bool? appIsUpdated,
@@ -30,6 +31,7 @@ class AppUser with _$AppUser implements JsonModel {
     email: '',
     role: '',
     createdAt: tryParseDate('')!,
+    motDePasse: '',
   );
 
   @override

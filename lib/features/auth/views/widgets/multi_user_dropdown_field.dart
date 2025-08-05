@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -40,7 +41,7 @@ class MultiUserDropdownField extends ConsumerWidget {
                   filtered.map((user) {
                     final isSelected = selectedUserIds.contains(user.id);
                     return FilterChip(
-                      label: Text(user.name ?? user.email),
+                      label: Text(user.company ?? user.name),
                       selected: isSelected,
                       onSelected: (selected) {
                         final updated = List<String>.from(selectedUserIds);
@@ -57,8 +58,11 @@ class MultiUserDropdownField extends ConsumerWidget {
           ],
         );
       },
-      loading: () => const CircularProgressIndicator(),
-      error: (e, _) => Text("Erreur: $e"),
+      loading: () => const LoadingApp(),
+      error:
+          (e, _) => ErrorApp(
+            message: "Erreur lors de la selection des utilisateurs : $e",
+          ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
+import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,8 +16,12 @@ class AdminHomeScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Admin - Utilisateurs")),
       body: usersAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text("Erreur: $e")),
+        loading: () => const LoadingApp(),
+        error:
+            (e, _) => ErrorApp(
+              message:
+                  "Erreur lors de la connection au profile administrateur : $e",
+            ),
         data:
             (users) => ListView.builder(
               itemCount: users.length,

@@ -15,8 +15,41 @@ import '../../controllers/providers/chantier_sync_provider.dart';
 
 class ChantierDetailScreen extends ConsumerWidget {
   final Chantier chantier;
+  final bool isClient;
+  final bool isTechnicien;
+  final String? userId;
 
-  const ChantierDetailScreen({super.key, required this.chantier});
+  const ChantierDetailScreen({
+    super.key,
+    required this.chantier,
+    this.isClient = false,
+    this.isTechnicien = false,
+    this.userId,
+  });
+
+  bool get chantierModifiable {
+    final now = DateTime.now();
+    return chantier.dateFin!.isAfter(now) &&
+        ['à faire', 'en cours'].contains(chantier.etat?.toLowerCase());
+  }
+
+  bool canModifyEtape(ChantierEtape etape) {
+    final now = DateTime.now();
+    if (isClient) return chantierModifiable;
+    if (isTechnicien) {
+      return etape.techniciens!.contains(userId) &&
+          (etape.dateFin.isAfter(now) ?? true);
+    }
+    return true; // admin ou autre
+  }
+
+  bool get chantierEstTermine {
+    return chantier.etapes.every((e) => e.terminee) &&
+        chantier.clientValide &&
+        chantier.chefDeProjetValide &&
+        chantier.techniciensValides &&
+        chantier.superUtilisateurValide;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -133,23 +166,43 @@ class ChantierDetailScreen extends ConsumerWidget {
                       // Étapes avec timeline interactive
                       SectionCard(
                         title: "Étapes du chantier",
-                        child: ChantiersEtapeKanbanInteractive(
-                          etapes: chantier.etapes,
-                          onReorder: (reordered) {
-                            notifier.update(
-                              chantier.copyWith(etapes: reordered),
-                            );
-                          },
-                          onDelete: (id) {
-                            notifier.update(
-                              chantier.copyWith(
-                                etapes: chantier.etapes
-                                    .where((e) => e.id != id.toString())
-                                    .toList(),
-                              ),
-                            );
-                          },
-                        ),
+                        child:
+                            chantierEstTermine
+                                ? ChantiersEtapeKanbanReadOnly(
+                                  etapes: chantier.etapes,
+                                )
+                                : ChantiersEtapeKanbanInteractive(
+                                  etapes: chantier.etapes,
+                                  canEditEtape: canModifyEtape,
+                                  onReorder: (reordered) {
+                                    notifier.update(
+                                      chantier.copyWith(etapes: reordered),
+                                    );
+                                  },
+                                  onDelete: (id) {
+                                    notifier.update(
+                                      chantier.copyWith(
+                                        etapes:
+                                            chantier.etapes
+                                                .where(
+                                                  (e) => e.id != id.toString(),
+                                                )
+                                                .toList(),
+                                      ),
+                                    );
+                                  },
+                                  onUpdate: (updatedEtape) {
+                                    final updatedList =
+                                        chantier.etapes.map((e) {
+                                          return e.id == updatedEtape.id
+                                              ? updatedEtape
+                                              : e;
+                                        }).toList();
+                                    notifier.update(
+                                      chantier.copyWith(etapes: updatedList),
+                                    );
+                                  },
+                                ),
                       ),
                     ],
                   ),

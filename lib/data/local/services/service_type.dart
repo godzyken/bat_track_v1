@@ -150,6 +150,18 @@ class EntityServices<T extends JsonModel>
       await delete(item.id);
     }
   }
+
+  @override
+  Stream<List<T>> watchByChantier(String chantierId) async* {
+    final box = await HiveService.box<T>(boxName);
+    yield* box.watch().asyncMap((_) async {
+      final allItems = await getAll();
+      return allItems.where((item) {
+        final json = item.toJson();
+        return json['chantierId'] == chantierId;
+      }).toList();
+    });
+  }
 }
 
 final chantierService = EntityServices<Chantier>('chantiers');

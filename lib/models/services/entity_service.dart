@@ -37,4 +37,6 @@ abstract class EntityService<T extends JsonModel> {
   Future<void> init();
 
   Future<void> clear();
+
+  Stream<List<T>> watchByChantier(String chantierId);
 }

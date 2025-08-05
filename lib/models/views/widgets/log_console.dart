@@ -26,7 +26,7 @@ class _LogConsoleState extends ConsumerState<LogConsole> {
             onPressed: () {
               ref.read(loggerNotifierProvider.notifier).clear();
             },
-            tooltip: 'effacer le journal',
+            tooltip: 'Effacer le journal',
           ),
         ],
       ),
@@ -44,7 +44,7 @@ class _LogConsoleState extends ConsumerState<LogConsole> {
                     decoration: const InputDecoration(
                       labelText: 'Filtrer par action',
                     ),
-                    onChanged: (val) => _applyFilters(),
+                    onChanged: (_) => _applyFilters(),
                   ),
                 ),
                 SizedBox(
@@ -54,7 +54,7 @@ class _LogConsoleState extends ConsumerState<LogConsole> {
                     decoration: const InputDecoration(
                       labelText: 'Filtrer par entité',
                     ),
-                    onChanged: (val) => _applyFilters(),
+                    onChanged: (_) => _applyFilters(),
                   ),
                 ),
                 IconButton(
@@ -69,18 +69,22 @@ class _LogConsoleState extends ConsumerState<LogConsole> {
               ],
             ),
           ),
+          const Divider(height: 0),
           Expanded(
-            child: ListView.builder(
-              itemCount: logs.length,
-              itemBuilder: (_, i) {
-                final log = logs[i];
-                return ListTile(
-                  title: Text('${log.action} → ${log.target}'),
-                  subtitle: Text(log.data?.toString() ?? ''),
-                  dense: true,
-                );
-              },
-            ),
+            child:
+                logs.isEmpty
+                    ? const Center(child: Text('Aucun log pour l’instant.'))
+                    : ListView.builder(
+                      itemCount: logs.length,
+                      itemBuilder: (_, i) {
+                        final log = logs[i];
+                        return ListTile(
+                          title: Text('${log.action} → ${log.target}'),
+                          subtitle: Text(log.data?.toString() ?? ''),
+                          dense: true,
+                        );
+                      },
+                    ),
           ),
         ],
       ),

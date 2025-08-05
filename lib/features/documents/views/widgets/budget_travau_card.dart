@@ -267,7 +267,7 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Erreur de chargement : $e')),
+      error: (e, _) => Center(child: ErrorWidget('Erreur de chargement : $e')),
     );
   }
 

@@ -6,18 +6,26 @@ import '../../../../data/local/providers/hive_provider.dart';
 
 class KanbanColumn extends ConsumerWidget {
   final String statut;
-  const KanbanColumn({super.key, required this.statut});
+  final List<ChantierEtape> etapes;
+  final void Function(ChantierEtape etape) onDrop;
+
+  const KanbanColumn({
+    super.key,
+    required this.statut,
+    required this.etapes,
+    required this.onDrop,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final etapes =
-        ref.watch(allEtapesProvider).where((e) => e.statut == statut).toList();
-
     return Expanded(
       child: DragTarget<ChantierEtape>(
-        onAcceptWithDetails: (etape) {
-          final updated = etape.copyWith(statut: statut);
-          ref.read(chantierEtapeServiceProvider).update(updated, etape.data.id);
+        onAcceptWithDetails: (details) {
+          final updated = details.data.copyWith(statut: statut);
+          ref
+              .read(chantierEtapeServiceProvider)
+              .update(updated, details.data.id);
+          onDrop(updated); // Optionnel : notifie le parent
         },
         builder:
             (context, _, _) => Column(
@@ -52,11 +60,5 @@ class KanbanColumn extends ConsumerWidget {
             ),
       ),
     );
-  }
-}
-
-extension on DragTargetDetails<ChantierEtape> {
-  ChantierEtape copyWith({required String statut}) {
-    return data.copyWith(statut: statut);
   }
 }

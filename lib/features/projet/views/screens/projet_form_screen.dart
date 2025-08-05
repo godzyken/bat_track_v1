@@ -68,7 +68,7 @@ class ProjectFormDialog extends ConsumerWidget {
             selectedUserIds: List<String>.from(value),
             onChanged: (newList) => onChanged(newList),
             role: 'technicien',
-            companyId: ref.watch(currentUserProvider).value?.company,
+            companyId: ref.watch(appUserProvider).value?.company,
           );
         }
 

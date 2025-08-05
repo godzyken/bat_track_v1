@@ -31,6 +31,7 @@ class ChantierEtape
     required int ordre,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
     required String statut,
+    List<String>? techniciens,
   }) = _ChantierEtape;
 
   factory ChantierEtape.fromJson(Map<String, dynamic> json) =>

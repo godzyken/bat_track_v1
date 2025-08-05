@@ -1,348 +1,173 @@
+import 'package:bat_track_v1/data/local/models/chantiers/chantier.dart';
 import 'package:bat_track_v1/features/auth/data/notifiers/auth_notifier.dart';
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
 import 'package:bat_track_v1/features/auth/views/screens/register_screen.dart';
-import 'package:bat_track_v1/features/dolibarr/views/screens/dolibarr_explorer_screen.dart';
-import 'package:bat_track_v1/features/equipement/views/screens/equipement_list_screen.dart';
-import 'package:bat_track_v1/models/data/json_model.dart';
-import 'package:bat_track_v1/models/data/state_wrapper/wrappers_errors.dart';
-import 'package:bat_track_v1/models/providers/observers/logging_navigator_observer.dart';
-import 'package:bat_track_v1/models/views/screens/entity_detail_screen.dart';
-import 'package:flutter/material.dart';
+import 'package:bat_track_v1/features/chantier/views/screens/chantiers_screen.dart';
+import 'package:bat_track_v1/features/documents/views/screens/factures_screen.dart';
+import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../data/local/models/index_model_extention.dart';
-import '../data/remote/providers/dolibarr_instance_provider.dart';
-import '../features/about/views/screens/about_screen.dart';
-import '../features/auth/views/screens/admin_home_screen.dart';
 import '../features/auth/views/screens/login_screen.dart';
-import '../features/chantier/views/screens/chantier_detail_loader.dart';
-import '../features/chantier/views/screens/chantier_etape_detail_screen.dart';
-import '../features/chantier/views/screens/chantier_etapes_screen.dart';
-import '../features/chantier/views/screens/chantiers_screen.dart';
-import '../features/client/views/screens/client_home_screen.dart';
-import '../features/client/views/screens/clients_screen.dart';
-import '../features/dashboard/views/screens/dashboard_screen.dart';
-import '../features/dolibarr/views/screens/dolibarr_import_client_screen.dart';
-import '../features/home/views/screens/home_screen.dart';
-import '../features/home/views/screens/pick_instance_screen.dart';
-import '../features/intervention/views/screens/interventions_screen.dart';
-import '../features/technicien/views/screens/tech_home_screen.dart';
+import '../features/chantier/views/screens/chantier_details_screen.dart';
+import '../features/chantier/views/screens/chantier_pieces_screen.dart';
 import '../features/technicien/views/screens/technitiens_screen.dart';
-import '../models/data/state_wrapper/wrappers.dart';
-import '../models/notifiers/sync_entity_notifier.dart';
+import '../models/services/navigator_key_service.dart';
 import '../providers/auth_provider.dart';
+import 'app_shell_route/frame_layout.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final hasInstance = ref.watch(selectedInstanceProvider) != null;
-  final authState = ref.watch(authStateChangesProvider);
-  final userProfile = ref.watch(userProfileProvider);
-  final userStateNotifier = ref.watch(authNotifierProvider);
-  final observer = LoggingNavigatorObserver(logger: AppLogger());
+  final authNotifier = ref.watch(authNotifierProvider);
+  final appUserAsync = ref.watch(appUserProvider);
+  //final role = ref.watch(userProfileProvider).value;
 
   return GoRouter(
-    initialLocation: '/',
-    refreshListenable: userStateNotifier,
+    refreshListenable: authNotifier,
+    initialLocation: '/loading',
+    debugLogDiagnostics: true,
+    navigatorKey: ref.read(navigatorKeyProvider),
     redirect: (context, state) {
-      final isLoggingIn =
-          state.matchedLocation == '/login' ||
-          state.matchedLocation == '/register';
+      final appUser = appUserAsync.asData?.value;
+      final isLoggedIn = appUser != null;
+      final isOnLogin = state.matchedLocation == '/login';
+      final isOnLoading = state.matchedLocation == '/loading';
 
-      final userAsync = authState;
-      final user = userAsync.asData?.value;
-      final profile = userProfile.asData?.value;
+      if (!isLoggedIn) {
+        return isOnLogin ? null : '/login';
+      }
 
-      // 1. Attente du chargement (évite redirections prématurées)
-      if (userAsync.isLoading || userAsync.hasError) return null;
-
-      // 2. Non connecté
-      if (user == null) return isLoggingIn ? null : '/login';
-
-      // 3. Connecté mais pas de profil encore chargé
-      if (profile == null) return null;
-
-      // 4. Rediriger en fonction du rôle
-      if (state.matchedLocation == '/' || isLoggingIn) {
-        switch (profile.role) {
-          case UserRole.client:
-          case UserRole.chefDeProjet:
-            return '/client';
-          case UserRole.technicien:
-            return '/tech';
-          case UserRole.superUtilisateur:
-            return '/admin';
+      if (isOnLogin || isOnLoading) {
+        switch (appUser.role) {
+          case 'Administrateur':
+            return '/admin/dashboard';
+          case 'Intervenant':
+            return '/tech/dashboard';
+          case 'Client':
+            return '/client/dashboard';
+          default:
+            return '/unauthorized';
         }
       }
 
       return null;
     },
-    observers: [observer],
     routes: [
+      GoRoute(path: '/loading', builder: (_, _) => const LoadingApp()),
+      GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
+      GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
       GoRoute(
-        path: '/login',
-        name: 'login',
-        builder: (context, state) => const LoginScreen(),
+        path: '/error',
+        builder:
+            (context, state) =>
+                const ErrorApp(message: 'Erreur d\'authentification'),
       ),
-      GoRoute(
-        path: '/register',
-        name: 'register',
-        builder: (context, state) => const RegisterScreen(),
-      ),
-      GoRoute(
-        path: '/admin',
-        name: 'admin',
-        builder: (context, state) => const AdminHomeScreen(),
-      ),
-      GoRoute(
-        path: '/tech',
-        name: 'tech',
-        builder: (context, state) => const TechHomeScreen(),
-      ),
-      GoRoute(
-        path: '/client',
-        name: 'client',
-        builder: (context, state) => const ClientHomeScreen(),
-      ),
-      GoRoute(
-        path: '/home',
-        name: 'Home',
-        builder: (context, state) => const HomeScreen(),
-        routes: [
-          GoRoute(
-            path: 'dashboard',
-            name: 'dashboard',
-            builder: (context, state) => const DashboardScreen(),
-          ),
-        ],
-      ),
-      GoRoute(
-        path: '/pick-instance',
-        name: 'pick-instance',
-        builder: (context, state) => const PickInstanceScreen(),
-      ),
-      GoRoute(
-        path: '/equipements',
-        name: 'equipements',
-        builder: (context, state) => const EquipementScreen(),
-      ),
-      GoRoute(
-        path: '/clients',
-        name: 'clients',
-        builder: (context, state) => const ClientsScreen(),
-        routes: [
-          GoRoute(
-            path: 'client/:id',
-            name: 'client-detail',
-            builder: (context, state) {
-              final id = state.pathParameters['id']!;
 
-              return EntityDetailScreen<Client>(
-                id: id,
-                title: 'Détail client',
-                builder: (
-                  BuildContext context,
-                  Client client,
-                  SyncEntityNotifier<Client> notifier,
-                  SyncedState<Client> state,
-                ) {
-                  return Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Nom : ${client.nom}',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text('Email : ${client.email}'),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () {
-                            final updated = client.copyWithId(id);
-                            notifier.update(updated);
-                          },
-                          child: const Text('Modifier email'),
-                        ),
-                        if (state.isSyncing)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 16),
-                            child: LinearProgressIndicator(),
-                          ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ],
-      ),
-      GoRoute(
-        path: '/techniciens',
-        name: 'techniciens',
-        builder: (context, state) => const TechniciensScreen(),
+      /// ----------------------------
+      /// ADMIN SHELL ROUTE
+      /// ----------------------------
+      ShellRoute(
+        builder: (context, state, child) => AdminLayout(child: child),
         routes: [
           GoRoute(
-            path: 'technicien/:id',
-            name: 'technicien-detail',
-            builder: (context, state) {
-              final id = state.pathParameters['id']!;
-              return EntityDetailScreen<Technicien>(
-                id: id,
-                title: 'Détail technicien',
-                builder: (
-                  BuildContext context,
-                  Technicien technicien,
-                  SyncEntityNotifier<Technicien> notifier,
-                  SyncedState<Technicien> state,
-                ) {
-                  return Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Nom : ${technicien.nom}',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text('Email : ${technicien.email}'),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () {
-                            final updated = technicien.copyWithId(id);
-                            notifier.update(updated);
-                          },
-                          child: const Text('Modifier email'),
-                        ),
-                        if (state.isSyncing)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 16),
-                            child: LinearProgressIndicator(),
-                          ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
+            path: '/admin/dashboard',
+            builder: (_, _) => const AdminDashboardScreen(),
           ),
-        ],
-      ),
-      GoRoute(
-        path: '/chantiers',
-        name: 'chantiers',
-        builder: (context, state) => const ChantiersScreen(),
-        routes: [
           GoRoute(
-            path: ':id',
-            name: 'chantier-detail',
-            builder: (context, state) {
-              final Chantier? passedChantier = state.extra as Chantier?;
-              final chantierId = state.pathParameters['id']!;
-              return ChantierDetailLoader(
-                chantierId: chantierId,
-                initialData: passedChantier,
-              );
-            },
+            path: '/admin/users',
+            builder: (_, _) => const AdminUserManagementScreen(),
+          ),
+          GoRoute(
+            path: '/admin/chantiers',
+            builder: (context, state) => const ChantiersScreen(),
             routes: [
-              // ✅ 1. Liste des étapes
               GoRoute(
-                path: 'etapes',
-                name: 'chantier-etapes',
+                path: ':chantierId',
                 builder: (context, state) {
-                  final chantierId = state.pathParameters['id']!;
-                  return ChantierEtapesScreen(chantierId: chantierId);
+                  final chantier = state.extra as Chantier;
+                  return ChantierDetailScreen(chantier: chantier);
                 },
-                routes: [
-                  // ✅ 2. Détail d’une étape
-                  GoRoute(
-                    path: ':etapeId',
-                    name: 'chantier-etape-detail',
-                    builder: (context, state) {
-                      final chantierId = state.pathParameters['id']!;
-                      final etapeId = state.pathParameters['etapeId']!;
-                      return ChantierEtapeDetailScreen(
-                        chantierId: chantierId,
-                        etapeId: etapeId,
-                      );
-                    },
-                  ),
-                ],
               ),
             ],
           ),
-        ],
-      ),
-      GoRoute(
-        path: '/interventions',
-        name: 'interventions',
-        builder: (context, state) => const InterventionsScreen(),
-        routes: [
           GoRoute(
-            path: 'intervention/:id',
-            name: 'intervention-detail',
-            builder: (context, state) {
-              final id = state.pathParameters['id']!;
-              return EntityDetailScreen<Intervention>(
-                id: id,
-                title: 'Détail intervention',
-                builder: (
-                  BuildContext context,
-                  Intervention intervention,
-                  SyncEntityNotifier<Intervention> notifier,
-                  SyncedState<Intervention> state,
-                ) {
-                  return Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Titre : ${intervention.titre}',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Commentaire id : ${intervention.commentaire ?? "non renseigné"}',
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () {
-                            final updated = intervention.copyWithId(id);
-                            notifier.update(updated);
-                          },
-                          child: const Text('Modifier commentaire'),
-                        ),
-                        if (state.isSyncing)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 16),
-                            child: LinearProgressIndicator(),
-                          ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
+            path: '/admin/techniciens',
+            builder: (context, state) => const TechniciensScreen(),
+          ),
+          GoRoute(
+            path: '/admin/pieces',
+            builder:
+                (context, state) => ChantierPiecesScreen(
+                  chantierId: state.pathParameters['id']!,
+                ),
+          ),
+          GoRoute(
+            path: '/admin/factures',
+            builder: (context, state) => const FacturesScreen(),
           ),
         ],
       ),
-      GoRoute(
-        path: '/about',
-        name: 'about',
-        builder: (context, state) => const AboutScreen(),
+
+      /// ----------------------------
+      /// TECH SHELL ROUTE
+      /// ----------------------------
+      ShellRoute(
+        builder: (context, state, child) => TechLayout(child: child),
+        routes: [
+          GoRoute(
+            path: '/tech/dashboard',
+            builder: (_, _) => const TechDashboardScreen(),
+          ),
+          GoRoute(
+            path: '/tech/interventions',
+            builder: (_, _) => const TechInterventionScreen(),
+          ),
+          GoRoute(
+            path: '/tech/chantiers',
+            builder: (context, state) => const ChantiersScreen(),
+            routes: [
+              GoRoute(
+                path: ':chantierId',
+                name: 'chantier-detail',
+                builder: (context, state) {
+                  final chantier = state.extra as Chantier;
+                  final isClient =
+                      state.uri.queryParameters['isClient'] == 'true';
+                  final isTechnicien =
+                      state.uri.queryParameters['isTechnicien'] == 'true';
+                  final userId = state.uri.queryParameters['userId'];
+                  return ChantierDetailScreen(
+                    chantier: chantier,
+                    isClient: isClient,
+                    isTechnicien: isTechnicien,
+                    userId: userId,
+                  );
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/tech/pieces',
+            builder:
+                (context, state) => const ChantierPiecesScreen(chantierId: ''),
+          ),
+        ],
       ),
-      GoRoute(
-        path: '/import-dolibarr',
-        name: 'import-dolibarr',
-        builder: (context, state) => const DolibarrImportScreen(),
-      ),
-      GoRoute(
-        path: '/explorer',
-        name: 'explorer',
-        builder: (context, state) => DolibarrExplorerScreen(),
+
+      /// ----------------------------
+      /// CLIENT SHELL ROUTE
+      /// ----------------------------
+      ShellRoute(
+        builder: (context, state, child) => ClientLayout(child: child),
+        routes: [
+          GoRoute(
+            path: '/client/dashboard',
+            builder: (_, _) => const ClientDashboardScreen(),
+          ),
+          GoRoute(
+            path: '/client/chantiers',
+            builder: (_, _) => const ClientChantiersScreen(),
+          ),
+        ],
       ),
     ],
   );
