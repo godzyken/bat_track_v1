@@ -41,20 +41,23 @@ mixin class Serializable {
       throw UnimplementedError('toJson() non implémenté');
 }
 
-mixin JsonSerializableModel<T> on JsonModel<T> {
-  static T? copyWithId<T>(String? id) => throw UnimplementedError();
-
-  @override
-  Map<String, dynamic> toJson();
-
-  static T? fromJson<T>(Map<String, dynamic> json) =>
-      throw UnimplementedError();
-}
-
 abstract class JsonModelWithUrl implements JsonModel {
   String? get firebaseUrl;
 
   JsonModelWithUrl copyWith({String? firebaseUrl});
+}
+
+abstract class JsonModelWithUser<T> implements JsonModel<T> {
+  String get ownerId;
+  String? get currentUserId;
+  List<String> get assignedUserIds; // Ex: techs assignés
+
+  JsonModelWithUser copyWith({
+    String? id,
+    String? ownerId,
+    String? currentUserId,
+    List<String>? assignedUserIds,
+  });
 }
 
 extension JsonModelCopyWith<T> on JsonModel<T> {
@@ -96,6 +99,31 @@ extension JsonModelCopyWith<T> on JsonModel<T> {
 }
 
 extension JsonModelFactory on JsonModel {
+  static final Map<String, dynamic Function(Map<String, dynamic>)> _builders =
+      {};
+
+  /// À appeler au boot de ton application pour chaque modèle :
+  /// JsonModelFactory.register<Projet>((json) => Projet.fromJson(json));
+  static void register<T>(T Function(Map<String, dynamic>) builder) {
+    _builders[T.toString()] = builder;
+  }
+
+  /// Retourne null si aucun builder enregistré pour T
+  static T? fromDynamic<T>(Map<String, dynamic> json) {
+    final key = T.toString();
+    final builder = _builders[key] as T Function(Map<String, dynamic>)?;
+    if (builder == null) return null;
+    return builder(json);
+  }
+
+  /// Comme above mais lance si absent (optionnel)
+  static T fromDynamicOrThrow<T>(Map<String, dynamic> json) {
+    final maybe = fromDynamic<T>(json);
+    if (maybe == null) throw Exception('No JsonModelFactory registered for $T');
+    return maybe;
+  }
+
+  /*
   static T fromDynamic<T>(dynamic data) {
     if (data is T) return data;
     if (data is! Map<String, dynamic>) {
@@ -139,10 +167,11 @@ extension JsonModelFactory on JsonModel {
         throw UnimplementedError('fromDynamic non implémenté pour $T');
     }
   }
+*/
 
   static T createEmptyEntity<T extends JsonModel>(String id) {
     final empty = fromDynamic<T>({'id': id});
-    return empty.copyWithId(id) as T;
+    return empty?.copyWithId(id) as T;
   }
 }
 

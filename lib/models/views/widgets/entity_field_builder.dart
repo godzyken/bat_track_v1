@@ -2,16 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../data/json_model.dart';
 
-typedef FieldBuilder =
-    Widget? Function(
-      BuildContext context,
-      String key,
-      dynamic value,
-      TextEditingController? controller,
-      void Function(dynamic) onChanged,
-      bool expertMode,
-    );
-
 bool isPrimitive(dynamic value) =>
     value is String ||
     value is num ||
@@ -86,7 +76,7 @@ Widget defaultFieldBuilder({
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(labelText: "$key (JSON)"),
-      style: const TextStyle(fontFamily: 'monospace'),
+      style: const TextStyle(fontFamily: 'NotoSans'),
       maxLines: 4,
       keyboardType: TextInputType.multiline,
     );

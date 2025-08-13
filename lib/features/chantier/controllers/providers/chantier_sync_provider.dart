@@ -1,5 +1,4 @@
 import 'package:bat_track_v1/features/chantier/controllers/notifiers/chantiers_list_notifier.dart';
-import 'package:bat_track_v1/models/services/file_sync_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
@@ -15,16 +14,17 @@ final chantierInitialProvider = FutureProvider.family<Chantier, String>((
   id,
 ) async {
   final chantierService = ref.watch(chantierServiceProvider);
-  final chantier = chantierService.getById(id);
+  final chantier = await chantierService.getById(id);
 
-  return chantier ??
-      Chantier(
-        id: id,
-        nom: '',
-        adresse: '',
-        clientId: '',
-        dateDebut: DateTime.now(),
-      );
+  return chantier?.id == id
+      ? Chantier(
+        id: chantier!.id,
+        nom: chantier.nom,
+        adresse: chantier.adresse,
+        clientId: chantier.clientId,
+        dateDebut: chantier.dateDebut,
+      )
+      : Chantier.mock();
 });
 
 final chantierSyncProvider = StateNotifierProvider.autoDispose
@@ -49,58 +49,70 @@ final chantierEtapesTempProvider = FutureProvider.autoDispose
       return List<ChantierEtape>.from(chantier.etapes);
     });
 
-final chantierSyncServiceProvider = Provider<EntitySyncService<Chantier>>(
-  (ref) => EntitySyncService<Chantier>('chantiers'),
+final chantierSyncServiceProvider = entitySyncServiceProvider<Chantier>(
+  'chantiers',
+  Chantier.fromJson,
 );
 
-final pieceJointeSyncServiceProvider = Provider<FileSyncService<PieceJointe>>(
-  (ref) => FileSyncService<PieceJointe>('piecesJointes'),
+final pieceJointeSyncServiceProvider = entitySyncServiceProvider<PieceJointe>(
+  'piecesJointes',
+  PieceJointe.fromJson,
 );
 
-final pieceSyncServiceProvider = Provider<EntitySyncService<Piece>>(
-  (ref) => EntitySyncService<Piece>('pieces'),
+final pieceSyncServiceProvider = entitySyncServiceProvider<Piece>(
+  'pieces',
+  Piece.fromJson,
 );
 
-final materielSyncServiceProvider = Provider<EntitySyncService<Materiel>>(
-  (ref) => EntitySyncService<Materiel>('materiels'),
+final materielSyncServiceProvider = entitySyncServiceProvider<Materiel>(
+  'materiels',
+  Materiel.fromJson,
 );
 
-final materiauSyncServiceProvider = Provider<EntitySyncService<Materiau>>(
-  (ref) => EntitySyncService<Materiau>('materiau'),
+final materiauSyncServiceProvider = entitySyncServiceProvider<Materiau>(
+  'materiau',
+  Materiau.fromJson,
 );
 
-final mainOeuvreSyncServiceProvider = Provider<EntitySyncService<MainOeuvre>>(
-  (ref) => EntitySyncService<MainOeuvre>('mainOeuvre'),
+final mainOeuvreSyncServiceProvider = entitySyncServiceProvider<MainOeuvre>(
+  'mainOeuvre',
+  MainOeuvre.fromJson,
 );
 
-final techSyncServiceProvider = Provider<EntitySyncService<Technicien>>(
-  (ref) => EntitySyncService<Technicien>('techniciens'),
+final techSyncServiceProvider = entitySyncServiceProvider<Technicien>(
+  'techniciens',
+  Technicien.fromJson,
 );
 
-final clientSyncServiceProvider = Provider<EntitySyncService<Client>>(
-  (ref) => EntitySyncService<Client>('clients'),
+final clientSyncServiceProvider = entitySyncServiceProvider<Client>(
+  'clients',
+  Client.fromJson,
 );
 
-final interventionSyncServiceProvider =
-    Provider<EntitySyncService<Intervention>>(
-      (ref) => EntitySyncService<Intervention>('interventions'),
-    );
+final interventionSyncServiceProvider = entitySyncServiceProvider<Intervention>(
+  'interventions',
+  Intervention.fromJson,
+);
 
 final chantierEtapeSyncServiceProvider =
-    Provider<EntitySyncService<ChantierEtape>>(
-      (ref) => EntitySyncService<ChantierEtape>('chantierEtapes'),
+    entitySyncServiceProvider<ChantierEtape>(
+      'chantierEtapes',
+      ChantierEtape.fromJson,
     );
 
-final factureSyncServiceProvider = Provider<EntitySyncService<Facture>>(
-  (ref) => EntitySyncService<Facture>('factures'),
+final factureSyncServiceProvider = entitySyncServiceProvider<Facture>(
+  'factures',
+  Facture.fromJson,
 );
 
-final projetSyncServiceProvider = Provider<EntitySyncService<Projet>>(
-  (ref) => EntitySyncService<Projet>('projets'),
+final projetSyncServiceProvider = entitySyncServiceProvider<Projet>(
+  'projets',
+  Projet.fromJson,
 );
 
-final userSyncServiceProvider = Provider<EntitySyncService<UserModel>>(
-  (ref) => EntitySyncService<UserModel>('users'),
+final userSyncServiceProvider = entitySyncServiceProvider<UserModel>(
+  'users',
+  UserModel.fromJson,
 );
 
 final filteredChantiersProvider = Provider<AsyncValue<List<Chantier>>>((ref) {
@@ -108,8 +120,9 @@ final filteredChantiersProvider = Provider<AsyncValue<List<Chantier>>>((ref) {
   final userAsync = ref.watch(appUserProvider);
 
   if (userAsync.isLoading) return const AsyncValue.loading();
-  if (userAsync.hasError)
+  if (userAsync.hasError) {
     return AsyncValue.error(userAsync.error!, StackTrace.current);
+  }
 
   final user = userAsync.value;
 
@@ -135,36 +148,36 @@ final filteredChantiersProvider = Provider<AsyncValue<List<Chantier>>>((ref) {
 
 final syncAllProvider = Provider(
   (ref) => () async {
-    await ref.read(chantierSyncServiceProvider).syncFromFirestore();
-    await ref.read(pieceJointeSyncServiceProvider).syncFromFirestore();
-    await ref.read(materielSyncServiceProvider).syncFromFirestore();
-    await ref.read(materiauSyncServiceProvider).syncFromFirestore();
-    await ref.read(mainOeuvreSyncServiceProvider).syncFromFirestore();
-    await ref.read(techSyncServiceProvider).syncFromFirestore();
-    await ref.read(clientSyncServiceProvider).syncFromFirestore();
-    await ref.read(interventionSyncServiceProvider).syncFromFirestore();
-    await ref.read(pieceSyncServiceProvider).syncFromFirestore();
-    await ref.read(chantierEtapeSyncServiceProvider).syncFromFirestore();
-    await ref.read(factureSyncServiceProvider).syncFromFirestore();
-    await ref.read(projetSyncServiceProvider).syncFromFirestore();
-    await ref.read(userSyncServiceProvider).syncFromFirestore();
+    await ref.read(chantierSyncServiceProvider).syncFromRemote();
+    await ref.read(pieceJointeSyncServiceProvider).syncFromRemote();
+    await ref.read(materielSyncServiceProvider).syncFromRemote();
+    await ref.read(materiauSyncServiceProvider).syncFromRemote();
+    await ref.read(mainOeuvreSyncServiceProvider).syncFromRemote();
+    await ref.read(techSyncServiceProvider).syncFromRemote();
+    await ref.read(clientSyncServiceProvider).syncFromRemote();
+    await ref.read(interventionSyncServiceProvider).syncFromRemote();
+    await ref.read(pieceSyncServiceProvider).syncFromRemote();
+    await ref.read(chantierEtapeSyncServiceProvider).syncFromRemote();
+    await ref.read(factureSyncServiceProvider).syncFromRemote();
+    await ref.read(projetSyncServiceProvider).syncFromRemote();
+    await ref.read(userSyncServiceProvider).syncFromRemote();
   },
 );
 
 final syncAllEntitiesProvider = FutureProvider<void>((ref) async {
-  await ref.read(chantierSyncServiceProvider).syncFromFirestore();
-  await ref.read(pieceJointeSyncServiceProvider).syncFromFirestore();
-  await ref.read(materielSyncServiceProvider).syncFromFirestore();
-  await ref.read(materiauSyncServiceProvider).syncFromFirestore();
-  await ref.read(mainOeuvreSyncServiceProvider).syncFromFirestore();
-  await ref.read(techSyncServiceProvider).syncFromFirestore();
-  await ref.read(clientSyncServiceProvider).syncFromFirestore();
-  await ref.read(interventionSyncServiceProvider).syncFromFirestore();
-  await ref.read(pieceSyncServiceProvider).syncFromFirestore();
-  await ref.read(chantierEtapeSyncServiceProvider).syncFromFirestore();
-  await ref.read(factureSyncServiceProvider).syncFromFirestore();
-  await ref.read(projetSyncServiceProvider).syncFromFirestore();
-  await ref.read(userSyncServiceProvider).syncFromFirestore();
+  await ref.read(chantierSyncServiceProvider).syncFromRemote();
+  await ref.read(pieceJointeSyncServiceProvider).syncFromRemote();
+  await ref.read(materielSyncServiceProvider).syncFromRemote();
+  await ref.read(materiauSyncServiceProvider).syncFromRemote();
+  await ref.read(mainOeuvreSyncServiceProvider).syncFromRemote();
+  await ref.read(techSyncServiceProvider).syncFromRemote();
+  await ref.read(clientSyncServiceProvider).syncFromRemote();
+  await ref.read(interventionSyncServiceProvider).syncFromRemote();
+  await ref.read(pieceSyncServiceProvider).syncFromRemote();
+  await ref.read(chantierEtapeSyncServiceProvider).syncFromRemote();
+  await ref.read(factureSyncServiceProvider).syncFromRemote();
+  await ref.read(projetSyncServiceProvider).syncFromRemote();
+  await ref.read(userSyncServiceProvider).syncFromRemote();
 });
 
 final allDataStreamProvider = StreamProvider.autoDispose((ref) async* {

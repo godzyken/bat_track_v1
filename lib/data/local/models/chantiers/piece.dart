@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -9,7 +10,9 @@ part 'piece.freezed.dart';
 part 'piece.g.dart';
 
 @freezed
-class Piece with _$Piece, JsonModel<Piece>, JsonSerializableModel<Piece> {
+class Piece
+    with _$Piece, JsonModel<Piece>
+    implements JsonSerializableModel, HasAccessControl {
   const Piece._();
 
   const factory Piece({
@@ -33,6 +36,14 @@ class Piece with _$Piece, JsonModel<Piece>, JsonSerializableModel<Piece> {
     surface: 32.60,
     addedBy: 'Sarl Company Dugazon',
   );
+
+  @override
+  bool canAccess(AppUser user) {
+    if (user.isAdmin) return true;
+    if (user.isClient) return addedBy == user.uid;
+    if (user.isTechnicien) return mainOeuvre!.contains(user.uid);
+    return false;
+  }
 
   double getBudgetTotal(List<Technicien> techniciens) {
     return BudgetGen.calculerTotalMulti(

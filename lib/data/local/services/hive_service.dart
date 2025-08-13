@@ -120,7 +120,7 @@ class HiveService {
     }
   }
 
-  static T? getSync<T>(String boxName, String key) {
+  static Future<T?> getSync<T>(String boxName, String key) async {
     final box = Hive.box<T>(boxName);
     return box.get(key);
   }

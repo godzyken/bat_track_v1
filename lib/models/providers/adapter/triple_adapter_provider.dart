@@ -5,7 +5,7 @@ import '../../data/adapter/triple_adapter.dart';
 
 final chantierAdapterProvider = Provider<TripleAdapter<Chantier>>((ref) {
   return TripleAdapter<Chantier>(
-    factory: () => Chantier.mock(),
+    fromJson: (json) => Chantier.fromJson(json),
     collectionPath: 'chantiers',
     dolibarrEndpoint: 'chantiers',
     ref: ref,

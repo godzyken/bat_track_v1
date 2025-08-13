@@ -1,12 +1,16 @@
+import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../utilisateurs/app_user.dart';
 
 part 'materiau.freezed.dart';
 part 'materiau.g.dart';
 
 @freezed
 class Materiau
-    with _$Materiau, JsonModel<Materiau>, JsonSerializableModel<Materiau> {
+    with _$Materiau, JsonModel<Materiau>
+    implements HasAccessControl, JsonSerializableModel<Materiau> {
   const factory Materiau({
     required String id,
     required String nom,
@@ -27,15 +31,6 @@ class Materiau
   factory Materiau.fromJson(Map<String, dynamic> json) =>
       _$MateriauFromJson(json);
 
-  /*  @override
-  Materiau fromJson(Map<String, dynamic> json) => Materiau.fromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$MateriauToJson(this);
-
-  @override
-  Materiau copyWithId(String? id) => copyWith(id: id ?? this.id);*/
-
   factory Materiau.mock() => Materiau(
     id: 'matId_003',
     nom: 'Poutre IPN 100: 3 metres',
@@ -43,4 +38,12 @@ class Materiau
     unite: 'm',
     quantiteFixe: 5,
   );
+
+  @override
+  bool canAccess(AppUser user) {
+    return true;
+  }
+
+  @override
+  bool get isUpdated => updatedAt != null;
 }

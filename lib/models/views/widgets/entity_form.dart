@@ -8,19 +8,8 @@ import '../../../features/auth/data/notifiers/auth_notifier.dart';
 import '../../../features/auth/data/providers/auth_state_provider.dart';
 import '../../../features/auth/views/widgets/multi_user_dropdown_field.dart';
 import '../../../features/auth/views/widgets/user_dropdown_field.dart';
+import '../../data/adapter/typedefs.dart';
 import '../../data/json_model.dart';
-
-typedef OnSubmit<T extends JsonModel> = void Function(T entity);
-typedef FieldBuilder =
-    Widget? Function(
-      BuildContext context,
-      String key,
-      dynamic value,
-      TextEditingController? controller,
-      void Function(dynamic) onChanged,
-      bool expertMode,
-    );
-typedef FieldVisibility = bool Function(String key, dynamic value);
 
 class EntityForm<T extends JsonModel> extends ConsumerStatefulWidget {
   final T? initialValue;
@@ -197,7 +186,7 @@ class _EntityFormState<T extends JsonModel>
         key: ValueKey(key),
         controller: controller,
         decoration: InputDecoration(labelText: "$key (JSON)"),
-        style: const TextStyle(fontFamily: 'monospace'),
+        style: const TextStyle(fontFamily: 'NotoSans'),
         maxLines: 4,
         keyboardType: TextInputType.multiline,
         autofillHints: autofill,
@@ -321,7 +310,7 @@ class _EntityFormState<T extends JsonModel>
             controller: ctl,
             decoration: InputDecoration(labelText: "$key (JSON brut)"),
             maxLines: 6,
-            style: const TextStyle(fontFamily: 'monospace'),
+            style: const TextStyle(fontFamily: 'NotoSans'),
             validator: (v) {
               try {
                 json.decode(v ?? '');

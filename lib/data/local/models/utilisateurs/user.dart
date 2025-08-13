@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../models/data/json_model.dart';
 import '../../adapters/signture_converter.dart';
+import '../base/has_acces_control.dart';
 
 part 'user.freezed.dart';
 part 'user.g.dart';

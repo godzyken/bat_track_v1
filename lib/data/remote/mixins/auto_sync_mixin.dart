@@ -5,8 +5,8 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../models/data/json_model.dart';
 import '../../../models/data/state_wrapper/wrappers.dart';
+import '../../local/models/base/has_acces_control.dart';
 
 mixin AutoSync<T extends JsonSerializableModel<T>, Serializable>
     on StateNotifier<SyncedState<T>> {
@@ -24,7 +24,7 @@ mixin AutoSync<T extends JsonSerializableModel<T>, Serializable>
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
       final tempDir = Directory.systemTemp;
-      final file = File('${tempDir.path}/${data.id}.json');
+      final file = File('${tempDir.path}/${data.toJson()['id']}.json');
       await file.writeAsString(json);
       final url = await upload(file);
       developer.log('🔄 AutoSync : $url');

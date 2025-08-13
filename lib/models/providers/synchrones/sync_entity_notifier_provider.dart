@@ -26,6 +26,13 @@ class GenericEntityProviderFactory {
           >;
     }
 
+    final initialEntityProvider = FutureProvider.autoDispose.family<T?, String>(
+      (ref, id) {
+        final service = ref.read(entityServiceProvider<T>());
+        return service.getById(id);
+      },
+    );
+
     final provider = StateNotifierProvider.autoDispose<
       SyncEntityNotifier<T>,
       SyncedState<T>
@@ -33,12 +40,12 @@ class GenericEntityProviderFactory {
       final service = ref.read(entityServiceProvider<T>());
       final storage = ref.read(storageServiceProvider);
 
-      final initialData = service.getById(id);
+      final initialData = ref.watch(initialEntityProvider(id)).value;
       if (initialData == null) {
         return SyncEntityNotifier<T>(
           entityService: service,
           storageService: storage,
-          initialState: initialData!.copyWithId(id),
+          initialState: initialData?.copyWithId(id),
           autoSync: false,
         );
       }
@@ -86,8 +93,7 @@ class GenericEntityProviderFactory {
 
 extension RefX on WidgetRef {
   AutoDisposeStateNotifierProvider<SyncEntityNotifier<T>, SyncedState<T>>
-  syncEntity<T extends JsonSerializableModel<T>>(String id) =>
-      GenericEntityProviderFactory.instance.getSyncEntityNotifierProvider<T>(
-        id,
-      );
+  syncEntity<T extends JsonModel<T>>(String id) => GenericEntityProviderFactory
+      .instance
+      .getSyncEntityNotifierProvider<T>(id);
 }

@@ -1,7 +1,8 @@
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../models/data/json_model.dart';
+import '../base/has_acces_control.dart';
 import 'facture_draft.dart';
 
 part 'facture.freezed.dart';
@@ -9,7 +10,8 @@ part 'facture.g.dart';
 
 @freezed
 class Facture
-    with _$Facture, JsonModel<Facture>, JsonSerializableModel<Facture> {
+    with _$Facture, JsonModel<Facture>
+    implements JsonSerializableModel<Facture> {
   const Facture._();
 
   const factory Facture({

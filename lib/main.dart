@@ -14,7 +14,7 @@ import 'features/parametres/affichage/themes/theme.dart';
 import 'models/views/screens/exeception_screens.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized(); // ✅ DOIT être en DEHORS
+  WidgetsFlutterBinding.ensureInitialized();
 
   runZonedGuarded(
     () async {
@@ -72,7 +72,34 @@ class MyApp extends ConsumerWidget {
 
         return MaterialApp.router(
           title: 'BatTrack',
-          theme: lightTheme,
+          theme: ThemeData(
+            fontFamily: 'NotoSans',
+            badgeTheme: lightTheme.badgeTheme,
+            appBarTheme: lightTheme.appBarTheme,
+            textTheme: lightTheme.textTheme,
+            actionIconTheme: lightTheme.actionIconTheme,
+            bannerTheme: lightTheme.bannerTheme,
+            bottomNavigationBarTheme: lightTheme.bottomNavigationBarTheme,
+            cardTheme: lightTheme.cardTheme,
+            chipTheme: lightTheme.chipTheme,
+            colorScheme: lightTheme.colorScheme,
+            elevatedButtonTheme: lightTheme.elevatedButtonTheme,
+            inputDecorationTheme: lightTheme.inputDecorationTheme,
+            listTileTheme: lightTheme.listTileTheme,
+            navigationRailTheme: lightTheme.navigationRailTheme,
+            outlinedButtonTheme: lightTheme.outlinedButtonTheme,
+            pageTransitionsTheme: lightTheme.pageTransitionsTheme,
+            radioTheme: lightTheme.radioTheme,
+            scaffoldBackgroundColor: lightTheme.scaffoldBackgroundColor,
+            snackBarTheme: lightTheme.snackBarTheme,
+            switchTheme: lightTheme.switchTheme,
+            textButtonTheme: lightTheme.textButtonTheme,
+            textSelectionTheme: lightTheme.textSelectionTheme,
+            toggleButtonsTheme: lightTheme.toggleButtonsTheme,
+            tooltipTheme: lightTheme.tooltipTheme,
+            useMaterial3: true,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
           darkTheme: darkTheme,
           themeMode: ThemeMode.system,
           routerConfig: router,

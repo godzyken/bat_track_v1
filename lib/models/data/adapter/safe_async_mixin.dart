@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/data/remote/providers/catch_error_provider.dart';
+import 'package:bat_track_v1/models/data/adapter/typedefs.dart';
 import 'package:bat_track_v1/models/data/maperror/logged_action.dart';
 import 'package:bat_track_v1/models/data/state_wrapper/analitics/crashlytics_wrapper.dart';
 import 'package:bat_track_v1/models/data/state_wrapper/wrappers_errors.dart';

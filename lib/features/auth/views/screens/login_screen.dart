@@ -19,19 +19,33 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _userCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+
   String? error;
   bool loading = false;
-
-  // 🔑 Nouveau champ : rôle sélectionné
   String? selectedRole;
 
-  final List<String> roles = ['admin', 'technicien', 'client'];
+  final List<String> roles = ['Administrateur', 'Intervenant', 'Client'];
+
+  String getRoleRoute(String role) {
+    switch (role) {
+      case 'Administrateur':
+        return '/admin/dashboard';
+      case 'Intervenant':
+        return '/tech/dashboard';
+      case 'Client':
+        return '/client/dashboard';
+      default:
+        return '/unauthorized';
+    }
+  }
+
+  bool hasRedirected = false;
 
   @override
   void dispose() {
-    _userCtrl.dispose();
+    _emailCtrl.dispose();
     _passCtrl.dispose();
     super.dispose();
   }
@@ -43,15 +57,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     if (_formKey.currentState!.validate()) {
+      if (selectedRole == null) {
+        setState(() {
+          error = 'Veuillez sélectionner un rôle';
+          loading = false;
+        });
+        return;
+      }
+
       try {
         await ref
             .read(authRepositoryProvider)
-            .signIn(_userCtrl.text.trim(), _passCtrl.text.trim());
-
-        if (mounted) {
-          // TODO: adapter le routage en fonction du rôle
-          context.go('/');
-        }
+            .signIn(_emailCtrl.text.trim(), _passCtrl.text.trim());
       } catch (e) {
         String errorMessage = 'Erreur inconnue';
         if (e is FirebaseAuthException) {
@@ -77,7 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
         setState(() {
           error = errorMessage;
-          developer.log('Error during connection: $error');
+          developer.log('Erreur de connexion: $error');
         });
       } finally {
         setState(() {
@@ -99,10 +116,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       appBar: AppBar(title: const Text("Connexion")),
       body: userAsync.when(
         data: (user) {
-          if (user != null) {
-            return Center(child: Text("Connecté en tant que ${user.email}"));
+          if (user != null && selectedRole != null && !hasRedirected) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final route = getRoleRoute(selectedRole!);
+              context.go(route);
+              hasRedirected = true;
+            });
           }
-          return buildResponsiveCardLayout;
+
+          return user == null
+              ? _buildResponsiveCardLayout
+              : const Center(child: CircularProgressIndicator());
         },
         error: (e, _) => ErrorApp(message: "Erreur : ${e.toString()}"),
         loading: () => const LoadingApp(),
@@ -110,7 +134,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  ResponsiveCardLayout get buildResponsiveCardLayout {
+  ResponsiveCardLayout get _buildResponsiveCardLayout {
     return ResponsiveCardLayout(
       spacing: 16,
       children: [
@@ -132,7 +156,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                   TextFormField(
-                    controller: _userCtrl,
+                    controller: _emailCtrl,
                     decoration: const InputDecoration(labelText: 'Email'),
                     keyboardType: TextInputType.emailAddress,
                     autofillHints: const [AutofillHints.username],
@@ -142,6 +166,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ? 'Champ requis'
                                 : null,
                   ),
+                  const SizedBox(height: 12),
                   TextFormField(
                     controller: _passCtrl,
                     decoration: const InputDecoration(
@@ -156,44 +181,99 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ? 'Champ requis'
                                 : null,
                   ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: "Rôle utilisateur",
-                    ),
-                    value: selectedRole,
-                    items:
-                        roles
-                            .map(
-                              (role) => DropdownMenuItem(
-                                value: role,
-                                child: Text(role),
-                              ),
-                            )
-                            .toList(),
-                    onChanged: (value) => setState(() => selectedRole = value),
-                    validator:
-                        (value) =>
-                            value == null ? 'Veuillez choisir un rôle' : null,
-                  ),
                   const SizedBox(height: 20),
+                  Text(
+                    'Choisissez un rôle',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children:
+                        roles.map((role) {
+                          final isSelected = selectedRole == role;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedRole = role;
+                              });
+                            },
+                            child: Container(
+                              width: 120,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color:
+                                      isSelected
+                                          ? Colors.blue
+                                          : Colors.grey.shade300,
+                                  width: isSelected ? 2 : 1,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                color:
+                                    isSelected
+                                        ? Colors.blue.shade50
+                                        : Colors.white,
+                                boxShadow: [
+                                  if (isSelected)
+                                    BoxShadow(
+                                      color: Colors.blue.withAlpha(
+                                        (0.2 * 255).round(),
+                                      ),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.asset(
+                                      'assets/roles/${role.toLowerCase()}.png',
+                                      height: 80,
+                                      width: 100,
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    role,
+                                    textAlign: TextAlign.center,
+                                    softWrap: true,
+                                    style: TextStyle(
+                                      fontWeight:
+                                          isSelected
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                      color:
+                                          isSelected
+                                              ? Colors.blue
+                                              : Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                  ),
+                  const SizedBox(height: 24),
                   loading
                       ? const Center(child: CircularProgressIndicator())
                       : ElevatedButton(
                         onPressed: login,
                         child: const Text("Se connecter"),
                       ),
-                  const SizedBox(height: 12),
-
-                  // 🔗 Lien vers l'inscription
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text("Pas encore de compte ?"),
                       TextButton(
-                        onPressed: () {
-                          context.go('/register');
-                        },
+                        onPressed: () => context.go('/register'),
                         child: const Text("Créer un compte"),
                       ),
                     ],

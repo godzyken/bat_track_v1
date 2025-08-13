@@ -1,83 +1,67 @@
-import 'package:bat_track_v1/data/local/models/chantiers/chantier.dart';
-import 'package:bat_track_v1/features/auth/data/notifiers/auth_notifier.dart';
-import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
-import 'package:bat_track_v1/features/auth/views/screens/register_screen.dart';
-import 'package:bat_track_v1/features/chantier/views/screens/chantiers_screen.dart';
-import 'package:bat_track_v1/features/documents/views/screens/factures_screen.dart';
-import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
+import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
+import 'package:bat_track_v1/features/home/views/screens/home_screen.dart';
+import 'package:bat_track_v1/features/projet/views/screens/project_list_screen.dart';
+import 'package:bat_track_v1/features/technicien/views/screens/technicien_detail_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../data/local/models/base/access_policy_interface.dart';
+import '../features/auth/data/notifiers/auth_notifier.dart';
+import '../features/auth/data/providers/auth_state_provider.dart';
 import '../features/auth/views/screens/login_screen.dart';
-import '../features/chantier/views/screens/chantier_details_screen.dart';
-import '../features/chantier/views/screens/chantier_pieces_screen.dart';
+import '../features/auth/views/screens/register_screen.dart';
+import '../features/auth/views/widgets/access_shell.dart';
+import '../features/chantier/views/screens/chantier_extensions_screens.dart';
+import '../features/documents/views/screens/factures_screen.dart';
+import '../features/projet/views/screens/projet_detail_screen.dart';
 import '../features/technicien/views/screens/technitiens_screen.dart';
 import '../models/services/navigator_key_service.dart';
+import '../models/views/screens/exeception_screens.dart';
 import '../providers/auth_provider.dart';
-import 'app_shell_route/frame_layout.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final authNotifier = ref.watch(authNotifierProvider);
+  final refresh = ref.watch(goRouterRefreshNotifierProvider);
   final appUserAsync = ref.watch(appUserProvider);
-  //final role = ref.watch(userProfileProvider).value;
+  final policy = MultiRolePolicy();
 
   return GoRouter(
-    refreshListenable: authNotifier,
-    initialLocation: '/loading',
-    debugLogDiagnostics: true,
     navigatorKey: ref.read(navigatorKeyProvider),
+    initialLocation: '/',
+    refreshListenable: refresh,
+    debugLogDiagnostics: true,
     redirect: (context, state) {
-      final appUser = appUserAsync.asData?.value;
+      // 1. AppUser est en train d'être chargé
+      if (appUserAsync.isLoading || appUserAsync.hasError) {
+        return null; // On ne redirige pas encore
+      }
+
+      final appUser = appUserAsync.value;
       final isLoggedIn = appUser != null;
       final isOnLogin = state.matchedLocation == '/login';
-      final isOnLoading = state.matchedLocation == '/loading';
 
       if (!isLoggedIn) {
         return isOnLogin ? null : '/login';
       }
 
-      if (isOnLogin || isOnLoading) {
-        switch (appUser.role) {
-          case 'Administrateur':
-            return '/admin/dashboard';
-          case 'Intervenant':
-            return '/tech/dashboard';
-          case 'Client':
-            return '/client/dashboard';
-          default:
-            return '/unauthorized';
-        }
-      }
-
-      return null;
+      return '/home';
     },
     routes: [
-      GoRoute(path: '/loading', builder: (_, _) => const LoadingApp()),
-      GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
-      GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
-      GoRoute(
-        path: '/error',
-        builder:
-            (context, state) =>
-                const ErrorApp(message: 'Erreur d\'authentification'),
-      ),
-
-      /// ----------------------------
-      /// ADMIN SHELL ROUTE
-      /// ----------------------------
       ShellRoute(
-        builder: (context, state, child) => AdminLayout(child: child),
+        builder:
+            (context, state, child) =>
+                AccessShell(policy: policy, child: child),
         routes: [
+          GoRoute(path: '/loading', builder: (_, _) => const LoadingApp()),
+          GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
+          GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),
+          GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
           GoRoute(
-            path: '/admin/dashboard',
-            builder: (_, _) => const AdminDashboardScreen(),
+            path: '/error',
+            builder:
+                (_, _) => const ErrorApp(message: 'Erreur d\'authentification'),
           ),
           GoRoute(
-            path: '/admin/users',
-            builder: (_, _) => const AdminUserManagementScreen(),
-          ),
-          GoRoute(
-            path: '/admin/chantiers',
+            path: '/chantiers',
             builder: (context, state) => const ChantiersScreen(),
             routes: [
               GoRoute(
@@ -86,86 +70,82 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                   final chantier = state.extra as Chantier;
                   return ChantierDetailScreen(chantier: chantier);
                 },
+                routes: [
+                  GoRoute(
+                    path: '/etape',
+                    builder: (context, state) {
+                      final chantierId =
+                          state.uri.queryParameters['chantierId'] ?? '';
+                      return ChantierEtapesScreen(chantierId: chantierId);
+                    },
+                    routes: [
+                      GoRoute(
+                        path: ':etapeId',
+                        builder: (context, state) {
+                          final chantierId =
+                              state.uri.queryParameters['chantierId'] ?? '';
+                          final etapeId =
+                              state.uri.queryParameters['etapeId'] ?? '';
+                          return ChantierEtapeDetailScreen(
+                            chantierId: chantierId,
+                            etapeId: etapeId,
+                          );
+                        },
+                        routes: [
+                          GoRoute(
+                            path: '/pieces',
+                            builder: (context, state) {
+                              final chantierId =
+                                  state.uri.queryParameters['chantierId'] ?? '';
+                              return ChantierPiecesScreen(
+                                chantierId: chantierId,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
           GoRoute(
-            path: '/admin/techniciens',
+            path: '/techniciens',
             builder: (context, state) => const TechniciensScreen(),
-          ),
-          GoRoute(
-            path: '/admin/pieces',
-            builder:
-                (context, state) => ChantierPiecesScreen(
-                  chantierId: state.pathParameters['id']!,
-                ),
-          ),
-          GoRoute(
-            path: '/admin/factures',
-            builder: (context, state) => const FacturesScreen(),
-          ),
-        ],
-      ),
-
-      /// ----------------------------
-      /// TECH SHELL ROUTE
-      /// ----------------------------
-      ShellRoute(
-        builder: (context, state, child) => TechLayout(child: child),
-        routes: [
-          GoRoute(
-            path: '/tech/dashboard',
-            builder: (_, _) => const TechDashboardScreen(),
-          ),
-          GoRoute(
-            path: '/tech/interventions',
-            builder: (_, _) => const TechInterventionScreen(),
-          ),
-          GoRoute(
-            path: '/tech/chantiers',
-            builder: (context, state) => const ChantiersScreen(),
             routes: [
               GoRoute(
-                path: ':chantierId',
-                name: 'chantier-detail',
+                path: ':technicienId',
                 builder: (context, state) {
-                  final chantier = state.extra as Chantier;
-                  final isClient =
-                      state.uri.queryParameters['isClient'] == 'true';
-                  final isTechnicien =
-                      state.uri.queryParameters['isTechnicien'] == 'true';
-                  final userId = state.uri.queryParameters['userId'];
-                  return ChantierDetailScreen(
-                    chantier: chantier,
-                    isClient: isClient,
-                    isTechnicien: isTechnicien,
-                    userId: userId,
-                  );
+                  final technicienId =
+                      state.uri.queryParameters['technicienId'] ?? '';
+                  return TechnicienDetailScreen(technicienId: technicienId);
                 },
               ),
             ],
           ),
           GoRoute(
-            path: '/tech/pieces',
-            builder:
-                (context, state) => const ChantierPiecesScreen(chantierId: ''),
-          ),
-        ],
-      ),
-
-      /// ----------------------------
-      /// CLIENT SHELL ROUTE
-      /// ----------------------------
-      ShellRoute(
-        builder: (context, state, child) => ClientLayout(child: child),
-        routes: [
-          GoRoute(
-            path: '/client/dashboard',
-            builder: (_, _) => const ClientDashboardScreen(),
+            path: '/documents',
+            builder: (context, state) => const FacturesScreen(),
+            routes: [],
           ),
           GoRoute(
-            path: '/client/chantiers',
-            builder: (_, _) => const ClientChantiersScreen(),
+            path: '/projets',
+            builder: (context, state) => const ProjectListScreen(),
+            routes: [
+              GoRoute(
+                path: '/edit-projet',
+                builder: (context, state) {
+                  final currentuser = state.pathParameters['id'] as AppUser;
+                  final projet = state.pathParameters['Projet'] as Projet;
+                  return ProjectDetailScreen(
+                    projet: projet,
+                    currentUser: currentuser,
+                  );
+                },
+                routes: [],
+              ),
+            ],
           ),
         ],
       ),

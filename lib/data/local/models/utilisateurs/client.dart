@@ -1,12 +1,15 @@
+import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
+
+import 'app_user.dart';
 
 part 'client.freezed.dart';
 part 'client.g.dart';
 
 @freezed
-class Client with _$Client, JsonModel<Client> {
+class Client with _$Client, JsonModel<Client> implements HasAccessControl {
   const Client._();
 
   const factory Client({
@@ -44,4 +47,9 @@ class Client with _$Client, JsonModel<Client> {
 
   @override
   bool get isUpdated => updatedAt != null;
+
+  @override
+  bool canAccess(AppUser user) {
+    return user.isAdmin || user.company == contactName || user.company == nom;
+  }
 }

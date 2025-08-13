@@ -3,7 +3,9 @@ import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.da
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../data/local/models/index_model_extention.dart';
+import '../../../../data/local/services/service_type.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
 import '../../../home/views/widgets/app_drawer.dart';
@@ -16,6 +18,12 @@ class ClientsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
     final clientsAsync = ref.watch(clientListProvider);
+    final user = ref.watch(appUserProvider).value;
+    if (user == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final isAdmin = user.role == 'admin';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Clients')),
@@ -23,30 +31,39 @@ class ClientsScreen extends ConsumerWidget {
       body: EntityList<Client>(
         items: clientsAsync,
         boxName: 'clients',
+        infoOverride: info,
+        onCreate:
+            isAdmin
+                ? () {
+                  showEntityFormDialog<Client>(
+                    context: context,
+                    ref: ref,
+                    role: user.role,
+                    onSubmit: (client) async {
+                      await clientService.save(client, client.id);
+                    },
+                    fromJson: Client.fromJson,
+                    createEmpty: Client.mock,
+                  );
+                }
+                : () {},
         onEdit: (client) {
-          showDialog(
+          showEntityFormDialog<Client>(
             context: context,
-            builder:
-                (_) => EntityForm<Client>(
-                  fromJson: (json) => Client.fromJson(json),
-                  initialValue: client,
-                  onSubmit: (updated) async {
-                    await ref
-                        .read(clientListProvider.notifier)
-                        .updateEntity(updated);
-                  },
-                  createEmpty: () => Client.mock(),
-                ),
+            ref: ref,
+            role: user.role,
+            onSubmit: (updated) async {
+              await clientService.update(updated, client.id);
+            },
+            fromJson: Client.fromJson,
+            createEmpty: Client.mock,
           );
         },
-        onDelete: (id) async {
-          await ref
-              .read(firestoreProvider)
-              .collection('clients')
-              .doc(id)
-              .delete();
-        },
-        infoOverride: info,
+        onDelete: isAdmin ? (id) => clientService.delete(id) : null,
+        readOnly: !isAdmin,
+        currentRole: user.role,
+        currentUserId: user.id,
+        policy: MultiRolePolicy(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

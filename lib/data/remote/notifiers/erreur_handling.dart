@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../models/data/adapter/typedefs.dart';
 import '../../../models/data/state_wrapper/analitics/crashlytics_wrapper.dart';
 import '../../../models/services/navigator_key_service.dart';
 import '../providers/catch_error_provider.dart';

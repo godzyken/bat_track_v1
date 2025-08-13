@@ -13,6 +13,7 @@ extension ProjetUtils on Projet {
   static Projet mock() => Projet(
     id: const Uuid().v4(),
     nom: 'Construction École',
+    company: 'Léon Bross',
     description: 'Projet de construction modulaire pour école primaire.',
     dateDebut: DateTime.now(),
     dateFin: DateTime.now().add(const Duration(days: 120)),
@@ -24,5 +25,13 @@ extension ProjetUtils on Projet {
     members: [],
     createdBy: 'Nickholos',
     deadLine: DateTime(1),
+    cloudVersion: {
+      'nom': 'Categate',
+      'description': 'Rénovation validée par admin',
+    },
+    localDraft: {
+      'nom': 'Categate v2',
+      'description': 'Rénovation avec nouvelles fenêtres',
+    },
   );
 }

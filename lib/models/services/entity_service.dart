@@ -5,7 +5,7 @@ abstract class EntityService<T extends JsonModel> {
 
   Future<void> update(T entity, String id);
 
-  T? getById(String id);
+  Future<T?> getById(String id);
 
   Future<T?> get(String id);
 
@@ -16,10 +16,11 @@ abstract class EntityService<T extends JsonModel> {
   Future<List<String>> getKeys();
 
   Future<List<T>> getAll();
+  Future<List<T>> getByQuery(Map<String, dynamic> query);
 
   Future<void> deleteAll();
 
-  Future<void> deleteByQuery(String query);
+  Future<void> deleteByQuery(Map<String, dynamic> query);
 
   Future<List<T>> where(bool Function(T) test);
 
@@ -38,5 +39,18 @@ abstract class EntityService<T extends JsonModel> {
 
   Future<void> clear();
 
+  Stream<List<T>> watchAll();
   Stream<List<T>> watchByChantier(String chantierId);
+  Stream<List<T>> watchByQuery(Map<String, dynamic> query);
+
+  Future<Map<String, dynamic>> getLocalRaw(String id);
+
+  /// Lit la version distante (ex. Firestore)
+  Future<Map<String, dynamic>> getRemoteRaw(String id);
+
+  /// Écrit la version distante
+  Future<void> saveRemoteRaw(String id, Map<String, dynamic> data);
+
+  /// Écrit la version locale
+  Future<void> saveLocalRaw(String id, Map<String, dynamic> data);
 }

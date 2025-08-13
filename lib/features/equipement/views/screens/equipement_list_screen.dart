@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
+import 'package:bat_track_v1/data/local/models/base/access_policy_interface.dart';
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
 import 'package:bat_track_v1/features/equipement/controllers/notifiers/equipements_list_notifier.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,10 @@ class EquipementScreen extends ConsumerWidget {
               .delete();
         },
         infoOverride: info,
+        policy: MultiRolePolicy(),
+        currentRole: '',
+        currentUserId: '',
+        onCreate: () {},
       ),
 
       floatingActionButton: FloatingActionButton(

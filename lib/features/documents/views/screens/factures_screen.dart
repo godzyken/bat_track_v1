@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
+import 'package:bat_track_v1/data/local/models/base/access_policy_interface.dart';
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
 import 'package:bat_track_v1/features/chantier/controllers/providers/chantier_sync_provider.dart';
 import 'package:bat_track_v1/features/documents/controllers/providers/facture_list_provider.dart';
@@ -20,6 +21,13 @@ class FacturesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
     final factureAsync = ref.watch(factureListProvider);
+    final user = ref.watch(appUserProvider).value;
+    if (user == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final isClient = user.role == 'client';
+    final isTech = user.role == 'tech';
 
     return Scaffold(
       appBar: AppBar(
@@ -102,14 +110,20 @@ class FacturesScreen extends ConsumerWidget {
                 ),
           );
         },
-        onDelete: (id) async {
-          await ref
-              .read(firestoreProvider)
-              .collection('factures')
-              .doc(id)
-              .delete();
-        },
+        onDelete:
+            isClient && isTech
+                ? (id) async {
+                  await ref
+                      .read(firestoreProvider)
+                      .collection('factures')
+                      .doc(id)
+                      .delete();
+                }
+                : null,
         infoOverride: info,
+        policy: MultiRolePolicy(),
+        currentRole: user.role,
+        currentUserId: user.id,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

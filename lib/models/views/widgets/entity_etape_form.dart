@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/local/models/index_model_extention.dart';
-
-typedef OnEtapeSubmit = void Function(ChantierEtape etape);
-
 class EntityEtapeForm<T> extends ConsumerStatefulWidget {
   final T? initialValue;
   final void Function(T etape) onSubmit;

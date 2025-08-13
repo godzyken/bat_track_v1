@@ -1,9 +1,10 @@
 import 'dart:io';
 
+import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 
-class StorageService {
+class StorageService implements RemoteStorageService {
   final FirebaseStorage _storage;
   StorageService(this._storage);
 
@@ -69,5 +70,50 @@ class StorageService {
         Uri.parse(url),
       ).load(url).then((data) => data.buffer.asUint8List()),
     );
+  }
+
+  Future<void> save(File file, String id) async {}
+
+  Future<List<String>> getAll() async {}
+
+  @override
+  Future<void> deleteRaw(String collectionOrTable, String id) {
+    // TODO: implement deleteRaw
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getAllRaw(
+    String collectionOrTable, {
+    DateTime? updatedAfter,
+    int? limit,
+  }) {
+    // TODO: implement getAllRaw
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Map<String, dynamic>> getRaw(String collectionOrTable, String id) {
+    // TODO: implement getRaw
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> saveRaw(
+    String collectionOrTable,
+    String id,
+    Map<String, dynamic> data,
+  ) {
+    // TODO: implement saveRaw
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> watchCollectionRaw(
+    String collectionOrTable, {
+    Function(dynamic query)? queryBuilder,
+  }) {
+    // TODO: implement watchCollectionRaw
+    throw UnimplementedError();
   }
 }

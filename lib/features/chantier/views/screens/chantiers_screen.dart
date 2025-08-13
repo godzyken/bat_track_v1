@@ -4,6 +4,7 @@ import 'package:bat_track_v1/features/chantier/controllers/providers/chantier_sy
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
@@ -64,13 +65,19 @@ class ChantiersScreen extends ConsumerWidget {
                 ),
           );
         },
-        onDelete: (id) async {
-          await ref
-              .read(firestoreProvider)
-              .collection('chantiers')
-              .doc(id)
-              .delete();
-        },
+        onDelete:
+            isClient && isAdmin
+                ? (id) async {
+                  await ref
+                      .read(firestoreProvider)
+                      .collection('chantiers')
+                      .doc(id)
+                      .delete();
+                }
+                : null,
+        currentRole: user.role,
+        currentUserId: user.id,
+        policy: MultiRolePolicy(),
         infoOverride: info,
       ),
       floatingActionButton:

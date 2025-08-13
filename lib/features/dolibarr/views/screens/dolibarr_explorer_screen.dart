@@ -112,7 +112,7 @@ class _DolibarrExplorerScreenState
             padding: const EdgeInsets.all(8),
             child: SelectableText(
               lines.isEmpty ? 'Aucune correspondance.' : lines,
-              style: const TextStyle(fontFamily: 'monospace'),
+              style: const TextStyle(fontFamily: 'NotoSans'),
             ),
           ),
         ),

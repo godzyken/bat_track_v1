@@ -42,10 +42,20 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
   @HiveField(11)
   DateTime? pupdatedAt;
 
+  @HiveField(12)
+  final String company;
+
+  @HiveField(13)
+  final Map<String, dynamic> cloudVersion;
+
+  @HiveField(14)
+  final Map<String, dynamic>? localDraft;
+
   ProjetEntity({
     required this.pid,
     required this.nom,
     required this.description,
+    required this.company,
     required this.dateDebut,
     required this.dateFin,
     required this.clientValide,
@@ -54,6 +64,8 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
     required this.superUtilisateurValide,
     required this.createBy,
     required this.members,
+    required this.cloudVersion,
+    required this.localDraft,
     this.pupdatedAt,
   });
 
@@ -62,6 +74,7 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
     return ProjetEntity(
       pid: model.id,
       nom: model.nom,
+      company: model.company,
       description: model.description,
       dateDebut: model.dateDebut,
       dateFin: model.dateFin,
@@ -72,6 +85,8 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
       createBy: model.createdBy,
       members: model.members,
       pupdatedAt: model.updatedAt,
+      cloudVersion: model.cloudVersion,
+      localDraft: model.localDraft,
     );
   }
 
@@ -83,6 +98,7 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
   Projet toModel() => Projet(
     id: id,
     nom: nom,
+    company: company,
     description: description,
     dateDebut: dateDebut,
     dateFin: dateFin,
@@ -93,6 +109,9 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
     updatedAt: updatedAt,
     createdBy: createBy,
     members: members,
+    cloudVersion: cloudVersion,
+    localDraft: localDraft,
+    deadLine: dateFin,
   );
 
   @override

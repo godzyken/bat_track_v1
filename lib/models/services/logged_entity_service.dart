@@ -1,56 +1,81 @@
-import 'package:bat_track_v1/data/remote/providers/catch_error_provider.dart';
+import 'dart:developer' as developer;
+
 import 'package:bat_track_v1/models/data/adapter/safe_async_mixin.dart';
-import 'package:bat_track_v1/models/data/maperror/fallback_factory.dart';
+import 'package:bat_track_v1/models/services/synced_entity_service.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/local/services/service_type.dart';
 import '../data/json_model.dart';
-import '../data/maperror/exceptions.dart';
 import '../data/maperror/logged_action.dart';
-import 'entity_service.dart';
+import 'entity_sync_services.dart';
 
-class LoggedEntityService<T extends JsonModel>
+class LoggedEntityService<T extends JsonModel> implements EntityServices<T> {
+  final EntityServices<T> _inner;
+  final Ref ref;
+
+  LoggedEntityService(this._inner, this.ref);
+
+  void _log(String method, List<dynamic> args) {
+    developer.log('[LOG][${T.toString()}] $method called with args: $args');
+  }
+
+  @override
+  noSuchMethod(Invocation invocation) {
+    // Log du nom et des arguments
+    _log(invocation.memberName.toString(), invocation.positionalArguments);
+
+    // Délégation automatique à _inner
+    final function = _getMethodFromInner(invocation.memberName);
+    if (function != null) {
+      return Function.apply(
+        function,
+        invocation.positionalArguments,
+        invocation.namedArguments,
+      );
+    }
+
+    return super.noSuchMethod(invocation);
+  }
+
+  dynamic _getMethodFromInner(Symbol memberName) {
+    // Récupère la méthode correspondante dans _inner
+    final methodName = memberName
+        .toString()
+        .replaceAll('Symbol("', '')
+        .replaceAll('")', '');
+    final instanceMirror = _inner as dynamic;
+    try {
+      return instanceMirror.noSuchMethod == null
+          ? instanceMirror
+          : instanceMirror;
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+class LoggedEntitySyncService<T extends JsonModel>
     with LoggedAction, SafeAsyncMixin<T>
-    implements EntityService<T> {
-  final EntityService<T> _delegate;
+    implements SyncedEntityService<T> {
+  final SyncedEntityService<T> _delegate;
 
-  LoggedEntityService(this._delegate, Reader ref) {
-    initLogger(ref);
-    initSafeAsync(ref);
+  LoggedEntitySyncService(this._delegate, Ref ref) {
+    initLogger(ref.read);
+    initSafeAsync(ref.read);
   }
 
   @override
-  @override
-  Future<void> save(T entity, String id) async {
-    await safeVoid(() => _delegate.save(entity, id), context: 'save<$T>: $id');
-    logAction(action: 'save', target: '$T/$id', data: entity.toJson());
-  }
-
-  @override
-  Future<void> update(T entity, String id) async {
+  Future<void> save(T entity, [String? id]) async {
     await safeVoid(
-      () => _delegate.update(entity, id),
-      context: 'update<$T>/$id',
+      () => _delegate.save(entity, id),
+      context: 'save<$T>: ${id ?? entity.id}',
     );
-    logAction(action: 'update', target: '$T/$id', data: entity.toJson());
-  }
-
-  @override
-  Future<T?> get(String id) async {
-    final result = await safeAsync<T>(
-      () async => await _delegate.get(id) ?? FallbackFactory.get<T>(),
-      context: 'get<$T>/$id',
-      logError: true,
-      fallback: EntityNotFoundException(T, id) as T,
+    logAction(
+      action: 'save',
+      target: '$T/${id ?? entity.id}',
+      data: entity.toJson(),
     );
-
-    logAction(action: 'get', target: '$T/$id', data: result.toJson());
-    return result;
-  }
-
-  @override
-  T? getById(String id) {
-    final result = _delegate.getById(id);
-    logAction(action: 'getById', target: '$T/$id', data: result?.toJson());
-    return result;
   }
 
   @override
@@ -63,135 +88,215 @@ class LoggedEntityService<T extends JsonModel>
   }
 
   @override
-  Future<List<String>> getKeys() async {
-    final keys = await safeAsync<List<String>>(
-      () => _delegate.getKeys(),
-      context: 'getKeys<$T>',
-      fallback: FallbackFactory.get<List<String>>(),
-    );
-    logAction(action: 'getKeys', target: '$T', data: {'keys': keys});
-    return keys;
-  }
-
-  @override
   Future<void> delete(String id) async {
-    await safeAsync(
-      () => _delegate.delete(id),
-      context: 'delete<$T>: $id',
-      fallback: null,
-    );
+    await safeVoid(() => _delegate.delete(id), context: 'delete<$T>: $id');
     logAction(action: 'delete', target: '$T/$id');
   }
 
+  // --- SyncedEntityService extra helpers (local / remote / sync) ---
+
   @override
-  Future<bool> exists(String id) async {
-    final result = await safeAsync<bool>(
-      () => _delegate.exists(id),
-      context: 'exists<$T>/$id',
-      fallback: FallbackFactory.get<bool>(),
+  Future<List<T>> getAllFromLocal() async {
+    return await safeAsync<List<T>>(
+      () => _delegate.getAllFromLocal(),
+      context: 'getAllFromLocal<$T>',
+      fallback: [],
     );
-    logAction(action: 'exists', target: '$T/$id', data: {'result': result});
-    return result;
   }
 
   @override
-  Future<void> deleteAll() async {
-    await safeVoid(() => _delegate.deleteAll(), context: 'deleteAll<$T>');
-    logAction(action: 'deleteAll', target: '$T');
+  Future<T?> getByIdFromLocal(String id) async {
+    return await safeAsync<T?>(
+      () => _delegate.getByIdFromLocal(id),
+      context: 'getByIdFromLocal<$T>/$id',
+      fallback: null,
+    );
   }
 
   @override
-  Future<void> deleteByQuery(String query) async {
+  Future<T?> getByIdFromRemote(String id) async {
+    return await safeAsync<T?>(
+      () => _delegate.getByIdFromRemote(id),
+      context: 'getByIdFromRemote<$T>/$id',
+      fallback: null,
+    );
+  }
+
+  @override
+  EntityLocalService<T> get local => _delegate.local;
+
+  @override
+  EntityRemoteService<T> get remote => _delegate.remote;
+
+  @override
+  Future<void> precacheAllWithContext(BuildContext context) async {
     await safeVoid(
-      () => _delegate.deleteByQuery(query),
-      context: 'deleteByQuery<$T>',
+      () => _delegate.precacheAllWithContext(context),
+      context: 'precacheAllWithContext<$T>',
     );
-    logAction(action: 'deleteByQuery', target: '$T/$query');
+    logAction(action: 'precacheAllWithContext', target: '$T');
   }
 
   @override
-  Future<List<T>> where(bool Function(T) test) async {
-    final result = await safeAsync<List<T>>(
-      () => _delegate.where(test),
-      context: 'where<$T>',
-      fallback: FallbackFactory.get<List<T>>(),
+  Future<void> syncFromRemote({BuildContext? context}) async {
+    await safeVoid(
+      () => _delegate.syncFromRemote(context: context),
+      context: 'syncFromRemote<$T>',
     );
-    logAction(
-      action: 'where',
-      target: '$T',
-      data: result.map((e) => e.toJson()).toList(),
-    );
-    return result;
+    logAction(action: 'syncFromRemote', target: '$T');
   }
 
   @override
-  Future<List<T>> sortedBy(
-    Comparable Function(T) selector, {
-    bool descending = false,
-  }) async {
-    final result = await safeAsync<List<T>>(
-      () => _delegate.sortedBy(selector, descending: descending),
-      context: 'sortedBy<$T>',
-      fallback: FallbackFactory.get<List<T>>(),
-    );
-    logAction(
-      action: 'sortedBy',
-      target: '$T',
-      data: result.map((e) => e.toJson()).toList(),
-    );
-    return result;
+  Future<void> syncToRemote() async {
+    await safeVoid(() => _delegate.syncToRemote(), context: 'syncToRemote<$T>');
+    logAction(action: 'syncToRemote', target: '$T');
   }
 
   @override
-  Future<List<T>> query(String query) async {
-    final result = await safeAsync<List<T>>(
-      () => _delegate.query(query),
-      context: 'query<$T>/$query',
-      fallback: FallbackFactory.get<List<T>>(),
-    );
-    logAction(
-      action: 'query',
-      target: '$T',
-      data: result.map((e) => e.toJson()).toList(),
-    );
-    return result;
-  }
-
-  @override
-  Future<void> clear() async {
-    await safeVoid(() => _delegate.clear(), context: 'clear<$T>');
-    logAction(action: 'clear', target: '$T');
-  }
-
-  @override
-  Future<void> closeAll() async {
-    await safeVoid(() => _delegate.closeAll(), context: 'closeAll<$T>');
-    logAction(action: 'closeAll', target: '$T');
-  }
-
-  @override
-  Future<void> open() async {
-    await safeVoid(() => _delegate.open(), context: 'open<$T>');
-    logAction(action: 'open', target: '$T');
-  }
-
-  @override
-  Future<void> init() async {
-    await safeVoid(() => _delegate.init(), context: 'init<$T>');
-    logAction(action: 'init', target: '$T');
-  }
-
-  @override
-  Stream<List<T>> watchByChantier(String chantierId) {
-    final result = _delegate.watchByChantier(chantierId);
-
-    return result.map((list) {
-      logAction(
-        action: 'watchByChantier',
-        target: '$T/$chantierId',
-        data: list.map((e) => e.toJson()).toList(),
-      );
+  Stream<List<T>> watchAllCombined() {
+    // On retourne le stream combiné du delegate mais on logge chaque emission.
+    return _delegate.watchAllCombined().map((list) {
+      try {
+        logAction(
+          action: 'watchAllCombined',
+          target: '$T',
+          data: list.map((e) => e.toJson()).toList(),
+        );
+      } catch (_) {
+        // ne pas throw dans un stream à cause du logging
+      }
       return list;
     });
   }
+
+  /// syncEntity est déjà présent dans ta classe précédente et gère SyncableEntityService fallback.
+  Future<void> syncEntity(Ref ref, T entity) => _syncEntityWrapper(ref, entity);
+
+  Future<void> _syncEntityWrapper(Ref ref, T entity) async {
+    final id = (entity as dynamic).id as String? ?? '';
+
+    await safeVoid(() async {
+      if (_delegate is SyncableEntityService<T>) {
+        final syncSvc = _delegate as SyncableEntityService<T>;
+        final local = await syncSvc.getLocalRaw(id);
+        final remote = await syncSvc.getRemoteRaw(id);
+
+        await entity.mergeCloudDataIfAllowed(
+          ref,
+          getLocalData: () async => local,
+          getCloudData: () async => remote,
+          saveMergedData: (merged) async {
+            await syncSvc.saveRemoteRaw(id, merged);
+            await syncSvc.saveLocalRaw(id, merged);
+          },
+        );
+
+        logAction(
+          action: 'syncEntity',
+          target: '$T/$id',
+          data: {'local': local, 'remote': remote},
+        );
+        return;
+      }
+
+      // FALLBACK
+      final maybeLocalEntity =
+          await _delegate.getByIdFromLocal(id) ??
+          await _delegate.getByIdFromRemote(id);
+
+      final localMap = maybeLocalEntity?.toJson() ?? <String, dynamic>{};
+
+      Map<String, dynamic>? remoteMap;
+      try {
+        if ((_delegate as dynamic).getRemote != null) {
+          remoteMap =
+              await (_delegate as dynamic).getRemote(id)
+                  as Map<String, dynamic>?;
+        } else {
+          logAction(
+            action: 'syncEntity-fallback-no-remote',
+            target: '$T/$id',
+            data: {'note': 'no remote access on delegate'},
+          );
+          return;
+        }
+      } catch (e) {
+        logAction(
+          action: 'syncEntity-fallback-remote-error',
+          target: '$T/$id',
+          data: {'error': e.toString()},
+        );
+        return;
+      }
+
+      final merged = {...(remoteMap ?? {}), ...localMap};
+
+      try {
+        final exists = await _delegate.exists(id);
+        if (exists) {
+          await _delegate.update(maybeLocalEntity ?? entity, id);
+        } else {
+          await _delegate.save(maybeLocalEntity ?? entity, id);
+        }
+        logAction(
+          action: 'syncEntity-fallback-saved',
+          target: '$T/$id',
+          data: merged,
+        );
+      } catch (e) {
+        logAction(
+          action: 'syncEntity-fallback-save-error',
+          target: '$T/$id',
+          data: {'error': e.toString()},
+        );
+      }
+    }, context: 'syncEntity<$T>:$id');
+  }
+
+  void _log(String method, List<dynamic> args) {
+    developer.log('[LOG][${T.toString()}] $method called with args: $args');
+  }
+
+  @override
+  noSuchMethod(Invocation invocation) {
+    // Log du nom et des arguments
+    _log(invocation.memberName.toString(), invocation.positionalArguments);
+
+    // Délégation automatique à _delegate
+    final function = _getMethodFromInner(invocation.memberName);
+    if (function != null) {
+      return Function.apply(
+        function,
+        invocation.positionalArguments,
+        invocation.namedArguments,
+      );
+    }
+
+    return super.noSuchMethod(invocation);
+  }
+
+  dynamic _getMethodFromInner(Symbol memberName) {
+    // Récupère la méthode correspondante dans _delegate
+    final methodName = memberName
+        .toString()
+        .replaceAll('Symbol("', '')
+        .replaceAll('")', '');
+    final instanceMirror = _delegate as dynamic;
+    try {
+      return instanceMirror.noSuchMethod == null
+          ? instanceMirror
+          : instanceMirror;
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+extension<T extends JsonModel> on JsonModel {
+  Future<void> mergeCloudDataIfAllowed(
+    Ref<Object?> ref, {
+    required Future<Map<String, dynamic>> Function() getLocalData,
+    required Future<Map<String, dynamic>> Function() getCloudData,
+    required Future<Null> Function(dynamic merged) saveMergedData,
+  }) async {}
 }

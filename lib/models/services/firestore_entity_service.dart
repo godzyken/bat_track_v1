@@ -1,22 +1,22 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
-import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/remote/services/firebase_service.dart';
+import '../../data/local/services/service_type.dart';
+import '../../data/remote/services/firestore_service.dart';
 import '../../models/data/json_model.dart';
 import '../../models/data/maperror/logged_action.dart';
 import '../data/adapter/safe_async_mixin.dart';
-import 'entity_service.dart';
 
 class FirestoreEntityService<T extends JsonModel>
     with LoggedAction, SafeAsyncMixin<T>
-    implements EntityService<T> {
+    implements EntityServices<T> {
   final String collectionPath;
   final T Function(Map<String, dynamic>) fromJson;
-
+  final Function(dynamic query)? queryBuilder;
   late Ref ref;
-  Function(dynamic query)? queryBuilder;
 
   FirestoreEntityService({
     required this.collectionPath,
@@ -30,12 +30,12 @@ class FirestoreEntityService<T extends JsonModel>
   }
 
   @override
-  Future<void> save(T entity, String id) async {
+  Future<void> save(T item, [String? id]) async {
     await safeVoid(
       () => FirestoreService.setData<T>(
         collectionPath: collectionPath,
-        docId: id,
-        data: entity,
+        docId: id!,
+        data: item,
       ),
       context: 'save($id)',
       logError: true,
@@ -43,15 +43,15 @@ class FirestoreEntityService<T extends JsonModel>
   }
 
   @override
-  Future<T?> get(String id) async {
+  Future<T?> getById(String id) async {
     return await safeAsync<T?>(
       () => FirestoreService.getData<T?>(
         collectionPath: collectionPath,
         docId: id,
         fromJson: fromJson,
-      ).then((value) => value ?? AppUser.empty() as T),
-      context: 'get($id)',
-      fallback: AppUser.empty() as T,
+      ),
+      context: 'getById($id)',
+      fallback: null,
       logError: true,
     );
   }
@@ -82,50 +82,23 @@ class FirestoreEntityService<T extends JsonModel>
   }
 
   @override
-  Future<void> update(T entity, String id) => save(entity, id);
+  Stream<List<T>> watchAll() {
+    Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>>)?
+    typedQueryBuilder;
 
-  @override
-  Future<bool> exists(String id) async => (await get(id)) != null;
+    if (queryBuilder != null) {
+      typedQueryBuilder =
+          (query) => queryBuilder!(query) as Query<Map<String, dynamic>>;
+    }
 
-  @override
-  Future<List<String>> getKeys() async {
-    final docs = await getAll();
-    return docs.map((e) => e.id).toList();
+    return FirestoreService.watchCollection<T>(
+      collectionPath: collectionPath,
+      fromJson: fromJson,
+      queryBuilder: typedQueryBuilder,
+    );
   }
 
-  @override
-  T? getById(String id) => throw UnimplementedError();
-
-  @override
-  Future<void> deleteAll() => throw UnimplementedError();
-
-  @override
-  Future<void> deleteByQuery(String query) => throw UnimplementedError();
-
-  @override
-  Future<void> clear() => throw UnimplementedError();
-
-  @override
-  Future<void> closeAll() => throw UnimplementedError();
-
-  @override
-  Future<void> init() => throw UnimplementedError();
-
-  @override
-  Future<void> open() => throw UnimplementedError();
-
-  @override
-  Future<List<T>> query(String query) => throw UnimplementedError();
-
-  @override
-  Future<List<T>> sortedBy(
-    Comparable Function(T p1), {
-    bool descending = false,
-  }) => throw UnimplementedError();
-
-  @override
-  Future<List<T>> where(bool Function(T p1)) => throw UnimplementedError();
-
+  /// Optionnel : watcher filtré par chantierId
   @override
   Stream<List<T>> watchByChantier(String chantierId) {
     return FirestoreService.watchCollection<T>(
@@ -133,6 +106,44 @@ class FirestoreEntityService<T extends JsonModel>
       fromJson: fromJson,
       queryBuilder: (query) => query.where('chantierId', isEqualTo: chantierId),
     );
+  }
+
+  void _log(String method, List<dynamic> args) {
+    developer.log('[LOG][${T.toString()}] $method called with args: $args');
+  }
+
+  @override
+  noSuchMethod(Invocation invocation) {
+    // Log du nom et des arguments
+    _log(invocation.memberName.toString(), invocation.positionalArguments);
+
+    // Délégation automatique à _supabase
+    final function = _getMethodFromFirestore(invocation.memberName);
+    if (function != null) {
+      return Function.apply(
+        function,
+        invocation.positionalArguments,
+        invocation.namedArguments,
+      );
+    }
+
+    return super.noSuchMethod(invocation);
+  }
+
+  dynamic _getMethodFromFirestore(Symbol memberName) {
+    // Récupère la méthode correspondante dans FirestoreService
+    final methodName = memberName
+        .toString()
+        .replaceAll('Symbol("', '')
+        .replaceAll('")', '');
+    final instanceMirror = FirestoreService as dynamic;
+    try {
+      return instanceMirror.noSuchMethod == null
+          ? instanceMirror
+          : instanceMirror;
+    } catch (_) {
+      return null;
+    }
   }
 }
 

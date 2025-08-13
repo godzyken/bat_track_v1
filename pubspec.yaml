@@ -69,6 +69,8 @@ dependencies:
   firebase_auth: ^6.0.0
   logger: ^2.6.1
   firebase_crashlytics: ^5.0.0
+  supabase: ^2.8.0
+  async: ^2.13.0
 
 dev_dependencies:
   flutter_test:
@@ -91,6 +93,12 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/config/dolibarr_config.json
+    - assets/roles/client.png
+    - assets/roles/intervenant.png
+    - assets/roles/administrateur.png
+    - assets/roles/innovation.png
+    - assets/fonts/NotoSans-VariableFont_wdth_wght.ttf
+    - assets/fonts/NotoSans-Italic-VariableFont_wdth_wght.ttf
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/to/resolution-aware-images
@@ -103,12 +111,12 @@ flutter:
     # "family" key with the font family name, and a "fonts" key with a
     # list giving the asset and other descriptors for the font. For
     # example:
-    # fonts:
-    #   - family: Schyler
-    #     fonts:
-    #       - asset: fonts/Schyler-Regular.ttf
-    #       - asset: fonts/Schyler-Italic.ttf
-    #         style: italic
+  fonts:
+   - family: NotoSans
+     fonts:
+       - asset: assets/fonts/NotoSans-VariableFont_wdth_wght.ttf
+       - asset: assets/fonts/NotoSans-Italic-VariableFont_wdth_wght.ttf
+         style: italic
     #   - family: Trajan Pro
     #     fonts:
     #       - asset: fonts/TrajanPro.ttf
@@ -117,3 +125,4 @@ flutter:
     #
     # For details regarding fonts from package dependencies,
     # see https://flutter.dev/to/font-from-package
+    # -d chrome --web-browser-flag="--user-data-dir=D:\flutter_temp_profile"

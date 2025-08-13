@@ -5,7 +5,7 @@ import '../../../chantier/controllers/providers/chantier_sync_provider.dart';
 
 final techniciensStreamProvider = StreamProvider<List<Technicien>>((ref) {
   final service = ref.watch(techSyncServiceProvider);
-  return service.watchAll();
+  return service.watchAllCombined();
 });
 
 final techniciensFutureProvider = FutureProvider<List<Technicien>>((ref) async {

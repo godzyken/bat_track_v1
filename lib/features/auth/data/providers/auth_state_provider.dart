@@ -14,22 +14,20 @@ final authStateChangesProvider = StreamProvider<User?>((ref) {
 });
 
 /// Optionnel : l'utilisateur courant (value ou null)
-final authStateProvider = Provider<AsyncValue<User>>((ref) {
-  final stream = ref.watch(authStateChangesProvider);
+final authStateProvider = StreamProvider<AppUser?>((ref) {
+  final auth = ref.watch(firebaseAuthProvider);
 
-  return stream.when(
-    data: (user) {
-      if (user == null) {
-        return AsyncValue.error(
-          Exception('Utilisateur non connecté'),
-          StackTrace.current,
-        );
-      }
-      return AsyncValue.data(user);
-    },
-    loading: () => const AsyncValue.loading(),
-    error: (e, st) => AsyncValue.error(e, st),
-  );
+  return auth.authStateChanges().asyncMap((user) async {
+    if (user == null) return null;
+
+    final doc =
+        await ref
+            .watch(firestoreProvider)
+            .collection('users')
+            .doc(user.uid)
+            .get();
+    return AppUser.fromJson(doc.data()!..['uid'] = user.uid);
+  });
 });
 
 /// Charge son profil Firestore
@@ -55,7 +53,11 @@ final appUserProvider = StreamProvider<AppUser?>((ref) {
       .collection('users')
       .doc(auth.uid)
       .snapshots()
-      .map((snap) => AppUser.fromJson(snap.data()!));
+      .map((snap) {
+        final data = snap.data();
+        if (data == null) return null;
+        return AppUser.fromJson(data);
+      });
 });
 
 final allUsersProfileProvider = StreamProvider<List<UserModel>>((ref) {

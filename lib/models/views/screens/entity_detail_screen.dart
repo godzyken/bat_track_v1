@@ -2,18 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../data/adapter/typedefs.dart';
 import '../../data/json_model.dart';
 import '../../data/state_wrapper/wrappers.dart';
-import '../../notifiers/sync_entity_notifier.dart';
 import '../../providers/synchrones/sync_entity_notifier_provider.dart';
-
-typedef EntityDetailBuilder<T extends JsonModel> =
-    Widget Function(
-      BuildContext context,
-      T entity,
-      SyncEntityNotifier<T> notifier,
-      SyncedState<T> state,
-    );
 
 class EntityDetailScreen<T extends JsonModel> extends ConsumerWidget {
   final String id;

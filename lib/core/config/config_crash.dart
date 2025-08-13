@@ -3,13 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../../data/remote/providers/catch_error_provider.dart';
+import '../../models/data/adapter/typedefs.dart';
 
 Future<void> recordFlutterError(Object error, StackTrace stack) async {
   final crashlytics = FirebaseCrashlytics.instance;
   await crashlytics.recordError(error, stack, fatal: true);
 }
-
-typedef AsyncCallback<T> = Future<T> Function();
 
 Future<T?> catchAsync<T>(
   Ref ref,

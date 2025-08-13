@@ -7,6 +7,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../models/data/json_model.dart';
+import '../base/has_acces_control.dart';
 
 part 'pieces_jointes.freezed.dart';
 part 'pieces_jointes.g.dart';

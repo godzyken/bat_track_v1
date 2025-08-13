@@ -14,24 +14,28 @@ class DolibarrSyncService {
     final syncs = <Future Function()>[
       () => _syncModel<Client>(
         context: context,
+        fromJson: Client.fromJson,
         factory: () => Client.mock(),
         collection: 'clients',
         endpoint: 'thirdparties',
       ),
       () => _syncModel<Chantier>(
         context: context,
+        fromJson: Chantier.fromJson,
         factory: () => Chantier.mock(),
         collection: 'chantiers',
         endpoint: 'projects',
       ),
       () => _syncModel<Intervention>(
         context: context,
+        fromJson: Intervention.fromJson,
         factory: () => Intervention.mock(),
         collection: 'interventions',
         endpoint: 'interventions',
       ),
       () => _syncModel<Technicien>(
         context: context,
+        fromJson: Technicien.fromJson,
         factory: () => Technicien.mock(),
         collection: 'techniciens',
         endpoint: 'techniciens',
@@ -56,12 +60,13 @@ class DolibarrSyncService {
   Future<void> _syncModel<T extends JsonModel>({
     required BuildContext context,
     required T Function() factory,
+    required T Function(Map<String, dynamic>) fromJson,
     required String collection,
     required String endpoint,
   }) async {
     final adapter = TripleAdapter<T>(
       ref: ref,
-      factory: factory,
+      fromJson: fromJson,
       collectionPath: collection,
       dolibarrEndpoint: endpoint,
     );
@@ -70,8 +75,10 @@ class DolibarrSyncService {
     final box = await adapter.getHiveBox();
 
     for (final item in items) {
+      box.isOpen;
+
       await adapter.saveToFirebase(item as dynamic);
-      await adapter.saveToHive(box, item as dynamic);
+      await adapter.saveToHive(item as dynamic);
     }
 
     if (context.mounted) {

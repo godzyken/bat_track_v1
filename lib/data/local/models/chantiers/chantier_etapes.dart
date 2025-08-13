@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -10,10 +11,8 @@ part 'chantier_etapes.g.dart';
 
 @freezed
 class ChantierEtape
-    with
-        _$ChantierEtape,
-        JsonModel<ChantierEtape>,
-        JsonSerializableModel<ChantierEtape> {
+    with _$ChantierEtape, JsonModel<ChantierEtape>
+    implements JsonSerializableModel<ChantierEtape>, HasAccessControl {
   const ChantierEtape._();
 
   const factory ChantierEtape({
@@ -53,4 +52,12 @@ class ChantierEtape
 
   @override
   bool get isUpdated => updatedAt != null;
+
+  @override
+  bool canAccess(AppUser user) {
+    if (user.isAdmin) return true;
+    if (user.isClient) return user.uid == chantierId;
+    if (user.isTechnicien) return techniciens!.contains(user.uid);
+    return false;
+  }
 }

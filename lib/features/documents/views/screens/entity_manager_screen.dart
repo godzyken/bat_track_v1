@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:printing/printing.dart';
 
 import '../../../../core/responsive/wrapper/responsive_layout.dart';
+import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
 import '../../../home/views/widgets/app_drawer.dart';
@@ -33,6 +34,12 @@ class EntityManagerScreen<T extends JsonModel> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
     final asyncList = ref.watch(listProvider);
+    final user = ref.watch(appUserProvider).value;
+    if (user == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final isAdmin = user.role == 'admin';
 
     return Scaffold(
       appBar: AppBar(
@@ -78,6 +85,10 @@ class EntityManagerScreen<T extends JsonModel> extends ConsumerWidget {
               .delete();
         },
         infoOverride: info,
+        readOnly: !isAdmin,
+        currentRole: user.role,
+        currentUserId: user.id,
+        policy: MultiRolePolicy(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

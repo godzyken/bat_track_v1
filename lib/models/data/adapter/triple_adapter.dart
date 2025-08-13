@@ -10,45 +10,44 @@ import '../json_model.dart';
 
 class TripleAdapter<T extends JsonModel> {
   final Ref ref;
-  final T Function() factory;
-  final String collectionPath; // Collection Firebase
-  final String dolibarrEndpoint; // Endpoint Dolibarr REST
+  final T Function(Map<String, dynamic> json) fromJson;
+  final String collectionPath;
+  final String dolibarrEndpoint;
 
   TripleAdapter({
     required this.ref,
-    required this.factory,
+    required this.fromJson,
     required this.collectionPath,
     required this.dolibarrEndpoint,
   });
 
-  /// 🔹 Hive: ouvre la box correspondante à T
-  Future<Box> getHiveBox() async {
+  /// 🔹 Hive
+  Future<Box<T>> getHiveBox() async {
     return await Hive.openBox<T>(collectionPath);
   }
 
-  /// 🔹 Hive: enregistre une instance
-  Future<void> saveToHive(Box box, T model) async {
+  Future<void> saveToHive(T model) async {
+    final box = await getHiveBox();
     await box.put(model.id, model);
   }
 
-  /// 🔹 Firebase: envoie une instance
+  /// 🔹 Firebase
   Future<void> saveToFirebase(T model) async {
     final doc = FirebaseFirestore.instance
         .collection(collectionPath)
         .doc(model.id);
-    await doc.set(model.copyWithId(model.id));
+    await doc.set(model.toJson(), SetOptions(merge: true));
   }
 
-  /// 🔹 Firebase: récupère la collection
   Future<List<T>> fetchFromFirebase() async {
     final snapshot =
         await FirebaseFirestore.instance.collection(collectionPath).get();
     return snapshot.docs
-        .map((doc) => factory().copyWithId(doc.id) as T)
+        .map((doc) => fromJson({...doc.data(), "id": doc.id}))
         .toList();
   }
 
-  /// 🔹 Dolibarr: récupère les données via REST
+  /// 🔹 Dolibarr
   Future<List<T>> fetchFromDolibarr() async {
     final instance = ref.read(selectedInstanceProvider);
     if (instance == null) {
@@ -62,14 +61,13 @@ class TripleAdapter<T extends JsonModel> {
     if (res.statusCode == 200) {
       final data = jsonDecode(res.body);
       return (data as List)
-          .map((json) => (factory() as JsonModel).copyWithId(json) as T)
+          .map((json) => fromJson(json as Map<String, dynamic>))
           .toList();
     } else {
       throw Exception('Erreur Dolibarr (${res.statusCode}) : ${res.body}');
     }
   }
 
-  /// 🔹 Dolibarr: exporte vers API REST
   Future<void> pushToDolibarr(T model) async {
     final instance = ref.read(selectedInstanceProvider);
     if (instance == null) {
@@ -82,8 +80,11 @@ class TripleAdapter<T extends JsonModel> {
       'Content-Type': 'application/json',
     };
 
-    final body = jsonEncode((model as JsonModel).toString());
-    final res = await http.post(Uri.parse(url), headers: headers, body: body);
+    final res = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: jsonEncode(model.toJson()),
+    );
 
     if (res.statusCode != 200 && res.statusCode != 201) {
       throw Exception(
@@ -91,15 +92,12 @@ class TripleAdapter<T extends JsonModel> {
       );
     }
   }
-}
 
-extension TripleAdapterExtension<T extends JsonModel> on TripleAdapter<T> {
+  /// 🔹 Import complet Dolibarr → Hive + Firebase
   Future<void> importFromDolibarr() async {
     final items = await fetchFromDolibarr();
-    final box = await getHiveBox();
-
     for (final item in items) {
-      await saveToHive(box, item);
+      await saveToHive(item);
       await saveToFirebase(item);
     }
   }

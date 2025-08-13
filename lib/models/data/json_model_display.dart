@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../data/local/models/base/has_acces_control.dart';
 import '../../data/local/models/index_model_extention.dart';
-import 'json_model.dart';
 
 extension JsonModelDisplay on JsonSerializableModel {
   /// Renvoie le champ principal pour le titre (ex: nom, titre…)

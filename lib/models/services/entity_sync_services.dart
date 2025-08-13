@@ -1,223 +1,245 @@
 import 'dart:developer' as developer;
 
+import 'package:async/async.dart';
 import 'package:bat_track_v1/data/local/services/hive_service.dart';
-import 'package:bat_track_v1/data/remote/services/firebase_service.dart';
 import 'package:bat_track_v1/data/remote/services/storage_service.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
+import 'package:bat_track_v1/models/providers/asynchrones/remote_service_provider.dart';
 import 'package:bat_track_v1/models/providers/synchrones/facture_sync_provider.dart';
+import 'package:bat_track_v1/models/services/cloud_flare_entity_service.dart';
+import 'package:bat_track_v1/models/services/firebase_entity_service.dart';
+import 'package:bat_track_v1/models/services/firestore_entity_service.dart';
+import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapter.dart';
+import 'package:bat_track_v1/models/services/supabase_entity_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local/models/index_model_extention.dart';
+import '../../data/local/services/service_type.dart';
 import '../../features/chantier/controllers/providers/chantier_sync_provider.dart';
+import 'hive_entity_service.dart';
+import 'multi_backend_remote_service.dart';
+
+abstract class EntityLocalService<T> implements HiveService {
+  Future<void> put(String id, T item);
+  Future<T?> get(String id);
+  Future<List<T>> getAll();
+  Future<void> delete(String id);
+  Stream<List<T>> watchAll();
+}
+
+abstract class EntityRemoteService<T> {
+  Future<void> save(T item, String id);
+  Future<T?> getById(String id);
+  Future<List<T>> getAll();
+  Future<void> delete(String id);
+  Stream<List<T>> watchAll();
+}
 
 class EntitySyncService<T extends JsonModel> {
   static final _cacheTimestamps = <String, DateTime>{};
   static const Duration ttl = Duration(seconds: 60);
 
-  final String boxName;
-  final FirebaseStorage storage;
-  final FirebaseFirestore firestore;
+  final EntityLocalService<T> local;
+  final EntityRemoteService<T> remote;
 
-  EntitySyncService(this.boxName)
-    : storage = FirebaseStorage.instance,
-      firestore = FirebaseFirestore.instance;
+  EntitySyncService(this.local, this.remote);
 
-  /// 🔁 Sync vers Hive + Firestore (+ Storage si HasFile)
+  /// 🔁 Sauvegarde local + remote (+ fichier si HasFile)
   Future<void> save(T item, {String? id}) async {
     final docId = id ?? item.id;
 
-    // ✅ Sauvegarde Hive locale
-    await HiveService.put<T>(boxName, docId, item);
+    await Future.wait([local.put(docId, item), remote.save(item, docId)]);
 
-    // ✅ Sauvegarde dans Firestore
-    await FirestoreService.setData<T>(
-      collectionPath: boxName,
-      docId: docId,
-      data: item,
-    );
-
-    // 📂 Sauvegarde le fichier dans Firebase Storage si applicable
     if (item is HasFile) {
-      final file = (item as HasFile).getFile();
-      final fileName = file.path.split('/').last;
-      final path = '$boxName/$docId/$fileName';
-      await StorageService(storage).uploadFile(file, path);
+      await _handleFileUpload(item as HasFile, docId);
     }
 
     if (item is PieceJointe) {
-      // ⚠️ Nécessite un `BuildContext`, on ne peut pas précacher sans contexte ici
       developer.log(
-        '💡 Note: Impossible de précacher ici sans BuildContext. Utilise plutôt precacheAllWithContext() après.',
+        '💡 Impossible de précacher ici sans BuildContext. Utiliser precacheAllWithContext() après.',
       );
     }
   }
 
-  /// 🗑 Supprimer sur Hive + Firestore
-  Future<void> delete(String id) async {
-    await HiveService.delete<T>(boxName, id);
-    await firestore.collection(boxName).doc(id).delete();
+  Future<void> _handleFileUpload(HasFile item, String docId) async {
+    try {
+      final file = item.getFile();
+      final fileName = file.path.split('/').last;
+      final path = '${T.toString()}/$docId/$fileName';
+
+      await StorageService(FirebaseStorage.instance).uploadFile(file, path);
+      developer.log('📁 Fichier uploadé: $path');
+    } catch (e) {
+      developer.log('❌ Erreur upload fichier: $e');
+    }
   }
 
-  /// 🧾 Lecture locale
+  /// 🗑 Supprime local + remote
+  Future<void> delete(String id) async {
+    await local.delete(id);
+    await remote.delete(id);
+  }
+
+  /// 🧾 Lecture avec TTL cache
   Future<List<T>> getAll() async {
     final now = DateTime.now();
-    final lastFetch = _cacheTimestamps[boxName];
+    final lastFetch = _cacheTimestamps[T.toString()];
     if (lastFetch != null && now.difference(lastFetch) < ttl) {
-      developer.log('⛔ [EntitySync:$boxName] getAll() ignoré (TTL actif)');
-      return HiveService.getAll<T>(boxName);
+      developer.log('⛔ [EntitySync:$T] getAll ignoré (TTL actif)');
+      return local.getAll();
     }
 
-    _cacheTimestamps[boxName] = now;
+    _cacheTimestamps[T.toString()] = now;
 
     final sw = Stopwatch()..start();
-    developer.log('⏳ [FileSync:$boxName] getAll started');
+    developer.log('⏳ [EntitySync:$T] getAll started');
 
-    // 1. Récupère les entités depuis Firestore (avec filtre + limite)
-    final modelsFromCloud = await FirestoreService.getAll(
-      collectionPath: boxName,
-      fromJson:
-          JsonModelFactory.fromDynamic as T Function(Map<String, dynamic>),
-      updatedAfter: DateTime.now().subtract(const Duration(days: 7)),
-      limitTo: 100,
-    );
+    final modelsFromCloud = await remote.getAll();
 
-    // 2. Pour chaque modèle, on stocke dans Hive et on télécharge le fichier si besoin
     for (final model in modelsFromCloud) {
-      final id = model.id;
-
-      await HiveService.put<T>(boxName, id, model);
+      await local.put(model.id, model);
 
       if (model is HasFile) {
-        final fileItem = model as HasFile; // ✅ Cast explicite
-
-        final fileName = fileItem.getFile().path.split('/').last;
-        final path = '$boxName/$id/$fileName';
-
-        final exists = await storage
-            .ref(path)
-            .getDownloadURL()
-            .then((_) => true)
-            .catchError((_) => false);
-        if (exists) {
-          developer.log(
-            '📦 Fichier $fileName déjà dans Firebase, download si nécessaire…',
-          );
-          // Tu peux ici ajouter une logique de download local ou cache si tu veux
-        }
+        // Ici tu peux rajouter ta logique de download/cache fichier
       }
     }
 
     sw.stop();
     developer.log(
-      '✅ [FileSync:$boxName] getAll terminé en ${sw.elapsedMilliseconds}ms',
+      '✅ [EntitySync:$T] getAll terminé en ${sw.elapsedMilliseconds}ms',
     );
     return modelsFromCloud;
   }
 
-  /// 🔄 Synchronisation depuis Firestore vers Hive
-  Future<void> syncFromFirestore({BuildContext? context}) async {
+  /// Récupération uniquement locale
+  Future<List<T>> getAllFromLocal() => local.getAll();
+
+  Future<T?> getByIdFromLocal(String id) => local.get(id);
+
+  Future<T?> getByIdFromRemote(String id) async {
+    final remoteItem = await remote.getById(id);
+    if (remoteItem != null) {
+      await local.put(id, remoteItem);
+    }
+    return remoteItem;
+  }
+
+  /// 🔄 Synchronisation depuis le remote vers le local
+  Future<void> syncFromRemote({BuildContext? context}) async {
     final sw = Stopwatch()..start();
-    developer.log('🚀 Début $boxName.syncFromFirestore()');
+    developer.log('🚀 Début syncFromRemote()');
 
-    final now = DateTime.now();
-    final since = now.subtract(const Duration(days: 7));
+    final remoteItems = await remote.getAll();
+    developer.log('🔁 ${remoteItems.length} éléments récupérés');
 
-    final query = firestore
-        .collection(boxName)
-        .where('updatedAt', isGreaterThan: since)
-        .limit(50); // 🧠 Soft-limit Firestore (préventif)
-
-    final snapshot = await query.get();
-    developer.log('🔁 [Sync:$boxName] ${snapshot.size} docs récupérés');
-
-    for (var doc in snapshot.docs) {
-      final json = doc.data();
-      final item = JsonModelFactory.fromDynamic<T>(json);
-      if (item != null) {
-        await HiveService.put<T>(boxName, doc.id, item);
-        if ((item is HasFile || item is PieceJointe) &&
-            context?.mounted == true) {
-          await HiveService.precachePieceJointe<T>(context!, boxName, item);
-        }
+    for (final item in remoteItems) {
+      await local.put(item.id, item);
+      if ((item is HasFile || item is PieceJointe) &&
+          context?.mounted == true) {
+        await HiveService.precachePieceJointe<T>(context!, T.toString(), item);
       }
     }
 
     developer.log('✅ Terminé ${sw.elapsedMilliseconds}ms');
   }
 
-  /// 🔍 Récupère un document depuis Firestore et met à jour Hive
-  Future<T?> getByIdFromFirestore(String id) async {
-    final doc = await firestore.collection(boxName).doc(id).get();
-    if (!doc.exists) return null;
-    final data = doc.data()!;
-    final item = JsonModelFactory.fromDynamic<T>(data);
-    if (item != null) {
-      await HiveService.put<T>(boxName, id, item);
+  /// 🔄 Synchronisation locale vers le remote
+  Future<void> syncToRemote() async {
+    final localItems = await local.getAll();
+    for (final item in localItems) {
+      await remote.save(item, item.id);
     }
-    return item;
   }
 
-  /// 🔄 Synchronise un seul objet local sur Firestore/Storage
-  Future<void> syncOne(T item) async {
-    await save(item, id: item.id);
-  }
-
-  /// 🔁 Vérifie si un document existe en distant
-  Future<bool> existsInFirestore(String id) async {
-    final doc = await firestore.collection(boxName).doc(id).get();
-    return doc.exists;
-  }
-
+  /// 📦 Précache toutes les pièces jointes
   Future<void> precacheAllWithContext(BuildContext context) async {
-    final items = await HiveService.getAll<T>(boxName);
+    final items = await local.getAll();
     for (final item in items) {
       if (item is PieceJointe && context.mounted) {
         await HiveService.precachePieceJointe<PieceJointe>(
           context,
-          boxName,
+          T.toString(),
           item,
         );
       }
     }
   }
 
-  /// 🔼 Envoie toutes les entités Hive modifiées vers Firestore
-  Future<void> syncToFirestore() async {
-    final localItems = await HiveService.getAll<T>(boxName);
-    final collection = firestore.collection(boxName);
+  /// 📡 Watch combiné (local + remote)
+  Stream<List<T>> watchAllCombined() async* {
+    final hiveStream = local.watchAll();
+    final remoteStream = remote.watchAll();
 
-    for (final item in localItems) {
-      final doc = await collection.doc(item.id).get();
-      final exists = doc.exists;
+    await for (final event in StreamGroup.merge([hiveStream, remoteStream])) {
+      final Map<String, T> mergedMap = {};
 
-      if (!exists || _isLocalNewer(item, doc)) {
-        await save(item); // ⬅️ Cela gère Hive + Firestore + Storage
+      // Ajout des items locaux
+      final localItems = await local.getAll();
+      for (final item in localItems) {
+        mergedMap[item.id] = item;
       }
+
+      // Ajout/MAJ avec les items du remote
+      for (final item in event) {
+        final existing = mergedMap[item.id];
+        if (existing == null ||
+            (item.updatedAt != null &&
+                (existing.updatedAt == null ||
+                    item.updatedAt!.isAfter(existing.updatedAt!)))) {
+          mergedMap[item.id] = item;
+        }
+      }
+
+      yield mergedMap.values.toList();
     }
   }
+}
 
-  /// Compare les dates de mise à jour pour détecter un besoin de sync
-  bool _isLocalNewer(T item, DocumentSnapshot<Map<String, dynamic>> doc) {
-    try {
-      final remoteUpdatedAt =
-          (doc.data()?['updatedAt'] as Timestamp?)?.toDate();
-      return remoteUpdatedAt == null ||
-          item.updatedAt!.isAfter(remoteUpdatedAt);
-    } catch (e) {
-      return true; // Si doute, push
-    }
-  }
+// ============================================================================
+// FACTORY POUR CRÉER LES SERVICES
+// ============================================================================
 
-  /// Ecoute les changements en temps réel
-  Stream<List<T>> watchAll() async* {
-    final box = await HiveService.box<T>(boxName);
-    yield box.values.toList(); // première émission
+class SyncServiceFactory {
+  static EntitySyncService<T> create<T extends JsonModel>({
+    required EntityLocalService<T> localService,
+    required String collectionPath,
+    required T Function(Map<String, dynamic>) fromJson,
+    Query<Map<String, dynamic>> Function(dynamic)? queryBuilder,
+    List<StorageMode> backends = const [StorageMode.cloudflare],
+  }) {
+    final firestoreService = FirestoreEntityService<T>(
+      collectionPath: collectionPath,
+      fromJson: fromJson,
+      queryBuilder: queryBuilder,
+    );
 
-    // ensuite écoute les changements :
-    yield* box.watch().map((_) => box.values.toList());
+    final firebaseService = FirebaseEntityService<T>(
+      fromJson: fromJson,
+      collectionPath: collectionPath,
+    );
+
+    final supabaseService = SupabaseEntityService<T>(
+      table: collectionPath,
+      fromJson: fromJson,
+    );
+
+    final cloudFlareService = CloudflareEntityService<T>(
+      collectionName: collectionPath,
+      fromJson: fromJson,
+    );
+
+    final remoteService = MultiBackendRemoteService<T>(
+      enabledBackends: backends,
+      firestoreService: firestoreService,
+      firebaseService: firebaseService,
+      supabaseService: supabaseService,
+      cloudflareService: cloudFlareService,
+    );
+
+    return EntitySyncService<T>(localService, remoteService);
   }
 }
 
@@ -227,22 +249,55 @@ Future<void> syncAllEntitiesFromFirestore(Ref ref) async {
   developer.log('🚀 Démarrage syncAllEntities');
 
   final syncs = [
-    ref.read(chantierSyncServiceProvider).syncFromFirestore(),
-    ref.read(pieceJointeSyncServiceProvider).syncFromFirestore(),
-    ref.read(materielSyncServiceProvider).syncFromFirestore(),
-    ref.read(materiauSyncServiceProvider).syncFromFirestore(),
-    ref.read(mainOeuvreSyncServiceProvider).syncFromFirestore(),
-    ref.read(techSyncServiceProvider).syncFromFirestore(),
-    ref.read(clientSyncServiceProvider).syncFromFirestore(),
-    ref.read(interventionSyncServiceProvider).syncFromFirestore(),
-    ref.read(pieceSyncServiceProvider).syncFromFirestore(),
-    ref.read(factureSyncServiceProvider).syncFromFirestore(),
-    ref.read(projetSyncServiceProvider).syncFromFirestore(),
-    ref.read(invoiceSyncServiceProvider).syncFromFirestore(),
+    ref.read(chantierSyncServiceProvider).syncFromRemote(),
+    ref.read(pieceJointeSyncServiceProvider).syncFromRemote(),
+    ref.read(materielSyncServiceProvider).syncFromRemote(),
+    ref.read(materiauSyncServiceProvider).syncFromRemote(),
+    ref.read(mainOeuvreSyncServiceProvider).syncFromRemote(),
+    ref.read(techSyncServiceProvider).syncFromRemote(),
+    ref.read(clientSyncServiceProvider).syncFromRemote(),
+    ref.read(interventionSyncServiceProvider).syncFromRemote(),
+    ref.read(pieceSyncServiceProvider).syncFromRemote(),
+    ref.read(factureSyncServiceProvider).syncFromRemote(),
+    ref.read(projetSyncServiceProvider).syncFromRemote(),
+    ref.read(invoiceSyncServiceProvider).syncFromRemote(),
   ];
 
   await Future.wait(syncs);
 
   sw.stop();
   developer.log('✅ syncAllEntities terminé en ${sw.elapsedMilliseconds}ms');
+}
+
+/// Définit les opérations "raw" nécessaires pour une synchronisation
+abstract class SyncableEntityService<T extends JsonModel>
+    implements EntitySyncService<T> {
+  /// Lit la version locale sous forme de Map (ex. Hive)
+  @override
+  Future<Map<String, dynamic>> getLocalRaw(String id);
+
+  /// Lit la version distante (ex. Firestore)
+  Future<Map<String, dynamic>> getRemoteRaw(String id);
+
+  /// Écrit la version distante
+  Future<void> saveRemoteRaw(String id, Map<String, dynamic> data);
+
+  /// Écrit la version locale
+  Future<void> saveLocalRaw(String id, Map<String, dynamic> data);
+}
+
+/// Provider générique pour construire un EntitySyncService
+Provider<EntitySyncService<T>> entitySyncServiceProvider<T extends JsonModel>(
+  String boxName,
+  T Function(Map<String, dynamic>) fromJson,
+) {
+  return Provider<EntitySyncService<T>>((ref) {
+    final local = HiveEntityService<T>(boxName: boxName, fromJson: fromJson);
+    final remote = RemoteEntityServiceAdapter<T>(
+      collection: boxName,
+      fromJson: fromJson,
+      storage: ref.read(remoteStorageServiceProvider),
+    );
+    return EntitySyncService<T>(local, remote);
+  });
 }

@@ -5,7 +5,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-import '../../../../data/remote/providers/catch_error_provider.dart';
+import '../../adapter/typedefs.dart';
 
 class CrashlyticsWrapper {
   static Future<void> captureException(

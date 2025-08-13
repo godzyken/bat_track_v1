@@ -6,9 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+import '../../../models/data/adapter/typedefs.dart';
 import '../../../models/data/state_wrapper/analitics/crashlytics_wrapper.dart';
-
-typedef Reader = T Function<T>(ProviderListenable<T> provider);
 
 final loggerProvider = Provider<Logger>((ref) {
   return Logger(

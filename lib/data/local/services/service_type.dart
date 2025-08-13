@@ -1,13 +1,26 @@
+import 'dart:developer' as developer;
+
+import 'package:bat_track_v1/data/remote/services/supabase_service.dart';
+import 'package:bat_track_v1/models/services/firestore_entity_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../../../models/data/json_model.dart';
+import '../../../models/services/cloud_flare_entity_service.dart';
 import '../../../models/services/entity_service.dart';
-import '../../remote/services/firebase_service.dart';
+import '../../../models/services/entity_service_registry.dart';
+import '../../../models/services/firebase_entity_service.dart';
+import '../../../models/services/remote/remote_storage_service.dart';
+import '../../../models/services/supabase_entity_service.dart';
+import '../../remote/services/firestore_service.dart';
 import '../../remote/services/storage_service.dart';
 import '../models/index_model_extention.dart';
 import 'hive_service.dart';
 
 enum StorageMode { hive, firebase, supabase, cloudflare }
+
+class AppConfig {
+  static StorageMode storageMode = StorageMode.hive;
+}
 
 mixin StorageHandlerMixin<T extends JsonModel> on Object {
   String get boxName;
@@ -49,7 +62,8 @@ mixin StorageHandlerMixin<T extends JsonModel> on Object {
         await FirestoreService.deleteData(collectionPath: boxName, docId: id);
         break;
       case StorageMode.supabase:
-        throw UnimplementedError('Supabase not yet implemented');
+        await SupabaseService.instance.deleteRaw(boxName, id);
+        break;
     }
   }
 
@@ -64,7 +78,7 @@ mixin StorageHandlerMixin<T extends JsonModel> on Object {
           fromJson: fromJson!,
         );
       case StorageMode.supabase:
-        throw UnimplementedError('Supabase not yet implemented');
+        return SupabaseService.instance.getAll<T>(boxName, fromJson!);
     }
   }
 }
@@ -74,11 +88,14 @@ class EntityServices<T extends JsonModel>
     implements EntityService<T> {
   @override
   final String boxName;
+  final RemoteStorageService remoteStorageService;
+  final T Function(Map<String, dynamic>) fromJson;
 
-  @override
-  final StorageMode storageMode;
-
-  const EntityServices(this.boxName, {this.storageMode = StorageMode.hive});
+  EntityServices({
+    required this.boxName,
+    required this.fromJson,
+    required this.remoteStorageService,
+  });
 
   @override
   Future<void> save(T item, [String? id]) => put(id ?? item.id, item);
@@ -96,7 +113,7 @@ class EntityServices<T extends JsonModel>
   Future<T?> get(String id) => HiveService.get<T>(boxName, id);
 
   @override
-  T? getById(String id) => HiveService.getSync<T>(boxName, id);
+  Future<T?> getById(String id) => HiveService.getSync<T>(boxName, id);
 
   @override
   Future<bool> exists(String id) => HiveService.exists<T>(boxName, id);
@@ -134,7 +151,7 @@ class EntityServices<T extends JsonModel>
     list.sort(
       (a, b) => selector(a).compareTo(selector(b)) * (descending ? -1 : 1),
     );
-    return list ?? [];
+    return list;
   }
 
   @override
@@ -144,8 +161,11 @@ class EntityServices<T extends JsonModel>
   }
 
   @override
-  Future<void> deleteByQuery(String queryStr) async {
-    final list = await query(queryStr);
+  Future<void> deleteByQuery(Map<String, dynamic> queryStr) async {
+    if (queryStr.isEmpty) return;
+    final fieldName = queryStr.keys.first;
+
+    final list = await query(fieldName);
     for (final item in list) {
       await delete(item.id);
     }
@@ -162,23 +182,217 @@ class EntityServices<T extends JsonModel>
       }).toList();
     });
   }
+
+  Future<List<Map<String, dynamic>>> getAllRaw(
+    String collectionOrTable, {
+    DateTime? updatedAfter,
+    int? limit,
+  }) {
+    // TODO: implement getAllRaw
+    throw UnimplementedError();
+  }
+
+  /// Lit la version locale brute
+  @override
+  Future<Map<String, dynamic>> getLocalRaw(String id) async {
+    try {
+      final localItem = await HiveService.get<T>(boxName, id);
+      return localItem?.toJson() ?? <String, dynamic>{};
+    } catch (e, st) {
+      developer.log('getLocalRaw error for $boxName/$id: $e\n$st');
+      rethrow;
+    }
+  }
+
+  /// Lit la version distante brute selon le mode de stockage
+  @override
+  Future<Map<String, dynamic>> getRemoteRaw(String id) async {
+    return remoteStorageService.getRaw(boxName, id);
+  }
+
+  /// Écrit la version distante brute
+  @override
+  Future<void> saveRemoteRaw(String id, Map<String, dynamic> data) async {
+    await remoteStorageService.saveRaw(boxName, id, data);
+  }
+
+  /// Écrit la version locale brute (construit un T depuis JSON via JsonModelFactory)
+  @override
+  Future<void> saveLocalRaw(String id, Map<String, dynamic> data) async {
+    try {
+      final instance = JsonModelFactory.fromDynamic<T>(data);
+      if (instance == null) {
+        throw Exception(
+          'No JsonModelFactory registered for $T -> cannot save local raw',
+        );
+      }
+      await HiveService.put<T>(boxName, id, instance);
+    } catch (e, st) {
+      developer.log('saveLocalRaw error for $boxName/$id: $e\n$st');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<T>> getByQuery(Map<String, dynamic> query) async {
+    final allItems = await getAll();
+    return allItems.where((item) {
+      final json = item.toJson();
+      return query.entries.every((e) => json[e.key] == e.value);
+    }).toList();
+  }
+
+  @override
+  Stream<List<T>> watchAll() async* {
+    final box = await HiveService.box<T>(boxName);
+    yield* box.watch().asyncMap((_) async {
+      return await getAll();
+    });
+  }
+
+  @override
+  Stream<List<T>> watchByQuery(Map<String, dynamic> query) async* {
+    final box = await HiveService.box<T>(boxName);
+    yield* box.watch().asyncMap((_) async {
+      final allItems = await getAll();
+      return allItems.where((item) {
+        final json = item.toJson();
+        return query.entries.every((e) => json[e.key] == e.value);
+      }).toList();
+    });
+  }
+
+  Future<T?> getRawRemote(String id) async {
+    final json = await remoteStorageService.getRaw(boxName, id);
+    if (json.isEmpty) return null;
+    return fromJson(json);
+  }
+
+  Future<List<T>> getAllRawRemote({DateTime? updatedAfter, int? limit}) async {
+    final list = await remoteStorageService.getAllRaw(
+      boxName,
+      updatedAfter: updatedAfter,
+      limit: limit,
+    );
+    return list.map(fromJson).toList();
+  }
+
+  Future<void> saveRawRemote(T entity) async {
+    await remoteStorageService.saveRaw(boxName, entity.id, entity.toJson());
+  }
+
+  Future<void> deleteRawRemote(String id) async {
+    await remoteStorageService.deleteRaw(boxName, id);
+  }
+
+  Stream<List<T>> watchAllRawRemote({Function(dynamic query)? queryBuilder}) {
+    return remoteStorageService
+        .watchCollectionRaw(boxName, queryBuilder: queryBuilder)
+        .map((rows) => rows.map(fromJson).toList());
+  }
 }
 
-final chantierService = EntityServices<Chantier>('chantiers');
-final clientService = EntityServices<Client>('clients');
-final technicienService = EntityServices<Technicien>('techniciens');
-final interventionService = EntityServices<Intervention>('interventions');
-final chantierEtapeService = EntityServices<ChantierEtape>('chantierEtapes');
-final pieceJointeService = EntityServices<PieceJointe>('piecesJointes');
-final pieceService = EntityServices<Piece>('pieces');
-final materielService = EntityServices<Materiel>('materiels');
-final materiauService = EntityServices<Materiau>('materiau');
-final mainOeuvreService = EntityServices<MainOeuvre>('mainOeuvre');
-final projetService = EntityServices<Projet>('projets');
-final factureService = EntityServices<Facture>('factures');
-final factureModelService = EntityServices<FactureModel>('factureModels');
-final factureDraftService = EntityServices<FactureDraft>('factureDrafts');
-final userService = EntityServices<UserModel>('users');
-final equipementService = EntityServices<Equipement>('equipements');
+class EntityServiceFactory {
+  EntityServiceFactory._(); // private constructor
+
+  static final EntityServiceFactory instance = EntityServiceFactory._();
+
+  /// Crée un service adapté au mode de stockage choisi
+  EntityService<T> create<T extends JsonModel>({
+    required String boxNameOrCollectionName,
+    required T Function(Map<String, dynamic>) fromJson,
+    String? supabaseTable,
+  }) {
+    switch (AppConfig.storageMode) {
+      case StorageMode.hive:
+        return FirestoreEntityService<T>(
+          collectionPath: boxNameOrCollectionName,
+          fromJson: fromJson,
+        );
+      case StorageMode.firebase:
+        return FirebaseEntityService<T>(
+          collectionPath: boxNameOrCollectionName,
+          fromJson: fromJson,
+        );
+      case StorageMode.supabase:
+        return SupabaseEntityService<T>(
+          table: supabaseTable ?? boxNameOrCollectionName,
+          fromJson: fromJson,
+        );
+      case StorageMode.cloudflare:
+        return CloudflareEntityService<T>(
+          collectionName: boxNameOrCollectionName,
+          fromJson: fromJson,
+        );
+    }
+  }
+}
+
+final chantierService = buildEntityServiceProvider<Chantier>(
+  collectionOrBoxName: 'chantiers',
+  fromJson: Chantier.fromJson,
+);
+
+final clientService = buildEntityServiceProvider<Client>(
+  collectionOrBoxName: 'clients',
+  fromJson: Client.fromJson,
+);
+final technicienService = buildEntityServiceProvider<Technicien>(
+  collectionOrBoxName: 'techniciens',
+  fromJson: Technicien.fromJson,
+);
+final interventionService = buildEntityServiceProvider<Intervention>(
+  collectionOrBoxName: 'interventions',
+  fromJson: Intervention.fromJson,
+);
+final chantierEtapeService = buildEntityServiceProvider<ChantierEtape>(
+  collectionOrBoxName: 'chantierEtapes',
+  fromJson: ChantierEtape.fromJson,
+);
+final pieceJointeService = buildEntityServiceProvider<PieceJointe>(
+  collectionOrBoxName: 'piecesJointes',
+  fromJson: PieceJointe.fromJson,
+);
+final pieceService = buildEntityServiceProvider<Piece>(
+  collectionOrBoxName: 'pieces',
+  fromJson: Piece.fromJson,
+);
+final materielService = buildEntityServiceProvider<Materiel>(
+  collectionOrBoxName: 'materiels',
+  fromJson: Materiel.fromJson,
+);
+final materiauService = buildEntityServiceProvider<Materiau>(
+  collectionOrBoxName: 'materiau',
+  fromJson: Materiau.fromJson,
+);
+final mainOeuvreService = buildEntityServiceProvider<MainOeuvre>(
+  collectionOrBoxName: 'mainOeuvre',
+  fromJson: MainOeuvre.fromJson,
+);
+final projetService = buildEntityServiceProvider<Projet>(
+  collectionOrBoxName: 'projets',
+  fromJson: Projet.fromJson,
+);
+final factureService = buildEntityServiceProvider<Facture>(
+  collectionOrBoxName: 'factures',
+  fromJson: Facture.fromJson,
+);
+final factureModelService = buildEntityServiceProvider<FactureModel>(
+  collectionOrBoxName: 'factureModels',
+  fromJson: FactureModel.fromJson,
+);
+final factureDraftService = buildEntityServiceProvider<FactureDraft>(
+  collectionOrBoxName: 'factureDrafts',
+  fromJson: FactureDraft.fromJson,
+);
+final userService = buildEntityServiceProvider<UserModel>(
+  collectionOrBoxName: 'users',
+  fromJson: UserModel.fromJson,
+);
+final equipementService = buildEntityServiceProvider<Equipement>(
+  collectionOrBoxName: 'equipements',
+  fromJson: Equipement.fromJson,
+);
 
 final storageService = StorageService(FirebaseStorage.instance);
+final firebaseService = FirestoreService();

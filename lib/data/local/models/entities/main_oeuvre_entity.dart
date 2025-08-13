@@ -42,7 +42,7 @@ class MainOeuvreEntity extends HiveObject implements HiveModel<MainOeuvre> {
     return MainOeuvreEntity(
       moId: model.id,
       chantierId: model.chantierId,
-      idTechnicien: model.idTechnicien!,
+      idTechnicien: model.idTechnicien,
       heuresEstimees: model.heuresEstimees,
       moUpdatedAt: model.updatedAt,
       dateCreate: model.dateDebut,

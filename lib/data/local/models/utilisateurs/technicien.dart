@@ -3,15 +3,15 @@ import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
+import '../base/has_acces_control.dart';
+
 part 'technicien.freezed.dart';
 part 'technicien.g.dart';
 
 @freezed
 class Technicien
-    with
-        _$Technicien,
-        JsonModel<Technicien>,
-        JsonSerializableModel<Technicien> {
+    with _$Technicien, JsonModel<Technicien>
+    implements JsonSerializableModel<Technicien> {
   const Technicien._();
 
   const factory Technicien({

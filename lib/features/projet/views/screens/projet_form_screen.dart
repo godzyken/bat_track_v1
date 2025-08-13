@@ -25,6 +25,7 @@ class ProjectFormDialog extends ConsumerWidget {
             id: const Uuid().v4(),
             nom: '',
             description: '',
+            company: '',
             createdBy: '',
             members: [],
             dateDebut: DateTime.timestamp(),
@@ -33,6 +34,8 @@ class ProjectFormDialog extends ConsumerWidget {
             chefDeProjetValide: false,
             superUtilisateurValide: true,
             dateFin: DateTime.now().add(const Duration(days: 365)),
+            cloudVersion: {},
+            localDraft: {},
           ),
       fromJson: (json) => Projet.fromJson(json),
       onSubmit: (project) async {

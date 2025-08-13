@@ -5,16 +5,15 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../models/data/json_model.dart';
 import '../../adapters/signture_converter.dart';
+import '../base/has_acces_control.dart';
 
 part 'facture_draft.freezed.dart';
 part 'facture_draft.g.dart';
 
 @freezed
 class FactureDraft
-    with
-        _$FactureDraft,
-        JsonModel<FactureDraft>,
-        JsonSerializableModel<FactureDraft> {
+    with _$FactureDraft, JsonModel<FactureDraft>
+    implements JsonSerializableModel<FactureDraft> {
   const factory FactureDraft({
     required String chantierId,
     required String clientId,
@@ -74,10 +73,8 @@ class FactureDraft
 
 @freezed
 class CustomLigneFacture
-    with
-        _$CustomLigneFacture,
-        JsonModel<CustomLigneFacture>,
-        JsonSerializableModel<CustomLigneFacture> {
+    with _$CustomLigneFacture, JsonModel<CustomLigneFacture>
+    implements JsonSerializableModel<CustomLigneFacture> {
   const factory CustomLigneFacture({
     required String ctlId,
     required String description,

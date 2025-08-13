@@ -1,10 +1,11 @@
 import 'dart:convert';
 
-import 'package:bat_track_v1/data/remote/providers/catch_error_provider.dart';
 import 'package:bat_track_v1/models/data/maperror/log_entry.dart';
 import 'package:bat_track_v1/models/notifiers/logged_notifier.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+
+import '../adapter/typedefs.dart';
 
 mixin LoggedAction {
   late Reader _ref;

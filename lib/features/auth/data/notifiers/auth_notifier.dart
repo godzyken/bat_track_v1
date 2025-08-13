@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/utilisateurs/app_user.dart';
-import '../providers/auth_state_provider.dart';
 
 class AuthNotifier extends ChangeNotifier {
   AuthNotifier(this._ref) {
-    _ref.listen<AsyncValue<User?>>(authStateChangesProvider, (previous, next) {
+    _ref.listen<AsyncValue<AppUser?>>(authStateNotifierProvider, (
+      previous,
+      next,
+    ) {
       if (previous?.value?.uid != next.value?.uid) {
         notifyListeners();
       }
@@ -18,9 +20,7 @@ class AuthNotifier extends ChangeNotifier {
   final Ref _ref;
 }
 
-final authNotifierProvider = ChangeNotifierProvider<AuthNotifier>(
-  (ref) => AuthNotifier(ref),
-);
+final authNotifierProvider = Provider<AuthNotifier>((ref) => AuthNotifier(ref));
 
 class AuthState {
   final User? user;
@@ -153,3 +153,25 @@ final authStateNotifierProvider =
     AutoDisposeAsyncNotifierProvider<AuthStateNotifier, AppUser?>(
       AuthStateNotifier.new,
     );
+
+/// Notifier pour rafraîchir le GoRouter quand auth change
+class GoRouterRefreshNotifier extends ChangeNotifier {
+  GoRouterRefreshNotifier(this.ref) {
+    ref.listen<AsyncValue<AppUser?>>(authStateNotifierProvider, (
+      previous,
+      next,
+    ) {
+      if (previous?.value?.uid != next.value?.uid) {
+        notifyListeners();
+      }
+    });
+  }
+
+  final Ref ref;
+}
+
+final goRouterRefreshNotifierProvider = Provider<GoRouterRefreshNotifier>((
+  ref,
+) {
+  return GoRouterRefreshNotifier(ref);
+});

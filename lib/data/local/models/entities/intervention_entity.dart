@@ -29,11 +29,14 @@ class InterventionEntity extends HiveObject implements HiveModel<Intervention> {
   final FactureDraft? facture;
   @HiveField(10)
   final DateTime? sUpdatedAt;
+  @HiveField(11)
+  final String company;
 
   InterventionEntity({
     required this.sId,
     required this.chantierId,
     required this.technicienId,
+    required this.company,
     required this.description,
     required this.date,
     required this.statut,
@@ -49,6 +52,7 @@ class InterventionEntity extends HiveObject implements HiveModel<Intervention> {
       sId: model.id,
       chantierId: model.chantierId,
       technicienId: model.technicienId,
+      company: model.company,
       description: model.description,
       date: model.create,
       statut: model.statut,
@@ -70,6 +74,7 @@ class InterventionEntity extends HiveObject implements HiveModel<Intervention> {
     id: id,
     chantierId: chantierId,
     technicienId: technicienId,
+    company: company,
     description: description,
     create: date,
     statut: statut,
