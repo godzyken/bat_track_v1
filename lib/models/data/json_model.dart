@@ -103,7 +103,7 @@ extension JsonModelFactory on JsonModel {
       {};
 
   /// À appeler au boot de ton application pour chaque modèle :
-  /// JsonModelFactory.register<Projet>((json) => Projet.fromJson(json));
+  /// [`JsonModelFactory.register<Projet>((json) => Projet.fromJson`](json));
   static void register<T>(T Function(Map<String, dynamic>) builder) {
     _builders[T.toString()] = builder;
   }

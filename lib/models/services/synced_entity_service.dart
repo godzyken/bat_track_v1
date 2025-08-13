@@ -334,4 +334,14 @@ class SyncedEntityService<T extends JsonModel> implements EntityServices<T> {
     // TODO: implement watchAllRawRemote
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<Map<String, dynamic>>> getAllRaw(
+    String collectionOrTable, {
+    DateTime? updatedAfter,
+    int? limit,
+  }) {
+    // TODO: implement getAllRaw
+    throw UnimplementedError();
+  }
 }

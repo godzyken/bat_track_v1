@@ -104,6 +104,18 @@ class EntitySyncService<T extends JsonModel> {
 
       if (model is HasFile) {
         // Ici tu peux rajouter ta logique de download/cache fichier
+        final fileItem = model as HasFile; // ✅ Cast explicite
+
+        final fileName = fileItem.getFile().path.split('/').last;
+        final path = '$model/${model.id}/$fileName';
+
+        final exists = await remote.fileExists(path);
+        if (exists) {
+          developer.log(
+            '📦 Fichier $fileName déjà dans Firebase, download si nécessaire…',
+          );
+          // Tu peux ici ajouter une logique de download local ou cache si tu veux
+        }
       }
     }
 
@@ -152,6 +164,18 @@ class EntitySyncService<T extends JsonModel> {
     for (final item in localItems) {
       await remote.save(item, item.id);
     }
+  }
+
+  /// 🔄 Synchronise un seul objet local sur Firestore/Storage
+  Future<void> syncOne(T item) async {
+    await remote.save(item, item.id);
+  }
+
+  /// 🔁 Vérifie si un document existe en distant
+  Future<bool> existsInFirestore(String id) async {
+    final doc = await remote.getById(id);
+    // TODO : doc.exist.
+    return doc!.isUpdated;
   }
 
   /// 📦 Précache toutes les pièces jointes

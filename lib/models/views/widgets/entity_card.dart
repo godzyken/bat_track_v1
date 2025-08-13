@@ -66,7 +66,7 @@ class EntityCard<T extends JsonModel> extends StatelessWidget {
                       entity.toJson()['imageUrl'],
                       fit: BoxFit.cover,
                       errorBuilder:
-                          (_, __, ___) => Container(
+                          (_, _, _) => Container(
                             color: Colors.grey.shade300,
                             child: const Icon(Icons.image_not_supported),
                           ),
