@@ -1,0 +1,61 @@
+name: Flutter CI (Cached)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      # 1️⃣ Récupération du code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Cache Flutter SDK pour éviter re-téléchargement
+      - name: Cache Flutter SDK
+        id: flutter-cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/flutter_sdk
+          key: flutter-${{ matrix.os }}-3.19.0
+
+      # 3️⃣ Télécharger le script si cache manquant
+      - name: Download install script
+        if: steps.flutter-cache.outputs.cache-hit != 'true'
+        run: |
+          curl -s -o install_flutter_tmp_multios.sh https://raw.githubusercontent.com/<TON_REPO>/main/install_flutter_tmp_multios.sh
+          chmod +x install_flutter_tmp_multios.sh
+
+      # 4️⃣ Installer Flutter si cache manquant
+      - name: Install Flutter
+        if: steps.flutter-cache.outputs.cache-hit != 'true'
+        run: ./install_flutter_tmp_multios.sh
+
+      # 5️⃣ Configurer PATH
+      - name: Configure Flutter PATH
+        run: |
+          export FLUTTER_ROOT=/tmp/flutter_sdk/flutter
+          echo "$FLUTTER_ROOT/bin" >> $GITHUB_PATH
+
+      # 6️⃣ Vérification version
+      - name: Check Flutter version
+        run: flutter --version
+
+      # 7️⃣ Installer dépendances
+      - name: Flutter pub get
+        run: flutter pub get
+
+      # 8️⃣ Analyse statique
+      - name: Flutter analyze
+        run: flutter analyze
+
+      # 9️⃣ Tests unitaires
+      - name: Flutter test
+        run: flutter test

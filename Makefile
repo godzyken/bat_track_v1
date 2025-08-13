@@ -3,7 +3,7 @@
 all: install_flutter restore_config doctor
 
 # Version Flutter
-FLUTTER_VERSION = 3.24.3
+FLUTTER_VERSION = 3.29.3
 INSTALL_DIR = $(HOME)/flutter
 OS_NAME := $(shell uname -s | tr A-Z a-z)
 
