@@ -1,13 +1,17 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:bat_track_v1/data/remote/services/base_storage_service.dart';
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 
-class StorageService implements RemoteStorageService {
+class StorageService implements RemoteStorageService, BaseStorageService {
   final FirebaseStorage _storage;
+
   StorageService(this._storage);
 
+  @override
   Future<String> uploadFile(File file, String path) async {
     final ref = _storage.ref().child(path);
     final uploadTask = await ref.putFile(file);
@@ -15,11 +19,13 @@ class StorageService implements RemoteStorageService {
     return url;
   }
 
+  @override
   Future<void> deleteFile(String path) async {
     final ref = _storage.ref().child(path);
     await ref.delete();
   }
 
+  @override
   Future<Uint8List?> downloadFile(String path) async {
     final ref = _storage.ref().child(path);
     return await ref.getData();
@@ -33,6 +39,7 @@ class StorageService implements RemoteStorageService {
     }
   }
 
+  @override
   Future<bool> fileExists(String path) async {
     final ref = _storage.ref().child(path);
     try {
@@ -43,26 +50,31 @@ class StorageService implements RemoteStorageService {
     }
   }
 
+  @override
   Future<String> getDownloadURL(String path) async {
     final ref = _storage.ref().child(path);
     return await ref.getDownloadURL();
   }
 
+  @override
   Future<void> uploadBytes(Uint8List bytes, String path) async {
     final ref = _storage.ref().child(path);
     await ref.putData(bytes);
   }
 
+  @override
   Future<void> uploadString(String content, String path) async {
     final ref = _storage.ref().child(path);
     await ref.putString(content);
   }
 
+  @override
   Future<void> uploadFileFromUrl(String url, String path) async {
     final ref = _storage.ref().child(path);
     await ref.putFile(File(url));
   }
 
+  @override
   Future<void> uploadBytesFromUrl(String url, String path) async {
     final ref = _storage.ref().child(path);
     await ref.putData(
@@ -72,48 +84,94 @@ class StorageService implements RemoteStorageService {
     );
   }
 
-  Future<void> save(File file, String id) async {}
-
-  Future<List<String>> getAll() async {}
-
   @override
-  Future<void> deleteRaw(String collectionOrTable, String id) {
-    // TODO: implement deleteRaw
-    throw UnimplementedError();
+  Future<void> deleteAllFiles() async {
+    try {
+      final ref = _storage.ref();
+      final listResult = await ref.listAll();
+      for (final item in listResult.items) {
+        await item.delete();
+      }
+    } on FirebaseException catch (e, stackTrace) {
+      developer.log(
+        'Error deleting all files',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getAllRaw(
-    String collectionOrTable, {
-    DateTime? updatedAfter,
-    int? limit,
-  }) {
-    // TODO: implement getAllRaw
-    throw UnimplementedError();
+  Future<FullMetadata?> getMetadata(String path) async {
+    try {
+      final ref = _storage.ref().child(path);
+      return await ref.getMetadata();
+    } on FirebaseException catch (e) {
+      if (e.code == 'object-not-found') {
+        return null;
+      }
+      developer.log('Error getting metadata', error: e);
+      rethrow;
+    }
   }
 
   @override
-  Future<Map<String, dynamic>> getRaw(String collectionOrTable, String id) {
-    // TODO: implement getRaw
-    throw UnimplementedError();
+  Future<List<Reference>> listAll(String path) async {
+    try {
+      final ref = _storage.ref().child(path);
+      final listResult = await ref.listAll();
+      return listResult.items;
+    } on FirebaseException catch (e, stackTrace) {
+      developer.log('Error listing files', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> save(File file, String id) async {
+    await uploadFile(file, id);
+  }
+
+  Future<List<String>> getAll() async {
+    final listResult = await _storage.ref().listAll();
+    return listResult.items.map((e) => e.fullPath).toList();
+  }
+
+  void _log(String method, List<dynamic> args) {
+    developer.log('[LOG][${_storage.bucket}] $method called with args: $args');
   }
 
   @override
-  Future<void> saveRaw(
-    String collectionOrTable,
-    String id,
-    Map<String, dynamic> data,
-  ) {
-    // TODO: implement saveRaw
-    throw UnimplementedError();
+  noSuchMethod(Invocation invocation) {
+    // Log du nom et des arguments
+    _log(invocation.memberName.toString(), invocation.positionalArguments);
+
+    // Délégation automatique à _storage
+    final function = _getMethodFromInner(invocation.memberName);
+    if (function != null) {
+      return Function.apply(
+        function,
+        invocation.positionalArguments,
+        invocation.namedArguments,
+      );
+    }
+
+    return super.noSuchMethod(invocation);
   }
 
-  @override
-  Stream<List<Map<String, dynamic>>> watchCollectionRaw(
-    String collectionOrTable, {
-    Function(dynamic query)? queryBuilder,
-  }) {
-    // TODO: implement watchCollectionRaw
-    throw UnimplementedError();
+  dynamic _getMethodFromInner(Symbol memberName) {
+    // Récupère la méthode correspondante dans _storage
+    final methodName = memberName
+        .toString()
+        .replaceAll('Symbol("', '')
+        .replaceAll('")', '');
+    final instanceMirror = _storage as dynamic;
+    try {
+      return instanceMirror.noSuchMethod == null
+          ? instanceMirror
+          : instanceMirror;
+    } catch (_) {
+      return null;
+    }
   }
 }

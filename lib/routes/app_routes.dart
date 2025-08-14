@@ -26,7 +26,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     navigatorKey: ref.read(navigatorKeyProvider),
-    initialLocation: '/',
+    initialLocation: '/loading',
     refreshListenable: refresh,
     debugLogDiagnostics: true,
     redirect: (context, state) {

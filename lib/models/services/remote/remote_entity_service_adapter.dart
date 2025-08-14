@@ -43,4 +43,10 @@ class RemoteEntityServiceAdapter<T extends JsonModel>
         .watchCollectionRaw(collection)
         .map((rows) => rows.map(fromJson).toList());
   }
+
+  @override
+  Future fileExists(String path) {
+    // TODO: implement fileExists
+    throw UnimplementedError();
+  }
 }

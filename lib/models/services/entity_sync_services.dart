@@ -36,6 +36,7 @@ abstract class EntityRemoteService<T> {
   Future<List<T>> getAll();
   Future<void> delete(String id);
   Stream<List<T>> watchAll();
+  Future fileExists(String path);
 }
 
 class EntitySyncService<T extends JsonModel> {
@@ -297,7 +298,6 @@ Future<void> syncAllEntitiesFromFirestore(Ref ref) async {
 abstract class SyncableEntityService<T extends JsonModel>
     implements EntitySyncService<T> {
   /// Lit la version locale sous forme de Map (ex. Hive)
-  @override
   Future<Map<String, dynamic>> getLocalRaw(String id);
 
   /// Lit la version distante (ex. Firestore)

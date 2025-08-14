@@ -8,7 +8,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../models/data/json_model.dart';
-import '../../../models/notifiers/entity_notifier_provider.dart';
+import '../../../models/providers/asynchrones/entity_notifier_provider.dart';
 import '../../../models/services/entity_service_registry.dart';
 import '../../../models/services/logged_entity_service.dart';
 import '../models/index_model_extention.dart';

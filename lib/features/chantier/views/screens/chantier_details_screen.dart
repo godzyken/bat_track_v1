@@ -2,7 +2,7 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/features/chantier/views/widgets/chantier_extensions_widgets.dart';
 import 'package:bat_track_v1/models/data/state_wrapper/wrappers.dart';
 import 'package:bat_track_v1/models/notifiers/sync_entity_notifier.dart';
-import 'package:bat_track_v1/models/providers/synchrones/sync_entity_notifier_provider.dart';
+import 'package:bat_track_v1/models/providers/synchrones/generic_entity_provider_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

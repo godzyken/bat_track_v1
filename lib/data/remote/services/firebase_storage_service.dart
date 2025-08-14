@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -174,6 +175,44 @@ class FirebaseStorageService implements BaseStorageService {
       }
       _logger.e('Error getting metadata', error: e);
       rethrow;
+    }
+  }
+
+  void _log(String method, List<dynamic> args) {
+    developer.log('[LOG][${_logger.init}] $method called with args: $args');
+  }
+
+  @override
+  noSuchMethod(Invocation invocation) {
+    // Log du nom et des arguments
+    _log(invocation.memberName.toString(), invocation.positionalArguments);
+
+    // Délégation automatique à _supabase
+    final function = _getMethodFromFirestore(invocation.memberName);
+    if (function != null) {
+      return Function.apply(
+        function,
+        invocation.positionalArguments,
+        invocation.namedArguments,
+      );
+    }
+
+    return super.noSuchMethod(invocation);
+  }
+
+  dynamic _getMethodFromFirestore(Symbol memberName) {
+    // Récupère la méthode correspondante dans _storage
+    final methodName = memberName
+        .toString()
+        .replaceAll('Symbol("', '')
+        .replaceAll('")', '');
+    final instanceMirror = _storage as dynamic;
+    try {
+      return instanceMirror.noSuchMethod == null
+          ? instanceMirror
+          : instanceMirror;
+    } catch (_) {
+      return null;
     }
   }
 }

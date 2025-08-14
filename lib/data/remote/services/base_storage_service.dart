@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-abstract class BaseStorageService {
+abstract class BaseStorageService<T extends File>
+    implements RemoteStorageService {
   Future<String> uploadFile(File file, String path);
 
   Future<void> deleteFile(String path);

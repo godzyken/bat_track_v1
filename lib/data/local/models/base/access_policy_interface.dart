@@ -6,6 +6,8 @@ abstract class AccessPolicy<T> {
   bool canCreate(String role, {dynamic entity});
   bool canEdit(String role, {dynamic entity});
   bool canDelete(String role, {dynamic entity});
+  bool canMerge(String role, JsonModelWithUser<dynamic> entity);
+  bool canRead(String role, String userId, JsonModelWithUser<dynamic> entity);
 }
 
 class MultiRolePolicy implements AccessPolicy {
@@ -72,13 +74,13 @@ class MultiRolePolicy implements AccessPolicy {
   }
 
   @override
-  bool canMerge(JsonModelWithUser<dynamic> entity, String role) {
+  bool canMerge(String role, JsonModelWithUser<dynamic> entity) {
     // TODO: implement canMerge
     throw UnimplementedError();
   }
 
   @override
-  bool canRead(JsonModelWithUser<dynamic> entity, String role, String userId) {
+  bool canRead(String role, String userId, JsonModelWithUser<dynamic> entity) {
     // TODO: implement canRead
     throw UnimplementedError();
   }

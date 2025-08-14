@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -21,13 +22,15 @@ class CrashlyticsWrapper {
 
       final userId = user?.id ?? 'anonymous';
 
-      await FirebaseCrashlytics.instance.recordError(
-        error,
-        stack,
-        reason: 'Handled by CrashlyticsWrapper',
-        fatal: false,
-        information: ['userId: $userId'],
-      );
+      if (!kIsWeb) {
+        await FirebaseCrashlytics.instance.recordError(
+          error,
+          stack,
+          reason: 'Handled by CrashlyticsWrapper',
+          fatal: false,
+          information: ['userId: $userId'],
+        );
+      }
     } catch (e, s) {
       // Ne jamais lancer d'erreur dans la fonction de log elle-même !
       developer.log('CrashlyticsWrapper error: $e', stackTrace: s);

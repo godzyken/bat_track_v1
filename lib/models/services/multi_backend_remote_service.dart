@@ -108,4 +108,10 @@ class MultiBackendRemoteService<T extends JsonModel>
 
     return Stream.value([]);
   }
+
+  @override
+  Future fileExists(String path) {
+    // TODO: implement fileExists
+    throw UnimplementedError();
+  }
 }

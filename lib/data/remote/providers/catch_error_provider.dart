@@ -64,7 +64,7 @@ class ErrorLogger {
       ).e('Flutter Error', error: details.exception, stackTrace: details.stack);
       CrashlyticsWrapper.captureException(
         details.exception,
-        details.stack!,
+        details.stack ?? StackTrace.fromString(details.stack.toString()),
         read,
       );
     };

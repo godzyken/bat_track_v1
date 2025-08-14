@@ -3,18 +3,20 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:bat_track_v1/data/remote/services/base_storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local/models/base/has_acces_control.dart';
 import '../../data/remote/services/storage_service.dart';
 import '../data/json_model.dart';
+import '../data/maperror/proxy.dart';
 import '../data/state_wrapper/wrappers.dart';
 import '../services/entity_service.dart';
 
 class SyncEntityNotifier<T extends JsonModel>
     extends StateNotifier<SyncedState<T>> {
   final EntityService<T> entityService;
-  final StorageService storageService;
+  final BaseStorageService<File> storageService;
   final bool autoSync;
   Timer? _debounceTimer;
   String? _lastJsonCache;
@@ -65,7 +67,7 @@ class SyncEntityNotifier<T extends JsonModel>
         'sync/${state.data.id}.json',
       );
       state = state.copyWith(isSyncing: false, lastSynced: DateTime.now());
-      developer.log('✅ Sync réussie : $url');
+      _logClickable('✅ Sync réussie', json, extra: {'url': url});
     } catch (e) {
       state = state.copyWith(isSyncing: false, hasError: true);
       developer.log('❌ Erreur de sync : $e');
@@ -79,9 +81,36 @@ class SyncEntityNotifier<T extends JsonModel>
     return file;
   }
 
+  void _logClickable(
+    String message,
+    String json, {
+    Map<String, dynamic>? extra,
+  }) {
+    final prettyJson = const JsonEncoder.withIndent(
+      '  ',
+    ).convert(jsonDecode(json));
+
+    final buffer =
+        StringBuffer()
+          ..writeln(message)
+          ..writeln('---- JSON ----')
+          ..writeln(prettyJson)
+          ..writeln('--------------');
+
+    if (extra != null) {
+      buffer.writeln('Extra: ${jsonEncode(extra)}');
+    }
+
+    // Log cliquable (le JSON apparait complet dans la console)
+    developer.log(
+      buffer.toString(),
+      name: 'SyncEntityNotifier<${T.toString()}>',
+    );
+  }
+
   Future<void> clearCache() async {
     _lastJsonCache = null;
-    await storageService.clearCache();
+    await storageService.deleteAllFiles();
   }
 
   @override
@@ -89,4 +118,33 @@ class SyncEntityNotifier<T extends JsonModel>
     _debounceTimer?.cancel();
     super.dispose();
   }
+}
+
+class SyncEntityNotifierDebug<T extends JsonModel>
+    extends SyncEntityNotifier<T> {
+  SyncEntityNotifierDebug({
+    required EntityService<T> entityService,
+    required StorageService storageService,
+    required T initialState,
+    bool autoSync = true,
+    MethodFilter? logFilter,
+    CallInterceptor? interceptor,
+  }) : super(
+         entityService:
+             DebugProxy<EntityService<T>>(
+                   entityService,
+                   logFilter: logFilter,
+                   interceptor: interceptor,
+                 )
+                 as EntityService<T>,
+         storageService:
+             DebugProxy<StorageService>(
+                   storageService,
+                   logFilter: logFilter,
+                   interceptor: interceptor,
+                 )
+                 as StorageService,
+         initialState: initialState,
+         autoSync: autoSync,
+       );
 }

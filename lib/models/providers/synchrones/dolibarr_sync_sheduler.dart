@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/remote/providers/dolibarr_instance_provider.dart';
 import '../../../data/remote/services/dolibarr_services.dart';
 import '../../data/dolibarr/dolibarr_impoter.dart';
-import '../../notifiers/error_logger_provider.dart';
+import '../asynchrones/error_logger_provider.dart';
 
 final dolibarrSchedulerProvider = Provider<DolibarrSyncScheduler>(
   (ref) => DolibarrSyncScheduler(ref),

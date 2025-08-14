@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/adapter/typedefs.dart';
 import '../../data/json_model.dart';
 import '../../data/state_wrapper/wrappers.dart';
-import '../../providers/synchrones/sync_entity_notifier_provider.dart';
+import '../../providers/synchrones/generic_entity_provider_factory.dart';
 
 class EntityDetailScreen<T extends JsonModel> extends ConsumerWidget {
   final String id;

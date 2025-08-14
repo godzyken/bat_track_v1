@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:io';
 
 import '../../data/local/services/service_type.dart';
 import '../../data/remote/services/storage_service.dart';
@@ -25,7 +27,7 @@ class FileSyncService<T extends JsonModel> {
       final items = raw.map((map) => entityService.fromJson(map)).toList();
 
       for (final item in items) {
-        await storageService.save(item.id, item.toJson());
+        await storageService.save(item.toJson() as File, item.id);
       }
 
       developer.log('[SYNC] Pull terminé: ${items.length} éléments.');
@@ -41,7 +43,12 @@ class FileSyncService<T extends JsonModel> {
       developer.log('[SYNC] Push ${T.toString()}...');
 
       final localItems = await storageService.getAll();
-      for (final map in localItems) {
+      for (final rawItem in localItems) {
+        final map =
+            rawItem is String
+                ? jsonDecode(rawItem) as Map<String, dynamic>
+                : rawItem as Map<String, dynamic>;
+
         final item = entityService.fromJson(map);
 
         if (force) {

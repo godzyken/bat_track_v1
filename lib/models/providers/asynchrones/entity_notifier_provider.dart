@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
-import '../data/json_model.dart';
-import '../services/entity_service.dart';
-import 'entity_notifier.dart';
+import '../../data/json_model.dart';
+import '../../services/entity_service.dart';
+import '../../notifiers/entity_notifier.dart';
 
 final entityNotifierProviderFamily = <Type, dynamic>{};
 
