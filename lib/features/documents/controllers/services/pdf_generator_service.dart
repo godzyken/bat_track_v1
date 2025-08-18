@@ -23,8 +23,8 @@ class PdfGeneratorService {
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text('Facture n°: ${f.id}'),
-                      pw.Text('Client: ${f.clientId ?? 'Inconnu'}'),
-                      pw.Text('Date: ${f.date.toIso8601String() ?? 'N/A'}'),
+                      pw.Text('Client: ${f.clientId}'),
+                      pw.Text('Date: ${f.date.toIso8601String()}'),
                       pw.Text('Montant: ${f.montant} €'),
                       pw.Divider(),
                     ],

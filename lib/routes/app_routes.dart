@@ -12,6 +12,7 @@ import '../features/auth/views/screens/login_screen.dart';
 import '../features/auth/views/screens/register_screen.dart';
 import '../features/auth/views/widgets/access_shell.dart';
 import '../features/chantier/views/screens/chantier_extensions_screens.dart';
+import '../features/documents/views/screens/factureDetailScreen.dart';
 import '../features/documents/views/screens/factures_screen.dart';
 import '../features/projet/views/screens/projet_detail_screen.dart';
 import '../features/technicien/views/screens/technitiens_screen.dart';
@@ -127,14 +128,26 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/documents',
             builder: (context, state) => const FacturesScreen(),
-            routes: [],
+            routes: [
+              GoRoute(
+                path: ':documentId',
+                builder: (context, state) {
+                  final currentuser = state.pathParameters['id'] as AppUser;
+                  final projetId = state.pathParameters['ProjetId'] as Projet;
+                  return FactureDetailScreen(
+                    userId: currentuser.id,
+                    projetId: projetId.id,
+                  );
+                },
+              ),
+            ],
           ),
           GoRoute(
             path: '/projets',
             builder: (context, state) => const ProjectListScreen(),
             routes: [
               GoRoute(
-                path: '/edit-projet',
+                path: ':projetId',
                 builder: (context, state) {
                   final currentuser = state.pathParameters['id'] as AppUser;
                   final projet = state.pathParameters['Projet'] as Projet;

@@ -1,14 +1,18 @@
 import 'dart:developer' as developer;
 
+import 'package:bat_track_v1/models/data/adapter/no_such_methode_logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../models/services/remote/remote_storage_service.dart';
 
-class CloudFlareService extends RemoteStorageService {
+class CloudFlareService extends RemoteStorageService with NoSuchMethodLogger {
   CloudFlareService._();
   static final CloudFlareService instance = CloudFlareService._();
 
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  @override
+  dynamic get proxyTarget => _db;
 
   /// 🔍 Récupère un enregistrement brut
   @override

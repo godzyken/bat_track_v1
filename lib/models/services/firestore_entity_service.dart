@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:developer' as developer;
 
+import 'package:bat_track_v1/models/data/adapter/no_such_methode_logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,9 +11,10 @@ import '../../models/data/maperror/logged_action.dart';
 import '../data/adapter/safe_async_mixin.dart';
 
 class FirestoreEntityService<T extends JsonModel>
-    with LoggedAction, SafeAsyncMixin<T>
+    with LoggedAction, SafeAsyncMixin<T>, NoSuchMethodLogger
     implements EntityServices<T> {
   final String collectionPath;
+  @override
   final T Function(Map<String, dynamic>) fromJson;
   final Function(dynamic query)? queryBuilder;
   late Ref ref;
@@ -28,6 +29,9 @@ class FirestoreEntityService<T extends JsonModel>
     this.ref = ref;
     initSafeAsync(ref.read);
   }
+
+  @override
+  dynamic get proxyTarget => ref;
 
   @override
   Future<void> save(T item, [String? id]) async {
@@ -106,44 +110,6 @@ class FirestoreEntityService<T extends JsonModel>
       fromJson: fromJson,
       queryBuilder: (query) => query.where('chantierId', isEqualTo: chantierId),
     );
-  }
-
-  void _log(String method, List<dynamic> args) {
-    developer.log('[LOG][${T.toString()}] $method called with args: $args');
-  }
-
-  @override
-  noSuchMethod(Invocation invocation) {
-    // Log du nom et des arguments
-    _log(invocation.memberName.toString(), invocation.positionalArguments);
-
-    // Délégation automatique à _supabase
-    final function = _getMethodFromFirestore(invocation.memberName);
-    if (function != null) {
-      return Function.apply(
-        function,
-        invocation.positionalArguments,
-        invocation.namedArguments,
-      );
-    }
-
-    return super.noSuchMethod(invocation);
-  }
-
-  dynamic _getMethodFromFirestore(Symbol memberName) {
-    // Récupère la méthode correspondante dans FirestoreService
-    final methodName = memberName
-        .toString()
-        .replaceAll('Symbol("', '')
-        .replaceAll('")', '');
-    final instanceMirror = FirestoreService as dynamic;
-    try {
-      return instanceMirror.noSuchMethod == null
-          ? instanceMirror
-          : instanceMirror;
-    } catch (_) {
-      return null;
-    }
   }
 }
 

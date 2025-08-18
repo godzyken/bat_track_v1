@@ -17,18 +17,21 @@ class AccessShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
     final userId = authState.value;
-    if (userId == null) return const Center(child: Text('Pas encore connecté'));
+    if (userId == null) {
+      return Stack(
+        children: [
+          const Center(child: Text('Pas encore connecté')),
+          const LoginScreen(),
+        ],
+      );
+    }
 
     return authState.when(
       data: (user) {
-        if (user == null) {
-          return const LoginScreen();
-        }
-
         final location = GoRouterState.of(context).uri.toString();
-        debugPrint("🔍 Navigation vers $location avec rôle ${user.role}");
+        debugPrint("🔍 Navigation vers $location avec rôle ${user?.role}");
 
-        if (!policy.canAccess(user.role)) {
+        if (!policy.canAccess(user!.role)) {
           return const UnauthorizedScreen();
         }
 

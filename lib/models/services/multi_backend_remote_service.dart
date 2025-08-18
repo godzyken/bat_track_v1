@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:bat_track_v1/data/local/services/service_type.dart';
 import 'package:bat_track_v1/models/services/firestore_entity_service.dart';
 import 'package:bat_track_v1/models/services/supabase_entity_service.dart';
@@ -28,25 +29,18 @@ class MultiBackendRemoteService<T extends JsonModel>
   Future<void> save(T item, String id) async {
     final futures = <Future<void>>[];
 
-    if (enabledBackends.contains(StorageMode.cloudflare) &&
+    if (enabledBackends.contains(StorageMode.firestore) &&
         firestoreService != null) {
       futures.add(firestoreService!.save(item, id));
     }
-
-    // TODO: Ajouter autres backends
-    // if (enabledBackends.contains(BackendType.supabase) && supabaseService != null) {
-    //   futures.add(supabaseService!.save(id, item));
-    // }
     if (enabledBackends.contains(StorageMode.supabase) &&
         supabaseService != null) {
       futures.add(supabaseService!.save(item, id));
     }
-
     if (enabledBackends.contains(StorageMode.firebase) &&
         firebaseService != null) {
       futures.add(firebaseService!.save(item, id));
     }
-
     if (enabledBackends.contains(StorageMode.cloudflare) &&
         cloudflareService != null) {
       futures.add(cloudflareService!.save(item, id));
@@ -57,27 +51,50 @@ class MultiBackendRemoteService<T extends JsonModel>
 
   @override
   Future<T?> getById(String id) async {
-    // Priorité: Firestore > Supabase > Dolibarr
-    if (enabledBackends.contains(StorageMode.cloudflare) &&
-        firestoreService != null) {
-      final result = await firestoreService!.getById(id);
+    final backends = [
+      if (enabledBackends.contains(StorageMode.firestore) &&
+          firestoreService != null)
+        firestoreService!,
+      if (enabledBackends.contains(StorageMode.supabase) &&
+          supabaseService != null)
+        supabaseService!,
+      if (enabledBackends.contains(StorageMode.firebase) &&
+          firebaseService != null)
+        firebaseService!,
+      if (enabledBackends.contains(StorageMode.cloudflare) &&
+          cloudflareService != null)
+        cloudflareService!,
+    ];
+
+    for (final backend in backends) {
+      final result = await backend.getById(id);
       if (result != null) return result;
     }
-
-    // TODO: Essayer autres backends en fallback
 
     return null;
   }
 
   @override
   Future<List<T>> getAll() async {
-    // Utilise le premier backend disponible
-    if (enabledBackends.contains(StorageMode.cloudflare) &&
-        firestoreService != null) {
-      return firestoreService!.getAll();
-    }
+    final backends = [
+      if (enabledBackends.contains(StorageMode.firestore) &&
+          firestoreService != null)
+        firestoreService!,
+      if (enabledBackends.contains(StorageMode.supabase) &&
+          supabaseService != null)
+        supabaseService!,
+      if (enabledBackends.contains(StorageMode.firebase) &&
+          firebaseService != null)
+        firebaseService!,
+      if (enabledBackends.contains(StorageMode.cloudflare) &&
+          cloudflareService != null)
+        cloudflareService!,
+    ];
 
-    // TODO: Fallback sur autres backends
+    for (final backend in backends) {
+      final result = await backend.getAll();
+      if (result.isNotEmpty) return result;
+    }
 
     return [];
   }
@@ -86,27 +103,51 @@ class MultiBackendRemoteService<T extends JsonModel>
   Future<void> delete(String id) async {
     final futures = <Future<void>>[];
 
-    if (enabledBackends.contains(StorageMode.cloudflare) &&
+    if (enabledBackends.contains(StorageMode.firestore) &&
         firestoreService != null) {
       futures.add(firestoreService!.delete(id));
     }
-
-    // TODO: Ajouter autres backends
+    if (enabledBackends.contains(StorageMode.supabase) &&
+        supabaseService != null) {
+      futures.add(supabaseService!.delete(id));
+    }
+    if (enabledBackends.contains(StorageMode.firebase) &&
+        firebaseService != null) {
+      futures.add(firebaseService!.delete(id));
+    }
+    if (enabledBackends.contains(StorageMode.cloudflare) &&
+        cloudflareService != null) {
+      futures.add(cloudflareService!.delete(id));
+    }
 
     await Future.wait(futures);
   }
 
   @override
   Stream<List<T>> watchAll() {
-    // Utilise le premier backend disponible pour le stream
-    if (enabledBackends.contains(StorageMode.cloudflare) &&
+    final streams = <Stream<List<T>>>[];
+
+    if (enabledBackends.contains(StorageMode.firestore) &&
         firestoreService != null) {
-      return firestoreService!.watchAll();
+      streams.add(firestoreService!.watchAll());
+    }
+    if (enabledBackends.contains(StorageMode.supabase) &&
+        supabaseService != null) {
+      streams.add(supabaseService!.watchAll());
+    }
+    if (enabledBackends.contains(StorageMode.firebase) &&
+        firebaseService != null) {
+      streams.add(firebaseService!.watchAll());
+    }
+    if (enabledBackends.contains(StorageMode.cloudflare) &&
+        cloudflareService != null) {
+      streams.add(cloudflareService!.watchAll());
     }
 
-    // TODO: Fallback ou merge de plusieurs streams
+    if (streams.isEmpty) return Stream.value([]);
 
-    return Stream.value([]);
+    // Merge de tous les streams en un seul
+    return StreamGroup.merge(streams);
   }
 
   @override

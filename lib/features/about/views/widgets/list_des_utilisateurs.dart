@@ -28,8 +28,8 @@ class ListeDesUtilisateurs extends ConsumerWidget {
           itemCount: users.length,
           itemBuilder:
               (_, i) => ListTile(
-                title: Text(users[i].name ?? 'Utilisateur inconnu'),
-                subtitle: Text(users[i].email ?? ''),
+                title: Text(users[i].name),
+                subtitle: Text(users[i].email),
               ),
         );
       },

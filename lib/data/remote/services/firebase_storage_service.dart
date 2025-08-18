@@ -2,18 +2,24 @@ import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:bat_track_v1/models/data/adapter/no_such_methode_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:logger/logger.dart';
 
 import 'base_storage_service.dart';
 
-class FirebaseStorageService implements BaseStorageService {
+class FirebaseStorageService
+    with NoSuchMethodLogger
+    implements BaseStorageService {
   final FirebaseStorage _storage;
   final Dio _dio;
   final Logger _logger;
 
   FirebaseStorageService(this._storage, this._dio, this._logger);
+
+  @override
+  dynamic get proxyTarget => _storage;
 
   @override
   Future<String> uploadFile(File file, String path) async {
@@ -179,7 +185,10 @@ class FirebaseStorageService implements BaseStorageService {
   }
 
   void _log(String method, List<dynamic> args) {
-    developer.log('[LOG][${_logger.init}] $method called with args: $args');
+    developer.log(
+      '[FirebaseStorageService] $method called with args: $args',
+      name: 'FirebaseStorageService',
+    );
   }
 
   @override
@@ -187,32 +196,11 @@ class FirebaseStorageService implements BaseStorageService {
     // Log du nom et des arguments
     _log(invocation.memberName.toString(), invocation.positionalArguments);
 
-    // Délégation automatique à _supabase
-    final function = _getMethodFromFirestore(invocation.memberName);
-    if (function != null) {
-      return Function.apply(
-        function,
-        invocation.positionalArguments,
-        invocation.namedArguments,
-      );
-    }
-
-    return super.noSuchMethod(invocation);
-  }
-
-  dynamic _getMethodFromFirestore(Symbol memberName) {
-    // Récupère la méthode correspondante dans _storage
-    final methodName = memberName
-        .toString()
-        .replaceAll('Symbol("', '')
-        .replaceAll('")', '');
-    final instanceMirror = _storage as dynamic;
     try {
-      return instanceMirror.noSuchMethod == null
-          ? instanceMirror
-          : instanceMirror;
+      // Délégation automatique à _delegate
+      return Function.apply((_storage as dynamic).noSuchMethod, [invocation]);
     } catch (_) {
-      return null;
+      return super.noSuchMethod(invocation);
     }
   }
 }

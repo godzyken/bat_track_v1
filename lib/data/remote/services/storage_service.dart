@@ -2,14 +2,20 @@ import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:bat_track_v1/data/remote/services/base_storage_service.dart';
+import 'package:bat_track_v1/models/data/adapter/no_such_methode_logger.dart';
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 
-class StorageService implements RemoteStorageService, BaseStorageService {
+class StorageService
+    with NoSuchMethodLogger
+    implements RemoteStorageService, BaseStorageService {
   final FirebaseStorage _storage;
 
   StorageService(this._storage);
+
+  @override
+  dynamic get proxyTarget => _storage;
 
   @override
   Future<String> uploadFile(File file, String path) async {
@@ -146,32 +152,11 @@ class StorageService implements RemoteStorageService, BaseStorageService {
     // Log du nom et des arguments
     _log(invocation.memberName.toString(), invocation.positionalArguments);
 
-    // Délégation automatique à _storage
-    final function = _getMethodFromInner(invocation.memberName);
-    if (function != null) {
-      return Function.apply(
-        function,
-        invocation.positionalArguments,
-        invocation.namedArguments,
-      );
-    }
-
-    return super.noSuchMethod(invocation);
-  }
-
-  dynamic _getMethodFromInner(Symbol memberName) {
-    // Récupère la méthode correspondante dans _storage
-    final methodName = memberName
-        .toString()
-        .replaceAll('Symbol("', '')
-        .replaceAll('")', '');
-    final instanceMirror = _storage as dynamic;
     try {
-      return instanceMirror.noSuchMethod == null
-          ? instanceMirror
-          : instanceMirror;
+      // Délégation automatique à _delegate
+      return Function.apply((_storage as dynamic).noSuchMethod, [invocation]);
     } catch (_) {
-      return null;
+      return super.noSuchMethod(invocation);
     }
   }
 }

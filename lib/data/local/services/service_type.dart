@@ -2,9 +2,11 @@ import 'dart:developer' as developer;
 
 import 'package:bat_track_v1/data/remote/services/supabase_service.dart';
 import 'package:bat_track_v1/models/services/firestore_entity_service.dart';
+import 'package:bat_track_v1/models/services/multi_backend_remote_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../../../models/data/json_model.dart';
+import '../../../models/providers/adapter/hive_remote_storage_wrapper.dart';
 import '../../../models/services/cloud_flare_entity_service.dart';
 import '../../../models/services/entity_service.dart';
 import '../../../models/services/entity_service_registry.dart';
@@ -16,16 +18,17 @@ import '../../remote/services/storage_service.dart';
 import '../models/index_model_extention.dart';
 import 'hive_service.dart';
 
-enum StorageMode { hive, firebase, supabase, cloudflare }
+enum StorageMode { hive, firebase, firestore, supabase, cloudflare }
 
 class AppConfig {
   static StorageMode storageMode = StorageMode.hive;
+  static List<StorageMode> enabledBackends = [storageMode];
 }
 
 mixin StorageHandlerMixin<T extends JsonModel> on Object {
   String get boxName;
 
-  StorageMode get storageMode => StorageMode.hive;
+  StorageMode get storageMode => AppConfig.storageMode;
 
   StorageService get storage => StorageService(FirebaseStorage.instance);
 
@@ -35,8 +38,10 @@ mixin StorageHandlerMixin<T extends JsonModel> on Object {
         await HiveService.put<T>(boxName, id, item);
         break;
       case StorageMode.firebase:
+      case StorageMode.firestore:
       case StorageMode.cloudflare:
         if (item is HasFile) {
+          developer.log('[ITEM] message :${item.toJson()}');
           final file = (item as HasFile).getFile();
           final path = '$boxName/$id/${file.path.split('/').last}';
           await storage.uploadFile(file, path);
@@ -58,6 +63,7 @@ mixin StorageHandlerMixin<T extends JsonModel> on Object {
         await HiveService.delete<T>(boxName, id);
         break;
       case StorageMode.firebase:
+      case StorageMode.firestore:
       case StorageMode.cloudflare:
         await FirestoreService.deleteData(collectionPath: boxName, docId: id);
         break;
@@ -72,6 +78,7 @@ mixin StorageHandlerMixin<T extends JsonModel> on Object {
       case StorageMode.hive:
         return HiveService.getAll<T>(boxName);
       case StorageMode.firebase:
+      case StorageMode.firestore:
       case StorageMode.cloudflare:
         return FirestoreService.getAll<T>(
           collectionPath: boxName,
@@ -305,24 +312,38 @@ class EntityServiceFactory {
   }) {
     switch (AppConfig.storageMode) {
       case StorageMode.hive:
-        return FirestoreEntityService<T>(
-          collectionPath: boxNameOrCollectionName,
-          fromJson: fromJson,
-        );
+      case StorageMode.firestore:
       case StorageMode.firebase:
-        return FirebaseEntityService<T>(
-          collectionPath: boxNameOrCollectionName,
-          fromJson: fromJson,
-        );
       case StorageMode.supabase:
-        return SupabaseEntityService<T>(
-          table: supabaseTable ?? boxNameOrCollectionName,
-          fromJson: fromJson,
-        );
       case StorageMode.cloudflare:
-        return CloudflareEntityService<T>(
-          collectionName: boxNameOrCollectionName,
+        // Définir les backends activés à partir de AppConfig
+
+        final multiBackend = MultiBackendRemoteService<T>(
+          enabledBackends: AppConfig.enabledBackends,
+          firestoreService: FirestoreEntityService(
+            collectionPath: boxNameOrCollectionName,
+            fromJson: fromJson,
+          ),
+          firebaseService: FirebaseEntityService(
+            collectionPath: boxNameOrCollectionName,
+            fromJson: fromJson,
+          ),
+          supabaseService: SupabaseEntityService(
+            table: supabaseTable ?? boxNameOrCollectionName,
+            fromJson: fromJson,
+          ),
+          cloudflareService: CloudflareEntityService(
+            collectionName: boxNameOrCollectionName,
+            fromJson: fromJson,
+          ),
+        );
+
+        return EntityServices<T>(
+          boxName: boxNameOrCollectionName,
           fromJson: fromJson,
+          remoteStorageService: HiveRemoteStorageWrapper<T>(
+            multiBackend: multiBackend,
+          ),
         );
     }
   }

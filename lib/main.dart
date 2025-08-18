@@ -16,11 +16,14 @@ import 'data/remote/providers/firebase_providers.dart';
 import 'features/parametres/affichage/themes/theme.dart';
 import 'models/views/screens/exeception_screens.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
+void main() {
   runZonedGuarded(
     () async {
+      WidgetsFlutterBinding.ensureInitialized();
+
+      // Initialisations asynchrones
+      await Future.delayed(Duration(milliseconds: 100));
+
       final firebaseContainer = ProviderContainer();
       await firebaseContainer.read(firebaseInitializationProvider.future);
       firebaseContainer.dispose();
@@ -42,8 +45,6 @@ Future<void> main() async {
           ),
         ),
       );
-      // TODO: Remove this line after sending the first sample event to sentry.
-      await Sentry.captureException(Exception('This is a sample exception.'));
     },
     (error, stack) {
       // ✅ Logging d’erreur global

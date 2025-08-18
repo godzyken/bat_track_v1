@@ -15,15 +15,12 @@ extension FactureDraftBuilder on FactureDraft {
           .where((p) => p.mainOeuvre != [])
           .fold<double>(
             0.0,
-            (sum, p) => sum + (p.getBudgetTotalSansMainOeuvre() ?? 0),
+            (sum, p) => sum + (p.getBudgetTotalSansMainOeuvre()),
           );
 
       final coutMainOeuvre = etape.pieces
           .where((p) => p.mainOeuvre != [])
-          .fold<double>(
-            0.0,
-            (sum, p) => sum + (p.getBudgetTotal(techList) ?? 0),
-          );
+          .fold<double>(0.0, (sum, p) => sum + (p.getBudgetTotal(techList)));
 
       lignes.add(
         CustomLigneFacture(
@@ -37,7 +34,7 @@ extension FactureDraftBuilder on FactureDraft {
       );
     }
 
-    final interventions = chantier.interventions ?? [];
+    final interventions = chantier.interventions;
 
     for (final intervention in interventions) {
       final montant = intervention.facture;

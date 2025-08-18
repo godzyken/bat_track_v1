@@ -40,14 +40,14 @@ class EtapeCard extends ConsumerWidget {
           children: [
             Text(etape.description),
             const SizedBox(height: 4),
-            if (etape.dateDebut != null)
-              Text(
-                '📅 Début : ${etape.dateDebut.toLocal().toString().split(' ')[0]}',
-              ),
-            if (etape.dateFin != null)
-              Text(
-                '🏁 Fin : ${etape.dateFin.toLocal().toString().split(' ')[0]}',
-              ),
+            Text(
+              '📅 Début : ${etape.dateDebut.toLocal().toString().split(' ')[0]}',
+            ),
+            const SizedBox(height: 2),
+            Text(
+              '🏁 Fin : ${etape.dateFin.toLocal().toString().split(' ')[0]}',
+            ),
+            const SizedBox(height: 2),
             Text(etape.terminee ? '✅ Terminée' : '⏳ En cours'),
           ],
         ),

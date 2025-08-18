@@ -25,32 +25,11 @@ class LoggedEntityService<T extends JsonModel> implements EntityServices<T> {
     // Log du nom et des arguments
     _log(invocation.memberName.toString(), invocation.positionalArguments);
 
-    // Délégation automatique à _inner
-    final function = _getMethodFromInner(invocation.memberName);
-    if (function != null) {
-      return Function.apply(
-        function,
-        invocation.positionalArguments,
-        invocation.namedArguments,
-      );
-    }
-
-    return super.noSuchMethod(invocation);
-  }
-
-  dynamic _getMethodFromInner(Symbol memberName) {
-    // Récupère la méthode correspondante dans _inner
-    final methodName = memberName
-        .toString()
-        .replaceAll('Symbol("', '')
-        .replaceAll('")', '');
-    final instanceMirror = _inner as dynamic;
     try {
-      return instanceMirror.noSuchMethod == null
-          ? instanceMirror
-          : instanceMirror;
+      // Délégation automatique à _delegate
+      return Function.apply((_inner as dynamic).noSuchMethod, [invocation]);
     } catch (_) {
-      return null;
+      return super.noSuchMethod(invocation);
     }
   }
 }
@@ -262,32 +241,11 @@ class LoggedEntitySyncService<T extends JsonModel>
     // Log du nom et des arguments
     _log(invocation.memberName.toString(), invocation.positionalArguments);
 
-    // Délégation automatique à _delegate
-    final function = _getMethodFromInner(invocation.memberName);
-    if (function != null) {
-      return Function.apply(
-        function,
-        invocation.positionalArguments,
-        invocation.namedArguments,
-      );
-    }
-
-    return super.noSuchMethod(invocation);
-  }
-
-  dynamic _getMethodFromInner(Symbol memberName) {
-    // Récupère la méthode correspondante dans _delegate
-    final methodName = memberName
-        .toString()
-        .replaceAll('Symbol("', '')
-        .replaceAll('")', '');
-    final instanceMirror = _delegate as dynamic;
     try {
-      return instanceMirror.noSuchMethod == null
-          ? instanceMirror
-          : instanceMirror;
+      // Délégation automatique à _delegate
+      return Function.apply((_delegate as dynamic).noSuchMethod, [invocation]);
     } catch (_) {
-      return null;
+      return super.noSuchMethod(invocation);
     }
   }
 }

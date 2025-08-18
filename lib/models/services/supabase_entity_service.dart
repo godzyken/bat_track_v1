@@ -8,6 +8,7 @@ import '../data/json_model.dart';
 
 class SupabaseEntityService<T extends JsonModel> implements EntityServices<T> {
   final String table;
+  @override
   final T Function(Map<String, dynamic> json) fromJson;
   final SupabaseClient _supabase = Supabase.instance.client;
 
@@ -158,32 +159,11 @@ class SupabaseEntityService<T extends JsonModel> implements EntityServices<T> {
     // Log du nom et des arguments
     _log(invocation.memberName.toString(), invocation.positionalArguments);
 
-    // Délégation automatique à _supabase
-    final function = _getMethodFromSupabase(invocation.memberName);
-    if (function != null) {
-      return Function.apply(
-        function,
-        invocation.positionalArguments,
-        invocation.namedArguments,
-      );
-    }
-
-    return super.noSuchMethod(invocation);
-  }
-
-  dynamic _getMethodFromSupabase(Symbol memberName) {
-    // Récupère la méthode correspondante dans _supabase
-    final methodName = memberName
-        .toString()
-        .replaceAll('Symbol("', '')
-        .replaceAll('")', '');
-    final instanceMirror = _supabase as dynamic;
     try {
-      return instanceMirror.noSuchMethod == null
-          ? instanceMirror
-          : instanceMirror;
+      // Délégation automatique à _delegate
+      return Function.apply((_supabase as dynamic).noSuchMethod, [invocation]);
     } catch (_) {
-      return null;
+      return super.noSuchMethod(invocation);
     }
   }
 }

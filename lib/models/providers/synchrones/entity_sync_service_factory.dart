@@ -40,6 +40,9 @@ class EntitySyncServiceFactory {
       case StorageMode.firebase:
         return EntitySyncService<T>(localService, remoteService);
 
+      case StorageMode.firestore:
+        return EntitySyncService<T>(localService, remoteService);
+
       case StorageMode.supabase:
         return EntitySyncService<T>(localService, remoteService);
 

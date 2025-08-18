@@ -38,7 +38,7 @@ class ChantierDetailScreen extends ConsumerWidget {
     if (isClient) return chantierModifiable;
     if (isTechnicien) {
       return etape.techniciens!.contains(userId) &&
-          (etape.dateFin.isAfter(now) ?? true);
+          (etape.dateFin.isAfter(now));
     }
     return true; // admin ou autre
   }
