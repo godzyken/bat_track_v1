@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
 
+part 'projet_model_entity.g.dart';
+
 @HiveType(typeId: 1)
 class ProjectModel extends HiveObject {
   @HiveField(0)

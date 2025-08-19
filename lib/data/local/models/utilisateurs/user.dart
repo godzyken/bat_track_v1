@@ -65,3 +65,48 @@ extension UserAccess on UserModel {
 
   bool get estDisponiblePourSelection => isTechnicien && estValideDolibarr;
 }
+
+extension UserRoleX on UserRole {
+  static UserRole fromString(String role) {
+    switch (role) {
+      case 'superUtilisateur':
+        return UserRole.superUtilisateur;
+      case 'technicien':
+        return UserRole.technicien;
+      case 'client':
+        return UserRole.client;
+      case 'chefDeProjet':
+        return UserRole.chefDeProjet;
+      default:
+        throw Exception("Rôle inconnu: $role");
+    }
+  }
+
+  String get displayName {
+    switch (this) {
+      case UserRole.superUtilisateur:
+        return "Administrateur";
+      case UserRole.technicien:
+        return "Intervenant";
+      case UserRole.client:
+        return "Client";
+      case UserRole.chefDeProjet:
+        return "Client";
+    }
+  }
+
+  String get assetName => displayName.toLowerCase();
+
+  String get asString {
+    switch (this) {
+      case UserRole.superUtilisateur:
+        return 'superUtilisateur';
+      case UserRole.technicien:
+        return 'technicien';
+      case UserRole.client:
+        return 'client';
+      case UserRole.chefDeProjet:
+        return 'chefDeProjet';
+    }
+  }
+}

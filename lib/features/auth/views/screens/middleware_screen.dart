@@ -29,6 +29,7 @@ class RoleGuard extends ConsumerWidget {
     return userAsync.when(
       data: (user) {
         if (user == null) return fallback;
+        debugPrint("✅ middleware = data : ${user.email} / role: ${user.role}");
 
         final role = user.role;
         final ok = switch (permission) {

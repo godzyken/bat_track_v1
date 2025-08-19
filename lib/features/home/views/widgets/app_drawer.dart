@@ -22,6 +22,7 @@ class AppDrawer extends ConsumerWidget {
               ),
             ),
             _navItem(context, 'Accueil', '/', Icons.home),
+            _navItem(context, 'Dashboard', '/dashboard', Icons.dashboard),
             _navItem(context, 'Clients', '/clients', Icons.people),
             _navItem(context, 'Techniciens', '/techniciens', Icons.settings),
             _navItem(context, 'Chantiers', '/chantiers', Icons.work),

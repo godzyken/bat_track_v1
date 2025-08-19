@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../models/data/json_model.dart';
 import '../../../models/providers/asynchrones/entity_notifier_provider.dart';
+import '../../../models/services/dashboard_data_service.dart';
 import '../../../models/services/entity_service_registry.dart';
 import '../../../models/services/logged_entity_service.dart';
 import '../models/index_model_extention.dart';
@@ -174,6 +175,37 @@ final allInterventionsProvider = Provider<List<Intervention>>((ref) {
 });
 
 ////Services for CRUD Operations
+final dashboardServiceProvider = Provider.family<DashboardService, AppUser>((
+  ref,
+  user,
+) {
+  final projetService = ref.watch(
+    buildLoggedEntityServiceProvider<Projet>(
+      boxName: 'projets',
+      fromJson: (json) => Projet.fromJson(json),
+    ),
+  );
+  final chantierService = ref.watch(
+    buildLoggedEntityServiceProvider<Chantier>(
+      boxName: 'chantiers',
+      fromJson: (json) => Chantier.fromJson(json),
+    ),
+  );
+  final interventionService = ref.watch(
+    buildLoggedEntityServiceProvider<Intervention>(
+      boxName: 'interventions',
+      fromJson: (json) => Intervention.fromJson(json),
+    ),
+  );
+
+  return DashboardService(
+    user: user,
+    projetService: projetService,
+    chantierService: chantierService,
+    interventionService: interventionService,
+  );
+});
+
 final appUserEntityServiceProvider =
     buildLoggedEntitySyncServiceProvider<AppUser>(
       collectionOrBoxName: 'users',

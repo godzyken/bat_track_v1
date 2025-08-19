@@ -1,10 +1,6 @@
-// Layouts communs pour les rôles
-
 import 'package:bat_track_v1/features/home/views/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 
-// ---------------- MAINLAYOUT ----------------
-// Layout commun
 class MainLayout extends StatelessWidget {
   final Widget child;
 

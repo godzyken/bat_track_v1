@@ -1,46 +1,55 @@
+import 'dart:developer' as developer;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../data/local/models/utilisateurs/app_user.dart';
 
-class AuthNotifier extends ChangeNotifier {
-  AuthNotifier(this._ref) {
-    _ref.listen<AsyncValue<AppUser?>>(authStateNotifierProvider, (
-      previous,
-      next,
-    ) {
-      if (previous?.value?.uid != next.value?.uid) {
-        notifyListeners();
-      }
-    });
-  }
+//part 'auth_notifier.g.dart';
 
-  final Ref _ref;
-}
-
-final authNotifierProvider = Provider<AuthNotifier>((ref) => AuthNotifier(ref));
-
-class AuthState {
-  final User? user;
-  final bool loading;
-  final String? error;
-
-  AuthState({this.user, this.loading = false, this.error});
-
-  AuthState copyWith({User? user, bool? loading, String? error}) {
-    return AuthState(
-      user: user ?? this.user,
-      loading: loading ?? this.loading,
-      error: error,
-    );
-  }
-}
-
-class AuthStateNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
+@riverpod
+class AuthNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
   late final FirebaseAuth _auth;
   late final FirebaseFirestore _firestore;
+
+  // 🔹 Normalisation Firestore
+  dynamic _convertFirestoreValue(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate().toIso8601String();
+    if (value is DocumentReference) return value.path;
+    if (value is GeoPoint)
+      return {'lat': value.latitude, 'lng': value.longitude};
+    if (value is Map<String, dynamic>) {
+      return value.map((k, v) => MapEntry(k, _convertFirestoreValue(v)));
+    }
+    if (value is List) return value.map(_convertFirestoreValue).toList();
+    return value;
+  }
+
+  Map<String, dynamic> _normalizeData(
+    Map<String, dynamic> data,
+    String uid,
+    String? name,
+    String? email,
+  ) {
+    final normalized = <String, dynamic>{};
+    data.forEach((key, value) {
+      normalized[key] = _convertFirestoreValue(value);
+    });
+
+    // Champs obligatoires pour AppUser
+    normalized['uid'] = uid;
+    normalized.putIfAbsent('name', () => name ?? '');
+    normalized.putIfAbsent('email', () => email ?? '');
+    normalized.putIfAbsent('role', () => 'client');
+    normalized.putIfAbsent('company', () => '');
+    normalized.putIfAbsent('createdAt', () => DateTime.now().toIso8601String());
+
+    return normalized;
+  }
 
   @override
   Future<AppUser?> build() async {
@@ -50,15 +59,22 @@ class AuthStateNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
     final user = _auth.currentUser;
     if (user == null) return null;
 
-    final doc = await _firestore.collection('users').doc(user.uid).get();
-    if (doc.exists) {
-      return AppUser.fromJson(doc.data()!);
-    } else {
-      return null;
+    try {
+      final doc = await _firestore.collection("users").doc(user.uid).get();
+      final data = _normalizeData(
+        doc.data() ?? {},
+        user.uid,
+        user.displayName,
+        user.email,
+      );
+      return AppUser.fromJson(data);
+    } catch (e, st) {
+      developer.log("[AuthNotifier] build() failed: $e", stackTrace: st);
+      return AppUser.empty();
     }
   }
 
-  /// Inscription avec création du AppUser dans Firestore
+  /// 🔹 Inscription
   Future<UserCredential?> signUpWithEmail({
     required String email,
     required String password,
@@ -88,16 +104,17 @@ class AuthStateNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
 
       await _firestore.collection('users').doc(user.uid).set(appUser.toJson());
 
-      // Recharge l'état
       state = AsyncValue.data(appUser);
       return userCredential;
+    } on FirebaseAuthException catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
-      return null;
     }
+    return null;
   }
 
-  /// Connexion + chargement du AppUser Firestore
+  /// 🔹 Connexion
   Future<UserCredential?> signInWithEmail({
     required String email,
     required String password,
@@ -109,14 +126,20 @@ class AuthStateNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
       );
 
       final user = userCredential.user;
-      if (user == null) {
+      if (user == null)
         throw Exception("Utilisateur introuvable après connexion");
-      }
 
       final doc = await _firestore.collection('users').doc(user.uid).get();
-      final appUser = AppUser.fromJson(doc.data()!);
+      final data = _normalizeData(
+        doc.data() ?? {},
+        user.uid,
+        user.displayName,
+        user.email,
+      );
 
+      final appUser = AppUser.fromJson(data);
       state = AsyncValue.data(appUser);
+
       return userCredential;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -124,13 +147,13 @@ class AuthStateNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
     }
   }
 
-  /// Déconnexion
+  /// 🔹 Déconnexion
   Future<void> signOut() async {
     await _auth.signOut();
     state = const AsyncValue.data(null);
   }
 
-  /// Recharge manuelle
+  /// 🔹 Recharge manuelle
   Future<void> reload() async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -141,7 +164,19 @@ class AuthStateNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
     state = const AsyncValue.loading();
     try {
       final doc = await _firestore.collection('users').doc(user.uid).get();
-      final appUser = AppUser.fromJson(doc.data()!);
+      if (!doc.exists) {
+        state = const AsyncValue.data(null);
+        return;
+      }
+
+      final data = _normalizeData(
+        doc.data() ?? {},
+        user.uid,
+        user.displayName,
+        user.email,
+      );
+
+      final appUser = AppUser.fromJson(data);
       state = AsyncValue.data(appUser);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -149,18 +184,29 @@ class AuthStateNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
   }
 }
 
-final authStateNotifierProvider =
-    AutoDisposeAsyncNotifierProvider<AuthStateNotifier, AppUser?>(
-      AuthStateNotifier.new,
+final authNotifierProvider =
+    AutoDisposeAsyncNotifierProvider<AuthNotifier, AppUser?>(AuthNotifier.new);
+
+class AuthState {
+  final User? user;
+  final bool loading;
+  final String? error;
+
+  AuthState({this.user, this.loading = false, this.error});
+
+  AuthState copyWith({User? user, bool? loading, String? error}) {
+    return AuthState(
+      user: user ?? this.user,
+      loading: loading ?? this.loading,
+      error: error,
     );
+  }
+}
 
 /// Notifier pour rafraîchir le GoRouter quand auth change
 class GoRouterRefreshNotifier extends ChangeNotifier {
   GoRouterRefreshNotifier(this.ref) {
-    ref.listen<AsyncValue<AppUser?>>(authStateNotifierProvider, (
-      previous,
-      next,
-    ) {
+    ref.listen<AsyncValue<AppUser?>>(authNotifierProvider, (previous, next) {
       if (previous?.value?.uid != next.value?.uid) {
         notifyListeners();
       }

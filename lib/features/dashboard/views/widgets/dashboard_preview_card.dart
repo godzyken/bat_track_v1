@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../intervention/controllers/providers/intervention_stats_provider.dart';
-import '../../../intervention/views/widgets/intervention_pie_chart.dart';
+import '../../../intervention/views/widgets/intervention_chart.dart';
 
 class DashboardPreviewCard extends ConsumerWidget {
   const DashboardPreviewCard({super.key});
@@ -48,8 +48,14 @@ class DashboardPreviewCard extends ConsumerWidget {
                     const SizedBox(height: 12),
                     SizedBox(
                       height: 100,
-                      child: InterventionPieChart(
-                        data: stats,
+                      child: InterventionChart(
+                        data: stats.map((key, value) {
+                          final total = value.values
+                              .expand((inner) => inner.values)
+                              .fold<int>(0, (prev, element) => prev + element);
+                          return MapEntry(key, total);
+                        }),
+                        chartType: InterventionChartType.pie,
                         isCompact: true, // paramètre pour mini chart
                       ),
                     ),

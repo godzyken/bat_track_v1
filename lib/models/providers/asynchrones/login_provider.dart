@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../data/local/models/utilisateurs/user.dart';
+
 // provider pour le rôle choisi
-final selectedRoleProvider = StateProvider<String?>((ref) => null);
+final selectedRoleProvider = StateProvider<UserRole?>((ref) => null);
 
 // provider pour l’état de chargement
 final loginLoadingProvider = StateProvider<bool>((ref) => false);

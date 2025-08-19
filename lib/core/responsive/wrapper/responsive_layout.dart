@@ -34,30 +34,51 @@ class ResponsiveObserver extends ConsumerStatefulWidget {
   ConsumerState<ResponsiveObserver> createState() => _ResponsiveObserverState();
 }
 
-class _ResponsiveObserverState extends ConsumerState<ResponsiveObserver> {
+class _ResponsiveObserverState extends ConsumerState<ResponsiveObserver>
+    with WidgetsBindingObserver {
+  void _updateScreenInfo() {
+    final mq = MediaQuery.of(context);
+    final width = mq.size.width;
+
+    final screenSize =
+        width < 600
+            ? ScreenSize.mobile
+            : width < 1024
+            ? ScreenSize.tablet
+            : ScreenSize.desktop;
+
+    final screenOrientation =
+        mq.orientation == Orientation.portrait
+            ? ScreenOrientation.portrait
+            : ScreenOrientation.landscape;
+
+    ref.read(screenSizeProvider.notifier).state = screenSize;
+    ref.read(screenOrientationProvider.notifier).state = screenOrientation;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // ✅ Ici, MediaQuery est garanti disponible
+    _updateScreenInfo();
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final mq = MediaQuery.of(context);
-      final width = mq.size.width;
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
-      final screenSize =
-          width < 600
-              ? ScreenSize.mobile
-              : width < 1024
-              ? ScreenSize.tablet
-              : ScreenSize.desktop;
-
-      final screenOrientation =
-          mq.orientation == Orientation.portrait
-              ? ScreenOrientation.portrait
-              : ScreenOrientation.landscape;
-
-      ref.read(screenSizeProvider.notifier).state = screenSize;
-      ref.read(screenOrientationProvider.notifier).state = screenOrientation;
-    });
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    _updateScreenInfo();
   }
 
   @override

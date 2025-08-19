@@ -417,3 +417,56 @@ final equipementService = buildEntityServiceProvider<Equipement>(
 
 final storageService = StorageService(FirebaseStorage.instance);
 final firebaseService = FirestoreService();
+
+extension EntityServicesFilters<T extends JsonModel> on EntityServices<T> {
+  /// Observe tous les items liés à un technicien spécifique
+  Stream<List<T>> watchByTechnicien(String technicienId) async* {
+    final box = await HiveService.box<T>(boxName);
+    yield* box.watch().asyncMap((_) async {
+      final allItems = await getAll();
+      return allItems.where((item) {
+        final json = item.toJson();
+        return json['technicienId'] == technicienId;
+      }).toList();
+    });
+  }
+
+  /// Observe tous les items appartenant à un propriétaire spécifique
+  Stream<List<T>> watchByOwner(String ownerId) async* {
+    final box = await HiveService.box<T>(boxName);
+    yield* box.watch().asyncMap((_) async {
+      final allItems = await getAll();
+      return allItems.where((item) {
+        final json = item.toJson();
+        return json['clientId'] == ownerId;
+      }).toList();
+    });
+  }
+
+  /// Observe tous les items liés à un projet spécifique
+  Stream<List<T>> watchByProjects(String projectId) async* {
+    final box = await HiveService.box<T>(boxName);
+    yield* box.watch().asyncMap((_) async {
+      final allItems = await getAll();
+      return allItems.where((item) {
+        final json = item.toJson();
+        return json['id'] == projectId;
+      }).toList();
+    });
+  }
+
+  /// Observe tous les items d'un propriétaire dans un projet spécifique
+  Stream<List<T>> watchByOwnerProjects(
+    String ownerId,
+    String projectId,
+  ) async* {
+    final box = await HiveService.box<T>(boxName);
+    yield* box.watch().asyncMap((_) async {
+      final allItems = await getAll();
+      return allItems.where((item) {
+        final json = item.toJson();
+        return json['clientId'] == ownerId && json['id'] == projectId;
+      }).toList();
+    });
+  }
+}

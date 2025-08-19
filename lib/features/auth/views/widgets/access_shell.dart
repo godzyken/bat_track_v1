@@ -4,34 +4,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../data/local/models/base/access_policy_interface.dart';
-import '../../data/providers/auth_state_provider.dart';
+import '../../data/notifiers/auth_notifier.dart';
 import '../screens/login_screen.dart';
 import '../screens/unauthorized_screen.dart';
 
 class AccessShell extends ConsumerWidget {
   final Widget child;
   final MultiRolePolicy policy;
-  const AccessShell({super.key, required this.child, required this.policy});
+  final GoRouterState state;
+  const AccessShell({
+    super.key,
+    required this.child,
+    required this.policy,
+    required this.state,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authStateProvider);
-    final userId = authState.value;
-    if (userId == null) {
-      return Stack(
-        children: [
-          const Center(child: Text('Pas encore connecté')),
-          const LoginScreen(),
-        ],
-      );
-    }
+    final authState = ref.watch(authNotifierProvider);
 
     return authState.when(
       data: (user) {
-        final location = GoRouterState.of(context).uri.toString();
-        debugPrint("🔍 Navigation vers $location avec rôle ${user?.role}");
+        if (user == null) {
+          return Stack(
+            children: [
+              const Center(child: Text('Pas encore connecté')),
+              const LoginScreen(),
+            ],
+          );
+        }
+        debugPrint("✅ accessShell = data : ${user.email} / role: ${user.role}");
 
-        if (!policy.canAccess(user!.role)) {
+        final location = state.uri.toString();
+        debugPrint("🔍 Navigation vers $location avec rôle ${user.role}");
+
+        if (!policy.canAccess(user.role)) {
           return const UnauthorizedScreen();
         }
 

@@ -45,7 +45,7 @@ class FileSyncService<T extends JsonModel> {
       final localItems = await storageService.getAll();
       for (final rawItem in localItems) {
         final map =
-            rawItem is String
+            rawItem.isNotEmpty
                 ? jsonDecode(rawItem) as Map<String, dynamic>
                 : rawItem as Map<String, dynamic>;
 

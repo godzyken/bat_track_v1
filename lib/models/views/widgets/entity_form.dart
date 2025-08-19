@@ -242,7 +242,7 @@ class _EntityFormState<T extends JsonModel>
 
         // Enregistrement dans Firebase Auth
         final userCredential = await ref
-            .read(authStateNotifierProvider.notifier)
+            .read(authNotifierProvider.notifier)
             .signUpWithEmail(
               email: email,
               password: password,
