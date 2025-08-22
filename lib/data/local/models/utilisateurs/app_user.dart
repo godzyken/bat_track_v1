@@ -20,6 +20,9 @@ class AppUser with _$AppUser implements JsonModel {
     @DateTimeIsoConverter() required DateTime createdAt,
     @NullableDateTimeIsoConverter() DateTime? appUpdatedAt,
     @Default(false) bool? appIsUpdated,
+    String? instanceId,
+    DateTime? updatedAt,
+    DateTime? lastTimeConnect,
   }) = _AppUser;
 
   factory AppUser.fromJson(Map<String, dynamic> json) =>
@@ -32,6 +35,7 @@ class AppUser with _$AppUser implements JsonModel {
     role: '',
     createdAt: tryParseDate('')!,
     motDePasse: '',
+    instanceId: '',
   );
 
   @override

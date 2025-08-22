@@ -16,16 +16,16 @@ class TechHomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
-    final currentUser = ref.watch(currentUserProvider);
+    final currentUser = ref.watch(currentUserProvider).value;
 
-    if (currentUser == null || currentUser.role.name != 'technicien') {
+    if (currentUser == null || currentUser.role != 'technicien') {
       return const Center(child: Text("Accès réservé aux techniciens."));
     }
 
     final userId = currentUser.id;
 
-    final isAdmin = currentUser.role.name == 'admin';
-    final isTech = currentUser.role.name == 'tech';
+    final isAdmin = currentUser.role == 'admin';
+    final isTech = currentUser.role == 'tech';
 
     final projects = ref.watch(allProjectsFutureProvider);
     final chantiers = ref.watch(allChantiersFutureProvider);
@@ -45,7 +45,6 @@ class TechHomeScreen extends ConsumerWidget {
               .where(
                 (i) =>
                     i.technicienId == userId &&
-                    i.create != null &&
                     i.create.isAfter(DateTime.now()),
               )
               .toList()
@@ -74,7 +73,7 @@ class TechHomeScreen extends ConsumerWidget {
                         showEntityFormDialog<Projet>(
                           context: context,
                           ref: ref,
-                          role: currentUser.role.name,
+                          role: currentUser.role,
                           onSubmit: (projet) async {
                             await projetService.save(projet, projet.id);
                           },
@@ -87,7 +86,7 @@ class TechHomeScreen extends ConsumerWidget {
                 showEntityFormDialog<Projet>(
                   context: context,
                   ref: ref,
-                  role: currentUser.role.name,
+                  role: currentUser.role,
                   onSubmit: (updated) async {
                     await projetService.update(updated, projet.id);
                   },
@@ -98,7 +97,7 @@ class TechHomeScreen extends ConsumerWidget {
               onDelete:
                   isAdmin && isTech ? (id) => projetService.delete(id) : null,
               readOnly: !isAdmin && !isTech,
-              currentRole: currentUser.role.name,
+              currentRole: currentUser.role,
               currentUserId: currentUser.id,
               policy: MultiRolePolicy(),
             ),
@@ -119,7 +118,7 @@ class TechHomeScreen extends ConsumerWidget {
                         showEntityFormDialog<Chantier>(
                           context: context,
                           ref: ref,
-                          role: currentUser.role.name,
+                          role: currentUser.role,
                           onSubmit: (chantier) async {
                             await chantierService.save(chantier, chantier.id);
                           },
@@ -132,7 +131,7 @@ class TechHomeScreen extends ConsumerWidget {
                 showEntityFormDialog<Chantier>(
                   context: context,
                   ref: ref,
-                  role: currentUser.role.name,
+                  role: currentUser.role,
                   onSubmit: (updated) async {
                     await chantierService.update(updated, chantier.id);
                   },
@@ -143,7 +142,7 @@ class TechHomeScreen extends ConsumerWidget {
               onDelete:
                   isAdmin && isTech ? (id) => projetService.delete(id) : null,
               readOnly: !isAdmin && !isTech,
-              currentRole: currentUser.role.name,
+              currentRole: currentUser.role,
               currentUserId: currentUser.id,
               policy: MultiRolePolicy(),
             ),
@@ -164,7 +163,7 @@ class TechHomeScreen extends ConsumerWidget {
                         showEntityFormDialog<Projet>(
                           context: context,
                           ref: ref,
-                          role: currentUser.role.name,
+                          role: currentUser.role,
                           onSubmit: (projet) async {
                             await projetService.save(projet, projet.id);
                           },
@@ -177,7 +176,7 @@ class TechHomeScreen extends ConsumerWidget {
                 showEntityFormDialog<Projet>(
                   context: context,
                   ref: ref,
-                  role: currentUser.role.name,
+                  role: currentUser.role,
                   onSubmit: (updated) async {
                     await projetService.update(updated, projet.id);
                   },
@@ -188,7 +187,7 @@ class TechHomeScreen extends ConsumerWidget {
               onDelete:
                   isAdmin && isTech ? (id) => projetService.delete(id) : null,
               readOnly: !isAdmin && !isTech,
-              currentRole: currentUser.role.name,
+              currentRole: currentUser.role,
               currentUserId: currentUser.id,
               policy: MultiRolePolicy(),
             ),

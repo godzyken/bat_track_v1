@@ -1,5 +1,5 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
-import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,7 +8,6 @@ import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/services/service_type.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
-import '../../../home/views/widgets/app_drawer.dart';
 import '../../controllers/notifiers/clients_list_notifier.dart';
 
 class ClientsScreen extends ConsumerWidget {
@@ -18,7 +17,7 @@ class ClientsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
     final clientsAsync = ref.watch(clientListProvider);
-    final user = ref.watch(appUserProvider).value;
+    final user = ref.watch(currentUserProvider).value;
     if (user == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -27,7 +26,6 @@ class ClientsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Clients')),
-      drawer: const AppDrawer(),
       body: EntityList<Client>(
         items: clientsAsync,
         boxName: 'clients',

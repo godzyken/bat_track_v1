@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,7 +27,8 @@ class PickInstanceScreen extends ConsumerWidget {
       final userBox = ref.read(userBoxProvider);
       await userBox.put(updatedUser.id, updatedUser);
 
-      ref.read(currentUserProvider.notifier).state = updatedUser;
+      ref.read(currentUserStateProvider.notifier).state =
+          updatedUser.toAppUser();
     }
 
     // 3. Naviguer

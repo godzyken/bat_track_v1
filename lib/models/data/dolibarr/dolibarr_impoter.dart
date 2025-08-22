@@ -67,7 +67,7 @@ class DolibarrImporter {
       Future<int> Function() importFn,
     ) async {
       if (!enabled) return;
-      if (!rule(user!)) {
+      if (!rule(user.value!.toUserModel())) {
         log.logWarning('Droit refusé pour l\'import $label');
         return;
       }

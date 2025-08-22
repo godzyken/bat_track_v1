@@ -1,5 +1,6 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/features/chantier/controllers/providers/chantier_sync_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +9,6 @@ import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
-import '../../../home/views/widgets/app_drawer.dart';
 import '../../controllers/notifiers/chantiers_list_notifier.dart';
 
 class ChantiersScreen extends ConsumerWidget {
@@ -17,7 +17,7 @@ class ChantiersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
-    final userAsync = ref.watch(appUserProvider);
+    final userAsync = ref.watch(currentUserProvider);
     if (userAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -32,7 +32,6 @@ class ChantiersScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Chantiers')),
-      drawer: const AppDrawer(),
       body: EntityList<Chantier>(
         items: chantierAsync,
         boxName: 'chantiers',

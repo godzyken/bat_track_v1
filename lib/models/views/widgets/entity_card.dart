@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../data/local/models/index_model_extention.dart';
+import '../../../data/local/providers/hive_provider.dart';
+import '../../../features/auth/data/providers/current_user_provider.dart';
+import '../../../features/projet/domain/rules/projet_policy.dart';
+import '../../../features/technicien/views/widgets/assign_technicien_dialog.dart';
 import '../../data/json_model.dart';
 
-class EntityCard<T extends JsonModel> extends StatelessWidget {
+class EntityCard<T extends JsonModel> extends ConsumerWidget {
   final T entity;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  final List<TextButton>? extraActions;
   final bool showActions;
   final bool readOnly;
+  final List<Widget>? trailingActions;
 
   const EntityCard({
     super.key,
@@ -16,6 +24,8 @@ class EntityCard<T extends JsonModel> extends StatelessWidget {
     this.onDelete,
     this.showActions = true,
     this.readOnly = false,
+    this.extraActions,
+    this.trailingActions,
   });
 
   bool get hasImage =>
@@ -45,7 +55,7 @@ class EntityCard<T extends JsonModel> extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isWide = MediaQuery.of(context).size.width > 600;
 
     return Card(
@@ -110,13 +120,13 @@ class EntityCard<T extends JsonModel> extends StatelessWidget {
                     isWide
                         ? Row(
                           mainAxisAlignment: MainAxisAlignment.end,
-                          children: _buildActionButtons(),
+                          children: _buildActionButtons(context, ref),
                         )
                         : Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const SizedBox(),
-                            Row(children: _buildActionButtons()),
+                            Row(children: _buildActionButtons(context, ref)),
                           ],
                         ),
               ),
@@ -161,21 +171,60 @@ class EntityCard<T extends JsonModel> extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildActionButtons() {
-    return [
-      if (onEdit != null)
+  List<Widget> _buildActionButtons(BuildContext context, WidgetRef ref) {
+    final currentUser = ref.read(currentUserProvider).value;
+    final policy = ProjetPolicy();
+    final buttons = <Widget>[];
+
+    if (onEdit != null) {
+      buttons.add(
         IconButton(
           icon: const Icon(Icons.edit),
           tooltip: 'Modifier',
           onPressed: readOnly ? null : onEdit,
         ),
-      if (onDelete != null)
+      );
+    }
+
+    if (onDelete != null) {
+      buttons.add(
         IconButton(
           icon: const Icon(Icons.delete),
           tooltip: 'Supprimer',
           onPressed: readOnly ? null : onDelete,
           color: Colors.red.shade400,
         ),
-    ];
+      );
+    }
+
+    if (trailingActions != null) {
+      buttons.addAll(trailingActions!);
+    }
+
+    // 🔹 Bouton "Assigner" visible uniquement si policy l’autorise
+    if (entity is Projet &&
+        currentUser != null &&
+        policy.canAssignTech(currentUser, entity as Projet)) {
+      buttons.add(
+        IconButton(
+          icon: const Icon(Icons.group_add),
+          tooltip: 'Assigner techniciens',
+          onPressed: () async {
+            final selectedTechs = await showDialog<List<String>>(
+              context: context,
+              builder: (_) => AssignTechnicienDialog(projet: entity as Projet),
+            );
+
+            if (selectedTechs != null) {
+              await ref
+                  .read(projetServiceProvider)
+                  .updateEntity(entity as Projet, entity.id);
+            }
+          },
+        ),
+      );
+    }
+
+    return buttons;
   }
 }

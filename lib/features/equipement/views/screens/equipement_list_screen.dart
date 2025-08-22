@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
-import '../../../home/views/widgets/app_drawer.dart';
 
 class EquipementScreen extends ConsumerWidget {
   const EquipementScreen({super.key});
@@ -20,7 +19,6 @@ class EquipementScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Équipements')),
-      drawer: const AppDrawer(),
       body: EntityList<Equipement>(
         items: equipementAsync,
         boxName: 'equipements',

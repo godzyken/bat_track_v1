@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,7 +35,7 @@ class EntityManagerScreen<T extends JsonModel> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
     final asyncList = ref.watch(listProvider);
-    final user = ref.watch(appUserProvider).value;
+    final user = ref.watch(currentUserProvider).value;
     if (user == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }

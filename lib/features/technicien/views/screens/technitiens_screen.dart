@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,8 +7,6 @@ import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/services/service_type.dart';
 import '../../../../models/views/widgets/entity_list.dart';
-import '../../../auth/data/providers/auth_state_provider.dart';
-import '../../../home/views/widgets/app_drawer.dart';
 import '../../controllers/notifiers/technicien_list_notifier.dart';
 
 class TechniciensScreen extends ConsumerWidget {
@@ -17,7 +16,7 @@ class TechniciensScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
     final techniciensAsync = ref.watch(techniciensListProvider);
-    final user = ref.watch(appUserProvider).value;
+    final user = ref.watch(currentUserProvider).value;
     if (user == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -27,7 +26,6 @@ class TechniciensScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Techniciens')),
-      drawer: const AppDrawer(),
       body: EntityList<Technicien>(
         items: techniciensAsync,
         boxName: 'techniciens',

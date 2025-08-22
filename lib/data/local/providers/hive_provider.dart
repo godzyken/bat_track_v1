@@ -1,4 +1,4 @@
-import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/models/providers/asynchrones/remote_service_provider.dart';
 import 'package:bat_track_v1/models/services/hive_entity_service.dart';
 import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapter.dart';
@@ -214,7 +214,7 @@ final appUserEntityServiceProvider =
 
 final filteredAppUserServiceProvider =
     Provider<LoggedEntitySyncService<AppUser>>((ref) {
-      final authUser = ref.watch(appUserProvider).value;
+      final authUser = ref.watch(currentUserProvider).value;
       final local = HiveEntityService<AppUser>(
         fromJson: (json) => AppUser.fromJson(authUser!.toJson()),
         boxName: 'users',

@@ -1,10 +1,10 @@
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/features/auth/views/screens/unauthorized_screen.dart';
 import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/base/access_policy_interface.dart';
-import '../../data/providers/auth_state_provider.dart';
 
 class RoleGuard extends ConsumerWidget {
   final WidgetBuilder builder;
@@ -24,7 +24,7 @@ class RoleGuard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userAsync = ref.watch(appUserProvider);
+    final userAsync = ref.watch(currentUserProvider);
 
     return userAsync.when(
       data: (user) {

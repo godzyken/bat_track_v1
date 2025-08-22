@@ -22,12 +22,16 @@ class Technicien
     required String specialite,
     required bool disponible,
     String? localisation,
+    String? region, // Nouvelle info pour filtrage géographique
     required double tauxHoraire,
     required List<String> chantiersAffectees,
     required List<String> etapesAffectees,
     @DateTimeIsoConverter() required DateTime createdAt,
     @NullableDateTimeIsoConverter() DateTime? dateDelete,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    List<String>? realisations,
+    double? rating, // note moyenne
+    List<String>? metiers, // pour suggestion selon secteur métier
   }) = _Technicien;
 
   factory Technicien.fromJson(Map<String, dynamic> json) =>
@@ -35,17 +39,43 @@ class Technicien
 
   factory Technicien.mock() => Technicien(
     id: const Uuid().v4(),
-    nom: 'Doeuf john',
-    email: 'john.doeuf@mailto.fr',
-    competences: ['Soudure electro/cuivre', 'Peinture interrieur'],
+    nom: 'Doeuf John',
+    email: 'john.doeuf@example.com',
+    competences: ['Soudure', 'Peinture intérieure'],
     specialite: 'Plomberie',
     disponible: true,
     tauxHoraire: 13.85,
     chantiersAffectees: ['chId_0004', 'chId_0023'],
     etapesAffectees: ['etape_Salle de bain', 'etape_Cuisine'],
     createdAt: DateTime.now(),
+    region: 'Montpellier',
+    rating: 4.2,
+    metiers: ['plomberie', 'chauffage', 'électricité'],
+    realisations: ['Projet A', 'Projet B'],
   );
 
   @override
   bool get isUpdated => updatedAt != null;
+
+  /// Vérifie si le technicien est disponible pour un projet
+  bool isAvailableForProjet({
+    required String projetSpecialite,
+    required String projetRegion,
+    double? minRating = 3.5,
+  }) {
+    final matchesSpecialite =
+        specialite.toLowerCase() == projetSpecialite.toLowerCase();
+    final matchesRegion = region == null || region == projetRegion;
+    final meetsRating = rating == null || rating! >= (minRating ?? 3.5);
+    return disponible && matchesSpecialite && matchesRegion && meetsRating;
+  }
+
+  /// Assigne ce technicien à un projet
+  Technicien assignToProjet(String projetId) {
+    if (chantiersAffectees.contains(projetId)) return this;
+    return copyWith(
+      chantiersAffectees: [...chantiersAffectees, projetId],
+      updatedAt: DateTime.now(),
+    );
+  }
 }

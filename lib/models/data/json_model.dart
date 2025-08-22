@@ -96,6 +96,17 @@ extension JsonModelCopyWith<T> on JsonModel<T> {
 
     throw UnimplementedError('copyWithId non implémenté pour $T');
   }
+
+  T copyWithJson(Map<String, dynamic> updates) {
+    final newJson = {...toJson(), ...updates};
+    return (fromJson(newJson) as T);
+  }
+
+  JsonModel fromJson(Map<String, dynamic> json) {
+    throw UnimplementedError(
+      'fromJson doit être implémenté dans chaque modèle concret.',
+    );
+  }
 }
 
 extension JsonModelFactory on JsonModel {

@@ -9,7 +9,7 @@ import '../adapter/wath_entities_args.dart';
 AutoDisposeProvider<Stream<List<T>>>
 watchVisibleEntitiesProvider<T extends JsonModel>(WatchEntitiesArgs<T> args) {
   return Provider.autoDispose<Stream<List<T>>>((ref) {
-    final user = ref.watch(currentUserProvider);
+    final user = ref.watch(currentUserProvider).value;
     if (user == null) return const Stream.empty();
 
     final service = ref.watch(args.serviceProvider);
@@ -18,8 +18,8 @@ watchVisibleEntitiesProvider<T extends JsonModel>(WatchEntitiesArgs<T> args) {
         uid: user.id,
         name: user.name,
         email: user.email,
-        role: user.role.name,
-        createdAt: user.createAt,
+        role: user.role,
+        createdAt: user.createdAt,
       );
       return _filterByUserRole<T>(entities, u);
     });

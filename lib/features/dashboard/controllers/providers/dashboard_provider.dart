@@ -17,7 +17,7 @@ class DashboardData {
 }
 
 final dashboardProvider = FutureProvider<DashboardData>((ref) async {
-  final user = ref.watch(currentUserProvider);
+  final user = ref.watch(currentUserProvider).value;
 
   final allProjets = await projetService.getAll();
   final allChantiers = await chantierService.getAll();
@@ -27,81 +27,81 @@ final dashboardProvider = FutureProvider<DashboardData>((ref) async {
   List<Chantier> chantiersFiltered = [];
   List<Intervention> interventionsFiltered = [];
 
-  switch (user?.role) {
-    case UserRole.superUtilisateur:
-      // L'admin voit tout
-      projetsFiltered = allProjets;
-      chantiersFiltered = allChantiers;
-      interventionsFiltered = allInterventions;
-      break;
+  if (user != null) {
+    final roles = UserRoleX.fromString(user.role);
 
-    case UserRole.technicien:
-      // Le technicien voit uniquement les chantiers et interventions qui lui sont assignés
-      chantiersFiltered =
-          allChantiers
-              .where((c) => user != null && c.technicienIds.contains(user.id))
-              .toList();
+    switch (roles) {
+      case UserRole.superUtilisateur:
+        // L'admin voit tout
+        projetsFiltered = allProjets;
+        chantiersFiltered = allChantiers;
+        interventionsFiltered = allInterventions;
+        break;
 
-      interventionsFiltered =
-          allInterventions
-              .where((i) => user != null && i.technicienId.contains(user.id))
-              .toList();
+      case UserRole.technicien:
+        // Le technicien voit uniquement les chantiers et interventions qui lui sont assignés
+        chantiersFiltered =
+            allChantiers
+                .where((c) => c.technicienIds.contains(user.id))
+                .toList();
 
-      // Projets liés aux chantiers du technicien
-      final projetIds = chantiersFiltered.map((c) => c.chefDeProjetId).toSet();
-      projetsFiltered =
-          allProjets.where((p) => projetIds.contains(p.id)).toList();
-      break;
+        interventionsFiltered =
+            allInterventions
+                .where((i) => i.technicienId.contains(user.id))
+                .toList();
 
-    case UserRole.client:
-      // Le client voit ses projets et chantiers associés
-      projetsFiltered =
-          allProjets
-              .where((p) => user != null && p.createdBy.contains(user.id))
-              .toList();
+        // Projets liés aux chantiers du technicien
+        final projetIds =
+            chantiersFiltered.map((c) => c.chefDeProjetId).toSet();
+        projetsFiltered =
+            allProjets.where((p) => projetIds.contains(p.id)).toList();
+        break;
 
-      chantiersFiltered =
-          allChantiers
-              .where(
-                (c) => projetsFiltered.map((p) => p.id).contains(c.clientId),
-              )
-              .toList();
+      case UserRole.client:
+        // Le client voit ses projets et chantiers associés
+        projetsFiltered =
+            allProjets.where((p) => p.ownerId.contains(user.id)).toList();
 
-      interventionsFiltered =
-          allInterventions
-              .where(
-                (i) =>
-                    chantiersFiltered.map((c) => c.id).contains(i.chantierId),
-              )
-              .toList();
-      break;
-    case null:
-      // TODO: Handle this case.
-      throw UnimplementedError();
-    case UserRole.chefDeProjet:
-      // Le client voit ses projets et chantiers associés
-      projetsFiltered =
-          allProjets
-              .where((p) => user != null && p.createdBy.contains(user.id))
-              .toList();
+        chantiersFiltered =
+            allChantiers
+                .where(
+                  (c) => projetsFiltered.map((p) => p.id).contains(c.clientId),
+                )
+                .toList();
 
-      chantiersFiltered =
-          allChantiers
-              .where(
-                (c) => projetsFiltered.map((p) => p.id).contains(c.clientId),
-              )
-              .toList();
+        interventionsFiltered =
+            allInterventions
+                .where(
+                  (i) =>
+                      chantiersFiltered.map((c) => c.id).contains(i.chantierId),
+                )
+                .toList();
+        break;
+      case null:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case UserRole.chefDeProjet:
+        // Le client voit ses projets et chantiers associés
+        projetsFiltered =
+            allProjets.where((p) => p.ownerId.contains(user.id)).toList();
 
-      interventionsFiltered =
-          allInterventions
-              .where(
-                (i) =>
-                    chantiersFiltered.map((c) => c.id).contains(i.chantierId),
-              )
-              .toList();
-      break;
+        chantiersFiltered =
+            allChantiers
+                .where(
+                  (c) => projetsFiltered.map((p) => p.id).contains(c.clientId),
+                )
+                .toList();
+
+        interventionsFiltered =
+            allInterventions
+                .where(
+                  (i) =>
+                      chantiersFiltered.map((c) => c.id).contains(i.chantierId),
+                )
+                .toList();
+        break;
+    }
   }
-
   return DashboardData(
     projets: projetsFiltered,
     chantiers: chantiersFiltered,

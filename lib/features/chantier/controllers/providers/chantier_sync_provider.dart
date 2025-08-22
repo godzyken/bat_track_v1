@@ -7,7 +7,7 @@ import '../../../../data/local/services/service_type.dart';
 import '../../../../models/data/state_wrapper/wrappers.dart';
 import '../../../../models/notifiers/sync_entity_notifier.dart';
 import '../../../../models/services/entity_sync_services.dart';
-import '../../../auth/data/providers/auth_state_provider.dart';
+import '../../../auth/data/providers/current_user_provider.dart';
 
 final chantierInitialProvider = FutureProvider.family<Chantier, String>((
   ref,
@@ -117,7 +117,7 @@ final userSyncServiceProvider = entitySyncServiceProvider<UserModel>(
 
 final filteredChantiersProvider = Provider<AsyncValue<List<Chantier>>>((ref) {
   final chantierAsync = ref.watch(chantierListProvider);
-  final userAsync = ref.watch(appUserProvider);
+  final userAsync = ref.watch(currentUserProvider);
 
   if (userAsync.isLoading) return const AsyncValue.loading();
   if (userAsync.hasError) {

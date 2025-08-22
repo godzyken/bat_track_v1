@@ -58,15 +58,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             }
           }
 
-          final pieChart = InterventionChart(
-            data: pieData,
-            chartType: InterventionChartType.pie,
-          );
+          final pieChart = AnimatedInterventionChart(data: pieData);
 
-          final barChart = InterventionChart(
-            data: barData,
-            chartType: InterventionChartType.bar,
-          );
+          final barChart = AnimatedInterventionChart(data: barData);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),

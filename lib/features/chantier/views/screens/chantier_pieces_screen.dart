@@ -1,12 +1,12 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/data/local/models/base/access_policy_interface.dart';
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/providers/hive_provider.dart';
 import '../../../../models/views/widgets/entity_list.dart';
-import '../../../auth/data/providers/auth_state_provider.dart';
 
 class ChantierPiecesScreen extends ConsumerWidget {
   final String chantierId;
@@ -15,7 +15,7 @@ class ChantierPiecesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
-    final user = ref.watch(appUserProvider).value;
+    final user = ref.watch(currentUserProvider).value;
     if (user == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }

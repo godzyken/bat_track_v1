@@ -132,7 +132,7 @@ class SyncedEntityService<T extends JsonModel> implements EntityServices<T> {
   }
 
   @override
-  Future<void> clear() {
+  Future<void> clear() async {
     // TODO: implement clear
     throw UnimplementedError();
   }
@@ -162,9 +162,15 @@ class SyncedEntityService<T extends JsonModel> implements EntityServices<T> {
   }
 
   @override
-  Future<T?> get(String id) {
-    // TODO: implement get
-    throw UnimplementedError();
+  Future<T?> get(String id) async {
+    final localEntity = await local.get(id);
+    if (localEntity != null) return localEntity;
+
+    final remoteEntity = await remote.getById(id);
+    if (remoteEntity != null) {
+      await local.put(remoteEntity.id, remoteEntity);
+    }
+    return remoteEntity;
   }
 
   @override
@@ -243,10 +249,7 @@ class SyncedEntityService<T extends JsonModel> implements EntityServices<T> {
   }
 
   @override
-  Stream<List<T>> watchAll() {
-    // TODO: implement watchAll
-    throw UnimplementedError();
-  }
+  Stream<List<T>> watchAll() => watchAllCombined();
 
   @override
   Stream<List<T>> watchByChantier(String chantierId) {
@@ -300,9 +303,9 @@ class SyncedEntityService<T extends JsonModel> implements EntityServices<T> {
   }
 
   @override
-  Future<void> put(String id, T item) {
-    // TODO: implement put
-    throw UnimplementedError();
+  Future<void> put(String id, T item) async {
+    await local.put(id, item);
+    await remote.save(item, id);
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,7 +10,6 @@ import '../../../../models/data/json_model.dart';
 import '../../../../models/providers/asynchrones/entity_list_future_provider.dart';
 import '../../../../models/views/screens/screen_wrapper.dart';
 import '../../../../models/views/widgets/entity_list.dart';
-import '../../../auth/data/providers/auth_state_provider.dart';
 
 class ClientHomeScreen extends ConsumerWidget {
   const ClientHomeScreen({super.key, required String clientId});
@@ -17,7 +17,7 @@ class ClientHomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
-    final currentUser = ref.watch(appUserProvider).value;
+    final currentUser = ref.watch(currentUserProvider).value;
 
     if (currentUser == null) {
       return const Center(child: Text("Veuillez vous connecter."));
@@ -32,7 +32,7 @@ class ClientHomeScreen extends ConsumerWidget {
     }) {
       String entityOwner;
       if (entity is Projet) {
-        entityOwner = entity.createdBy;
+        entityOwner = entity.ownerId;
       } else if (entity is Chantier) {
         entityOwner = entity.clientId;
       } else if (entity is Intervention) {
@@ -133,7 +133,7 @@ class ClientHomeScreen extends ConsumerWidget {
                       list
                           .where(
                             (p) =>
-                                isOwner ? p.createdBy == currentUser.uid : true,
+                                isOwner ? p.ownerId == currentUser.uid : true,
                           )
                           .toList(),
             ),
@@ -154,7 +154,7 @@ class ClientHomeScreen extends ConsumerWidget {
                                 projects.value?.any(
                                   (p) =>
                                       p.id == c.chefDeProjetId &&
-                                      p.createdBy == currentUser.uid,
+                                      p.ownerId == currentUser.uid,
                                 ) ??
                                 false,
                           )
@@ -179,7 +179,7 @@ class ClientHomeScreen extends ConsumerWidget {
                                       projects.value?.any(
                                         (p) =>
                                             p.id == c.chefDeProjetId &&
-                                            p.createdBy == currentUser.uid,
+                                            p.ownerId == currentUser.uid,
                                       ) ??
                                       false,
                                 ) ??

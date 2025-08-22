@@ -1,50 +1,77 @@
+import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
+import 'package:bat_track_v1/data/local/models/projets/projet.dart';
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
+import 'package:bat_track_v1/models/views/widgets/entity_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../../data/local/models/projets/projet.dart';
-import '../../../../models/views/widgets/entity_form.dart';
 import '../../../auth/data/providers/auth_state_provider.dart';
-import '../../../auth/views/widgets/multi_user_dropdown_field.dart';
 import '../../../auth/views/widgets/user_dropdown_field.dart';
+import '../../../technicien/controllers/notifiers/technicien_list_notifier.dart';
 
-class ProjectFormDialog extends ConsumerWidget {
+class ProjectFormDialog extends ConsumerStatefulWidget {
   final Projet? project;
 
   const ProjectFormDialog({super.key, this.project});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isEditing = project != null;
+  ConsumerState<ProjectFormDialog> createState() => _ProjectFormDialogState();
+}
+
+class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
+  String? selectedClientId;
+  List<String> selectedTechniciens = [];
+  bool clientValide = false;
+  bool chefDeProjetValide = false;
+  bool superUtilisateurValide = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.project != null) {
+      selectedClientId = widget.project!.ownerId;
+      selectedTechniciens = [...widget.project!.members];
+      clientValide = widget.project!.clientValide;
+      chefDeProjetValide = widget.project!.chefDeProjetValide;
+      superUtilisateurValide = widget.project!.superUtilisateurValide;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isEditing = widget.project != null;
+    final userAsync = ref.watch(currentUserProvider);
+    final techsAsync = ref.watch(techniciensListProvider);
+
+    if (userAsync.isLoading || techsAsync.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final user = userAsync.value!;
+    final techs = techsAsync.value!;
 
     return EntityForm<Projet>(
       chantierId: isEditing ? 'Modifier le projet' : 'Créer un projet',
-      initialValue: project,
-      createEmpty:
-          () => Projet(
-            id: const Uuid().v4(),
-            nom: '',
-            description: '',
-            company: '',
-            createdBy: '',
-            members: [],
-            dateDebut: DateTime.timestamp(),
-            clientValide: false,
-            techniciensValides: false,
-            chefDeProjetValide: false,
-            superUtilisateurValide: true,
-            dateFin: DateTime.now().add(const Duration(days: 365)),
-            cloudVersion: {},
-            localDraft: {},
-          ),
+      initialValue: widget.project,
+      createEmpty: () => Projet.mock(),
       fromJson: (json) => Projet.fromJson(json),
       onSubmit: (project) async {
+        // ⚡ Gestion validation par rôle
+        final updatedProject = project.copyWith(
+          createdBy: selectedClientId ?? project.createdBy,
+          members: selectedTechniciens,
+          clientValide: clientValide,
+          chefDeProjetValide: chefDeProjetValide,
+          superUtilisateurValide: superUtilisateurValide,
+        );
+
         final doc = ref
             .read(firestoreProvider)
             .collection('projects')
-            .doc(project.id);
-        await doc.set(project.toJson());
-        Navigator.of(context).pop();
+            .doc(updatedProject.id);
+        await doc.set(updatedProject.toJson());
+        context.pop();
       },
       customFieldBuilder: (
         context,
@@ -54,35 +81,64 @@ class ProjectFormDialog extends ConsumerWidget {
         onChanged,
         expertMode,
       ) {
-        if (key == 'clientId') {
+        // 🔹 Choix du client (toujours accessible au admin)
+        if (key == 'clientId' && (user.isAdmin || !isEditing)) {
           return UserDropdownField(
             role: 'client',
             label: 'Client assigné',
-            selectedUserId: controller?.text ?? '',
-            onChanged: (newId) {
-              controller?.text = newId ?? '';
-              onChanged(newId);
-            },
+            selectedUserId: selectedClientId ?? '',
+            onChanged: (newId) => setState(() => selectedClientId = newId),
           );
         }
 
-        if (key == 'technicienIds' && value is List) {
-          return MultiUserDropdownField(
-            selectedUserIds: List<String>.from(value),
-            onChanged: (newList) => onChanged(newList),
-            role: 'technicien',
-            companyId: ref.watch(appUserProvider).value?.company,
+        // 🔹 Multi-sélection technicien pour admin / chef de projet
+        if (key == 'technicienIds' &&
+            value is List &&
+            (user.isAdmin || user.isChefDeProjet)) {
+          return Wrap(
+            spacing: 8,
+            children:
+                techs.map((t) {
+                  final isSelected = selectedTechniciens.contains(t.id);
+                  return FilterChip(
+                    label: Text('${t.nom} (${t.specialite})'),
+                    selected: isSelected,
+                    onSelected: (sel) {
+                      setState(() {
+                        if (sel)
+                          selectedTechniciens.add(t.id);
+                        else
+                          selectedTechniciens.remove(t.id);
+                      });
+                    },
+                  );
+                }).toList(),
           );
         }
 
-        if (key == 'techIds') {
-          return TextFormField(
-            controller: controller,
-            decoration: const InputDecoration(
-              labelText: 'IDs des techniciens (séparés par virgule)',
-            ),
+        // 🔹 Validation par rôle
+        if (key == 'clientValide' && user.isClient) {
+          return CheckboxListTile(
+            title: const Text('Je valide le projet'),
+            value: clientValide,
+            onChanged: (v) => setState(() => clientValide = v ?? false),
+          );
+        }
+
+        if (key == 'chefDeProjetValide' && user.isChefDeProjet) {
+          return CheckboxListTile(
+            title: const Text('Validation Chef de projet'),
+            value: chefDeProjetValide,
+            onChanged: (v) => setState(() => chefDeProjetValide = v ?? false),
+          );
+        }
+
+        if (key == 'superUtilisateurValide' && user.isAdmin) {
+          return CheckboxListTile(
+            title: const Text('Validation Super Utilisateur'),
+            value: superUtilisateurValide,
             onChanged:
-                (v) => onChanged(v.split(',').map((e) => e.trim()).toList()),
+                (v) => setState(() => superUtilisateurValide = v ?? false),
           );
         }
 

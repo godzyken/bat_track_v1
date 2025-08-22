@@ -48,14 +48,13 @@ class DashboardPreviewCard extends ConsumerWidget {
                     const SizedBox(height: 12),
                     SizedBox(
                       height: 100,
-                      child: InterventionChart(
+                      child: AnimatedInterventionChart(
                         data: stats.map((key, value) {
                           final total = value.values
                               .expand((inner) => inner.values)
                               .fold<int>(0, (prev, element) => prev + element);
                           return MapEntry(key, total);
                         }),
-                        chartType: InterventionChartType.pie,
                         isCompact: true, // paramètre pour mini chart
                       ),
                     ),

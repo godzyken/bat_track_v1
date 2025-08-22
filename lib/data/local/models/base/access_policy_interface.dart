@@ -75,14 +75,17 @@ class MultiRolePolicy implements AccessPolicy {
 
   @override
   bool canMerge(String role, JsonModelWithUser<dynamic> entity) {
-    // TODO: implement canMerge
-    throw UnimplementedError();
+    return role == 'admin';
   }
 
   @override
   bool canRead(String role, String userId, JsonModelWithUser<dynamic> entity) {
-    // TODO: implement canRead
-    throw UnimplementedError();
+    return switch (role) {
+      'admin' => true,
+      'client' => entity.ownerId == userId,
+      'tech' => entity.assignedUserIds.contains(userId),
+      _ => false,
+    };
   }
 }
 

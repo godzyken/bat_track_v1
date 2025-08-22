@@ -3,17 +3,29 @@ import 'package:flutter/material.dart';
 
 enum InterventionChartType { bar, pie }
 
-class InterventionChart extends StatelessWidget {
+class AnimatedInterventionChart extends StatefulWidget {
   final Map<String, int> data;
-  final InterventionChartType chartType;
   final bool isCompact;
 
-  const InterventionChart({
+  const AnimatedInterventionChart({
     super.key,
     required this.data,
-    this.chartType = InterventionChartType.bar,
     this.isCompact = false,
   });
+
+  @override
+  State<AnimatedInterventionChart> createState() =>
+      _AnimatedInterventionChartState();
+}
+
+class _AnimatedInterventionChartState extends State<AnimatedInterventionChart>
+    with SingleTickerProviderStateMixin {
+  InterventionChartType _chartType = InterventionChartType.bar;
+
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  Map<String, int> _oldData = {};
 
   static final List<Color> defaultColors = [
     Colors.indigo,
@@ -23,15 +35,58 @@ class InterventionChart extends StatelessWidget {
     Colors.blueGrey,
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _oldData = Map.from(widget.data);
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    );
+    _controller.forward();
+  }
+
+  @override
+  void didUpdateWidget(covariant AnimatedInterventionChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data != widget.data) {
+      _oldData = Map.from(oldWidget.data);
+      _controller
+        ..reset()
+        ..forward();
+    }
+  }
+
+  void _toggleChartType() {
+    _controller.reset();
+    setState(() {
+      _chartType =
+          _chartType == InterventionChartType.bar
+              ? InterventionChartType.pie
+              : InterventionChartType.bar;
+    });
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Color _getColor(int index) => defaultColors[index % defaultColors.length];
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty)
+    if (widget.data.isEmpty)
       return const Center(child: Text('Aucune donnée disponible.'));
 
-    final entries = data.entries.toList();
-    final maxY = data.values.reduce((a, b) => a > b ? a : b).toDouble();
+    final bars = widget.data.entries.toList();
+    final maxY = widget.data.values.reduce((a, b) => a > b ? a : b).toDouble();
 
     double interval;
     if (maxY <= 5)
@@ -45,20 +100,25 @@ class InterventionChart extends StatelessWidget {
     else
       interval = 20;
 
+    double _animatedValue(String key) {
+      final oldVal = _oldData[key]?.toDouble() ?? 0;
+      final newVal = widget.data[key]?.toDouble() ?? 0;
+      return oldVal + (newVal - oldVal) * _animation.value;
+    }
+
     Widget _buildBarChart() {
       final barGroups =
-          entries.asMap().entries.map((entry) {
+          bars.asMap().entries.map((entry) {
             final index = entry.key;
             final e = entry.value;
             return BarChartGroupData(
               x: index,
               barRods: [
                 BarChartRodData(
-                  toY: e.value.toDouble(),
+                  toY: _animatedValue(e.key),
                   width: 16,
                   color: _getColor(index),
                   borderRadius: BorderRadius.circular(4),
-                  rodStackItems: [],
                 ),
               ],
             );
@@ -67,59 +127,54 @@ class InterventionChart extends StatelessWidget {
       return BarChart(
         BarChartData(
           maxY: maxY + interval,
-          barGroups: barGroups,
-          alignment: BarChartAlignment.spaceAround,
+          barTouchData: BarTouchData(enabled: false),
           gridData: FlGridData(show: true),
           borderData: FlBorderData(show: false),
-          barTouchData: BarTouchData(enabled: false),
+          alignment: BarChartAlignment.spaceAround,
+          barGroups: barGroups,
           titlesData: FlTitlesData(
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
-                showTitles: !isCompact,
+                showTitles: !widget.isCompact,
                 interval: interval,
                 reservedSize: 32,
-                getTitlesWidget:
-                    (value, _) => Text(
-                      value % interval == 0 ? value.toInt().toString() : '',
-                      style: const TextStyle(fontSize: 10),
-                    ),
               ),
             ),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
-                showTitles: !isCompact,
+                showTitles: !widget.isCompact,
                 reservedSize: 42,
                 getTitlesWidget: (value, _) {
                   final index = value.toInt();
-                  if (index >= entries.length) return const SizedBox();
+                  if (index >= bars.length) return const SizedBox();
                   return Text(
-                    entries[index].key,
+                    bars[index].key,
                     style: const TextStyle(fontSize: 10),
                     overflow: TextOverflow.ellipsis,
                   );
                 },
               ),
             ),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
             rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
         ),
       );
     }
 
     Widget _buildPieChart() {
-      final total = data.values.fold<int>(0, (p, e) => p + e);
+      final total = widget.data.values.fold<int>(0, (p, e) => p + e);
       return PieChart(
         PieChartData(
           sections:
-              entries.asMap().entries.map((entry) {
+              bars.asMap().entries.map((entry) {
                 final index = entry.key;
                 final e = entry.value;
                 return PieChartSectionData(
                   color: _getColor(index),
-                  value: e.value.toDouble(),
+                  value: _animatedValue(e.key),
                   title: '${((e.value / total) * 100).toStringAsFixed(1)}%',
-                  radius: isCompact ? 30 : 50,
+                  radius: widget.isCompact ? 30 : 50,
                   titleStyle: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -128,42 +183,37 @@ class InterventionChart extends StatelessWidget {
                 );
               }).toList(),
           sectionsSpace: 2,
-          centerSpaceRadius: isCompact ? 20 : 40,
+          centerSpaceRadius: widget.isCompact ? 20 : 40,
         ),
       );
     }
 
-    Widget _buildLegend(bool isHorizontal) {
-      final legendItems =
-          entries.asMap().entries.map((entry) {
-            final index = entry.key;
-            final e = entry.value;
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: _getColor(index),
-                    borderRadius: BorderRadius.circular(3),
+    Widget _buildLegend() {
+      return Wrap(
+        spacing: 8,
+        runSpacing: 4,
+        children:
+            bars.asMap().entries.map((entry) {
+              final index = entry.key;
+              final e = entry.value;
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: _getColor(index),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                Text(e.key, style: const TextStyle(fontSize: 12)),
-              ],
-            );
-          }).toList();
-
-      return isHorizontal
-          ? Wrap(spacing: 8, runSpacing: 4, children: legendItems)
-          : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: legendItems,
-          );
+                  const SizedBox(width: 4),
+                  Text(e.key, style: const TextStyle(fontSize: 12)),
+                ],
+              );
+            }).toList(),
+      );
     }
-
-    final isWide = MediaQuery.of(context).size.width > 600;
 
     return Card(
       elevation: 2,
@@ -174,27 +224,42 @@ class InterventionChart extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Interventions par statut',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                const Text(
+                  'Interventions par statut',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: Icon(
+                    _chartType == InterventionChartType.bar
+                        ? Icons.pie_chart
+                        : Icons.bar_chart,
+                  ),
+                  onPressed: _toggleChartType,
+                ),
+              ],
             ),
             const SizedBox(height: 12),
-            TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: 1),
-              duration: const Duration(seconds: 1),
-              builder: (_, value, __) {
-                if (chartType == InterventionChartType.bar) {
-                  return SizedBox(
-                    height: isCompact ? 16.0 * data.length + 80 : 240,
-                    child: _buildBarChart(),
-                  );
-                } else {
-                  return SizedBox(height: 240, child: _buildPieChart());
-                }
-              },
+            AnimatedBuilder(
+              animation: _animation,
+              builder:
+                  (_, __) => SizedBox(
+                    height:
+                        _chartType == InterventionChartType.bar
+                            ? (widget.isCompact
+                                ? 16.0 * widget.data.length + 80
+                                : 240)
+                            : 240,
+                    child:
+                        _chartType == InterventionChartType.bar
+                            ? _buildBarChart()
+                            : _buildPieChart(),
+                  ),
             ),
             const SizedBox(height: 12),
-            _buildLegend(isWide),
+            _buildLegend(),
           ],
         ),
       ),

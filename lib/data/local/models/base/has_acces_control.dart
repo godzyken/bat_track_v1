@@ -1,6 +1,6 @@
-import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../features/auth/data/providers/current_user_provider.dart';
 import '../utilisateurs/app_user.dart';
 
 /// Interface de base pour le contrôle d'accès
@@ -40,7 +40,7 @@ mixin RoleBasedAccess on HasAccessControl {
   String get ownerId;
 
   bool canView(Ref ref) {
-    final user = ref.read(appUserProvider).value;
+    final user = ref.read(currentUserProvider).value;
     if (user == null) return false;
     if (user.isAdmin) return true;
     if (user.uid == ownerId) return true;
@@ -48,13 +48,13 @@ mixin RoleBasedAccess on HasAccessControl {
   }
 
   bool canCreate(Ref ref) {
-    final user = ref.read(appUserProvider).value;
+    final user = ref.read(currentUserProvider).value;
     if (user == null) return false;
     return user.isAdmin || user.isClient;
   }
 
   bool canEdit(Ref ref) {
-    final user = ref.read(appUserProvider).value;
+    final user = ref.read(currentUserProvider).value;
     if (user == null) return false;
 
     if (user.isAdmin) return true;
@@ -67,13 +67,13 @@ mixin RoleBasedAccess on HasAccessControl {
   }
 
   bool canDelete(Ref ref) {
-    final user = ref.read(appUserProvider).value;
+    final user = ref.read(currentUserProvider).value;
     if (user == null) return false;
     return user.isAdmin;
   }
 
   bool canMerge(Ref ref) {
-    final user = ref.read(appUserProvider).value;
+    final user = ref.read(currentUserProvider).value;
     if (user == null) return false;
     return user.isAdmin;
   }

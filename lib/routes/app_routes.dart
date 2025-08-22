@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/features/client/views/screens/client_home_screen.dart';
 import 'package:bat_track_v1/features/client/views/screens/clients_screen.dart';
 import 'package:bat_track_v1/features/dashboard/views/screens/dashboard_screen.dart';
@@ -11,13 +12,13 @@ import 'package:go_router/go_router.dart';
 
 import '../data/local/models/base/access_policy_interface.dart';
 import '../features/auth/data/notifiers/auth_notifier.dart';
-import '../features/auth/data/providers/auth_state_provider.dart';
 import '../features/auth/views/screens/login_screen.dart';
 import '../features/auth/views/screens/register_screen.dart';
 import '../features/auth/views/widgets/access_shell.dart';
 import '../features/chantier/views/screens/chantier_extensions_screens.dart';
 import '../features/documents/views/screens/factureDetailScreen.dart';
 import '../features/documents/views/screens/factures_screen.dart';
+import '../features/intervention/views/screens/interventions_screen.dart';
 import '../features/projet/views/screens/projet_detail_screen.dart';
 import '../features/technicien/views/screens/technitiens_screen.dart';
 import '../models/services/navigator_key_service.dart';
@@ -26,7 +27,7 @@ import '../providers/auth_provider.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final refresh = ref.watch(goRouterRefreshNotifierProvider);
-  final appUserAsync = ref.watch(appUserProvider);
+  final appUserAsync = ref.watch(currentUserProvider);
   final policy = MultiRolePolicy();
 
   return GoRouter(
@@ -143,10 +144,37 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                                 chantierId: chantierId,
                               );
                             },
+                            /*   routes: [
+                              GoRoute(
+                                path: "/pieces/:pieceId",
+                                builder: (context, state) {
+                                  final chantierId =
+                                      state.uri.queryParameters["chantierId"]!;
+                                  final pieceId =
+                                      state.uri.queryParameters["pieceId"]!;
+                                  return PieceDetailScreen(
+                                    chantierId: chantierId,
+                                    pieceId: pieceId,
+                                  );
+                                },
+                              ),
+                            ],*/
                           ),
                         ],
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: "/chantier/:chantierId/interventions/:statut",
+                    builder: (context, state) {
+                      final chantierId =
+                          state.uri.queryParameters["chantierId"]!;
+                      final statut = state.uri.queryParameters["statut"]!;
+                      return InterventionsScreen(
+                        chantierId: chantierId,
+                        statut: statut,
+                      );
+                    },
                   ),
                 ],
               ),

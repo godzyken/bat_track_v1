@@ -7,50 +7,40 @@ import '../widgets/app_drawer.dart';
 import '../widgets/home_content.dart';
 import '../widgets/side_menu.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+/// HomeScreen simplifié, responsive
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  late Widget layout;
-  late ScreenSize screenSize;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    detectScreenSizeOrientation();
-    synchronisationProviders();
-  }
-
-  void synchronisationProviders() {
-    Future.microtask(() async {
-      try {
-        await ref.read(syncAllProvider).call();
-      } catch (e) {
+  /// Synchronise les providers (par ex. fetch des chantiers)
+  Future<void> _syncProviders(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref.read(syncAllProvider).call();
+    } catch (e) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Erreur lors de la synchronisation')),
         );
       }
-    });
+    }
   }
 
-  void detectScreenSizeOrientation() {
-    screenSize = ref.watch(screenSizeProvider);
-    switch (screenSize) {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Accès rapide aux infos responsive
+    final info = context.responsiveInfo(ref);
+
+    // Lance la synchronisation au build initial
+    Future.microtask(() => _syncProviders(context, ref));
+
+    // Layout responsive
+    Widget layout;
+    switch (info.screenSize) {
       case ScreenSize.desktop:
         layout = Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Expanded(flex: 1, child: SideMenu()),
-            const Expanded(flex: 3, child: HomeContent()),
+          children: const [
+            Expanded(flex: 1, child: SideMenu()),
+            Expanded(flex: 3, child: HomeContent()),
           ],
         );
         break;
@@ -63,13 +53,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         layout = const HomeContent();
         break;
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Accueil')),
-      drawer: screenSize == ScreenSize.mobile ? const AppDrawer() : null,
+      drawer: info.isMobile ? const AppDrawer() : null,
       body: layout,
     );
   }

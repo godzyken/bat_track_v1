@@ -232,6 +232,41 @@ class LoggedEntitySyncService<T extends JsonModel>
     }, context: 'syncEntity<$T>:$id');
   }
 
+  Future<void> updateEntity(T entity, [String? id]) async {
+    final entityId = id ?? entity.id;
+
+    await safeVoid(
+      () => _delegate.save(entity, entityId),
+      context: 'updateEntity<$T>:$entityId',
+    );
+
+    logAction(
+      action: 'updateEntity',
+      target: '$T/$entityId',
+      data: entity.toJson(),
+    );
+  }
+
+  Future<void> updateEntityPartial(
+    String id,
+    Map<String, dynamic> updates,
+  ) async {
+    await safeVoid(() async {
+      final current =
+          await _delegate.getByIdFromLocal(id) ??
+          await _delegate.getByIdFromRemote(id);
+
+      if (current == null) {
+        throw Exception('Entity <$T> with id=$id not found for update.');
+      }
+
+      final updated = current.copyWithJson(updates);
+      await _delegate.save(updated, id);
+    }, context: 'updateEntityPartial<$T>:$id');
+
+    logAction(action: 'updateEntityPartial', target: '$T/$id', data: updates);
+  }
+
   void _log(String method, List<dynamic> args) {
     developer.log('[LOG][${T.toString()}] $method called with args: $args');
   }

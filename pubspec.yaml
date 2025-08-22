@@ -71,6 +71,7 @@ dependencies:
   firebase_crashlytics: ^5.0.0
   supabase: ^2.8.0
   async: ^2.13.0
+  flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
   flutter_test:

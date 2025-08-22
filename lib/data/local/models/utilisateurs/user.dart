@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../models/data/json_model.dart';
 import '../../adapters/signture_converter.dart';
 import '../base/has_acces_control.dart';
+import 'app_user.dart';
 
 part 'user.freezed.dart';
 part 'user.g.dart';
@@ -10,7 +11,10 @@ part 'user.g.dart';
 @freezed
 class UserModel
     with _$UserModel
-    implements JsonModel<UserModel>, JsonSerializableModel<UserModel> {
+    implements
+        JsonModel<UserModel>,
+        JsonSerializableModel<UserModel>,
+        HasAccessControl {
   const factory UserModel({
     required String id,
     required String name,
@@ -46,23 +50,29 @@ class UserModel
 
   @override
   bool get isUpdated => updatedAt != null;
+
+  // HasAccessControl implémentation (basique, à enrichir si besoin)
+  String get ownerId => id;
+
+  String get roleName => role.asString;
+
+  @override
+  bool canAccess(AppUser user) {
+    // TODO: implement canAccess
+    throw UnimplementedError();
+  }
 }
 
 enum UserRole { client, chefDeProjet, technicien, superUtilisateur }
 
 extension UserAccess on UserModel {
   bool get isClient => role == UserRole.client;
-
   bool get isChefDeProjet => role == UserRole.chefDeProjet;
-
   bool get isTechnicien => role == UserRole.technicien;
-
   bool get isSuperUtilisateur => role == UserRole.superUtilisateur;
 
   bool get peutValiderDolibarr => isSuperUtilisateur;
-
   bool get estValideDolibarr => isDolibarrValidated == true;
-
   bool get estDisponiblePourSelection => isTechnicien && estValideDolibarr;
 }
 
@@ -91,7 +101,7 @@ extension UserRoleX on UserRole {
       case UserRole.client:
         return "Client";
       case UserRole.chefDeProjet:
-        return "Client";
+        return "Chef de projet"; // ✅ corrigé
     }
   }
 
@@ -108,5 +118,37 @@ extension UserRoleX on UserRole {
       case UserRole.chefDeProjet:
         return 'chefDeProjet';
     }
+  }
+}
+
+extension UserModelX on UserModel {
+  AppUser toAppUser() {
+    return AppUser(
+      uid: id,
+      name: name,
+      email: email,
+      role: role.asString,
+      company: company,
+      instanceId: instanceId,
+      createdAt: createAt,
+      updatedAt: updatedAt,
+      lastTimeConnect: lastTimeConnect,
+    );
+  }
+}
+
+extension AppUserX on AppUser {
+  UserModel toUserModel() {
+    return UserModel(
+      id: uid,
+      name: name,
+      email: email,
+      role: UserRoleX.fromString(role),
+      company: company,
+      instanceId: instanceId,
+      createAt: createdAt,
+      updatedAt: updatedAt,
+      lastTimeConnect: lastTimeConnect,
+    );
   }
 }

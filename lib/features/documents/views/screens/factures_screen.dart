@@ -1,6 +1,7 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/data/local/models/base/access_policy_interface.dart';
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/features/chantier/controllers/providers/chantier_sync_provider.dart';
 import 'package:bat_track_v1/features/documents/controllers/providers/facture_list_provider.dart';
 import 'package:bat_track_v1/features/documents/controllers/providers/pdr_generator_provider.dart';
@@ -12,7 +13,6 @@ import 'package:printing/printing.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
-import '../../../home/views/widgets/app_drawer.dart';
 
 class FacturesScreen extends ConsumerWidget {
   const FacturesScreen({super.key});
@@ -21,7 +21,7 @@ class FacturesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
     final factureAsync = ref.watch(factureListProvider);
-    final user = ref.watch(appUserProvider).value;
+    final user = ref.watch(currentUserProvider).value;
     if (user == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -56,7 +56,6 @@ class FacturesScreen extends ConsumerWidget {
           ),
         ],
       ),
-      drawer: const AppDrawer(),
       body: EntityList<Facture>(
         items: factureAsync,
         boxName: 'factures',
