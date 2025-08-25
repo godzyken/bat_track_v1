@@ -26,8 +26,9 @@ class ProjectListScreen extends ConsumerWidget {
     final info = context.responsiveInfo(ref);
     final policy = ProjetPolicy();
 
-    if (currentUser == null)
+    if (currentUser == null) {
       return const Center(child: Text('Utilisateur non connecté'));
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -51,8 +52,9 @@ class ProjectListScreen extends ConsumerWidget {
               itemCount: projects.length,
               itemBuilder: (context, index) {
                 final project = projects[index];
-                if (!policy.canRead(currentUser, project))
+                if (!policy.canRead(currentUser, project)) {
                   return const SizedBox.shrink();
+                }
                 return EntityCard(
                   entity: project,
                   onEdit:
@@ -102,8 +104,9 @@ class ProjectListScreen extends ConsumerWidget {
               itemCount: projects.length,
               itemBuilder: (context, index) {
                 final projet = projects[index];
-                if (!policy.canRead(currentUser, projet))
+                if (!policy.canRead(currentUser, projet)) {
                   return const SizedBox.shrink();
+                }
 
                 return EntityCard(
                   entity: projet,

@@ -9,8 +9,9 @@ class ProjetPolicy {
     if (user.isAdmin) return true;
     if (user.isClient &&
         projet.createdBy == user.uid &&
-        projet.status == ProjetStatus.draft)
+        projet.status == ProjetStatus.draft) {
       return true;
+    }
     if (user.isTechnicien && projet.members.contains(user.uid)) return true;
     return false;
   }
@@ -23,8 +24,9 @@ class ProjetPolicy {
     if (user.isAdmin) return true;
     if (user.isClient &&
         projet.createdBy == user.uid &&
-        projet.status == ProjetStatus.draft)
+        projet.status == ProjetStatus.draft) {
       return true;
+    }
     return false;
   }
 

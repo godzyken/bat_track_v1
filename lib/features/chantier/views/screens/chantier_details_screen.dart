@@ -51,6 +51,29 @@ class ChantierDetailScreen extends ConsumerWidget {
         chantier.superUtilisateurValide;
   }
 
+  void _updateEtape(
+    ChantierEtape updatedEtape,
+    SyncEntityNotifier<Chantier> notifier,
+  ) {
+    final updatedList =
+        chantier.etapes
+            .map((e) => e.id == updatedEtape.id ? updatedEtape : e)
+            .toList();
+    notifier.update(chantier.copyWith(etapes: updatedList));
+  }
+
+  void _deleteEtape(String id, SyncEntityNotifier<Chantier> notifier) {
+    final updatedList = chantier.etapes.where((e) => e.id != id).toList();
+    notifier.update(chantier.copyWith(etapes: updatedList));
+  }
+
+  void _reorderEtapes(
+    List<ChantierEtape> reordered,
+    SyncEntityNotifier<Chantier> notifier,
+  ) {
+    notifier.update(chantier.copyWith(etapes: reordered));
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
@@ -70,6 +93,15 @@ class ChantierDetailScreen extends ConsumerWidget {
         context,
       ),
     };
+  }
+
+  Widget buildSection(String title, Widget child) {
+    return Column(
+      children: [
+        SectionCard(title: title, child: child),
+        const SizedBox(height: 16),
+      ],
+    );
   }
 
   PopScope<Object> buildPopScope(
@@ -119,18 +151,16 @@ class ChantierDetailScreen extends ConsumerWidget {
                         ),
 
                       // Infos Dolibarrr
-                      SectionCard(
-                        title: "Connexion Dolibarr",
-                        child: DolibarrSection(
-                          onSync: () => notifier.syncNow(),
-                        ),
+                      buildSection(
+                        "Connexion Dolibarr",
+                        DolibarrSection(onSync: () => notifier.syncNow()),
                       ),
                       const SizedBox(height: 16),
 
                       // Infos générales
-                      SectionCard(
-                        title: "Informations générales",
-                        child: ChantierCardInfo(
+                      buildSection(
+                        "Informations générales",
+                        ChantierCardInfo(
                           chantier: state.data,
                           dateFormat: dateFormat,
                           onChanged: notifier.update,
@@ -139,9 +169,9 @@ class ChantierDetailScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
 
                       // Description
-                      SectionCard(
-                        title: "Description",
-                        child: ChantierDescription(
+                      buildSection(
+                        "Description",
+                        ChantierDescription(
                           chantier: chantier,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -150,59 +180,37 @@ class ChantierDetailScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
 
                       // Documents
-                      SectionCard(
-                        title: "Documents",
-                        child: ChantierListDocuments(chantier: chantier),
+                      buildSection(
+                        "Documents",
+                        ChantierListDocuments(chantier: chantier),
                       ),
                       const SizedBox(height: 16),
 
                       // Budget
-                      SectionCard(
-                        title: "Budget",
-                        child: BudgetDetailSansTech(details: totalBudget),
+                      buildSection(
+                        "Budget",
+                        BudgetDetailSansTech(details: totalBudget),
                       ),
                       const SizedBox(height: 16),
 
                       // Étapes avec timeline interactive
-                      SectionCard(
-                        title: "Étapes du chantier",
-                        child:
-                            chantierEstTermine
-                                ? ChantiersEtapeKanbanReadOnly(
-                                  etapes: chantier.etapes,
-                                )
-                                : ChantiersEtapeKanbanInteractive(
-                                  etapes: chantier.etapes,
-                                  canEditEtape: canModifyEtape,
-                                  onReorder: (reordered) {
-                                    notifier.update(
-                                      chantier.copyWith(etapes: reordered),
-                                    );
-                                  },
-                                  onDelete: (id) {
-                                    notifier.update(
-                                      chantier.copyWith(
-                                        etapes:
-                                            chantier.etapes
-                                                .where(
-                                                  (e) => e.id != id.toString(),
-                                                )
-                                                .toList(),
-                                      ),
-                                    );
-                                  },
-                                  onUpdate: (updatedEtape) {
-                                    final updatedList =
-                                        chantier.etapes.map((e) {
-                                          return e.id == updatedEtape.id
-                                              ? updatedEtape
-                                              : e;
-                                        }).toList();
-                                    notifier.update(
-                                      chantier.copyWith(etapes: updatedList),
-                                    );
-                                  },
-                                ),
+                      buildSection(
+                        "Étapes du chantier",
+                        chantierEstTermine
+                            ? ChantiersEtapeKanbanReadOnly(
+                              etapes: chantier.etapes,
+                            )
+                            : ChantiersEtapeKanbanInteractive(
+                              etapes: chantier.etapes,
+                              canEditEtape: canModifyEtape,
+                              onReorder:
+                                  (reordered) =>
+                                      _reorderEtapes(reordered, notifier),
+                              onDelete: (id) => _deleteEtape(id, notifier),
+                              onUpdate:
+                                  (updatedEtape) =>
+                                      _updateEtape(updatedEtape, notifier),
+                            ),
                       ),
                     ],
                   ),

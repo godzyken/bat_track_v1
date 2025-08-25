@@ -1,10 +1,9 @@
 import 'package:bat_track_v1/data/local/adapters/signture_converter.dart';
 import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
+import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
-
-import '../utilisateurs/app_user.dart';
 
 part 'projet.freezed.dart';
 part 'projet.g.dart';
@@ -54,6 +53,7 @@ class Projet with _$Projet implements JsonModel<Projet>, HasAccessControl {
     String? localisation, // 🔹 zone géographique du projet
     double? budgetEstime,
     String? currentUserId,
+    List<Chantier>? chantiers,
   }) = _Projet;
 
   factory Projet.fromJson(Map<String, dynamic> json) => _$ProjetFromJson(json);
@@ -84,6 +84,8 @@ class Projet with _$Projet implements JsonModel<Projet>, HasAccessControl {
       'nom': 'Categate v2',
       'description': 'Rénovation avec nouvelles fenêtres',
     },
+    currentUserId: 'um1',
+    chantiers: [],
   );
 
   String get ownerId => createdBy;
@@ -140,8 +142,9 @@ class Projet with _$Projet implements JsonModel<Projet>, HasAccessControl {
     if (user.isAdmin) return true;
     if (user.isClient &&
         projet.createdBy == user.uid &&
-        projet.status == ProjetStatus.draft)
+        projet.status == ProjetStatus.draft) {
       return true;
+    }
     if (user.isTechnicien && projet.members.contains(user.uid)) return true;
     return false;
   }
@@ -151,10 +154,12 @@ extension ProjetWorkflow on Projet {
   /// 🔹 Vérifie si l'utilisateur peut modifier le projet
   bool canEditProject(AppUser user) {
     if (user.isAdmin || user.isChefDeProjet) return true;
-    if (user.isClient && ownerId == user.uid && !chefDeProjetValide)
+    if (user.isClient && ownerId == user.uid && !chefDeProjetValide) {
       return true;
-    if (user.isTechnicien && members.contains(user.uid) && clientValide)
+    }
+    if (user.isTechnicien && members.contains(user.uid) && clientValide) {
       return true;
+    }
     return false;
   }
 
@@ -182,8 +187,9 @@ extension ProjetWorkflow on Projet {
 
   /// 🔹 Assignation d'un technicien
   Projet assignTechnician(AppUser tech) {
-    if (!canBeAssigned(tech))
+    if (!canBeAssigned(tech)) {
       throw Exception("Technicien non valide ou déjà assigné.");
+    }
     final updatedMembers = List<String>.from(members)..add(tech.uid);
     return copyWith(members: updatedMembers);
   }
@@ -192,10 +198,12 @@ extension ProjetWorkflow on Projet {
   String get status {
     if (!clientValide) return 'draft';
     if (clientValide && !chefDeProjetValide) return 'pendingValidation';
-    if (clientValide && chefDeProjetValide && !techniciensValides)
+    if (clientValide && chefDeProjetValide && !techniciensValides) {
       return 'validatedWithoutTechnicians';
-    if (clientValide && chefDeProjetValide && techniciensValides)
+    }
+    if (clientValide && chefDeProjetValide && techniciensValides) {
       return 'fullyValidated';
+    }
     return 'unknown';
   }
 }

@@ -83,6 +83,8 @@ dev_dependencies:
   dwds: ^24.4.0
   freezed: ^2.4.6
   sentry_dart_plugin: ^3.1.1
+  riverpod_test: ^0.1.9
+  test: ^1.25.15
 
 flutter:
 
