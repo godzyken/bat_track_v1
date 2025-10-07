@@ -438,128 +438,96 @@ void main() {
       projectListProvider.overrideWith(
         mockStreamProvider<Projet>(
           snapshots: [
+            [projetPenelope], // snapshot 0 : 1 projet
             [
+              projetPenelope,
               Projet(
-                id: '1',
-                nom: 'Projet A',
-                description: '',
-                dateDebut: DateTime.now(),
-                dateFin: DateTime.now().add(Duration(days: 10)),
-                company: '',
-                createdBy: '',
+                id: 'prj_002',
+                nom: 'Rénovation villa Zeus',
+                description: 'Projet secondaire',
+                createdBy: 'cli_002',
+                dateDebut: DateTime(2025, 4, 1),
+                chantiers: [chantierPenelope],
+                dateFin: DateTime(2025, 5, 1),
+                company: 'Panhihi',
                 members: [],
+                assignedUserIds: [],
                 clientValide: true,
                 chefDeProjetValide: true,
                 techniciensValides: true,
                 superUtilisateurValide: false,
-                cloudVersion: {},
-                localDraft: {},
+                cloudVersion: const {},
+                localDraft: const {},
               ),
-            ],
+            ], // snapshot 1 : 2 projets
+            [], // snapshot 2 : erreur simulée
             [
+              projetPenelope,
               Projet(
-                id: '1',
-                nom: 'Projet A',
-                description: '',
-                dateDebut: DateTime.now(),
-                dateFin: DateTime.now().add(Duration(days: 10)),
-                company: '',
-                createdBy: '',
+                id: 'prj_002',
+                nom: 'Rénovation villa Zeus',
+                description: 'Projet secondaire',
+                createdBy: 'cli_002',
+                dateDebut: DateTime(2025, 4, 1),
+                chantiers: [chantierPenelope],
+                dateFin: DateTime(2025, 5, 1),
+                company: 'Panhihi',
                 members: [],
+                assignedUserIds: [],
                 clientValide: true,
                 chefDeProjetValide: true,
                 techniciensValides: true,
                 superUtilisateurValide: false,
-                cloudVersion: {},
-                localDraft: {},
+                cloudVersion: const {},
+                localDraft: const {},
               ),
               Projet(
-                id: '2',
-                nom: 'Projet B',
-                description: '',
-                dateDebut: DateTime.now(),
-                dateFin: DateTime.now().add(Duration(days: 20)),
-                company: '',
-                createdBy: '',
+                id: 'prj_003',
+                nom: 'Rénovation villa Athena',
+                description: 'Projet tertiaire',
+                createdBy: 'cli_003',
+                dateDebut: DateTime(2025, 5, 1),
+                chantiers: [chantierPenelope],
+                dateFin: DateTime(2025, 6, 1),
+                company: 'Panhihi',
                 members: [],
+                assignedUserIds: [],
                 clientValide: true,
                 chefDeProjetValide: true,
                 techniciensValides: true,
                 superUtilisateurValide: false,
-                cloudVersion: {},
-                localDraft: {},
+                cloudVersion: const {},
+                localDraft: const {},
               ),
-            ],
-            [
-              Projet(
-                id: '1',
-                nom: 'Projet A',
-                description: '',
-                dateDebut: DateTime.now(),
-                dateFin: DateTime.now().add(Duration(days: 10)),
-                company: '',
-                createdBy: '',
-                members: [],
-                clientValide: true,
-                chefDeProjetValide: true,
-                techniciensValides: true,
-                superUtilisateurValide: false,
-                cloudVersion: {},
-                localDraft: {},
-              ),
-              Projet(
-                id: '2',
-                nom: 'Projet B',
-                description: '',
-                dateDebut: DateTime.now(),
-                dateFin: DateTime.now().add(Duration(days: 20)),
-                company: '',
-                createdBy: '',
-                members: [],
-                clientValide: true,
-                chefDeProjetValide: true,
-                techniciensValides: true,
-                superUtilisateurValide: false,
-                cloudVersion: {},
-                localDraft: {},
-              ),
-              Projet(
-                id: '3',
-                nom: 'Projet C',
-                description: '',
-                dateDebut: DateTime.now(),
-                dateFin: DateTime.now().add(Duration(days: 30)),
-                company: '',
-                createdBy: '',
-                members: [],
-                clientValide: true,
-                chefDeProjetValide: true,
-                techniciensValides: true,
-                superUtilisateurValide: false,
-                cloudVersion: {},
-                localDraft: {},
-              ),
-            ],
+            ], // snapshot 3 : 3 projets
           ],
-          errorAt: 2, // simule une erreur après le 2e snapshot
-          error: Exception('Firestore disconnected'),
+          errors: {
+            2: Exception('Firestore disconnected'),
+          }, // erreur au snapshot 2
         ),
       ),
     ],
     expect:
         () => <dynamic>[
           isA<AsyncLoading<List<Projet>>>(),
+          isA<AsyncData<List<Projet>>>()
+              .having((r) => r.value, 'value', isNotEmpty)
+              .having(
+                (r) => r.value.first.nom,
+                'nom du premier projet',
+                'Rénovation villa Penelope',
+              ),
           predicate<AsyncValue<List<Projet>>>(
             (a) => a.hasValue && a.value!.length == 1,
           ),
           predicate<AsyncValue<List<Projet>>>(
             (a) => a.hasValue && a.value!.length == 2,
           ),
-          /*          predicate<AsyncValue<List<Projet>>>(
+          predicate<AsyncValue<List<Projet>>>(
             (a) =>
                 a.hasError &&
                 a.error.toString().contains('Firestore disconnected'),
-          ),*/
+          ),
           predicate<AsyncValue<List<Projet>>>(
             (a) => a.hasValue && a.value!.length == 3,
           ),
@@ -567,57 +535,60 @@ void main() {
     wait: const Duration(milliseconds: 300),
     verify:
         () => print(
-          '✅ verify: test séquence complète réussite/erreur/reconnexion',
+          '✅ verify: séquence complète 1→2→erreur→3 projets avec chantiers et étapes',
         ),
   );
 
   testProvider<AsyncValue<List<Projet>>>(
     'projectListProvider test 5 snapshots avec 2 erreurs simulées',
     provider: projectListProvider,
-
     overrides: [
       projectListProvider.overrideWith(
         mockStreamProvider<Projet>(
           snapshots: [
             [projetA], // snapshot 0
-            [projetA, projetB], // snapshot 1 → erreur simulée ici
+            [projetA, projetB], // snapshot 1 → erreur
             [projetA, projetB, projetC], // snapshot 2
-            [
-              projetA,
-              projetB,
-              projetC,
-              projetD,
-            ], // snapshot 3 → 2e erreur simulée
+            [projetA, projetB, projetC, projetD], // snapshot 3 → 2e erreur
             [projetA, projetB, projetC, projetD, projetE], // snapshot 4
           ],
-          errorAt: 1, // première erreur simulée
-          error: Exception('Firestore disconnected'),
+          errors: {
+            1: Exception('Firestore disconnected'),
+            3: Exception('Firestore timeout'),
+          },
         ),
       ),
     ],
-
     expect:
         () => <dynamic>[
-          isA<AsyncLoading<List<Projet>>>(), // initial
+          isA<AsyncLoading<List<Projet>>>(),
+          isA<AsyncData<List<Projet>>>()
+              .having((r) => r.value, 'value', isNotEmpty)
+              .having(
+                (r) => r.value.first.nom,
+                'nom du premier projet',
+                'Rénovation villa Penelope',
+              ),
           predicate<AsyncValue<List<Projet>>>(
             (a) => a.hasValue && a.value!.length == 1,
           ),
           predicate<AsyncValue<List<Projet>>>(
-            (a) => a.hasValue && a.value!.length == 2,
+            (a) =>
+                a.hasError &&
+                a.error.toString().contains('Firestore disconnected'),
           ),
           predicate<AsyncValue<List<Projet>>>(
             (a) => a.hasValue && a.value!.length == 3,
           ),
           predicate<AsyncValue<List<Projet>>>(
-            (a) => a.hasValue && a.value!.length == 4,
+            (a) =>
+                a.hasError && a.error.toString().contains('Firestore timeout'),
           ),
           predicate<AsyncValue<List<Projet>>>(
             (a) => a.hasValue && a.value!.length == 5,
           ),
         ],
-
     wait: const Duration(milliseconds: 300),
-
     verify:
         () => print(
           '✅ Test Firestore réaliste avec 5 snapshots et 2 erreurs simulées passé',
@@ -655,11 +626,9 @@ void main() {
       projectListProvider.overrideWith(
         mockStreamProvider<Projet>(
           snapshots: [
-            // snapshot 1 : 1 projet
-            [projetPenelope],
-
-            // snapshot 2 : 2 projets (le même + un second projet fictif)
+            [projetPenelope], // snapshot 1
             [
+              // snapshot 2
               projetPenelope,
               Projet(
                 id: 'prj_002',
@@ -667,9 +636,7 @@ void main() {
                 description: 'Projet secondaire de rénovation',
                 createdBy: 'cli_002',
                 dateDebut: DateTime(2025, 4, 1),
-                chantiers: [
-                  chantierPenelope,
-                ], // on réutilise les mêmes chantiers pour simplifier
+                chantiers: [chantierPenelope],
                 dateFin: DateTime(2025, 5, 1),
                 company: 'Panhihi',
                 members: [],
@@ -682,12 +649,9 @@ void main() {
                 localDraft: const {},
               ),
             ],
-
-            // snapshot 3 : simulate error
-            [],
-
-            // snapshot 4 : 3 projets
+            [], // snapshot 3 → erreur
             [
+              // snapshot 4
               projetPenelope,
               Projet(
                 id: 'prj_002',
@@ -727,8 +691,7 @@ void main() {
               ),
             ],
           ],
-          errorAt: 2, // simule l'erreur au 3e snapshot
-          error: Exception('Firestore disconnected'),
+          errors: {2: Exception('Firestore disconnected')},
         ),
       ),
     ],
@@ -739,13 +702,16 @@ void main() {
             (a) =>
                 a.hasValue &&
                 a.value!.length == 1 &&
-                a.value!.first.chantiers?.first.etapes.length == 3,
+                a.value!.first.nom == 'Rénovation villa Penelope' &&
+                a.value!.first.chantiers!.first.etapes.length == 3,
           ),
           predicate<AsyncValue<List<Projet>>>(
             (a) => a.hasValue && a.value!.length == 2,
           ),
           predicate<AsyncValue<List<Projet>>>(
-            (a) => a.hasValue && a.value!.isEmpty,
+            (a) =>
+                a.hasError &&
+                a.error.toString().contains('Firestore disconnected'),
           ),
           predicate<AsyncValue<List<Projet>>>(
             (a) => a.hasValue && a.value!.length == 3,
@@ -754,7 +720,7 @@ void main() {
     wait: const Duration(milliseconds: 300),
     verify:
         () => print(
-          '✅ verify: séquence complète 1→2→erreur→3 projets avec chantiers et étapes',
+          '✅ séquence complète, 1→2→erreur→3 projets avec chantiers et étapes, validée',
         ),
   );
 }

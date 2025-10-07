@@ -2,7 +2,6 @@ import 'dart:developer' as developer;
 
 import 'package:async/async.dart';
 import 'package:bat_track_v1/data/local/services/hive_service.dart';
-import 'package:bat_track_v1/data/remote/services/storage_service.dart';
 import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:bat_track_v1/models/providers/asynchrones/remote_service_provider.dart';
 import 'package:bat_track_v1/models/providers/synchrones/facture_sync_provider.dart';
@@ -18,6 +17,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local/models/index_model_extention.dart';
 import '../../data/local/services/service_type.dart';
+import '../../data/remote/services/storage_service.dart';
 import '../../features/chantier/controllers/providers/chantier_sync_provider.dart';
 import 'hive_entity_service.dart';
 import 'multi_backend_remote_service.dart';

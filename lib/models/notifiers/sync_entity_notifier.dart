@@ -7,6 +7,7 @@ import 'package:bat_track_v1/data/remote/services/base_storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local/models/base/has_acces_control.dart';
+import '../../data/remote/services/firebase_storage_service.dart';
 import '../../data/remote/services/storage_service.dart';
 import '../data/json_model.dart';
 import '../data/maperror/proxy.dart';
@@ -143,7 +144,7 @@ class SyncEntityNotifierDebug<T extends JsonModel>
                    logFilter: logFilter,
                    interceptor: interceptor,
                  )
-                 as StorageService,
+                 as FirebaseStorageService,
          initialState: initialState,
          autoSync: autoSync,
        );

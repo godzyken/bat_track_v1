@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../../../data/remote/services/storage_service.dart';
+import '../../../data/remote/services/firebase_storage_service.dart';
 import '../../data/json_model.dart';
 import '../../data/maperror/proxy.dart';
 import '../../notifiers/sync_entity_notifier.dart';
@@ -8,7 +8,7 @@ import '../../services/entity_service.dart';
 
 SyncEntityNotifier<T> debugNotifierProvider<T extends JsonModel>({
   required EntityService<T> entityService,
-  required StorageService storageService,
+  required FirebaseStorageService storageService,
   required T initialState,
   bool autoSync = true,
   MethodFilter? logFilter,
@@ -26,7 +26,7 @@ SyncEntityNotifier<T> debugNotifierProvider<T extends JsonModel>({
 
   final ss =
       kDebugMode
-          ? DebugProxy<StorageService>(
+          ? DebugProxy<FirebaseStorageService>(
             storageService,
             logFilter: logFilter,
             interceptor: interceptor,
@@ -35,7 +35,7 @@ SyncEntityNotifier<T> debugNotifierProvider<T extends JsonModel>({
 
   return SyncEntityNotifier<T>(
     entityService: es as EntityService<T>,
-    storageService: ss as StorageService,
+    storageService: ss as FirebaseStorageService,
     initialState: initialState,
     autoSync: autoSync,
   );

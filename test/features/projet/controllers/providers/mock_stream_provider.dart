@@ -5,28 +5,34 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Simule un StreamProvider pour tests.
 ///
 /// [snapshots] : liste de listes de T à émettre successivement.
-/// [errorAt] : index où une erreur doit être simulée (optionnel).
-/// [error] : Exception ou String pour l’erreur.
+/// [errors] : Exceptions ou Strings pour les erreurs.
 /// [delay] : délai entre les snapshots (optionnel).
 Stream<List<T>> Function(Ref) mockStreamProvider<T>({
   required List<List<T>> snapshots,
-  int? errorAt,
-  Object? error,
+  Map<int, Object>? errors,
   Duration delay = const Duration(milliseconds: 10),
 }) {
   return (ref) async* {
+    List<T>? lastValidSnapshot;
+
     for (var i = 0; i < snapshots.length; i++) {
       await Future.delayed(delay);
-      // si on est à l’index errorAt, yield une AsyncValue.error encapsulée
-      if (errorAt != null && i == errorAt) {
-        // on peut “injecter” une erreur mais continuer le stream
-        yield snapshots[i]; // yield le snapshot avant erreur
-        // yield un snapshot vide ou répéter le dernier pour simuler reconnection
-        // ici on simule juste l’erreur en log
-        print('⚠️ Simulated Firestore error: $error');
-        continue; // stream continue
+
+      if (errors != null && errors.containsKey(i)) {
+        final err = errors[i]!;
+        print('⚠️ Simulated error at snapshot $i: $err');
+
+        // Yield last snapshot or empty to continue the stream
+        yield lastValidSnapshot ?? [];
+
+        // Le test devra vérifier "hasError" séparément
+        continue;
       }
-      yield snapshots[i];
+
+      final snapshot = snapshots[i];
+      yield snapshot;
+      lastValidSnapshot = snapshot;
+      print('✅ Yield snapshot $i: $snapshot');
     }
   };
 }
