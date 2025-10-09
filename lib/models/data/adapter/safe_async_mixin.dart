@@ -10,7 +10,7 @@ mixin SafeAsyncMixin<T> on LoggedAction {
   late Reader _ref;
 
   void initSafeAsync(Reader ref) {
-    this._ref = ref;
+    _ref = ref;
     initLogger(ref);
   }
 

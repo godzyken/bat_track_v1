@@ -1,13 +1,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../core/unified_model.dart';
-import '../../adapters/signture_converter.dart' hide tryParseDate;
 
 part 'app_user.freezed.dart';
 part 'app_user.g.dart';
 
 @freezed
-class AppUser with _$AppUser implements UnifiedModel {
+class AppUser
+    with _$AppUser, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const AppUser._();
 
   const factory AppUser({

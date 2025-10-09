@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/models/adapters/json_adapter.dart';
 import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapter.dart';
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 import 'package:bat_track_v1/models/services/synced_entity_service.dart';
@@ -51,7 +52,10 @@ buildLoggedEntitySyncServiceProvider<T extends UnifiedModel>({
         remoteService: remoteService,
       ),
     );
-    return LoggedEntitySyncService<T>(synced, ref);
+
+    final adapter = GenericJsonAdapter();
+
+    return LoggedEntitySyncService<T>(synced, GenericJsonAdapter(), ref);
   });
 }
 

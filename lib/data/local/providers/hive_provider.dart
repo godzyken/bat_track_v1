@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/models/adapters/json_adapter.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/models/providers/asynchrones/remote_service_provider.dart';
 import 'package:bat_track_v1/models/services/hive_entity_service.dart';
@@ -228,7 +229,14 @@ final filteredAppUserServiceProvider =
       );
 
       final delegate = SyncedEntityService<AppUser>(local, remote);
-      return LoggedEntitySyncService(delegate, AppUserAdapter(), ref);
+      return LoggedEntitySyncService(
+        delegate,
+        GenericJsonAdapter<AppUser>(
+          fromJsonFn: AppUser.fromJson,
+          toJsonFn: (model) => model.toJson(),
+        ),
+        ref,
+      );
     });
 
 final watchPiecesByChantierProvider = StreamProvider.autoDispose
