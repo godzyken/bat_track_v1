@@ -9,6 +9,7 @@ import '../../data/core/unified_model.dart';
 import '../../data/local/models/adapters/json_adapter.dart';
 import '../../data/local/services/service_type.dart';
 import '../data/maperror/logged_action.dart';
+import '../providers/asynchrones/generic_adapter_provider.dart';
 import 'entity_sync_services.dart';
 
 class LoggedEntityService<T extends UnifiedModel> implements EntityServices<T> {
@@ -39,12 +40,14 @@ class LoggedEntitySyncService<T extends UnifiedModel>
     with LoggedAction, SafeAsyncMixin<T>
     implements SyncedEntityService<T> {
   final SyncedEntityService<T> _delegate;
-  final JsonAdapter<T> adapter;
+  final Ref ref;
 
-  LoggedEntitySyncService(this._delegate, this.adapter, Ref ref) {
+  LoggedEntitySyncService(this._delegate, this.ref) {
     initLogger(ref.read);
     initSafeAsync(ref.read);
   }
+
+  GenericJsonAdapter<T> get _adapter => ref.adapterFor<T>();
 
   @override
   Future<void> save(T entity, [String? id]) async {
@@ -266,7 +269,7 @@ class LoggedEntitySyncService<T extends UnifiedModel>
       final merged = {...currentJson, ...updates};
 
       // ✅ Conversion JSON -> modèle
-      final updated = adapter.fromJson(merged);
+      final updated = _adapter.fromJson(merged);
 
       await _delegate.save(updated, id);
     }, context: 'updateEntityPartial<$T>:$id');

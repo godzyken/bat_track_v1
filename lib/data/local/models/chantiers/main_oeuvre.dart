@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../core/unified_model.dart';
-import '../../adapters/signture_converter.dart';
 
 part 'main_oeuvre.freezed.dart';
 part 'main_oeuvre.g.dart';

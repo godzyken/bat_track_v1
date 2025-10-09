@@ -31,14 +31,18 @@ class _DolibarrImportScreenState extends ConsumerState<DolibarrImportScreen> {
     try {
       await importer.api.fetch('/explorer');
       setState(() => _log = '✅ Importation terminée avec succès !');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Importation réussie !')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Importation réussie !')));
+      }
     } catch (e) {
       setState(() => _log = '❌ Erreur : $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erreur : $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erreur : $e')));
+      }
     } finally {
       setState(() => _isLoading = false);
     }

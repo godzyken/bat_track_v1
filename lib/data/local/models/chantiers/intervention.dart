@@ -2,7 +2,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/unified_model.dart';
-import '../../adapters/signture_converter.dart';
 import '../index_model_extention.dart';
 
 part 'intervention.freezed.dart';

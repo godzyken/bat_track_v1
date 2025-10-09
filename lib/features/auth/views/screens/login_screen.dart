@@ -50,9 +50,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           .read(authRepositoryProvider)
           .signIn(emailCtrl.text.trim(), passCtrl.text.trim());
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Erreur : $e")));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Erreur : $e")));
+      }
     } finally {
       ref.read(loginLoadingProvider.notifier).state = false;
     }

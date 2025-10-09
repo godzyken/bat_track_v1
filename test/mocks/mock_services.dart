@@ -1,4 +1,4 @@
-import 'package:bat_track_v1/models/data/json_model.dart';
+import 'package:bat_track_v1/data/core/unified_model.dart';
 import 'package:bat_track_v1/models/services/hive_entity_service.dart';
 import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapter.dart';
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';

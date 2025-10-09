@@ -5,7 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 
-final firebaseAuthProvider = Provider((ref) => FirebaseAuth.instance);
+final firebaseAuthProvider = Provider<FirebaseAuth>(
+  (ref) => FirebaseAuth.instance,
+);
+
 final firestoreProvider = Provider((ref) => FirebaseFirestore.instance);
 
 /// Le stream qui notifie des changements d'état de connexion
@@ -43,4 +46,35 @@ final usersByRoleProvider = FutureProvider.family<List<UserModel>, String>((
   final query =
       await firestore.collection('users').where('role', isEqualTo: role).get();
   return query.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+});
+
+/// Fournisseur du flux d'authentification
+final firebaseUserProvider = StreamProvider<User?>((ref) {
+  return ref.watch(firebaseAuthProvider).authStateChanges();
+});
+
+/// Fournisseur de AppUser (convertit FirebaseUser -> AppUser)
+final appUserProvider = FutureProvider<AppUser>((ref) async {
+  final firebaseUser = await ref.watch(firebaseUserProvider.future);
+  if (firebaseUser == null) {
+    return AppUser.empty();
+  }
+
+  final userDoc =
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(firebaseUser.uid)
+          .get();
+
+  if (!userDoc.exists) {
+    return AppUser(
+      uid: firebaseUser.uid,
+      role: 'client',
+      email: firebaseUser.email,
+      name: firebaseUser.displayName ?? '',
+      createdAt: firebaseUser.metadata.creationTime ?? DateTime.now(),
+    );
+  }
+
+  return AppUser.fromJson(userDoc.data()!);
 });

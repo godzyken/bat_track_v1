@@ -56,7 +56,7 @@ void main() {
           projectListAsync.when(
             data: (data) => data.length,
             loading: () => 0,
-            error: (_, __) => -1,
+            error: (_, _) => -1,
           ),
           equals(5),
         );
@@ -85,7 +85,7 @@ void main() {
         projectListAsync.when(
           data: (data) => data.length,
           loading: () => 0,
-          error: (_, __) => -1,
+          error: (_, _) => -1,
         ),
         equals(2),
       );

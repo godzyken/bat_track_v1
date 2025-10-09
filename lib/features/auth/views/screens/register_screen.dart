@@ -60,9 +60,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               context.pushReplacementNamed('/');
                             }
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Erreur: $e')),
-                            );
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Erreur: $e')),
+                              );
+                            }
                           }
                         },
                       ),

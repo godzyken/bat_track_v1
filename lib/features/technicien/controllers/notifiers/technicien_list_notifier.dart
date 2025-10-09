@@ -31,6 +31,7 @@ class TechniciensNotifier extends EntityListNotifier<Technicien> {
     state = AsyncValue.data(await service.getAll());
   }
 
+  @override
   Future<void> delete(String id) async {
     final service = ref.read(technicienServiceProvider);
     await service.delete(id);

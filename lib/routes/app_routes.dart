@@ -28,7 +28,6 @@ import '../providers/auth_provider.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final refresh = ref.watch(goRouterRefreshNotifierProvider);
-  final appUserAsync = ref.watch(currentUserProvider);
   final policy = MultiRolePolicy();
 
   return GoRouter(
@@ -37,6 +36,43 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: refresh,
     debugLogDiagnostics: true,
     redirect: (context, state) {
+      final status = ref.read(userStatusProvider);
+
+      switch (status) {
+        case UserStatus.guest:
+          // Seules les routes publiques sont accessibles
+          final isPublic = [
+            '/login',
+            '/register',
+            '/',
+          ].contains(state.matchedLocation);
+          return isPublic ? null : '/login';
+
+        case UserStatus.authenticated:
+          // Profil en cours de chargement → page de loading
+          return '/loading';
+        case UserStatus.loaded:
+          // Si l’utilisateur est sur une page d’auth alors qu’il est déjà chargé, on le redirige
+          final appUser = ref.read(currentUserProvider).value!;
+          final role = appUser.role.toLowerCase();
+
+          if (['/login', '/register'].contains(state.matchedLocation)) {
+            switch (role) {
+              case 'admin':
+              case 'superutilisateur':
+                return '/dashboard';
+              case 'technicien':
+                return '/techniciens';
+              case 'client':
+              case 'chefdeprojet':
+                return '/clients';
+              default:
+                return '/home';
+            }
+          }
+          return null;
+      }
+      /*
       if (appUserAsync.isLoading) return '/loading';
 
       // Erreur de chargement
@@ -79,7 +115,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         return '/error';
       }
 
-      return null;
+      return null;*/
     },
     routes: [
       GoRoute(
@@ -237,13 +273,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':documentId',
                 builder: (context, state) {
-                  final currentUser = ref.read(currentUserProvider).value;
+                  final currentUser = ref.read(authNotifierProvider).value;
                   if (currentUser == null) {
                     return const ErrorApp(message: 'Utilisateur non connecté');
                   }
+                  final documentId = currentUser.id;
+
                   final projetId = state.pathParameters['ProjetId'] as Projet;
                   return FactureDetailScreen(
-                    userId: currentuser.id,
+                    userId: documentId,
                     projetId: projetId.id,
                   );
                 },
@@ -258,13 +296,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':equipementId',
                 builder: (context, state) {
-                  final currentUser = ref.read(currentUserProvider).value;
+                  final currentUser = ref.read(authNotifierProvider).value;
                   if (currentUser == null) {
                     return const ErrorApp(message: 'Utilisateur non connecté');
                   }
+                  final documentId = currentUser.id;
+
                   final projetId = state.pathParameters['ProjetId'] as Projet;
                   return FactureDetailScreen(
-                    userId: currentuser.id,
+                    userId: documentId,
                     projetId: projetId.id,
                   );
                 },
@@ -279,7 +319,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':projetId',
                 builder: (context, state) {
-                  final projetId = state.pathParameters['projetId'] ?? '';
                   final projet = state.extra as Projet?;
 
                   if (projet == null) {
@@ -293,7 +332,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
                   return ProjectDetailScreen(
                     projet: projet,
-                    currentUser: currentUser.toUserModel(),
+                    currentUser: currentUser,
                   );
                 },
                 routes: [],

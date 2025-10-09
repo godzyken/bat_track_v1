@@ -105,10 +105,11 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
                     selected: isSelected,
                     onSelected: (sel) {
                       setState(() {
-                        if (sel)
+                        if (sel) {
                           selectedTechniciens.add(t.id);
-                        else
+                        } else {
                           selectedTechniciens.remove(t.id);
+                        }
                       });
                     },
                   );

@@ -8,8 +8,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../data/local/models/utilisateurs/app_user.dart';
 
-//part 'auth_notifier.g.dart';
-
 @riverpod
 class AuthNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
   late final FirebaseAuth _auth;
@@ -20,8 +18,9 @@ class AuthNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
     if (value == null) return null;
     if (value is Timestamp) return value.toDate().toIso8601String();
     if (value is DocumentReference) return value.path;
-    if (value is GeoPoint)
+    if (value is GeoPoint) {
       return {'lat': value.latitude, 'lng': value.longitude};
+    }
     if (value is Map<String, dynamic>) {
       return value.map((k, v) => MapEntry(k, _convertFirestoreValue(v)));
     }
@@ -126,8 +125,9 @@ class AuthNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
       );
 
       final user = userCredential.user;
-      if (user == null)
+      if (user == null) {
         throw Exception("Utilisateur introuvable après connexion");
+      }
 
       final doc = await _firestore.collection('users').doc(user.uid).get();
       final data = _normalizeData(

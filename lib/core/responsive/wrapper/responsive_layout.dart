@@ -66,7 +66,7 @@ class _ResponsiveObserverState extends ConsumerState<ResponsiveObserver>
   void didChangeDependencies() {
     super.didChangeDependencies();
     // ✅ Ici, MediaQuery est garanti disponible
-    _updateScreenInfo();
+    // _updateScreenInfo();
   }
 
   @override

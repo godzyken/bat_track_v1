@@ -1,11 +1,8 @@
-import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/unified_model.dart';
-import '../../adapters/signture_converter.dart';
-import '../utilisateurs/app_user.dart';
 
 part 'equipement.freezed.dart';
 part 'equipement.g.dart';
@@ -59,21 +56,6 @@ class Equipement
 
   @override
   bool get isUpdated => updatedAt != null;
-
-  @override
-  bool canAccess(AppUser user) {
-    if (user.isAdmin) return true;
-
-    if (user.isTechnicien) {
-      return technicienIds?.contains(user.uid) ?? false;
-    }
-
-    if (user.isClient) {
-      return user.uid == createdBy;
-    }
-
-    return false;
-  }
 
   @override
   UnifiedModel copyWithId(String newId) => copyWith(id: newId);

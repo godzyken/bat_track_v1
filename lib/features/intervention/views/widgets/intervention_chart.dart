@@ -82,31 +82,34 @@ class _AnimatedInterventionChartState extends State<AnimatedInterventionChart>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.data.isEmpty)
+    if (widget.data.isEmpty) {
       return const Center(child: Text('Aucune donnée disponible.'));
+    }
 
     final bars = widget.data.entries.toList();
     final maxY = widget.data.values.reduce((a, b) => a > b ? a : b).toDouble();
 
     double interval;
-    if (maxY <= 5)
+    if (maxY <= 5) {
       interval = 1;
-    else if (maxY <= 10)
+    } else if (maxY <= 10) {
       interval = 2;
-    else if (maxY <= 25)
+    } else if (maxY <= 25) {
       interval = 5;
-    else if (maxY <= 50)
+    } else if (maxY <= 50) {
       interval = 10;
-    else
+    } else {
       interval = 20;
+    }
+    interval = interval.clamp(1, 20);
 
-    double _animatedValue(String key) {
+    double animatedValue(String key) {
       final oldVal = _oldData[key]?.toDouble() ?? 0;
       final newVal = widget.data[key]?.toDouble() ?? 0;
       return oldVal + (newVal - oldVal) * _animation.value;
     }
 
-    Widget _buildBarChart() {
+    Widget buildBarChart() {
       final barGroups =
           bars.asMap().entries.map((entry) {
             final index = entry.key;
@@ -115,7 +118,7 @@ class _AnimatedInterventionChartState extends State<AnimatedInterventionChart>
               x: index,
               barRods: [
                 BarChartRodData(
-                  toY: _animatedValue(e.key),
+                  toY: animatedValue(e.key),
                   width: 16,
                   color: _getColor(index),
                   borderRadius: BorderRadius.circular(4),
@@ -162,7 +165,7 @@ class _AnimatedInterventionChartState extends State<AnimatedInterventionChart>
       );
     }
 
-    Widget _buildPieChart() {
+    Widget buildPieChart() {
       final total = widget.data.values.fold<int>(0, (p, e) => p + e);
       return PieChart(
         PieChartData(
@@ -172,7 +175,7 @@ class _AnimatedInterventionChartState extends State<AnimatedInterventionChart>
                 final e = entry.value;
                 return PieChartSectionData(
                   color: _getColor(index),
-                  value: _animatedValue(e.key),
+                  value: animatedValue(e.key),
                   title: '${((e.value / total) * 100).toStringAsFixed(1)}%',
                   radius: widget.isCompact ? 30 : 50,
                   titleStyle: const TextStyle(
@@ -188,7 +191,7 @@ class _AnimatedInterventionChartState extends State<AnimatedInterventionChart>
       );
     }
 
-    Widget _buildLegend() {
+    Widget buildLegend() {
       return Wrap(
         spacing: 8,
         runSpacing: 4,
@@ -245,7 +248,7 @@ class _AnimatedInterventionChartState extends State<AnimatedInterventionChart>
             AnimatedBuilder(
               animation: _animation,
               builder:
-                  (_, __) => SizedBox(
+                  (_, _) => SizedBox(
                     height:
                         _chartType == InterventionChartType.bar
                             ? (widget.isCompact
@@ -254,12 +257,12 @@ class _AnimatedInterventionChartState extends State<AnimatedInterventionChart>
                             : 240,
                     child:
                         _chartType == InterventionChartType.bar
-                            ? _buildBarChart()
-                            : _buildPieChart(),
+                            ? buildBarChart()
+                            : buildPieChart(),
                   ),
             ),
             const SizedBox(height: 12),
-            _buildLegend(),
+            buildLegend(),
           ],
         ),
       ),

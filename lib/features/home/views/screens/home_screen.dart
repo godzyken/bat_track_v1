@@ -30,7 +30,11 @@ class HomeScreen extends ConsumerWidget {
     final info = context.responsiveInfo(ref);
 
     // Lance la synchronisation au build initial
-    Future.microtask(() => _syncProviders(context, ref));
+    Future.microtask(() {
+      if (context.mounted) {
+        _syncProviders(context, ref);
+      }
+    });
 
     // Layout responsive
     Widget layout;

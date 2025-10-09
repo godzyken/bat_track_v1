@@ -30,7 +30,7 @@ class UserDropdownField extends ConsumerWidget {
           ),
       data: (users) {
         return DropdownButtonFormField<String>(
-          value: selectedUserId?.isEmpty ?? true ? null : selectedUserId,
+          initialValue: selectedUserId?.isEmpty ?? true ? null : selectedUserId,
           onChanged: onChanged,
           decoration: InputDecoration(labelText: label),
           items:

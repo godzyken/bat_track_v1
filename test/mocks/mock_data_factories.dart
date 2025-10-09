@@ -43,9 +43,11 @@ class MockDataFactories {
   static Chantier createChantier({String? id, String? projetId, String? nom}) {
     return Chantier(
       id: id ?? _uuid.v4(),
-      projetId: projetId ?? 'proj_default',
+      chefDeProjetId: projetId ?? 'proj_default',
       nom: nom ?? 'Chantier Test',
-      // Ajouter les autres propriétés requises
+      adresse: '7 rue du Solitaires',
+      dateDebut: DateTime.now(),
+      clientId: 'client_test',
     );
   }
 
@@ -57,9 +59,9 @@ class MockDataFactories {
     return AppUser(
       uid: uid ?? _uuid.v4(),
       email: 'test@example.com',
-      role: role ?? UserRole.client,
-      isAdmin: isAdmin,
-      // Autres propriétés requises
+      role: isAdmin ? 'admin' : 'technicien',
+      createdAt: DateTime.now(),
+      name: 'anthony',
     );
   }
 }

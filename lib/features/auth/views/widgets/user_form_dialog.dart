@@ -45,7 +45,7 @@ class UserFormDialog extends ConsumerWidget {
       ) {
         if (key == 'role') {
           return DropdownButtonFormField<String>(
-            value: value ?? 'client',
+            initialValue: value ?? 'client',
             decoration: const InputDecoration(labelText: 'Rôle'),
             items: const [
               DropdownMenuItem(value: 'admin', child: Text('Admin')),

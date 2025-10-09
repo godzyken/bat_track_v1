@@ -4,7 +4,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/unified_model.dart';
-import '../../adapters/signture_converter.dart';
 
 part 'projet.freezed.dart';
 part 'projet.g.dart';
@@ -92,28 +91,12 @@ class Projet
     chantiers: [],
   );
 
+  @override
   String get ownerId => createdBy;
 
   @override
   bool get isUpdated => updatedAt != null;
-
-  /// Détermine si l'utilisateur peut éditer ce projet
-  bool canEdit(AppUser user) {
-    if (user.isAdmin || user.isChefDeProjet) return true;
-
-    // Le client propriétaire peut éditer tant que c’est un draft/pending
-    if (user.isClient && ownerId == user.uid) {
-      return status == ProjetStatus.draft ||
-          status == ProjetStatus.pendingValidation;
-    }
-
-    // Technicien assigné peut intervenir (ex: interventions)
-    if (user.isTechnicien && assignedUserIds.contains(user.uid)) {
-      return status == ProjetStatus.validated;
-    }
-
-    return false;
-  }
+  bool get isDraft => status == ProjetStatus.draft;
 
   /// Droits de validation
   bool canValidate(AppUser user) {
@@ -131,6 +114,7 @@ class Projet
     return user.isAdmin || user.isChefDeProjet;
   }
 
+  /// Détermine si l'utilisateur peut editer
   bool canEditUser(AppUser user, Projet projet) {
     if (user.isAdmin) return true;
     if (user.isClient &&
@@ -142,7 +126,6 @@ class Projet
     return false;
   }
 
-  @override
   @override
   UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }

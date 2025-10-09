@@ -126,8 +126,8 @@ class SyncEntityNotifierDebug<T extends UnifiedModel>
   SyncEntityNotifierDebug({
     required EntityService<T> entityService,
     required StorageService storageService,
-    required T initialState,
-    bool autoSync = true,
+    required super.initialState,
+    super.autoSync,
     MethodFilter? logFilter,
     CallInterceptor? interceptor,
   }) : super(
@@ -145,7 +145,5 @@ class SyncEntityNotifierDebug<T extends UnifiedModel>
                    interceptor: interceptor,
                  )
                  as FirebaseStorageService,
-         initialState: initialState,
-         autoSync: autoSync,
        );
 }

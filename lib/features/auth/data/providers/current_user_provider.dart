@@ -13,7 +13,7 @@ import 'auth_state_provider.dart';
 final currentUserProvider = StreamProvider<AppUser?>((ref) {
   final auth = ref.watch(firebaseAuthProvider);
 
-  dynamic _convert(dynamic value) {
+  dynamic convert(dynamic value) {
     if (value == null) return null;
     if (value is Timestamp) return value.toDate().toIso8601String();
     if (value is DocumentReference) return value.path;
@@ -21,20 +21,20 @@ final currentUserProvider = StreamProvider<AppUser?>((ref) {
       return {'lat': value.latitude, 'lng': value.longitude};
     }
     if (value is Map<String, dynamic>) {
-      return value.map((k, v) => MapEntry(k, _convert(v)));
+      return value.map((k, v) => MapEntry(k, convert(v)));
     }
-    if (value is List) return value.map(_convert).toList();
+    if (value is List) return value.map(convert).toList();
     return value;
   }
 
-  Map<String, dynamic> _normalize(
+  Map<String, dynamic> normalize(
     Map<String, dynamic> data,
     String uid,
     String? name,
     String? email,
   ) {
     final normalized = <String, dynamic>{};
-    data.forEach((k, v) => normalized[k] = _convert(v));
+    data.forEach((k, v) => normalized[k] = convert(v));
 
     normalized['uid'] = uid;
     normalized.putIfAbsent('name', () => name ?? '');
@@ -49,16 +49,19 @@ final currentUserProvider = StreamProvider<AppUser?>((ref) {
     return normalized;
   }
 
-  return auth.authStateChanges().asyncExpand((user) {
-    if (user == null) return Stream.value(null);
+  return auth.authStateChanges().asyncExpand((user) async* {
+    if (user == null) {
+      yield null;
+      return;
+    }
 
-    return FirebaseFirestore.instance
-        .collection("users")
-        .doc(user.uid)
+    final doc = FirebaseFirestore.instance.collection("users").doc(user.uid);
+
+    yield* doc
         .snapshots()
-        .map((doc) {
-          final data = _normalize(
-            doc.data() ?? {},
+        .map((snap) {
+          final data = normalize(
+            snap.data() ?? {},
             user.uid,
             user.displayName,
             user.email,
@@ -70,6 +73,19 @@ final currentUserProvider = StreamProvider<AppUser?>((ref) {
           return AppUser.empty();
         });
   });
+});
+
+/// Fournit l’état global de l’utilisateur (Guest / Auth / Loaded)
+final userStatusProvider = Provider<UserStatus>((ref) {
+  final auth = ref.watch(firebaseAuthProvider);
+  final currentUser = ref.watch(currentUserProvider);
+
+  if (auth.currentUser == null) return UserStatus.guest;
+  if (currentUser.isLoading) return UserStatus.authenticated;
+  if (currentUser.hasValue && currentUser.value != null) {
+    return UserStatus.loaded;
+  }
+  return UserStatus.authenticated;
 });
 
 /// Fournisseur modifiable en local (ex: ajout instanceId)

@@ -35,7 +35,7 @@ class LoggerNotifier extends StateNotifier<List<LogEntry>> {
 
 extension LoggerExport on LoggerNotifier {
   String exportJson() {
-    final filteredLogs = this.filtered;
+    final filteredLogs = filtered;
     final list =
         filteredLogs
             .map(

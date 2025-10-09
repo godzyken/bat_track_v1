@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/unified_model.dart';
-import '../../adapters/signture_converter.dart' hide tryParseDate;
 import '../base/import_log.dart';
 
 part 'chantier.freezed.dart';

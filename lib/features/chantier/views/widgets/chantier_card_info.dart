@@ -124,7 +124,7 @@ class ChantierCardInfo extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value:
+              initialValue:
                   chantier.etat != null && etatOptions.contains(chantier.etat)
                       ? chantier.etat
                       : null,

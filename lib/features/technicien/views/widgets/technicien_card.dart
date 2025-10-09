@@ -32,7 +32,7 @@ class TechnicienCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               blurRadius: 4,
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withAlpha((255 * 0.05).toInt()),
               offset: const Offset(0, 2),
             ),
           ],

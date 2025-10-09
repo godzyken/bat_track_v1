@@ -77,9 +77,6 @@ final dashboardProvider = FutureProvider<DashboardData>((ref) async {
                 )
                 .toList();
         break;
-      case null:
-        // TODO: Handle this case.
-        throw UnimplementedError();
       case UserRole.chefDeProjet:
         // Le client voit ses projets et chantiers associés
         projetsFiltered =

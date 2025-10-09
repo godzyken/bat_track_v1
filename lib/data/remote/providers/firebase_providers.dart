@@ -13,7 +13,6 @@ final firebaseInitializationProvider = FutureProvider<FirebaseApp>((ref) async {
   final logger = ref.watch(loggerProvider);
   try {
     final options = DefaultFirebaseOptions.currentPlatform;
-    if (options == null) throw Exception('FirebaseOptions is null');
 
     final app = await Firebase.initializeApp(options: options);
 

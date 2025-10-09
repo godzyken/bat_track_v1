@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../core/unified_model.dart';
-import '../../adapters/signture_converter.dart';
 import 'app_user.dart';
 
 part 'user.freezed.dart';
@@ -48,7 +47,7 @@ class UserModel
   @override
   bool get isUpdated => updatedAt != null;
 
-  // HasAccessControl implémentation (basique, à enrichir si besoin)
+  @override
   String get ownerId => id;
 
   String get roleName => role.asString;
@@ -59,6 +58,12 @@ class UserModel
 }
 
 enum UserRole { client, chefDeProjet, technicien, superUtilisateur }
+
+enum UserStatus {
+  guest, // pas connecté
+  authenticated, // connecté Firebase, mais profil non encore chargé
+  loaded, // AppUser complet
+}
 
 extension UserAccess on UserModel {
   bool get isClient => role == UserRole.client;
@@ -80,7 +85,7 @@ extension UserRoleX on UserRole {
         return UserRole.technicien;
       case 'client':
         return UserRole.client;
-      case 'chefDeProjet':
+      case 'chef_de_projet':
         return UserRole.chefDeProjet;
       default:
         throw Exception("Rôle inconnu: $role");
@@ -96,7 +101,7 @@ extension UserRoleX on UserRole {
       case UserRole.client:
         return "Client";
       case UserRole.chefDeProjet:
-        return "Chef de projet"; // ✅ corrigé
+        return "Chef de Projet"; // ✅ corrigé
     }
   }
 
@@ -105,13 +110,13 @@ extension UserRoleX on UserRole {
   String get asString {
     switch (this) {
       case UserRole.superUtilisateur:
-        return 'superUtilisateur';
+        return 'administrateur';
       case UserRole.technicien:
-        return 'technicien';
+        return 'intervenant';
       case UserRole.client:
         return 'client';
       case UserRole.chefDeProjet:
-        return 'chefDeProjet';
+        return 'chef_de_projet';
     }
   }
 }
@@ -136,8 +141,8 @@ extension AppUserX on AppUser {
   UserModel toUserModel() {
     return UserModel(
       id: uid,
-      name: name,
-      email: email,
+      name: name!,
+      email: email!,
       role: UserRoleX.fromString(role),
       company: company,
       instanceId: instanceId,

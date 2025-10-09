@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:bat_track_v1/data/local/adapters/signture_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 

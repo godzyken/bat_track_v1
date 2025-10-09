@@ -56,7 +56,7 @@ class RoleSelector extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Image.asset(
-                        "assets/roles/${role.assetName}.png",
+                        "assets/roles/${role.asString}.png",
                         fit: BoxFit.contain,
                       ),
                     ),

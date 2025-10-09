@@ -13,9 +13,9 @@ class AppUser
 
   const factory AppUser({
     required String uid,
-    required String name,
-    required String email,
     required String role,
+    String? name,
+    String? email,
     String? company,
     @JsonKey(includeFromJson: false, includeToJson: false) String? motDePasse,
     @DateTimeIsoConverter() required DateTime createdAt,
@@ -31,13 +31,12 @@ class AppUser
       _$AppUserFromJson(json);
 
   factory AppUser.empty() => AppUser(
-    uid: '',
-    name: '',
-    email: '',
-    role: '',
+    uid: 'guest',
+    name: 'Visiteur',
+    email: null,
+    role: 'guest',
     createdAt: tryParseDate('')!,
-    motDePasse: '',
-    instanceId: '',
+    company: null,
   );
 
   @override
@@ -49,7 +48,6 @@ class AppUser
   @override
   DateTime? get updatedAt => appUpdatedAt;
 
-  @override
   @override
   UnifiedModel copyWithId(String newId) => copyWith(uid: newId);
 }

@@ -34,7 +34,7 @@ class InterventionsScreen extends ConsumerWidget {
           }
           return ListView.separated(
             itemCount: list.length,
-            separatorBuilder: (_, __) => const Divider(),
+            separatorBuilder: (_, _) => const Divider(),
             itemBuilder: (context, index) {
               final interv = list[index];
               return ListTile(
