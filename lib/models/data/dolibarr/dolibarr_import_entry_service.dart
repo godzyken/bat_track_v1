@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../json_model.dart';
+import '../../../data/core/unified_model.dart';
 
-class DolibarrImportEntry<T extends JsonModel> {
+class DolibarrImportEntry<T extends UnifiedModel> {
   final String endpoint;
   final T Function(Map<String, dynamic>) fromJson;
   final Future<void> Function(WidgetRef ref, T model) saveFn;

@@ -1,6 +1,6 @@
-import '../data/json_model.dart';
+import '../../data/core/unified_model.dart';
 
-abstract class EntityService<T extends JsonModel> {
+abstract class EntityService<T extends UnifiedModel> {
   Future<void> save(T entity, String id);
 
   Future<void> update(T entity, String id);

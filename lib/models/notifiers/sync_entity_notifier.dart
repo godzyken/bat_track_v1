@@ -6,15 +6,15 @@ import 'dart:io';
 import 'package:bat_track_v1/data/remote/services/base_storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/core/unified_model.dart';
 import '../../data/local/models/base/has_acces_control.dart';
 import '../../data/remote/services/firebase_storage_service.dart';
 import '../../data/remote/services/storage_service.dart';
-import '../data/json_model.dart';
 import '../data/maperror/proxy.dart';
 import '../data/state_wrapper/wrappers.dart';
 import '../services/entity_service.dart';
 
-class SyncEntityNotifier<T extends JsonModel>
+class SyncEntityNotifier<T extends UnifiedModel>
     extends StateNotifier<SyncedState<T>> {
   final EntityService<T> entityService;
   final BaseStorageService<File> storageService;
@@ -121,7 +121,7 @@ class SyncEntityNotifier<T extends JsonModel>
   }
 }
 
-class SyncEntityNotifierDebug<T extends JsonModel>
+class SyncEntityNotifierDebug<T extends UnifiedModel>
     extends SyncEntityNotifier<T> {
   SyncEntityNotifierDebug({
     required EntityService<T> entityService,

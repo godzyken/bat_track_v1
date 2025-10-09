@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../data/core/unified_model.dart';
 import '../../../data/local/models/index_model_extention.dart';
 import '../../../data/local/providers/hive_provider.dart';
 import '../../../features/auth/data/providers/current_user_provider.dart';
 import '../../../features/projet/domain/rules/projet_policy.dart';
 import '../../../features/technicien/views/widgets/assign_technicien_dialog.dart';
-import '../../data/json_model.dart';
 
-class EntityCard<T extends JsonModel> extends ConsumerWidget {
+class EntityCard<T extends UnifiedModel> extends ConsumerWidget {
   final T entity;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;

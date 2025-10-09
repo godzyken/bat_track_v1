@@ -1,7 +1,7 @@
+import '../../../data/core/unified_model.dart';
 import '../hive_model.dart';
-import '../json_model.dart';
 
-class ModelMapper<H extends HiveModel<T>, T extends JsonModel<T>> {
+class ModelMapper<H extends HiveModel<T>, T extends UnifiedModel> {
   final H Function() hiveFactory;
   final T Function() modelFactory;
 

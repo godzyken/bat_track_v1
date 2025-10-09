@@ -3,8 +3,8 @@ import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart'
 import 'package:bat_track_v1/models/services/synced_entity_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/core/unified_model.dart';
 import '../../data/local/services/service_type.dart';
-import '../data/json_model.dart';
 import '../providers/asynchrones/remote_service_provider.dart';
 import 'hive_entity_service.dart';
 import 'logged_entity_service.dart';
@@ -13,7 +13,7 @@ typedef FromJson<T> = T Function(Map<String, dynamic> json);
 
 // Provider pour le service local+remote synchronisé (SyncedEntityService)
 Provider<SyncedEntityService<T>>
-buildSyncedEntityProvider<T extends JsonModel>({
+buildSyncedEntityProvider<T extends UnifiedModel>({
   required String collectionOrBoxName,
   required T Function(Map<String, dynamic>) fromJson,
   RemoteStorageService? remoteService, // optionnel, permet override
@@ -38,7 +38,7 @@ buildSyncedEntityProvider<T extends JsonModel>({
 
 // Provider pour un service synchronisé avec logs (LoggedEntitySyncService)
 Provider<LoggedEntitySyncService<T>>
-buildLoggedEntitySyncServiceProvider<T extends JsonModel>({
+buildLoggedEntitySyncServiceProvider<T extends UnifiedModel>({
   required String collectionOrBoxName,
   required T Function(Map<String, dynamic>) fromJson,
   RemoteStorageService? remoteService,
@@ -57,7 +57,7 @@ buildLoggedEntitySyncServiceProvider<T extends JsonModel>({
 
 // Provider pour un service local avec logs (LoggedEntityService) (sans sync)
 Provider<LoggedEntityService<T>> buildLoggedEntityServiceProvider<
-  T extends JsonModel
+  T extends UnifiedModel
 >({required String boxName, required FromJson<T> fromJson}) {
   return Provider<LoggedEntityService<T>>((ref) {
     final remoteStorageService = ref.watch(remoteStorageServiceProvider);
@@ -71,7 +71,7 @@ Provider<LoggedEntityService<T>> buildLoggedEntityServiceProvider<
 }
 
 // Provider pour les services (sans logs et sync)
-EntityServices<T> buildEntityServiceProvider<T extends JsonModel>({
+EntityServices<T> buildEntityServiceProvider<T extends UnifiedModel>({
   required String collectionOrBoxName,
   required T Function(Map<String, dynamic>) fromJson,
   RemoteStorageService? remoteStorageService,

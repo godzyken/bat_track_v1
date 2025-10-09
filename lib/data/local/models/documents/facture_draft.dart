@@ -3,17 +3,16 @@ import 'dart:typed_data';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../models/data/json_model.dart';
+import '../../../core/unified_model.dart';
 import '../../adapters/signture_converter.dart';
-import '../base/has_acces_control.dart';
 
 part 'facture_draft.freezed.dart';
 part 'facture_draft.g.dart';
 
 @freezed
 class FactureDraft
-    with _$FactureDraft, JsonModel<FactureDraft>
-    implements JsonSerializableModel<FactureDraft> {
+    with _$FactureDraft, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const factory FactureDraft({
     required String chantierId,
     required String clientId,
@@ -69,12 +68,18 @@ class FactureDraft
 
   @override
   bool get isUpdated => updatedAt != null;
+
+  @override
+  UnifiedModel copyWithId(String newId) {
+    // TODO: implement copyWithId
+    throw UnimplementedError();
+  }
 }
 
 @freezed
 class CustomLigneFacture
-    with _$CustomLigneFacture, JsonModel<CustomLigneFacture>
-    implements JsonSerializableModel<CustomLigneFacture> {
+    with _$CustomLigneFacture, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const factory CustomLigneFacture({
     required String ctlId,
     required String description,
@@ -103,4 +108,14 @@ class CustomLigneFacture
     total: 600,
     ctlUpdatedAt: DateTime.now(),
   );
+
+  @override
+  UnifiedModel copyWithId(String newId) {
+    // TODO: implement copyWithId
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement isUpdated
+  bool get isUpdated => throw UnimplementedError();
 }

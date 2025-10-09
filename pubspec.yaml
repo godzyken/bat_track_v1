@@ -72,6 +72,7 @@ dependencies:
   supabase: ^2.8.0
   async: ^2.13.0
   flutter_rating_bar: ^4.0.1
+  image_picker: ^1.2.0
 
 dev_dependencies:
   flutter_test:
@@ -80,7 +81,7 @@ dev_dependencies:
   hive_generator: ^2.0.1
   build_runner: ^2.4.8
   json_serializable: ^6.6.2
-  dwds: ^24.4.0
+  dwds: ^25.1.0
   freezed: ^2.4.6
   sentry_dart_plugin: ^3.1.1
   riverpod_test: ^0.1.9
@@ -97,11 +98,10 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/config/dolibarr_config.json
-    - assets/roles/client.png
-    - assets/roles/intervenant.png
-    - assets/roles/administrateur.png
-    - assets/roles/innovation.png
+    - assets/
+    - assets/config/
+    - assets/images/
+    - assets/roles/
     - assets/fonts/NotoSans-VariableFont_wdth_wght.ttf
     - assets/fonts/NotoSans-Italic-VariableFont_wdth_wght.ttf
 

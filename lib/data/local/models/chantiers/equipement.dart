@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../models/data/json_model.dart';
+import '../../../core/unified_model.dart';
 import '../../adapters/signture_converter.dart';
 import '../utilisateurs/app_user.dart';
 
@@ -12,7 +12,9 @@ part 'equipement.g.dart';
 
 @HiveType(typeId: 31)
 @freezed
-class Equipement with _$Equipement implements JsonModel, HasAccessControl {
+class Equipement
+    with _$Equipement, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const Equipement._();
 
   const factory Equipement({
@@ -72,4 +74,7 @@ class Equipement with _$Equipement implements JsonModel, HasAccessControl {
 
     return false;
   }
+
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }

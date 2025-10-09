@@ -1,7 +1,7 @@
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 
+import '../../../data/core/unified_model.dart';
 import '../../../data/local/services/service_type.dart';
-import '../../data/json_model.dart';
 import '../../services/entity_sync_services.dart';
 import '../../services/hive_entity_service.dart';
 import '../../services/remote/remote_entity_service_adapter.dart';
@@ -12,7 +12,7 @@ class EntitySyncServiceFactory {
   static final EntitySyncServiceFactory instance = EntitySyncServiceFactory._();
 
   /// Crée un service de synchronisation local + distant
-  EntitySyncService<T> create<T extends JsonModel>(
+  EntitySyncService<T> create<T extends UnifiedModel>(
     StorageMode mode, {
     required String collectionName,
     required T Function(Map<String, dynamic>) fromJson,

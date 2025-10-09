@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:bat_track_v1/models/data/json_model.dart';
+import 'package:bat_track_v1/data/core/unified_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -32,8 +32,8 @@ class TestHelpers {
     return completer.future;
   }
 
-  /// Helper pour vérifier l'égalité profonde des listes JsonModel
-  static bool deepEquals<T extends JsonModel>(List<T> a, List<T> b) {
+  /// Helper pour vérifier l'égalité profonde des listes UnifiedModel
+  static bool deepEquals<T extends UnifiedModel>(List<T> a, List<T> b) {
     if (a.length != b.length) return false;
 
     for (int i = 0; i < a.length; i++) {

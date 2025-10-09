@@ -1,6 +1,6 @@
-import 'json_model.dart';
+import '../../data/core/unified_model.dart';
 
-abstract class HiveModel<T extends JsonModel> {
+abstract class HiveModel<T extends UnifiedModel> {
   String get id;
   DateTime? get updatedAt;
 

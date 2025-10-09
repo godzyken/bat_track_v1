@@ -1,13 +1,14 @@
 import 'dart:developer';
 
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../core/unified_model.dart';
 
 class FirestoreService {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   /// 🔄 CREATE or UPDATE
-  static Future<void> setData<T extends JsonModel>({
+  static Future<void> setData<T extends UnifiedModel>({
     required String collectionPath,
     required String docId,
     required T data,
@@ -18,7 +19,7 @@ class FirestoreService {
     await _db
         .collection(collectionPath)
         .doc(docId)
-        .set(data.copyWithId(docId), SetOptions(merge: true));
+        .set(data.copyWithId(docId).toJson(), SetOptions(merge: true));
 
     sw.stop();
     log('✅ setData terminé en ${sw.elapsedMilliseconds}ms');

@@ -1,17 +1,16 @@
 import 'package:bat_track_v1/data/local/adapters/signture_converter.dart';
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import '../base/has_acces_control.dart';
+import '../../../core/unified_model.dart';
 
 part 'technicien.freezed.dart';
 part 'technicien.g.dart';
 
 @freezed
 class Technicien
-    with _$Technicien, JsonModel<Technicien>
-    implements JsonSerializableModel<Technicien> {
+    with _$Technicien, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const Technicien._();
 
   const factory Technicien({
@@ -34,6 +33,7 @@ class Technicien
     List<String>? metiers, // pour suggestion selon secteur métier
   }) = _Technicien;
 
+  @override
   factory Technicien.fromJson(Map<String, dynamic> json) =>
       _$TechnicienFromJson(json);
 
@@ -78,4 +78,8 @@ class Technicien
       updatedAt: DateTime.now(),
     );
   }
+
+  @override
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }

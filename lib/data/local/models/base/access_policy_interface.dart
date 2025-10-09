@@ -25,7 +25,7 @@ class MultiRolePolicy implements AccessPolicy {
   bool canCreate(String role, {entity}) {
     return switch (role) {
       'admin' => true,
-      'tech' => true,
+      'tech' => _canEditTech(entity),
       'client' => true,
       _ => false,
     };
@@ -45,8 +45,8 @@ class MultiRolePolicy implements AccessPolicy {
   bool canDelete(String role, {entity}) {
     return switch (role) {
       'admin' => true,
-      'tech' => false, // pas de suppression
-      'client' => false,
+      'tech' => _canEditTech(entity), // pas de suppression
+      'client' => _canEditClient(entity),
       _ => false,
     };
   }

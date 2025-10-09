@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:bat_track_v1/models/data/state_wrapper/wrappers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/core/unified_model.dart';
 import '../data/maperror/debug_config.dart';
 
-class SyncEntityNotifierLogger<T extends JsonModel>
+class SyncEntityNotifierLogger<T extends UnifiedModel>
     implements StateNotifier<SyncedState<T>> {
   final StateNotifier<SyncedState<T>> _inner;
 

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../data/core/unified_model.dart';
 import '../../data/adapter/typedefs.dart';
-import '../../data/json_model.dart';
 import '../../data/state_wrapper/wrappers.dart';
 import '../../providers/synchrones/generic_entity_provider_factory.dart';
 
-class EntityDetailScreen<T extends JsonModel> extends ConsumerWidget {
+class EntityDetailScreen<T extends UnifiedModel> extends ConsumerWidget {
   final String id;
   final String title;
   final EntityDetailBuilder<T> builder;
@@ -41,7 +41,7 @@ class EntityDetailScreen<T extends JsonModel> extends ConsumerWidget {
 }
 
 class JsonModelRouter {
-  static void navigateToDetail<T extends JsonModel>(
+  static void navigateToDetail<T extends UnifiedModel>(
     BuildContext context,
     T entity,
   ) {

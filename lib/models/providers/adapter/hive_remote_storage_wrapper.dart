@@ -1,8 +1,9 @@
+import '../../../data/core/unified_model.dart';
 import '../../data/json_model.dart';
 import '../../services/multi_backend_remote_service.dart';
 import '../../services/remote/remote_storage_service.dart';
 
-class HiveRemoteStorageWrapper<T extends JsonModel>
+class HiveRemoteStorageWrapper<T extends UnifiedModel>
     extends RemoteStorageService {
   final MultiBackendRemoteService<T> multiBackend;
 

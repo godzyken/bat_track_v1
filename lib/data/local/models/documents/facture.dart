@@ -1,8 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../models/data/json_model.dart';
-import '../base/has_acces_control.dart';
+import '../../../core/unified_model.dart';
 import 'facture_draft.dart';
 
 part 'facture.freezed.dart';
@@ -10,8 +9,8 @@ part 'facture.g.dart';
 
 @freezed
 class Facture
-    with _$Facture, JsonModel<Facture>
-    implements JsonSerializableModel<Facture> {
+    with _$Facture, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const Facture._();
 
   const factory Facture({
@@ -24,6 +23,7 @@ class Facture
   }) = _Facture;
 
   /// Génération standard JSON via json_serializable
+  @override
   factory Facture.fromJson(Map<String, dynamic> json) =>
       _$FactureFromJson(json);
 
@@ -56,4 +56,10 @@ class Facture
     clientId: 'clientId',
     date: DateTime.now(),
   );
+
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
+
+  @override
+  bool get isUpdated => updatedAt != null;
 }

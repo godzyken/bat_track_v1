@@ -1,16 +1,16 @@
 import 'dart:async';
 
+import 'package:bat_track_v1/data/core/unified_model.dart';
 import 'package:bat_track_v1/models/data/adapter/no_such_methode_logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local/services/service_type.dart';
 import '../../data/remote/services/firestore_service.dart';
-import '../../models/data/json_model.dart';
 import '../../models/data/maperror/logged_action.dart';
 import '../data/adapter/safe_async_mixin.dart';
 
-class FirestoreEntityService<T extends JsonModel>
+class FirestoreEntityService<T extends UnifiedModel>
     with LoggedAction, SafeAsyncMixin<T>, NoSuchMethodLogger
     implements EntityServices<T> {
   final String collectionPath;
@@ -113,7 +113,7 @@ class FirestoreEntityService<T extends JsonModel>
   }
 }
 
-class FirestoreEntityServiceConfig<T extends JsonModel> {
+class FirestoreEntityServiceConfig<T extends UnifiedModel> {
   final String collectionPath;
   final T Function(Map<String, dynamic>) fromJson;
 

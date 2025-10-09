@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 
+import '../../data/core/unified_model.dart';
 import '../../data/local/services/service_type.dart';
 import '../../data/remote/services/storage_service.dart';
-import '../data/json_model.dart';
 
 /// Service de synchronisation fichiers/entités
-class FileSyncService<T extends JsonModel> {
+class FileSyncService<T extends UnifiedModel> {
   final EntityServices<T> entityService; // Firestore ou Supabase
   final StorageService storageService; // Hive, SQLite ou autre local
 

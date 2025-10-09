@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../data/json_model.dart';
+import '../../../data/core/unified_model.dart';
 
 bool isPrimitive(dynamic value) =>
     value is String ||
@@ -72,7 +72,7 @@ Widget defaultFieldBuilder({
     );
   }
 
-  if (value is Map || value is JsonModel) {
+  if (value is Map || value is UnifiedModel) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(labelText: "$key (JSON)"),

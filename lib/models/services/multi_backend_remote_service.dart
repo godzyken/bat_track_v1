@@ -3,12 +3,12 @@ import 'package:bat_track_v1/data/local/services/service_type.dart';
 import 'package:bat_track_v1/models/services/firestore_entity_service.dart';
 import 'package:bat_track_v1/models/services/supabase_entity_service.dart';
 
-import '../data/json_model.dart';
+import '../../data/core/unified_model.dart';
 import 'cloud_flare_entity_service.dart';
 import 'entity_sync_services.dart';
 import 'firebase_entity_service.dart';
 
-class MultiBackendRemoteService<T extends JsonModel>
+class MultiBackendRemoteService<T extends UnifiedModel>
     implements EntityRemoteService<T> {
   final List<StorageMode> enabledBackends;
   final FirestoreEntityService<T>? firestoreService;

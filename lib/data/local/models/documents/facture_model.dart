@@ -4,8 +4,7 @@ import 'package:bat_track_v1/data/local/adapters/signture_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../models/data/json_model.dart';
-import '../base/has_acces_control.dart';
+import '../../../core/unified_model.dart';
 import 'facture_draft.dart';
 
 part 'facture_model.freezed.dart';
@@ -13,8 +12,8 @@ part 'facture_model.g.dart';
 
 @freezed
 class FactureModel
-    with _$FactureModel, JsonModel<FactureModel>
-    implements JsonSerializableModel<FactureModel> {
+    with _$FactureModel, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const FactureModel._();
 
   const factory FactureModel({
@@ -78,6 +77,12 @@ class FactureModel
 
   @override
   bool get isUpdated => updatedAt != null;
+
+  @override
+  UnifiedModel copyWithId(String newId) {
+    // TODO: implement copyWithId
+    throw UnimplementedError();
+  }
 }
 
 enum FactureStatus { brouillon, validee, envoyee, payee }

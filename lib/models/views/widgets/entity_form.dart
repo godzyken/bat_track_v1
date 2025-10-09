@@ -5,13 +5,13 @@ import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../data/core/unified_model.dart';
 import '../../../features/auth/data/notifiers/auth_notifier.dart';
 import '../../../features/auth/views/widgets/multi_user_dropdown_field.dart';
 import '../../../features/auth/views/widgets/user_dropdown_field.dart';
 import '../../data/adapter/typedefs.dart';
-import '../../data/json_model.dart';
 
-class EntityForm<T extends JsonModel> extends ConsumerStatefulWidget {
+class EntityForm<T extends UnifiedModel> extends ConsumerStatefulWidget {
   final T? initialValue;
   final OnSubmit<T> onSubmit;
   final T Function(Map<String, dynamic>) fromJson;
@@ -35,7 +35,7 @@ class EntityForm<T extends JsonModel> extends ConsumerStatefulWidget {
   ConsumerState<EntityForm<T>> createState() => _EntityFormState<T>();
 }
 
-class _EntityFormState<T extends JsonModel>
+class _EntityFormState<T extends UnifiedModel>
     extends ConsumerState<EntityForm<T>> {
   final _formKey = GlobalKey<FormState>();
   late Map<String, dynamic> _json;
@@ -181,7 +181,7 @@ class _EntityFormState<T extends JsonModel>
         autofillHints: autofill,
       );
     }
-    if (value is Map || value is JsonModel) {
+    if (value is Map || value is UnifiedModel) {
       return TextFormField(
         key: ValueKey(key),
         controller: controller,
@@ -224,7 +224,7 @@ class _EntityFormState<T extends JsonModel>
           (_expertMode &&
                   (original is Map ||
                       original is List ||
-                      original is JsonModel))
+                      original is UnifiedModel))
               ? json.decode(raw)
               : _parseValue(original, _controllers[key]!.text);
     }
@@ -301,7 +301,7 @@ class _EntityFormState<T extends JsonModel>
     return _json.keys
         .where((key) {
           final val = _json[key];
-          return val is Map || val is List || val is JsonModel;
+          return val is Map || val is List || val is UnifiedModel;
         })
         .map((key) {
           final ctl = _rawOverrides[key];

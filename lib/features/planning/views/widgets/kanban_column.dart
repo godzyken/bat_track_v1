@@ -47,13 +47,11 @@ class KanbanColumn extends ConsumerWidget {
                       child: Card(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(e.displayTitle),
+                          child: Text(e.titre),
                         ),
                       ),
                     ),
-                    child: Card(
-                      child: ListTile(title: Text(e.displaySubtitle)),
-                    ),
+                    child: Card(child: ListTile(title: Text(e.titre))),
                   ),
                 ),
               ],

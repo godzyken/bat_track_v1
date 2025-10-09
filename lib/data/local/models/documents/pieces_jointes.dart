@@ -6,19 +6,15 @@ import 'package:bat_track_v1/data/local/models/base/has_files.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../models/data/json_model.dart';
-import '../base/has_acces_control.dart';
+import '../../../core/unified_model.dart';
 
 part 'pieces_jointes.freezed.dart';
 part 'pieces_jointes.g.dart';
 
 @freezed
 class PieceJointe
-    with _$PieceJointe
-    implements
-        JsonModel<PieceJointe>,
-        JsonSerializableModel<PieceJointe>,
-        HasFile {
+    with _$PieceJointe, AccessControlMixin, ValidationMixin
+    implements UnifiedModel, HasFile {
   const PieceJointe._();
 
   const factory PieceJointe({
@@ -68,6 +64,10 @@ class PieceJointe
 
   @override
   bool get isUpdated => updatedAt != null;
+
+  @override
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }
 
 // Extension personnalisée

@@ -5,12 +5,13 @@ import 'package:bat_track_v1/models/services/synced_entity_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/core/unified_model.dart';
+import '../../data/local/models/adapters/json_adapter.dart';
 import '../../data/local/services/service_type.dart';
-import '../data/json_model.dart';
 import '../data/maperror/logged_action.dart';
 import 'entity_sync_services.dart';
 
-class LoggedEntityService<T extends JsonModel> implements EntityServices<T> {
+class LoggedEntityService<T extends UnifiedModel> implements EntityServices<T> {
   final EntityServices<T> _inner;
   final Ref ref;
 
@@ -34,12 +35,13 @@ class LoggedEntityService<T extends JsonModel> implements EntityServices<T> {
   }
 }
 
-class LoggedEntitySyncService<T extends JsonModel>
+class LoggedEntitySyncService<T extends UnifiedModel>
     with LoggedAction, SafeAsyncMixin<T>
     implements SyncedEntityService<T> {
   final SyncedEntityService<T> _delegate;
+  final JsonAdapter<T> adapter;
 
-  LoggedEntitySyncService(this._delegate, Ref ref) {
+  LoggedEntitySyncService(this._delegate, this.adapter, Ref ref) {
     initLogger(ref.read);
     initSafeAsync(ref.read);
   }
@@ -260,7 +262,12 @@ class LoggedEntitySyncService<T extends JsonModel>
         throw Exception('Entity <$T> with id=$id not found for update.');
       }
 
-      final updated = current.copyWithJson(updates);
+      final currentJson = current.toJson();
+      final merged = {...currentJson, ...updates};
+
+      // ✅ Conversion JSON -> modèle
+      final updated = adapter.fromJson(merged);
+
       await _delegate.save(updated, id);
     }, context: 'updateEntityPartial<$T>:$id');
 
@@ -285,7 +292,7 @@ class LoggedEntitySyncService<T extends JsonModel>
   }
 }
 
-extension<T extends JsonModel> on JsonModel {
+extension<T extends UnifiedModel> on UnifiedModel {
   Future<void> mergeCloudDataIfAllowed(
     Ref<Object?> ref, {
     required Future<Map<String, dynamic>> Function() getLocalData,

@@ -1,9 +1,8 @@
+import 'package:bat_track_v1/data/core/unified_model.dart';
 import 'package:bat_track_v1/models/services/entity_sync_services.dart';
 import 'package:hive/hive.dart';
 
-import '../data/json_model.dart';
-
-class HiveEntityService<T extends JsonModel<dynamic>>
+class HiveEntityService<T extends UnifiedModel>
     implements EntityLocalService<T> {
   final String boxName;
   final T Function(Map<String, dynamic>) fromJson;

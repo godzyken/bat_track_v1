@@ -5,10 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../data/core/unified_model.dart';
 import '../../../data/remote/providers/dolibarr_instance_provider.dart';
-import '../json_model.dart';
 
-class TripleAdapter<T extends JsonModel> {
+class TripleAdapter<T extends UnifiedModel> {
   final Ref ref;
   final T Function(Map<String, dynamic> json) fromJson;
   final String collectionPath;

@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/responsive/wrapper/responsive_layout.dart';
+import '../../../data/core/unified_model.dart';
 import '../../../data/local/models/base/access_policy_interface.dart';
 import '../../../data/local/services/hive_service.dart';
 import '../../data/json_model.dart';
 import 'entity_card.dart';
 import 'entity_form.dart';
 
-class EntityList<T extends JsonModel> extends ConsumerWidget {
+class EntityList<T extends UnifiedModel> extends ConsumerWidget {
   final AsyncValue<List<T>> items;
   final String boxName;
   final void Function(T)? onEdit;
@@ -123,14 +124,14 @@ class EntityList<T extends JsonModel> extends ConsumerWidget {
   /// Injecte `currentUserId` dans l'entité
   T _withUserId(T entity) {
     if (entity is JsonModelWithUser) {
-      return entity.copyWith(currentUserId: currentUserId) as T;
+      return entity.copyWithId(currentUserId) as T;
     }
     return entity;
   }
 }
 
 /// Affiche un formulaire générique pour créer ou éditer une entité
-Future<void> showEntityFormDialog<T extends JsonModel>({
+Future<void> showEntityFormDialog<T extends UnifiedModel>({
   required BuildContext context,
   required WidgetRef ref,
   required String role,

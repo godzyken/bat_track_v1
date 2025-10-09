@@ -1,16 +1,14 @@
-import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../utilisateurs/app_user.dart';
+import '../../../core/unified_model.dart';
 
 part 'materiau.freezed.dart';
 part 'materiau.g.dart';
 
 @freezed
 class Materiau
-    with _$Materiau, JsonModel<Materiau>
-    implements HasAccessControl, JsonSerializableModel<Materiau> {
+    with _$Materiau, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const factory Materiau({
     required String id,
     required String nom,
@@ -28,6 +26,7 @@ class Materiau
     return prixUnitaire * q;
   }
 
+  @override
   factory Materiau.fromJson(Map<String, dynamic> json) =>
       _$MateriauFromJson(json);
 
@@ -40,10 +39,9 @@ class Materiau
   );
 
   @override
-  bool canAccess(AppUser user) {
-    return true;
-  }
+  bool get isUpdated => updatedAt != null;
 
   @override
-  bool get isUpdated => updatedAt != null;
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }

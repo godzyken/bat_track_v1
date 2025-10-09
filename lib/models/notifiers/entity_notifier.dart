@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
-import '../data/json_model.dart';
+import '../../data/core/unified_model.dart';
 import '../services/entity_service.dart';
 
-class EntityNotifier<T extends JsonModel> extends StateNotifier<T?> {
+class EntityNotifier<T extends UnifiedModel> extends StateNotifier<T?> {
   final String id;
   final Box<T> box;
   final EntityService<T> service;

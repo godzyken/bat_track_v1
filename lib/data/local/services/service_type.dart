@@ -13,6 +13,7 @@ import '../../../models/services/entity_service_registry.dart';
 import '../../../models/services/firebase_entity_service.dart';
 import '../../../models/services/remote/remote_storage_service.dart';
 import '../../../models/services/supabase_entity_service.dart';
+import '../../core/unified_model.dart';
 import '../../remote/services/firestore_service.dart';
 import '../../remote/services/storage_service.dart';
 import '../models/index_model_extention.dart';
@@ -25,7 +26,7 @@ class AppConfig {
   static List<StorageMode> enabledBackends = [storageMode];
 }
 
-mixin StorageHandlerMixin<T extends JsonModel> on Object {
+mixin StorageHandlerMixin<T extends UnifiedModel> on Object {
   String get boxName;
 
   StorageMode get storageMode => AppConfig.storageMode;
@@ -90,7 +91,7 @@ mixin StorageHandlerMixin<T extends JsonModel> on Object {
   }
 }
 
-class EntityServices<T extends JsonModel>
+class EntityServices<T extends UnifiedModel>
     with StorageHandlerMixin<T>
     implements EntityService<T> {
   @override
@@ -305,7 +306,7 @@ class EntityServiceFactory {
   static final EntityServiceFactory instance = EntityServiceFactory._();
 
   /// Crée un service adapté au mode de stockage choisi
-  EntityService<T> create<T extends JsonModel>({
+  EntityService<T> create<T extends UnifiedModel>({
     required String boxNameOrCollectionName,
     required T Function(Map<String, dynamic>) fromJson,
     String? supabaseTable,
@@ -418,7 +419,7 @@ final equipementService = buildEntityServiceProvider<Equipement>(
 final storageService = StorageService(FirebaseStorage.instance);
 final firebaseService = FirestoreService();
 
-extension EntityServicesFilters<T extends JsonModel> on EntityServices<T> {
+extension EntityServicesFilters<T extends UnifiedModel> on EntityServices<T> {
   /// Observe tous les items liés à un technicien spécifique
   Stream<List<T>> watchByTechnicien(String technicienId) async* {
     final box = await HiveService.box<T>(boxName);

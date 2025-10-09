@@ -1,9 +1,10 @@
-import 'package:bat_track_v1/data/local/adapters/signture_converter.dart';
 import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
+
+import '../../../core/unified_model.dart';
+import '../../adapters/signture_converter.dart';
 
 part 'projet.freezed.dart';
 part 'projet.g.dart';
@@ -11,7 +12,9 @@ part 'projet.g.dart';
 enum ProjetStatus { draft, pendingValidation, validated, rejected }
 
 @freezed
-class Projet with _$Projet implements JsonModel<Projet>, HasAccessControl {
+class Projet
+    with _$Projet, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const Projet._();
 
   const factory Projet({
@@ -56,6 +59,7 @@ class Projet with _$Projet implements JsonModel<Projet>, HasAccessControl {
     List<Chantier>? chantiers,
   }) = _Projet;
 
+  @override
   factory Projet.fromJson(Map<String, dynamic> json) => _$ProjetFromJson(json);
 
   factory Projet.mock() => Projet(
@@ -92,17 +96,6 @@ class Projet with _$Projet implements JsonModel<Projet>, HasAccessControl {
 
   @override
   bool get isUpdated => updatedAt != null;
-
-  @override
-  bool canAccess(AppUser user) {
-    if (user.isAdmin) return true;
-
-    // Le propriétaire ou ses membres
-    if (user.uid == ownerId) return true;
-    if (members.contains(user.uid)) return true;
-
-    return false;
-  }
 
   /// Détermine si l'utilisateur peut éditer ce projet
   bool canEdit(AppUser user) {
@@ -148,6 +141,10 @@ class Projet with _$Projet implements JsonModel<Projet>, HasAccessControl {
     if (user.isTechnicien && projet.members.contains(user.uid)) return true;
     return false;
   }
+
+  @override
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }
 
 extension ProjetWorkflow on Projet {

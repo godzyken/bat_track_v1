@@ -1,13 +1,13 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../../models/data/json_model.dart';
-import '../../adapters/signture_converter.dart';
+import '../../../core/unified_model.dart';
+import '../../adapters/signture_converter.dart' hide tryParseDate;
 
 part 'app_user.freezed.dart';
 part 'app_user.g.dart';
 
 @freezed
-class AppUser with _$AppUser implements JsonModel {
+class AppUser with _$AppUser implements UnifiedModel {
   const AppUser._();
 
   const factory AppUser({
@@ -25,6 +25,7 @@ class AppUser with _$AppUser implements JsonModel {
     DateTime? lastTimeConnect,
   }) = _AppUser;
 
+  @override
   factory AppUser.fromJson(Map<String, dynamic> json) =>
       _$AppUserFromJson(json);
 
@@ -46,4 +47,8 @@ class AppUser with _$AppUser implements JsonModel {
 
   @override
   DateTime? get updatedAt => appUpdatedAt;
+
+  @override
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(uid: newId);
 }

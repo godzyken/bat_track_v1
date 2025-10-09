@@ -1,17 +1,15 @@
-import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import '../utilisateurs/app_user.dart';
+import '../../../core/unified_model.dart';
 
 part 'materiel.freezed.dart';
 part 'materiel.g.dart';
 
 @freezed
 class Materiel
-    with _$Materiel, JsonModel<Materiel>
-    implements HasAccessControl, JsonSerializableModel<Materiel> {
+    with _$Materiel, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const Materiel._();
 
   const factory Materiel({
@@ -24,6 +22,7 @@ class Materiel
     DateTime? updatedAt,
   }) = _Materiel;
 
+  @override
   factory Materiel.fromJson(Map<String, dynamic> json) =>
       _$MaterielFromJson(json);
 
@@ -37,10 +36,9 @@ class Materiel
   double get prixTotal => prixUnitaire * quantiteFixe;
 
   @override
-  bool canAccess(AppUser user) {
-    return user.isAdmin || user.isTechnicien;
-  }
+  bool get isUpdated => updatedAt != null;
 
   @override
-  bool get isUpdated => updatedAt != null;
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }

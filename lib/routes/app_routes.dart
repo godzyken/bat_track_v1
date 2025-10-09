@@ -14,6 +14,7 @@ import '../data/local/models/base/access_policy_interface.dart';
 import '../features/auth/data/notifiers/auth_notifier.dart';
 import '../features/auth/views/screens/login_screen.dart';
 import '../features/auth/views/screens/register_screen.dart';
+import '../features/auth/views/screens/user_profile_screen.dart';
 import '../features/auth/views/widgets/access_shell.dart';
 import '../features/chantier/views/screens/chantier_extensions_screens.dart';
 import '../features/documents/views/screens/factureDetailScreen.dart';
@@ -36,35 +37,71 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: refresh,
     debugLogDiagnostics: true,
     redirect: (context, state) {
-      if (appUserAsync.isLoading || appUserAsync.hasError) return null;
+      if (appUserAsync.isLoading) return '/loading';
+
+      // Erreur de chargement
+      if (appUserAsync.hasError) {
+        return state.matchedLocation == '/error' ? null : '/error';
+      }
 
       final appUser = appUserAsync.value;
       final isLoggedIn = appUser != null;
 
-      final loggingIn =
+      final isAuthRoute =
           state.matchedLocation == '/login' ||
           state.matchedLocation == '/register';
 
-      if (!isLoggedIn) return loggingIn ? null : '/login';
+      // Pas connecté -> rediriger vers login
+      if (!isLoggedIn) {
+        return isAuthRoute ? null : '/login';
+      }
 
-      // Déjà connecté, on ne doit pas rester sur login/register
-      if (loggingIn) {
-        final role = UserRoleX.fromString(appUser.role);
+      // Connecté mais sur une page d'auth -> rediriger selon le rôle
+      if (isAuthRoute) {
+        final role = appUser.role.toLowerCase();
+
         switch (role) {
-          case UserRole.superUtilisateur:
-            return '/admin/dashboard';
-          case UserRole.technicien:
-            return '/tech/dashboard';
-          case UserRole.client:
-          case UserRole.chefDeProjet:
-            return '/client/dashboard';
+          case 'admin':
+          case 'superutilisateur':
+            return '/dashboard';
+          case 'technicien':
+            return '/techniciens';
+          case 'client':
+          case 'chefdeprojet':
+            return '/clients';
+          default:
+            return '/home';
         }
       }
 
-      // Si déjà sur une route autorisée, ne rien changer
+      // Vérifier les permissions pour les routes protégées
+      if (!isAuthRoute && !policy.canAccess(appUser.role)) {
+        return '/error';
+      }
+
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/loading',
+        name: 'loading',
+        builder: (_, _) => const LoadingApp(),
+      ),
+      GoRoute(
+        path: '/login',
+        name: 'Login',
+        builder: (_, _) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        name: 'Register',
+        builder: (_, _) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/error',
+        builder:
+            (_, _) => const ErrorApp(message: 'Erreur d\'authentification'),
+      ),
       ShellRoute(
         builder:
             (context, state, child) =>
@@ -76,29 +113,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (_, _) => const HomeScreen(),
           ),
           GoRoute(
-            path: '/loading',
-            name: 'loading',
-            builder: (_, _) => const LoadingApp(),
-          ),
-          GoRoute(
-            path: '/login',
-            name: 'Login',
-            builder: (_, _) => const LoginScreen(),
-          ),
-          GoRoute(
-            path: '/register',
-            name: 'Register',
-            builder: (_, _) => const RegisterScreen(),
+            path: '/profile',
+            name: 'Profile',
+            builder: (_, _) => const UserProfileScreen(),
           ),
           GoRoute(
             path: '/dashboard',
             name: 'Dashboard',
             builder: (_, _) => const DashboardScreen(),
-          ),
-          GoRoute(
-            path: '/error',
-            builder:
-                (_, _) => const ErrorApp(message: 'Erreur d\'authentification'),
           ),
           GoRoute(
             path: '/chantiers',
@@ -113,11 +135,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 },
                 routes: [
                   GoRoute(
-                    path: '/etapes',
+                    path: 'etapes',
                     name: 'Etapes',
                     builder: (context, state) {
                       final chantierId =
-                          state.uri.queryParameters['chantierId'] ?? '';
+                          state.pathParameters['chantierId'] ?? '';
                       return ChantierEtapesScreen(chantierId: chantierId);
                     },
                     routes: [
@@ -125,9 +147,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         path: ':etapeId',
                         builder: (context, state) {
                           final chantierId =
-                              state.uri.queryParameters['chantierId'] ?? '';
-                          final etapeId =
-                              state.uri.queryParameters['etapeId'] ?? '';
+                              state.pathParameters['chantierId'] ?? '';
+                          final etapeId = state.pathParameters['etapeId'] ?? '';
                           return ChantierEtapeDetailScreen(
                             chantierId: chantierId,
                             etapeId: etapeId,
@@ -135,11 +156,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         },
                         routes: [
                           GoRoute(
-                            path: '/pieces',
+                            path: 'pieces',
                             name: 'Pieces',
                             builder: (context, state) {
                               final chantierId =
-                                  state.uri.queryParameters['chantierId'] ?? '';
+                                  state.pathParameters['chantierId'] ?? '';
                               return ChantierPiecesScreen(
                                 chantierId: chantierId,
                               );
@@ -165,11 +186,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     ],
                   ),
                   GoRoute(
-                    path: "/chantier/:chantierId/interventions/:statut",
+                    path: "interventions/:statut",
                     builder: (context, state) {
-                      final chantierId =
-                          state.uri.queryParameters["chantierId"]!;
-                      final statut = state.uri.queryParameters["statut"]!;
+                      final chantierId = state.pathParameters["chantierId"]!;
+                      final statut = state.pathParameters["statut"]!;
                       return InterventionsScreen(
                         chantierId: chantierId,
                         statut: statut,
@@ -189,7 +209,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: ':technicienId',
                 builder: (context, state) {
                   final technicienId =
-                      state.uri.queryParameters['technicienId'] ?? '';
+                      state.pathParameters['technicienId'] ?? '';
                   return TechnicienDetailScreen(technicienId: technicienId);
                 },
               ),
@@ -203,7 +223,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':clientId',
                 builder: (context, state) {
-                  final clientId = state.uri.queryParameters['clientId'] ?? '';
+                  final clientId = state.pathParameters['clientId'] ?? '';
                   return ClientHomeScreen(clientId: clientId);
                 },
               ),
@@ -217,7 +237,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':documentId',
                 builder: (context, state) {
-                  final currentuser = state.pathParameters['id'] as AppUser;
+                  final currentUser = ref.read(currentUserProvider).value;
+                  if (currentUser == null) {
+                    return const ErrorApp(message: 'Utilisateur non connecté');
+                  }
                   final projetId = state.pathParameters['ProjetId'] as Projet;
                   return FactureDetailScreen(
                     userId: currentuser.id,
@@ -235,7 +258,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':equipementId',
                 builder: (context, state) {
-                  final currentuser = state.pathParameters['id'] as AppUser;
+                  final currentUser = ref.read(currentUserProvider).value;
+                  if (currentUser == null) {
+                    return const ErrorApp(message: 'Utilisateur non connecté');
+                  }
                   final projetId = state.pathParameters['ProjetId'] as Projet;
                   return FactureDetailScreen(
                     userId: currentuser.id,
@@ -253,11 +279,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':projetId',
                 builder: (context, state) {
-                  final currentuser = state.pathParameters['id'] as AppUser;
-                  final projet = state.pathParameters['Projet'] as Projet;
+                  final projetId = state.pathParameters['projetId'] ?? '';
+                  final projet = state.extra as Projet?;
+
+                  if (projet == null) {
+                    return const ErrorApp(message: 'Projet introuvable');
+                  }
+
+                  final currentUser = ref.read(currentUserProvider).value;
+                  if (currentUser == null) {
+                    return const ErrorApp(message: 'Utilisateur non connecté');
+                  }
+
                   return ProjectDetailScreen(
                     projet: projet,
-                    currentUser: currentuser,
+                    currentUser: currentUser.toUserModel(),
                   );
                 },
                 routes: [],

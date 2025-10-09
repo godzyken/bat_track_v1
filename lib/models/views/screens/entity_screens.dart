@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/json_model.dart';
+import '../../../data/core/unified_model.dart';
 import '../../services/logged_entity_service.dart';
 
-class EntityScreen<T extends JsonModel> extends StatelessWidget {
+class EntityScreen<T extends UnifiedModel> extends StatelessWidget {
   final String title;
   final ProviderBase<LoggedEntityService<T>> serviceProvider;
   final T Function() createEmpty;

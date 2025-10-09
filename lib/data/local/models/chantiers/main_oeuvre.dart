@@ -1,17 +1,15 @@
-import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../core/unified_model.dart';
 import '../../adapters/signture_converter.dart';
-import '../utilisateurs/app_user.dart';
 
 part 'main_oeuvre.freezed.dart';
 part 'main_oeuvre.g.dart';
 
 @freezed
 class MainOeuvre
-    with _$MainOeuvre, JsonModel<MainOeuvre>
-    implements JsonSerializableModel<MainOeuvre>, HasAccessControl {
+    with _$MainOeuvre, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const MainOeuvre._();
 
   const factory MainOeuvre({
@@ -26,6 +24,7 @@ class MainOeuvre
   }) = _MainOeuvre;
 
   /// JSON local
+  @override
   factory MainOeuvre.fromJson(Map<String, dynamic> json) =>
       _$MainOeuvreFromJson(json);
 
@@ -42,7 +41,6 @@ class MainOeuvre
   bool get isUpdated => updatedAt != null;
 
   @override
-  bool canAccess(AppUser user) {
-    return user.isAdmin || user.isTechnicien || user.isClient;
-  }
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }

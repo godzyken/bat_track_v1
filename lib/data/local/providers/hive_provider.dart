@@ -7,11 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../../../models/data/json_model.dart';
 import '../../../models/providers/asynchrones/entity_notifier_provider.dart';
 import '../../../models/services/dashboard_data_service.dart';
 import '../../../models/services/entity_service_registry.dart';
 import '../../../models/services/logged_entity_service.dart';
+import '../../core/unified_model.dart';
 import '../models/index_model_extention.dart';
 import '../services/hive_service.dart';
 import '../services/service_type.dart';
@@ -228,7 +228,7 @@ final filteredAppUserServiceProvider =
       );
 
       final delegate = SyncedEntityService<AppUser>(local, remote);
-      return LoggedEntitySyncService(delegate, ref);
+      return LoggedEntitySyncService(delegate, AppUserAdapter(), ref);
     });
 
 final watchPiecesByChantierProvider = StreamProvider.autoDispose
@@ -312,7 +312,7 @@ final equipementServiceProvider =
     );
 
 ////Providers for EntityServices
-Provider<EntityServices<T>> entityServiceProvider<T extends JsonModel>() {
+Provider<EntityServices<T>> entityServiceProvider<T extends UnifiedModel>() {
   return Provider<EntityServices<T>>((ref) {
     final provider = _serviceRegistry[T];
     if (provider == null) {

@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../data/core/unified_model.dart';
 import '../../../data/remote/services/firebase_storage_service.dart';
-import '../../data/json_model.dart';
 import '../../data/maperror/proxy.dart';
 import '../../notifiers/sync_entity_notifier.dart';
 import '../../services/entity_service.dart';
 
-SyncEntityNotifier<T> debugNotifierProvider<T extends JsonModel>({
+SyncEntityNotifier<T> debugNotifierProvider<T extends UnifiedModel>({
   required EntityService<T> entityService,
   required FirebaseStorageService storageService,
   required T initialState,

@@ -1,8 +1,9 @@
-import '../../data/json_model.dart';
+import 'package:bat_track_v1/data/core/unified_model.dart';
+
 import '../entity_sync_services.dart';
 import 'remote_storage_service.dart';
 
-class RemoteEntityServiceAdapter<T extends JsonModel>
+class RemoteEntityServiceAdapter<T extends UnifiedModel>
     implements EntityRemoteService<T> {
   final RemoteStorageService storage;
   final String collection;

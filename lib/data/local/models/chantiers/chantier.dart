@@ -1,10 +1,9 @@
-import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../adapters/signture_converter.dart';
+import '../../../core/unified_model.dart';
+import '../../adapters/signture_converter.dart' hide tryParseDate;
 import '../base/import_log.dart';
 
 part 'chantier.freezed.dart';
@@ -12,8 +11,8 @@ part 'chantier.g.dart';
 
 @freezed
 class Chantier
-    with _$Chantier, JsonModel<Chantier>
-    implements HasAccessControl, JsonSerializableModel<Chantier> {
+    with _$Chantier, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const Chantier._();
 
   const factory Chantier({
@@ -40,6 +39,7 @@ class Chantier
     @Default(false) bool isCloudOnly,
   }) = _Chantier;
 
+  @override
   factory Chantier.fromJson(Map<String, dynamic> json) =>
       _$ChantierFromJson(json);
 
@@ -108,10 +108,6 @@ class Chantier
   bool get isUpdated => updatedAt != null;
 
   @override
-  bool canAccess(AppUser user) {
-    if (user.isAdmin) return true;
-    if (user.isClient) return user.uid == clientId;
-    if (user.isTechnicien) return technicienIds.contains(user.uid);
-    return false;
-  }
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }

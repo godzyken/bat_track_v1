@@ -3,10 +3,11 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../data/core/unified_model.dart';
 import '../../data/local/services/service_type.dart';
-import '../data/json_model.dart';
 
-class SupabaseEntityService<T extends JsonModel> implements EntityServices<T> {
+class SupabaseEntityService<T extends UnifiedModel>
+    implements EntityServices<T> {
   final String table;
   @override
   final T Function(Map<String, dynamic> json) fromJson;

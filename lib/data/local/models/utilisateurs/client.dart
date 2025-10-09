@@ -1,15 +1,15 @@
-import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import 'app_user.dart';
+import '../../../core/unified_model.dart';
 
 part 'client.freezed.dart';
 part 'client.g.dart';
 
 @freezed
-class Client with _$Client, JsonModel<Client> implements HasAccessControl {
+class Client
+    with _$Client, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const Client._();
 
   const factory Client({
@@ -28,6 +28,7 @@ class Client with _$Client, JsonModel<Client> implements HasAccessControl {
   }) = _Client;
 
   /// JSON & Hive
+  @override
   factory Client.fromJson(Map<String, dynamic> json) => _$ClientFromJson(json);
 
   factory Client.mock() => Client(
@@ -49,7 +50,6 @@ class Client with _$Client, JsonModel<Client> implements HasAccessControl {
   bool get isUpdated => updatedAt != null;
 
   @override
-  bool canAccess(AppUser user) {
-    return user.isAdmin || user.company == contactName || user.company == nom;
-  }
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }

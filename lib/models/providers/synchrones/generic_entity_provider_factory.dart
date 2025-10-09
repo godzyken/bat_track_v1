@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../data/core/unified_model.dart';
 import '../../../data/local/providers/hive_provider.dart';
 import '../../../providers/hive_firebase_provider.dart';
-import '../../data/json_model.dart';
 import '../../data/state_wrapper/wrappers.dart';
 import '../../notifiers/sync_entity_notifier.dart';
 
@@ -15,7 +15,7 @@ class GenericEntityProviderFactory {
 
   /// Provider pour un [SyncEntityNotifier<T>] avec cache
   AutoDisposeStateNotifierProvider<SyncEntityNotifier<T>, SyncedState<T>>
-  getSyncEntityNotifierProvider<T extends JsonModel>(String id) {
+  getSyncEntityNotifierProvider<T extends UnifiedModel>(String id) {
     final key = 'SyncEntityNotifier<${T.toString()}>::$id';
 
     if (_providerCache.containsKey(key)) {
@@ -45,7 +45,7 @@ class GenericEntityProviderFactory {
         return SyncEntityNotifier<T>(
           entityService: service,
           storageService: storage,
-          initialState: initialData?.copyWithId(id),
+          initialState: initialData!,
           autoSync: false,
         );
       }
@@ -62,8 +62,9 @@ class GenericEntityProviderFactory {
   }
 
   /// Provider pour liste d'entités [T], avec filtre optionnel
-  AutoDisposeFutureProvider<List<T>>
-  getEntityListProvider<T extends JsonModel>([Map<String, dynamic>? filter]) {
+  AutoDisposeFutureProvider<List<T>> getEntityListProvider<
+    T extends UnifiedModel
+  >([Map<String, dynamic>? filter]) {
     final key = 'EntityList<${T.toString()}>::${filter?.toString() ?? 'all'}';
 
     if (_providerCache.containsKey(key)) {
@@ -77,7 +78,7 @@ class GenericEntityProviderFactory {
 
       return all.where((item) {
         for (final entry in filter.entries) {
-          final value = item.copyWithId(key)[entry.key];
+          final value = item.copyWithId(entry.key);
           if (value != entry.value) return false;
         }
         return true;
@@ -93,7 +94,7 @@ class GenericEntityProviderFactory {
 
 extension RefX on WidgetRef {
   AutoDisposeStateNotifierProvider<SyncEntityNotifier<T>, SyncedState<T>>
-  syncEntity<T extends JsonModel<T>>(String id) => GenericEntityProviderFactory
+  syncEntity<T extends UnifiedModel>(String id) => GenericEntityProviderFactory
       .instance
       .getSyncEntityNotifierProvider<T>(id);
 }

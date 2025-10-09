@@ -1,8 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../../models/data/json_model.dart';
+import '../../../core/unified_model.dart';
 import '../../adapters/signture_converter.dart';
-import '../base/has_acces_control.dart';
 import 'app_user.dart';
 
 part 'user.freezed.dart';
@@ -10,11 +9,8 @@ part 'user.g.dart';
 
 @freezed
 class UserModel
-    with _$UserModel
-    implements
-        JsonModel<UserModel>,
-        JsonSerializableModel<UserModel>,
-        HasAccessControl {
+    with _$UserModel, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const factory UserModel({
     required String id,
     required String name,
@@ -31,6 +27,7 @@ class UserModel
 
   const UserModel._();
 
+  @override
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
 
@@ -57,10 +54,8 @@ class UserModel
   String get roleName => role.asString;
 
   @override
-  bool canAccess(AppUser user) {
-    // TODO: implement canAccess
-    throw UnimplementedError();
-  }
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }
 
 enum UserRole { client, chefDeProjet, technicien, superUtilisateur }

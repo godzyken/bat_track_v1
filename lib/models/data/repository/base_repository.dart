@@ -1,9 +1,8 @@
-import 'package:bat_track_v1/models/data/json_model.dart';
-
+import '../../../data/core/unified_model.dart';
 import '../../../data/remote/services/firestore_service.dart';
 import '../adapter/typedefs.dart';
 
-abstract class BaseRepository<T extends JsonModel> {
+abstract class BaseRepository<T extends UnifiedModel> {
   final String collectionPath;
   final T Function(Map<String, dynamic>) fromJson;
 

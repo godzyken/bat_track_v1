@@ -1,8 +1,9 @@
-import '../../../models/data/json_model.dart';
+import '../../data/core/unified_model.dart';
 import '../../data/remote/services/cloud_flare_service.dart';
 import 'entity_service.dart';
 
-class CloudflareEntityService<T extends JsonModel> implements EntityService<T> {
+class CloudflareEntityService<T extends UnifiedModel>
+    implements EntityService<T> {
   final String collectionName;
   final T Function(Map<String, dynamic>) fromJson;
 

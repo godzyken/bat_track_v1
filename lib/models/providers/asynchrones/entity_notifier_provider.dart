@@ -1,14 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
-import '../../data/json_model.dart';
-import '../../services/entity_service.dart';
+import '../../../data/core/unified_model.dart';
 import '../../notifiers/entity_notifier.dart';
+import '../../services/entity_service.dart';
 
 final entityNotifierProviderFamily = <Type, dynamic>{};
 
 StateNotifierProviderFamily<EntityNotifier<T>, T?, String>
-createEntityNotifierProvider<T extends JsonModel>({
+createEntityNotifierProvider<T extends UnifiedModel>({
   required String hiveBoxName,
   required Provider<EntityService<T>> serviceProvider,
 }) {

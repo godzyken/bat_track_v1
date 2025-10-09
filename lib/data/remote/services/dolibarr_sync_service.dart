@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../models/data/adapter/triple_adapter.dart';
-import '../../../models/data/json_model.dart';
+import '../../core/unified_model.dart';
 import '../../local/models/index_model_extention.dart';
 
 class DolibarrSyncService {
@@ -57,7 +57,7 @@ class DolibarrSyncService {
     }
   }
 
-  Future<void> _syncModel<T extends JsonModel>({
+  Future<void> _syncModel<T extends UnifiedModel>({
     required BuildContext context,
     required T Function() factory,
     required T Function(Map<String, dynamic>) fromJson,

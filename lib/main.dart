@@ -25,17 +25,50 @@ void main() {
       await Future.delayed(Duration(milliseconds: 100));
 
       final firebaseContainer = ProviderContainer();
-      await firebaseContainer.read(firebaseInitializationProvider.future);
-      firebaseContainer.dispose();
+      try {
+        await firebaseContainer.read(firebaseInitializationProvider.future);
+      } catch (e) {
+        debugPrint('⚠️ Firebase initialization failed: $e');
+      } finally {
+        firebaseContainer.dispose();
+      }
 
+      // Initialisation SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       final container = ProviderContainer(
         overrides: [sharedPreferencesProvider.overrideWith((ref) => prefs)],
       );
 
+      // ✅ Initialise le gestionnaire d'erreurs global
       if (!kIsWeb) {
-        container.read(errorLoggerProvider).catcherFlutterError(container.read);
+        try {
+          container
+              .read(errorLoggerProvider)
+              .catcherFlutterError(container.read);
+        } catch (e) {
+          debugPrint('⚠️ Error logger initialization failed: $e');
+        }
       }
+
+      // ✅ Configure le gestionnaire d'erreurs Flutter
+      FlutterError.onError = (FlutterErrorDetails details) {
+        // Filtre les erreurs du DebugService et des assets
+        if (_shouldIgnoreError(details)) {
+          debugPrint('🔇 Ignored error: ${details.exception}');
+          return;
+        }
+
+        // Log l'erreur
+        debugPrint('❌ Flutter Error: ${details.exception}');
+        if (kDebugMode) {
+          FlutterError.presentError(details);
+        }
+
+        // Envoie à Sentry en production
+        if (!kDebugMode) {
+          Sentry.captureException(details.exception, stackTrace: details.stack);
+        }
+      };
 
       runApp(
         SentryWidget(
@@ -47,11 +80,33 @@ void main() {
       );
     },
     (error, stack) {
-      // ✅ Logging d’erreur global
-      debugPrint('Uncaught error: $error');
+      // ✅ Gestion des erreurs non capturées
+      if (_shouldIgnoreErrorString(error.toString())) {
+        debugPrint('🔇 Ignored uncaught error: $error');
+        return;
+      }
+
+      debugPrint('❌ Uncaught error: $error');
       debugPrintStack(stackTrace: stack);
+
+      if (!kDebugMode) {
+        Sentry.captureException(error, stackTrace: stack);
+      }
     },
   );
+}
+
+/// ✅ Filtre les erreurs non critiques
+bool _shouldIgnoreError(FlutterErrorDetails details) {
+  return _shouldIgnoreErrorString(details.exception.toString());
+}
+
+bool _shouldIgnoreErrorString(String error) {
+  return error.contains('DebugService') ||
+      error.contains('Cannot send Null') ||
+      error.contains('Unable to load asset') ||
+      error.contains('asset does not exist') ||
+      error.contains('HTTP status 404');
 }
 
 class AppInitializer extends ConsumerWidget {
@@ -111,7 +166,12 @@ class MyApp extends ConsumerWidget {
       routerConfig: router,
       builder:
           (context, child) => ResponsiveObserver(
-            child: Stack(children: [child!, const DebugFloatingOverlay()]),
+            child: Stack(
+              children: [
+                child ?? const SizedBox.shrink(),
+                if (kDebugMode) const DebugFloatingOverlay(),
+              ],
+            ),
           ),
     );
   }

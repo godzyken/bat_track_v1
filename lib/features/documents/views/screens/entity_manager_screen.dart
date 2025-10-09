@@ -2,18 +2,18 @@ import 'dart:typed_data';
 
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:printing/printing.dart';
 
 import '../../../../core/responsive/wrapper/responsive_layout.dart';
+import '../../../../data/core/unified_model.dart';
 import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
 import '../../../home/views/widgets/app_drawer.dart';
 
-class EntityManagerScreen<T extends JsonModel> extends ConsumerWidget {
+class EntityManagerScreen<T extends UnifiedModel> extends ConsumerWidget {
   final String title;
   final FutureProvider<List<T>> listProvider;
   final Provider<dynamic> serviceProvider;

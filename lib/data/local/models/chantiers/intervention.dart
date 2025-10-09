@@ -1,8 +1,7 @@
-import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../models/data/json_model.dart';
+import '../../../core/unified_model.dart';
 import '../../adapters/signture_converter.dart';
 import '../index_model_extention.dart';
 
@@ -11,8 +10,8 @@ part 'intervention.g.dart';
 
 @freezed
 class Intervention
-    with _$Intervention, JsonModel<Intervention>
-    implements JsonSerializableModel<Intervention>, HasAccessControl {
+    with _$Intervention, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const Intervention._();
 
   const factory Intervention({
@@ -32,6 +31,7 @@ class Intervention
     int? count,
   }) = _Intervention;
 
+  @override
   factory Intervention.fromJson(Map<String, dynamic> json) =>
       _$InterventionFromJson(json);
 
@@ -50,9 +50,5 @@ class Intervention
   bool get isUpdated => updatedAt != null;
 
   @override
-  bool canAccess(AppUser user) {
-    if (user.isAdmin) return true;
-    if (user.isTechnicien) return technicienId == user.uid;
-    return user.company == company;
-  }
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 }

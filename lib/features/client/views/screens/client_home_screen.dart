@@ -3,10 +3,10 @@ import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../data/core/unified_model.dart';
 import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/services/service_type.dart';
-import '../../../../models/data/json_model.dart';
 import '../../../../models/providers/asynchrones/entity_list_future_provider.dart';
 import '../../../../models/views/screens/screen_wrapper.dart';
 import '../../../../models/views/widgets/entity_list.dart';
@@ -26,7 +26,7 @@ class ClientHomeScreen extends ConsumerWidget {
     final isAdmin = currentUser.role == 'admin';
     final isOwner = currentUser.role == 'client';
 
-    bool canEdit<T extends JsonModel>({
+    bool canEdit<T extends UnifiedModel>({
       required T entity,
       required AppUser currentUser,
     }) {
@@ -44,10 +44,10 @@ class ClientHomeScreen extends ConsumerWidget {
           (currentUser.role == 'client' && entityOwner == currentUser.uid);
     }
 
-    bool canDelete(JsonModel entity) =>
+    bool canDelete(UnifiedModel entity) =>
         canEdit(entity: entity, currentUser: currentUser);
 
-    Widget buildEntitySection<T extends JsonModel>({
+    Widget buildEntitySection<T extends UnifiedModel>({
       required String title,
       required AsyncValue<List<T>> items,
       required String boxName,

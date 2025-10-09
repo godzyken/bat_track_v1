@@ -1,8 +1,8 @@
 import 'dart:developer' as developer;
 
 import 'package:async/async.dart';
+import 'package:bat_track_v1/data/core/unified_model.dart';
 import 'package:bat_track_v1/data/local/services/hive_service.dart';
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:bat_track_v1/models/providers/asynchrones/remote_service_provider.dart';
 import 'package:bat_track_v1/models/providers/synchrones/facture_sync_provider.dart';
 import 'package:bat_track_v1/models/services/cloud_flare_entity_service.dart';
@@ -39,7 +39,7 @@ abstract class EntityRemoteService<T> {
   Future fileExists(String path);
 }
 
-class EntitySyncService<T extends JsonModel> {
+class EntitySyncService<T extends UnifiedModel> {
   static final _cacheTimestamps = <String, DateTime>{};
   static const Duration ttl = Duration(seconds: 60);
 
@@ -228,7 +228,7 @@ class EntitySyncService<T extends JsonModel> {
 // ============================================================================
 
 class SyncServiceFactory {
-  static EntitySyncService<T> create<T extends JsonModel>({
+  static EntitySyncService<T> create<T extends UnifiedModel>({
     required EntityLocalService<T> localService,
     required String collectionPath,
     required T Function(Map<String, dynamic>) fromJson,
@@ -295,7 +295,7 @@ Future<void> syncAllEntitiesFromFirestore(Ref ref) async {
 }
 
 /// Définit les opérations "raw" nécessaires pour une synchronisation
-abstract class SyncableEntityService<T extends JsonModel>
+abstract class SyncableEntityService<T extends UnifiedModel>
     implements EntitySyncService<T> {
   /// Lit la version locale sous forme de Map (ex. Hive)
   Future<Map<String, dynamic>> getLocalRaw(String id);
@@ -311,10 +311,9 @@ abstract class SyncableEntityService<T extends JsonModel>
 }
 
 /// Provider générique pour construire un EntitySyncService
-Provider<EntitySyncService<T>> entitySyncServiceProvider<T extends JsonModel>(
-  String boxName,
-  T Function(Map<String, dynamic>) fromJson,
-) {
+Provider<EntitySyncService<T>> entitySyncServiceProvider<
+  T extends UnifiedModel
+>(String boxName, T Function(Map<String, dynamic>) fromJson) {
   return Provider<EntitySyncService<T>>((ref) {
     final local = HiveEntityService<T>(boxName: boxName, fromJson: fromJson);
     final remote = RemoteEntityServiceAdapter<T>(
