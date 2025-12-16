@@ -1,5 +1,4 @@
-import '../../data/core/unified_model.dart';
-
+/*
 abstract class EntityService<T extends UnifiedModel> {
   Future<void> save(T entity, String id);
 
@@ -54,3 +53,4 @@ abstract class EntityService<T extends UnifiedModel> {
   /// Écrit la version locale
   Future<void> saveLocalRaw(String id, Map<String, dynamic> data);
 }
+*/

@@ -35,7 +35,7 @@ class ChantierDetailLoader extends ConsumerWidget {
             body: Center(child: Text('Chantier introuvable')),
           );
         }
-        return ChantierDetailScreen(chantier: chantier);
+        return ChantierDetailScreen(chantierId: chantier.id);
       },
     );
   }

@@ -11,41 +11,62 @@ class TechnicienDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final technicien = ref.watch(technicienNotifierProvider(technicienId));
+    final technicienAsync = ref.watch(watchTechnicienProvider(technicienId));
 
-    if (technicien == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
+    final chantierAsync = ref.watch(allChantiersStreamProvider);
+    final etapesAsync = ref.watch(allEtapesStreamProvider);
 
-    final chantiers = ref.watch(allChantiersProvider);
-    final etapes = ref.watch(allEtapesProvider);
+    return technicienAsync.when(
+      data: (technicien) {
+        if (technicien == null) {
+          return const Center(child: Text('Technicien non trouvé'));
+        }
 
-    final chantiersAffectes =
-        chantiers
-            .where(
-              (chantier) => technicien.chantiersAffectees.contains(chantier.id),
-            )
-            .toList();
+        final chantiers = chantierAsync.value ?? [];
+        final etapes = etapesAsync.value ?? [];
 
-    final etapesAffectees =
-        etapes
-            .where((etape) => technicien.etapesAffectees.contains(etape.id))
-            .toList();
+        final chantiersAffectes =
+            chantiers
+                .where(
+                  (chantier) =>
+                      technicien.chantiersAffectees.contains(chantier.id),
+                )
+                .toList();
 
-    return Scaffold(
-      appBar: AppBar(title: Text('Détail de ${technicien.nom}')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            _buildInfoSection(technicien),
-            const SizedBox(height: 16),
-            _buildAffectations('Chantiers affectés', chantiersAffectes),
-            const SizedBox(height: 16),
-            _buildAffectations('Étapes affectées', etapesAffectees),
-          ],
-        ),
-      ),
+        final etapesAffectees =
+            etapes
+                .where((etape) => technicien.etapesAffectees.contains(etape.id))
+                .toList();
+
+        return Scaffold(
+          appBar: AppBar(title: Text('Détail de ${technicien.nom}')),
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: ListView(
+              children: [
+                _buildInfoSection(technicien),
+                const SizedBox(height: 16),
+                chantierAsync.isLoading
+                    ? const LinearProgressIndicator()
+                    : _buildAffectations(
+                      'Chantiers affectés',
+                      chantiersAffectes,
+                    ),
+                const SizedBox(height: 16),
+                etapesAsync.isLoading
+                    ? const LinearProgressIndicator()
+                    : _buildAffectations('Étapes affectées', etapesAffectees),
+              ],
+            ),
+          ),
+        );
+      },
+      loading:
+          () =>
+              const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error:
+          (err, stack) =>
+              Scaffold(body: Center(child: Text('Erreur Technicien: $err'))),
     );
   }
 

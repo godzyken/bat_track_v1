@@ -167,7 +167,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: ':chantierId',
                 builder: (context, state) {
                   final chantier = state.extra as Chantier;
-                  return ChantierDetailScreen(chantier: chantier);
+                  return ChantierDetailScreen(chantierId: chantier.id);
                 },
                 routes: [
                   GoRoute(

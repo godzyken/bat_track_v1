@@ -37,7 +37,7 @@ class ChantierPiecesScreen extends ConsumerWidget {
                     ref: ref,
                     role: user.role,
                     onSubmit: (piece) async {
-                      await pieceService.save(piece, piece.id);
+                      await pieceService.save(piece);
                     },
                     fromJson: Piece.fromJson,
                     createEmpty: Piece.mock,
@@ -57,7 +57,7 @@ class ChantierPiecesScreen extends ConsumerWidget {
                     ref: ref,
                     role: user.role,
                     onSubmit: (piece) async {
-                      await pieceService.save(piece, piece.id);
+                      await pieceService.save(piece);
                     },
                     fromJson: Piece.fromJson,
                     createEmpty: Piece.mock,
@@ -70,7 +70,7 @@ class ChantierPiecesScreen extends ConsumerWidget {
             ref: ref,
             role: user.role,
             onSubmit: (updated) async {
-              await pieceService.update(updated, piece.id);
+              await pieceService.save(updated);
             },
             fromJson: Piece.fromJson,
             createEmpty: Piece.mock,

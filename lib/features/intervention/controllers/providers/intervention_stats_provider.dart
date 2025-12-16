@@ -10,13 +10,10 @@ final interventionStatsProvider =
       final interventions = await interventionService.getAll();
 
       // Groupement par projet
-      final byProjet = groupBy(interventions, (i) => i.id ?? 'Sans projet');
+      final byProjet = groupBy(interventions, (i) => i.id);
 
       return byProjet.map((projetId, chantierList) {
-        final byChantier = groupBy(
-          chantierList,
-          (i) => i.chantierId ?? 'Sans chantier',
-        );
+        final byChantier = groupBy(chantierList, (i) => i.chantierId);
 
         final chantierStats = byChantier.map((chantierId, interventions) {
           final byStatut = groupBy(interventions, (i) => i.statut);

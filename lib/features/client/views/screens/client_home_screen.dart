@@ -125,9 +125,9 @@ class ClientHomeScreen extends ConsumerWidget {
               boxName: 'project',
               createEmpty: Projet.mock,
               fromJson: Projet.fromJson,
-              save: projetService.save,
+              save: (entity, id) => projetService.save(entity),
               delete: projetService.delete,
-              update: projetService.update,
+              update: (entity, id) => projetService.sync(entity),
               filter:
                   (list) =>
                       list
@@ -143,9 +143,9 @@ class ClientHomeScreen extends ConsumerWidget {
               boxName: 'chantierBox',
               createEmpty: Chantier.mock,
               fromJson: Chantier.fromJson,
-              save: chantierService.save,
+              save: (entity, id) => chantierService.save(entity),
               delete: chantierService.delete,
-              update: chantierService.update,
+              update: (entity, id) => chantierService.sync(entity),
               filter:
                   (list) =>
                       list
@@ -166,9 +166,9 @@ class ClientHomeScreen extends ConsumerWidget {
               boxName: 'interventionBox',
               createEmpty: Intervention.mock,
               fromJson: Intervention.fromJson,
-              save: interventionService.save,
+              save: (entity, id) => interventionService.save(entity),
               delete: interventionService.delete,
-              update: interventionService.update,
+              update: (entity, id) => interventionService.sync(entity),
               filter:
                   (list) =>
                       list

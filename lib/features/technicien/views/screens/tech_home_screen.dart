@@ -75,7 +75,7 @@ class TechHomeScreen extends ConsumerWidget {
                           ref: ref,
                           role: currentUser.role,
                           onSubmit: (projet) async {
-                            await projetService.save(projet, projet.id);
+                            await projetService.save(projet);
                           },
                           fromJson: Projet.fromJson,
                           createEmpty: Projet.mock,
@@ -88,7 +88,7 @@ class TechHomeScreen extends ConsumerWidget {
                   ref: ref,
                   role: currentUser.role,
                   onSubmit: (updated) async {
-                    await projetService.update(updated, projet.id);
+                    await projetService.save(updated);
                   },
                   fromJson: Projet.fromJson,
                   createEmpty: Projet.mock,
@@ -120,7 +120,7 @@ class TechHomeScreen extends ConsumerWidget {
                           ref: ref,
                           role: currentUser.role,
                           onSubmit: (chantier) async {
-                            await chantierService.save(chantier, chantier.id);
+                            await chantierService.save(chantier);
                           },
                           fromJson: Chantier.fromJson,
                           createEmpty: Chantier.mock,
@@ -133,7 +133,7 @@ class TechHomeScreen extends ConsumerWidget {
                   ref: ref,
                   role: currentUser.role,
                   onSubmit: (updated) async {
-                    await chantierService.update(updated, chantier.id);
+                    await chantierService.save(updated);
                   },
                   fromJson: Chantier.fromJson,
                   createEmpty: Chantier.mock,
@@ -165,7 +165,7 @@ class TechHomeScreen extends ConsumerWidget {
                           ref: ref,
                           role: currentUser.role,
                           onSubmit: (projet) async {
-                            await projetService.save(projet, projet.id);
+                            await projetService.save(projet);
                           },
                           fromJson: Projet.fromJson,
                           createEmpty: Projet.mock,
@@ -178,7 +178,7 @@ class TechHomeScreen extends ConsumerWidget {
                   ref: ref,
                   role: currentUser.role,
                   onSubmit: (updated) async {
-                    await projetService.update(updated, projet.id);
+                    await projetService.save(updated);
                   },
                   fromJson: Projet.fromJson,
                   createEmpty: Projet.mock,

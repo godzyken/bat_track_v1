@@ -2,11 +2,11 @@ import 'dart:developer' as developer;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../core/services/unified_entity_service.dart';
 import '../../data/core/unified_model.dart';
-import '../../data/local/services/service_type.dart';
 
 class FirebaseEntityService<T extends UnifiedModel>
-    implements EntityServices<T> {
+    implements UnifiedEntityService<T> {
   final String collectionPath;
   @override
   final T Function(Map<String, dynamic> json) fromJson;

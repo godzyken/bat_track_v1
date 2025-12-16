@@ -28,7 +28,7 @@ class PickInstanceScreen extends ConsumerWidget {
       await userBox.put(updatedUser.id, updatedUser);
 
       ref.read(currentUserStateProvider.notifier).state =
-          updatedUser.toAppUser();
+          updatedUser.toUserModel();
     }
 
     // 3. Naviguer

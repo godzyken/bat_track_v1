@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/providers/hive_provider.dart';
+import '../../../../data/remote/providers/chantier_provider.dart';
 import '../../../chantier/views/widgets/chantier_etape_time_line_interactive.dart';
 import '../widgets/kanban_column.dart';
 
@@ -14,10 +15,12 @@ class KanbanPlanningScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final statuts = ['À faire', 'En cours', 'Terminé'];
 
-    final chantierAsync = ref.watch(chantierProvider(chantierId));
-    final allEtapes = ref.watch(allEtapesProvider);
+    final chantierAsync = ref.watch(
+      chantierAdvancedNotifierProvider(chantierId),
+    );
+    final allEtapes = ref.watch(allEtapesStreamProvider);
 
-    if (chantierAsync == null) {
+    if (chantierAsync.value == null) {
       return const Scaffold(
         body: Center(child: Text("Chargement du chantier...")),
       );
@@ -25,7 +28,7 @@ class KanbanPlanningScreen extends ConsumerWidget {
 
     // Étapes liées uniquement à ce chantier
     final etapesDuChantier =
-        allEtapes.where((e) => e.chantierId == chantierId).toList();
+        allEtapes.value!.where((e) => e.chantierId == chantierId).toList();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Planning Chantier')),
@@ -47,7 +50,7 @@ class KanbanPlanningScreen extends ConsumerWidget {
                           onDrop: (updatedEtape) {
                             ref
                                 .read(chantierEtapeServiceProvider)
-                                .update(updatedEtape, updatedEtape.id);
+                                .save(updatedEtape);
                           },
                         ),
                       )
@@ -65,9 +68,7 @@ class KanbanPlanningScreen extends ConsumerWidget {
               onReorder: (reordered) {
                 for (var i = 0; i < reordered.length; i++) {
                   final updated = reordered[i].copyWith(ordre: i);
-                  ref
-                      .read(chantierEtapeServiceProvider)
-                      .update(updated, updated.id);
+                  ref.read(chantierEtapeServiceProvider).save(updated);
                 }
               },
               onDelete: (id) {

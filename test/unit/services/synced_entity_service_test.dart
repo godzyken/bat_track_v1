@@ -1,5 +1,5 @@
+import 'package:bat_track_v1/core/services/unified_entity_service.dart';
 import 'package:bat_track_v1/data/local/models/projets/projet.dart';
-import 'package:bat_track_v1/models/services/synced_entity_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -10,13 +10,17 @@ void main() {
   group('SyncedEntityService<Projet>', () {
     late MockHiveEntityService<Projet> mockLocal;
     late MockRemoteEntityServiceAdapter<Projet> mockRemote;
-    late SyncedEntityService<Projet> syncedService;
+    late UnifiedEntityService<Projet> syncedService;
     late List<Projet> testProjets;
 
     setUp(() {
       mockLocal = MockHiveEntityService<Projet>();
       mockRemote = MockRemoteEntityServiceAdapter<Projet>();
-      syncedService = SyncedEntityService<Projet>(mockLocal, mockRemote);
+      syncedService = UnifiedEntityService<Projet>(
+        collectionName: mockRemote.collection,
+        remoteStorage: mockRemote.storage,
+        fromJson: mockLocal.fromJson,
+      );
 
       testProjets = MockDataFactories.createProjetList(3);
 
@@ -31,16 +35,16 @@ void main() {
         // Arrange
         when(() => mockLocal.getAll()).thenAnswer((_) async => testProjets);
         when(
-          () => mockRemote.createBatch(any()),
+          () => mockRemote.storage.saveRaw(any(), any(), any()),
         ).thenAnswer((_) async => testProjets);
 
         // Act
-        final result = await syncedService.syncToRemote();
+        final result = await syncedService.watchAll();
 
         // Assert
         expect(result.length, equals(3));
         verify(() => mockLocal.getAll()).called(1);
-        verify(() => mockRemote.createBatch(testProjets)).called(1);
+        verify(() => mockRemote.storage.createBatch(testProjets)).called(1);
       });
 
       test('syncFromRemote should pull remote changes to local', () async {

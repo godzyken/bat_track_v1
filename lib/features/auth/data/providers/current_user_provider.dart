@@ -93,7 +93,13 @@ final currentUserStateProvider = StateProvider<AppUser?>((ref) {
   return ref.watch(currentUserProvider).value;
 });
 
-final currentUserLoaderProvider = FutureProvider<UserModel?>((ref) async {
-  final users = ref.watch(allUsersProvider);
-  return users.firstWhereOrNull((user) => user.isCloudOnly == false);
+final currentUserLoaderProvider = FutureProvider<AppUser?>((ref) async {
+  final usersAsync = ref.watch(allUsersStreamProvider);
+
+  final users = usersAsync.value;
+  if (users == null) {
+    return null;
+  }
+
+  return users.firstWhereOrNull((user) => user.appIsUpdated == false);
 });

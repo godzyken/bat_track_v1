@@ -134,14 +134,14 @@ class StorageService
     }
   }
 
-  Future<void> save(File file, String id) async {
+  /* Future<void> save(File file, String id) async {
     await uploadFile(file, id);
-  }
+  }*/
 
-  Future<List<String>> getAll() async {
+  /*  Future<List<String>> getAll() async {
     final listResult = await _storage.ref().listAll();
     return listResult.items.map((e) => e.fullPath).toList();
-  }
+  }*/
 
   void _log(String method, List<dynamic> args) {
     developer.log('[LOG][${_storage.bucket}] $method called with args: $args');

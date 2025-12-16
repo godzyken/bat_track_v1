@@ -41,7 +41,7 @@ void main() {
       () async {
         // Arrange - Données remote
         final remoteProjets = MockDataFactories.createProjetList(5);
-        when(() => mockRemoteStorage.getCollection('projets')).thenAnswer(
+        when(() => mockRemoteStorage.getAllRaw('projets')).thenAnswer(
           (_) async => remoteProjets.map((p) => p.toJson()).toList(),
         );
 
@@ -67,7 +67,7 @@ void main() {
       // Arrange - Simuler hors ligne
       when(() => mockRemoteStorage.isConnected).thenReturn(false);
       when(
-        () => mockRemoteStorage.getCollection(any()),
+        () => mockRemoteStorage.getAllRaw(any()),
       ).thenThrow(Exception('No internet connection'));
 
       // Créer des données locales
@@ -75,7 +75,7 @@ void main() {
       final projetService = container.read(projetServiceProvider);
 
       for (final projet in localProjets) {
-        await projetService.create(projet);
+        await projetService.sync(projet);
       }
 
       // Act & Assert - Le provider doit retourner les données locales
@@ -106,22 +106,22 @@ void main() {
 
       // Setup mocks
       when(
-        () => mockRemoteStorage.getCollection('projets'),
+        () => mockRemoteStorage.getAllRaw('projets'),
       ).thenAnswer((_) async => [remoteProjet.toJson()]);
       when(
-        () => mockRemoteStorage.setDocument('projets', any(), any()),
+        () => mockRemoteStorage.saveRaw('projets', any(), any()),
       ).thenAnswer((_) async {});
 
       // Créer la version locale
       final projetService = container.read(projetServiceProvider);
-      await projetService.create(localProjet);
+      await projetService.sync(localProjet);
 
       // Act - Synchronisation bidirectionnelle
-      await projetService.bidirectionalSync();
+      await projetService.syncAllFromRemote();
 
       // Assert - La version remote (plus récente) doit être conservée
-      final finalProjet = await projetService.getById('conflict_1');
-      expect(finalProjet?.nom, equals('Version Remote'));
+      final finalProjet = await projetService.watch('conflict_1');
+      expect(finalProjet.first, equals('Version Remote'));
     });
   });
 }

@@ -230,7 +230,7 @@ class ProjectListScreen extends ConsumerWidget {
         assignedUserIds: selectedTechs,
         updatedAt: DateTime.now(),
       );
-      await ref.read(projetServiceProvider).updateEntity(updated);
+      await ref.read(projetServiceProvider).sync(updated);
     }
   }
 }

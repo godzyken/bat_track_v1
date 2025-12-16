@@ -1,19 +1,114 @@
 import 'dart:developer' as developer;
 
 import 'package:bat_track_v1/models/data/adapter/safe_async_mixin.dart';
-import 'package:bat_track_v1/models/services/synced_entity_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/services/unified_entity_service.dart';
 import '../../data/core/unified_model.dart';
-import '../../data/local/models/adapters/json_adapter.dart';
-import '../../data/local/services/service_type.dart';
 import '../data/maperror/logged_action.dart';
-import '../providers/asynchrones/generic_adapter_provider.dart';
-import 'entity_sync_services.dart';
 
-class LoggedEntityService<T extends UnifiedModel> implements EntityServices<T> {
-  final EntityServices<T> _inner;
+class SafeAndLoggedEntityService<T extends UnifiedModel>
+    with LoggedAction, SafeAsyncMixin<T>
+    implements UnifiedEntityService<T> {
+  final UnifiedEntityService<T> _delegate;
+  final Ref ref;
+
+  SafeAndLoggedEntityService(this._delegate, this.ref) {
+    initLogger(ref.read);
+    initSafeAsync(ref.read);
+  }
+
+  // 1. DÉLÉGATION ET SÉCURITÉ POUR LES MÉTHODES D'ÉCRITURE (Sync)
+
+  @override
+  Future<void> save(T entity) async {
+    // 💡 Simplification: utilise la signature simplifiée save(T entity)
+    await safeVoid(
+      () => _delegate.save(entity),
+      context: 'save<$T>: ${entity.id}',
+    );
+    logAction(action: 'save', target: '$T/${entity.id}', data: entity.toJson());
+  }
+
+  @override
+  Future<void> delete(String id) async {
+    await safeVoid(() => _delegate.delete(id), context: 'delete<$T>: $id');
+    logAction(action: 'delete', target: '$T/$id');
+  }
+
+  // 2. DÉLÉGATION ET SÉCURITÉ POUR LES MÉTHODES DE LECTURE (Fetch)
+
+  // Utiliser getAll() pour les besoins de l'UI (qui fait local/remote/merge)
+  @override
+  Future<List<T>> getAll() async {
+    return await safeAsync<List<T>>(
+      () => _delegate.getAllLocal(), // Utilise la méthode hybride getAll()
+      context: 'getAll<$T>',
+      fallback: [],
+    );
+  }
+
+  // Utiliser get(id) pour la lecture hybride
+  @override
+  Future<T?> get(String id) async {
+    return await safeAsync<T?>(
+      () => _delegate.get(id), // Utilise la méthode hybride get(id)
+      context: 'get<$T>:$id',
+      fallback: null,
+    );
+  }
+
+  // 3. DÉLÉGATION DES OPÉRATIONS DE SYNC MANUEL (si besoin)
+
+  // Ces méthodes doivent être présentes dans l'interface UnifiedEntityService
+  @override
+  Future<void> syncFromRemote({BuildContext? context}) async {
+    await safeVoid(
+      () => _delegate.syncAllFromRemote(),
+      context: 'syncFromRemote<$T>',
+    );
+    logAction(action: 'syncFromRemote', target: '$T');
+  }
+
+  @override
+  Future<void> syncToRemote() async {
+    await safeVoid(
+      () => _delegate.syncAllFromRemote(),
+      context: 'syncToRemote<$T>',
+    );
+    logAction(action: 'syncToRemote', target: '$T');
+  }
+
+  // 4. DÉLÉGATION AUTOMATIQUE VIA noSuchMethod POUR TOUT LE RESTE
+
+  void _log(String method, List<dynamic> args) {
+    developer.log('[LOG][${T.toString()}] $method called with args: $args');
+  }
+
+  @override
+  noSuchMethod(Invocation invocation) {
+    // Log du nom et des arguments
+    _log(invocation.memberName.toString(), invocation.positionalArguments);
+
+    try {
+      // Délégation automatique à _delegate pour toutes les autres méthodes (watchAll, getLocalRaw, etc.)
+      return Function.apply((_delegate as dynamic).noSuchMethod, [invocation]);
+    } catch (e) {
+      // En cas d'erreur lors de la délégation, si la méthode n'est pas implémentée
+      if (e is NoSuchMethodError) {
+        throw UnimplementedError(
+          'Method ${invocation.memberName} not implemented in delegate or decorator.',
+        );
+      }
+      rethrow;
+    }
+  }
+}
+
+/*class LoggedEntityService<T extends UnifiedModel>
+    implements UnifiedEntityService<T> {
+  final UnifiedEntityService<T> _inner;
   final Ref ref;
 
   LoggedEntityService(this._inner, this.ref);
@@ -38,8 +133,8 @@ class LoggedEntityService<T extends UnifiedModel> implements EntityServices<T> {
 
 class LoggedEntitySyncService<T extends UnifiedModel>
     with LoggedAction, SafeAsyncMixin<T>
-    implements SyncedEntityService<T> {
-  final SyncedEntityService<T> _delegate;
+    implements UnifiedEntityService<T> {
+  final UnifiedEntityService<T> _delegate;
   final Ref ref;
 
   LoggedEntitySyncService(this._delegate, this.ref) {
@@ -50,22 +145,18 @@ class LoggedEntitySyncService<T extends UnifiedModel>
   GenericJsonAdapter<T> get _adapter => ref.adapterFor<T>();
 
   @override
-  Future<void> save(T entity, [String? id]) async {
+  Future<void> save(T entity) async {
     await safeVoid(
-      () => _delegate.save(entity, id),
-      context: 'save<$T>: ${id ?? entity.id}',
+      () => _delegate.save(entity),
+      context: 'save<$T>: ${entity.id}',
     );
-    logAction(
-      action: 'save',
-      target: '$T/${id ?? entity.id}',
-      data: entity.toJson(),
-    );
+    logAction(action: 'save', target: '$T/${entity.id}', data: entity.toJson());
   }
 
   @override
   Future<List<T>> getAll() async {
     return await safeAsync<List<T>>(
-      () => _delegate.getAll(),
+      () => _delegate.getAllRemote(),
       context: 'getAll<$T>',
       fallback: [],
     );
@@ -77,40 +168,13 @@ class LoggedEntitySyncService<T extends UnifiedModel>
     logAction(action: 'delete', target: '$T/$id');
   }
 
-  // --- SyncedEntityService extra helpers (local / remote / sync) ---
+  // --- UnifiedEntityService extra helpers (local / remote / sync) ---
 
   @override
-  Future<List<T>> getAllFromLocal() async {
-    return await safeAsync<List<T>>(
-      () => _delegate.getAllFromLocal(),
-      context: 'getAllFromLocal<$T>',
-      fallback: [],
-    );
-  }
+  EntityLocalService<T> get local => _delegate.getAllLocal();
 
   @override
-  Future<T?> getByIdFromLocal(String id) async {
-    return await safeAsync<T?>(
-      () => _delegate.getByIdFromLocal(id),
-      context: 'getByIdFromLocal<$T>/$id',
-      fallback: null,
-    );
-  }
-
-  @override
-  Future<T?> getByIdFromRemote(String id) async {
-    return await safeAsync<T?>(
-      () => _delegate.getByIdFromRemote(id),
-      context: 'getByIdFromRemote<$T>/$id',
-      fallback: null,
-    );
-  }
-
-  @override
-  EntityLocalService<T> get local => _delegate.local;
-
-  @override
-  EntityRemoteService<T> get remote => _delegate.remote;
+  EntityRemoteService<T> get remote => _delegate.remoteStorage;
 
   @override
   Future<void> precacheAllWithContext(BuildContext context) async {
@@ -293,8 +357,9 @@ class LoggedEntitySyncService<T extends UnifiedModel>
       return super.noSuchMethod(invocation);
     }
   }
-}
+}*/
 
+/*
 extension<T extends UnifiedModel> on UnifiedModel {
   Future<void> mergeCloudDataIfAllowed(
     Ref<Object?> ref, {
@@ -303,3 +368,4 @@ extension<T extends UnifiedModel> on UnifiedModel {
     required Future<Null> Function(dynamic merged) saveMergedData,
   }) async {}
 }
+*/

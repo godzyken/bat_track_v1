@@ -1,13 +1,13 @@
+import 'package:bat_track_v1/core/services/unified_entity_service.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../data/core/unified_model.dart';
 import '../../../data/remote/services/firebase_storage_service.dart';
 import '../../data/maperror/proxy.dart';
 import '../../notifiers/sync_entity_notifier.dart';
-import '../../services/entity_service.dart';
 
 SyncEntityNotifier<T> debugNotifierProvider<T extends UnifiedModel>({
-  required EntityService<T> entityService,
+  required UnifiedEntityService<T> entityService,
   required FirebaseStorageService storageService,
   required T initialState,
   bool autoSync = true,
@@ -17,7 +17,7 @@ SyncEntityNotifier<T> debugNotifierProvider<T extends UnifiedModel>({
   // En debug, on wrap les services avec le DebugProxy
   final es =
       kDebugMode
-          ? DebugProxy<EntityService<T>>(
+          ? DebugProxy<UnifiedEntityService<T>>(
             entityService,
             logFilter: logFilter,
             interceptor: interceptor,
@@ -34,7 +34,7 @@ SyncEntityNotifier<T> debugNotifierProvider<T extends UnifiedModel>({
           : storageService;
 
   return SyncEntityNotifier<T>(
-    entityService: es as EntityService<T>,
+    entityService: es as UnifiedEntityService<T>,
     storageService: ss as FirebaseStorageService,
     initialState: initialState,
     autoSync: autoSync,

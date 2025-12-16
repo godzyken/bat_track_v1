@@ -22,9 +22,7 @@ class KanbanColumn extends ConsumerWidget {
       child: DragTarget<ChantierEtape>(
         onAcceptWithDetails: (details) {
           final updated = details.data.copyWith(statut: statut);
-          ref
-              .read(chantierEtapeServiceProvider)
-              .update(updated, details.data.id);
+          ref.read(chantierEtapeServiceProvider).save(updated);
           onDrop(updated); // Optionnel : notifie le parent
         },
         builder:

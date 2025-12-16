@@ -1,19 +1,4 @@
-import 'dart:developer' as developer;
-
-import 'package:async/async.dart';
-import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/widgets.dart';
-
-import '../../data/core/unified_model.dart';
-import '../../data/local/models/base/has_files.dart';
-import '../../data/local/models/documents/pieces_jointes.dart';
-import '../../data/local/services/hive_service.dart';
-import '../../data/local/services/service_type.dart';
-import '../../data/remote/services/storage_service.dart';
-import 'entity_sync_services.dart';
-
-class SyncedEntityService<T extends UnifiedModel> implements EntityServices<T> {
+/*class SyncedEntityService<T extends UnifiedModel> implements EntityServices<T> {
   static final _cacheTimestamps = <String, DateTime>{};
   static const Duration ttl = Duration(seconds: 60);
 
@@ -347,4 +332,4 @@ class SyncedEntityService<T extends UnifiedModel> implements EntityServices<T> {
     // TODO: implement getAllRaw
     throw UnimplementedError();
   }
-}
+}*/

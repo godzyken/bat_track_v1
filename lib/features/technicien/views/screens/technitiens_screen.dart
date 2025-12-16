@@ -37,7 +37,7 @@ class TechniciensScreen extends ConsumerWidget {
                     ref: ref,
                     role: user.role,
                     onSubmit: (technicien) async {
-                      await technicienService.save(technicien, technicien.id);
+                      await technicienService.save(technicien);
                     },
                     fromJson: Technicien.fromJson,
                     createEmpty: Technicien.mock,
@@ -50,7 +50,7 @@ class TechniciensScreen extends ConsumerWidget {
             ref: ref,
             role: user.role,
             onSubmit: (updated) async {
-              await technicienService.update(updated, technicien.id);
+              await technicienService.save(updated);
             },
             fromJson: Technicien.fromJson,
             createEmpty: Technicien.mock,

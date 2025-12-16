@@ -1,11 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/core/unified_model.dart';
-import '../../../data/local/providers/hive_provider.dart';
-import '../../../providers/hive_firebase_provider.dart';
-import '../../data/state_wrapper/wrappers.dart';
-import '../../notifiers/sync_entity_notifier.dart';
-
+/*
 class GenericEntityProviderFactory {
   GenericEntityProviderFactory._();
 
@@ -91,10 +86,11 @@ class GenericEntityProviderFactory {
 
   void clearCache() => _providerCache.clear();
 }
+*/
 
 extension RefX on WidgetRef {
-  AutoDisposeStateNotifierProvider<SyncEntityNotifier<T>, SyncedState<T>>
+  /*  AutoDisposeStateNotifierProvider<SyncEntityNotifier<T>, SyncedState<T>>
   syncEntity<T extends UnifiedModel>(String id) => GenericEntityProviderFactory
       .instance
-      .getSyncEntityNotifierProvider<T>(id);
+      .getSyncEntityNotifierProvider<T>(id);*/
 }

@@ -1,13 +1,18 @@
+import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
+
+import '../../core/services/unified_entity_service.dart';
 import '../../data/core/unified_model.dart';
 import '../../data/remote/services/cloud_flare_service.dart';
-import 'entity_service.dart';
 
 class CloudflareEntityService<T extends UnifiedModel>
-    implements EntityService<T> {
+    implements UnifiedEntityService<T> {
   final String collectionName;
   final T Function(Map<String, dynamic>) fromJson;
 
-  const CloudflareEntityService({
+  @override
+  final RemoteStorageService remoteStorage = CloudFlareService.instance;
+
+  CloudflareEntityService({
     required this.collectionName,
     required this.fromJson,
   });
@@ -22,9 +27,7 @@ class CloudflareEntityService<T extends UnifiedModel>
   }
 
   @override
-  Future<void> update(T item, String id) async {
-    await CloudFlareService.instance.saveRaw(collectionName, id, item.toJson());
-  }
+  Future<void> update(T item, String id) async => save(item, id);
 
   @override
   Future<void> delete(String id) async {
@@ -71,24 +74,6 @@ class CloudflareEntityService<T extends UnifiedModel>
   Future<void> clear() async => deleteAll();
 
   @override
-  Future<void> open() async {
-    // Firestore/Cloudflare n'a pas besoin d'ouverture explicite
-    return;
-  }
-
-  @override
-  Future<void> init() async {
-    // Pas d'init nécessaire ici
-    return;
-  }
-
-  @override
-  Future<void> closeAll() async {
-    // Pas de fermeture explicite
-    return;
-  }
-
-  @override
   Future<List<T>> where(bool Function(T) test) async {
     final all = await getAll();
     return all.where(test).toList();
@@ -115,15 +100,10 @@ class CloudflareEntityService<T extends UnifiedModel>
   @override
   Future<void> deleteByQuery(Map<String, dynamic> queryStr) async {
     if (queryStr.isEmpty) return;
-    final fieldName = queryStr.keys.first;
-    final value = queryStr.values.first;
 
-    final list = await getAll();
+    final list = await getByQuery(queryStr);
     for (final item in list) {
-      final json = item.toJson();
-      if (json[fieldName] == value) {
-        await delete(item.id);
-      }
+      await delete(item.id);
     }
   }
 
@@ -142,11 +122,12 @@ class CloudflareEntityService<T extends UnifiedModel>
         );
   }
 
+  static const _unsupportedLocal =
+      'Non supporté : ce service est purement Cloudflare (Cloud-Only).';
+
   @override
   Future<Map<String, dynamic>> getLocalRaw(String id) {
-    throw UnsupportedError(
-      'getLocalRaw n’est pas supporté pour StorageMode.cloudflare',
-    );
+    throw UnsupportedError(_unsupportedLocal);
   }
 
   @override
@@ -161,9 +142,7 @@ class CloudflareEntityService<T extends UnifiedModel>
 
   @override
   Future<void> saveLocalRaw(String id, Map<String, dynamic> data) {
-    throw UnsupportedError(
-      'saveLocalRaw n’est pas supporté pour StorageMode.cloudflare',
-    );
+    throw UnsupportedError(_unsupportedLocal);
   }
 
   @override
@@ -181,6 +160,96 @@ class CloudflareEntityService<T extends UnifiedModel>
   @override
   Stream<List<T>> watchByQuery(Map<String, dynamic> query) {
     // TODO: implement watchByQuery
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> close() {
+    // TODO: implement close
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> deleteLocal(String id) {
+    // TODO: implement deleteLocal
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> deleteRemote(String id) {
+    // TODO: implement deleteRemote
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<T>> getAllLocal() {
+    // TODO: implement getAllLocal
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<T>> getAllRemote() {
+    // TODO: implement getAllRemote
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<T?> getLocal(String id) {
+    // TODO: implement getLocal
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<T?> getRemote(String id) {
+    // TODO: implement getRemote
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> saveLocal(T entity) {
+    // TODO: implement saveLocal
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> saveRemote(T entity) {
+    // TODO: implement saveRemote
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> sync(T entity) {
+    // TODO: implement sync
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> syncAllFromRemote() {
+    // TODO: implement syncAllFromRemote
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> syncAllToRemote() {
+    // TODO: implement syncAllToRemote
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<T?> watch(String id) {
+    // TODO: implement watch
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<List<T>> watchLocal() {
+    // TODO: implement watchLocal
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<List<T>> watchRemote() {
+    // TODO: implement watchRemote
     throw UnimplementedError();
   }
 }

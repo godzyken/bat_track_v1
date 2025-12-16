@@ -216,9 +216,7 @@ class EntityCard<T extends UnifiedModel> extends ConsumerWidget {
             );
 
             if (selectedTechs != null) {
-              await ref
-                  .read(projetServiceProvider)
-                  .updateEntity(entity as Projet, entity.id);
+              await ref.read(projetServiceProvider).sync(entity as Projet);
             }
           },
         ),

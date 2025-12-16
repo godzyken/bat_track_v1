@@ -27,7 +27,7 @@ class TechniciensNotifier extends EntityListNotifier<Technicien> {
 
   Future<void> updateTechnicien(Technicien updated) async {
     final service = ref.read(technicienServiceProvider);
-    await service.update(updated, updated.id);
+    await service.save(updated);
     state = AsyncValue.data(await service.getAll());
   }
 
@@ -75,7 +75,7 @@ class TechniciensNotifier extends EntityListNotifier<Technicien> {
       updatedAt: technicien.updatedAt,
     );
 
-    await service.update(updated, updated.id);
+    await service.save(updated);
     state = AsyncValue.data(await service.getAll());
   }
 
@@ -109,7 +109,7 @@ class TechniciensNotifier extends EntityListNotifier<Technicien> {
       createdAt: technicien.createdAt,
     );
 
-    await service.update(updated, updated.id);
+    await service.save(updated);
     state = AsyncValue.data(await service.getAll());
   }
 }

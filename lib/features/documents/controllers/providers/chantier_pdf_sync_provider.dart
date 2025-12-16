@@ -7,15 +7,16 @@ import '../services/pdf_sync_service.dart';
 
 final chantierPdfSyncProvider =
     Provider.family<PdfSyncService<Chantier>, Chantier>((ref, chantier) {
-      final client = ref.read(
-        clientProvider(chantier.id),
-      ); // à récupérer depuis ref
-      final draft = ref.read(factureDraftProvider(chantier.id)); // idem
+      final clientAsync = ref.read(allClientsStreamProvider);
+
+      final client = clientAsync.value;
+
+      final draft = ref.read(allFacturesDraftStreamProvider); // idem
       return PdfSyncService<Chantier>(
         generator: ChantierPdfGenerator(
-          client: client!,
+          client: client!.first,
           documents: chantier.documents,
-          facture: draft!,
+          facture: draft.value!.first,
         ),
       );
     });

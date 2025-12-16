@@ -13,8 +13,7 @@ import 'package:open_filex/open_filex.dart';
 import '../../../../core/responsive/wrapper/responsive_card_layout.dart';
 import '../../../../core/responsive/wrapper/responsive_layout.dart';
 import '../../../../data/local/models/index_model_extention.dart';
-import '../../../../data/local/providers/hive_provider.dart';
-import '../../controllers/notifiers/chantier_notifier.dart';
+import '../../../../data/remote/providers/chantier_provider.dart';
 import '../widgets/etape_time_line.dart';
 
 class ChantierEtapeDetailScreen extends ConsumerWidget {
@@ -58,7 +57,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
 
         await ref
             .read(chantierAdvancedNotifierProvider(chantierId).notifier)
-            .addPieceJointe(etape.id, piece);
+            .addPieceJointe(piece);
       }
     } catch (_) {
       if (context.mounted) {
@@ -79,7 +78,12 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chantier = ref.watch(chantierProvider(chantierId));
+    final chantierAsync = ref.watch(
+      chantierAdvancedNotifierProvider(chantierId),
+    );
+
+    final chantier = chantierAsync.value;
+
     final etape = chantier?.etapes.firstWhere(
       (e) => e.id == etapeId,
       orElse: () => throw Exception('Étape introuvable'),

@@ -5,7 +5,7 @@ import 'package:implicitly_animated_reorderable_list_2/implicitly_animated_reord
 import 'package:implicitly_animated_reorderable_list_2/transitions.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
-import '../../../../data/local/providers/hive_provider.dart';
+import '../../../../data/remote/providers/chantier_provider.dart';
 
 class ChantiersEtapeKanbanInteractive extends ConsumerWidget {
   final List<ChantierEtape> etapes;
@@ -157,7 +157,7 @@ class ChantiersEtapeKanbanInteractive extends ConsumerWidget {
                                                               onPressed: () {
                                                                 final chantier =
                                                                     ref.read(
-                                                                      chantierProvider(
+                                                                      chantierAdvancedNotifierProvider(
                                                                         item.chantierId,
                                                                       ),
                                                                     );

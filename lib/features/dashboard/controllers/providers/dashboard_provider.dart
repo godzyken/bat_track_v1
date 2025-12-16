@@ -19,9 +19,9 @@ class DashboardData {
 final dashboardProvider = FutureProvider<DashboardData>((ref) async {
   final user = ref.watch(currentUserProvider).value;
 
-  final allProjets = await projetService.getAll();
-  final allChantiers = await chantierService.getAll();
-  final allInterventions = await interventionService.getAll();
+  final allProjets = await projetService.getAllRemote();
+  final allChantiers = await chantierService.getAllRemote();
+  final allInterventions = await interventionService.getAllRemote();
 
   List<Projet> projetsFiltered = [];
   List<Chantier> chantiersFiltered = [];

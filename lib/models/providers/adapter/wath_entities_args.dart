@@ -4,7 +4,7 @@ import '../../../data/core/unified_model.dart';
 import '../../services/logged_entity_service.dart';
 
 class WatchEntitiesArgs<T extends UnifiedModel> {
-  final ProviderListenable<LoggedEntityService<T>> serviceProvider;
+  final ProviderListenable<SafeAndLoggedEntityService<T>> serviceProvider;
   final String chantierId;
 
   const WatchEntitiesArgs({

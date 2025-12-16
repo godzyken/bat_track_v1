@@ -38,7 +38,7 @@ class ClientsScreen extends ConsumerWidget {
                     ref: ref,
                     role: user.role,
                     onSubmit: (client) async {
-                      await clientService.save(client, client.id);
+                      await clientService.save(client);
                     },
                     fromJson: Client.fromJson,
                     createEmpty: Client.mock,
@@ -51,7 +51,7 @@ class ClientsScreen extends ConsumerWidget {
             ref: ref,
             role: user.role,
             onSubmit: (updated) async {
-              await clientService.update(updated, client.id);
+              await clientService.sync(updated);
             },
             fromJson: Client.fromJson,
             createEmpty: Client.mock,

@@ -1,14 +1,6 @@
-import 'dart:convert';
-import 'dart:developer' as developer;
-import 'dart:io';
-
-import '../../data/core/unified_model.dart';
-import '../../data/local/services/service_type.dart';
-import '../../data/remote/services/storage_service.dart';
-
 /// Service de synchronisation fichiers/entités
-class FileSyncService<T extends UnifiedModel> {
-  final EntityServices<T> entityService; // Firestore ou Supabase
+/*class FileSyncService<T extends UnifiedModel> {
+  final UnifiedEntityService<T> entityService; // Firestore ou Supabase
   final StorageService storageService; // Hive, SQLite ou autre local
 
   FileSyncService({required this.entityService, required this.storageService});
@@ -19,7 +11,7 @@ class FileSyncService<T extends UnifiedModel> {
       developer.log('[SYNC] Pull ${T.toString()}...');
 
       final raw = await entityService.getAllRaw(
-        entityService.boxName,
+        entityService.collectionName,
         updatedAfter: updatedAfter,
         limit: limit,
       );
@@ -52,14 +44,14 @@ class FileSyncService<T extends UnifiedModel> {
         final item = entityService.fromJson(map);
 
         if (force) {
-          await entityService.update(item, item.id);
+          await entityService.sync(item);
         } else {
-          final remote = await entityService.getById(item.id);
+          final remote = await entityService.get(item.id);
           if (remote == null ||
               (item.updatedAt != null &&
                   remote.updatedAt != null &&
                   item.updatedAt!.isAfter(remote.updatedAt!))) {
-            await entityService.update(item, item.id);
+            await entityService.save(item);
           }
         }
       }
@@ -78,4 +70,4 @@ class FileSyncService<T extends UnifiedModel> {
     await push();
     developer.log('[SYNC] Merge terminé.');
   }
-}
+}*/

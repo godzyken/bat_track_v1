@@ -1,41 +1,39 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/features/chantier/views/widgets/chantier_extensions_widgets.dart';
-import 'package:bat_track_v1/models/data/state_wrapper/wrappers.dart';
-import 'package:bat_track_v1/models/notifiers/sync_entity_notifier.dart';
-import 'package:bat_track_v1/models/providers/synchrones/generic_entity_provider_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
+import '../../../../data/remote/providers/chantier_provider.dart';
 import '../../../dolibarr/views/widgets/dolibarr_section.dart';
 import '../../../dolibarr/views/widgets/sync_statu_bar.dart';
-import '../../controllers/providers/chantier_sync_provider.dart';
+import '../../controllers/notifiers/chantier_notifier.dart';
 
 class ChantierDetailScreen extends ConsumerWidget {
-  final Chantier chantier;
+  final String chantierId;
   final bool isClient;
   final bool isTechnicien;
   final String? userId;
 
   const ChantierDetailScreen({
     super.key,
-    required this.chantier,
+    required this.chantierId,
     this.isClient = false,
     this.isTechnicien = false,
     this.userId,
   });
 
-  bool get chantierModifiable {
+  bool chantierModifiable(Chantier chantier) {
     final now = DateTime.now();
     return chantier.dateFin!.isAfter(now) &&
         ['à faire', 'en cours'].contains(chantier.etat?.toLowerCase());
   }
 
-  bool canModifyEtape(ChantierEtape etape) {
+  bool canModifyEtape(ChantierEtape etape, Chantier chantier) {
     final now = DateTime.now();
-    if (isClient) return chantierModifiable;
+    if (isClient) return chantierModifiable(chantier);
     if (isTechnicien) {
       return etape.techniciens!.contains(userId) &&
           (etape.dateFin.isAfter(now));
@@ -43,7 +41,7 @@ class ChantierDetailScreen extends ConsumerWidget {
     return true; // admin ou autre
   }
 
-  bool get chantierEstTermine {
+  bool chantierEstTermine(Chantier chantier) {
     return chantier.etapes.every((e) => e.terminee) &&
         chantier.clientValide &&
         chantier.chefDeProjetValide &&
@@ -51,48 +49,47 @@ class ChantierDetailScreen extends ConsumerWidget {
         chantier.superUtilisateurValide;
   }
 
-  void _updateEtape(
-    ChantierEtape updatedEtape,
-    SyncEntityNotifier<Chantier> notifier,
-  ) {
-    final updatedList =
-        chantier.etapes
-            .map((e) => e.id == updatedEtape.id ? updatedEtape : e)
-            .toList();
-    notifier.update(chantier.copyWith(etapes: updatedList));
-  }
-
-  void _deleteEtape(String id, SyncEntityNotifier<Chantier> notifier) {
-    final updatedList = chantier.etapes.where((e) => e.id != id).toList();
-    notifier.update(chantier.copyWith(etapes: updatedList));
-  }
-
-  void _reorderEtapes(
-    List<ChantierEtape> reordered,
-    SyncEntityNotifier<Chantier> notifier,
-  ) {
-    notifier.update(chantier.copyWith(etapes: reordered));
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
     final dateFormat = DateFormat('dd/MM/yyyy');
-    final state = ref.watch(ref.syncEntity<Chantier>(chantier.id));
-    final notifier = ref.read(chantierSyncProvider(chantier).notifier);
 
-    final totalBudget = computeTotalBudget(chantier.etapes);
+    // ✅ NOUVEAU : Lecture du Notifier familial
+    final chantierAsync = ref.watch(
+      chantierAdvancedNotifierProvider(chantierId),
+    );
 
-    return switch (state) {
-      SyncedState<Chantier>(data: final chantier) => buildPopScope(
-        notifier,
-        chantier,
-        state,
-        dateFormat,
-        totalBudget,
-        context,
-      ),
-    };
+    // ✅ NOUVEAU : Lecture du Notifier pour les actions
+    // On lit le Notifier lui-même (pas la valeur) pour accéder aux méthodes
+    final notifier = ref.read(
+      chantierAdvancedNotifierProvider(chantierId).notifier,
+    );
+
+    return chantierAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => Center(child: Text('Erreur: $err')),
+      data: (chantier) {
+        if (chantier == null) {
+          return const Center(child: Text('Chantier non trouvé.'));
+        }
+
+        final totalBudget = computeTotalBudget(chantier.etapes);
+
+        // ✅ L'ancienne logique 'switch' est remplacée par 'chantierAsync.when'
+        return buildPopScope(
+          notifier, // Nouveau Notifier
+          chantier,
+          // L'état de synchro doit être lu séparément (voir point 2 ci-dessous)
+          // Pour l'instant, on laisse des valeurs par défaut
+          false, // isSyncing
+          false, // hasError
+          null, // lastSynced
+          dateFormat,
+          totalBudget,
+          context,
+        );
+      },
+    );
   }
 
   Widget buildSection(String title, Widget child) {
@@ -105,9 +102,11 @@ class ChantierDetailScreen extends ConsumerWidget {
   }
 
   PopScope<Object> buildPopScope(
-    SyncEntityNotifier<Chantier> notifier,
+    ChantierNotifier notifier,
     Chantier chantier,
-    SyncedState<Chantier> state,
+    bool isSyncing, // Simplifié
+    bool hasError, // Simplifié
+    DateTime? lastSynced,
     DateFormat dateFormat,
     Map<String, double> totalBudget,
     BuildContext context,
@@ -115,7 +114,7 @@ class ChantierDetailScreen extends ConsumerWidget {
     return PopScope(
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
-          await notifier.syncNow();
+          await notifier.recalculateFactureDraft();
         }
       },
       child: Scaffold(
@@ -133,13 +132,13 @@ class ChantierDetailScreen extends ConsumerWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: SyncStatusBar(
-                          isSyncing: state.isSyncing,
-                          hasError: state.hasError,
-                          lastSynced: state.lastSynced,
-                          onForceSync: notifier.syncNow,
+                          isSyncing: isSyncing,
+                          hasError: hasError,
+                          lastSynced: lastSynced,
+                          onForceSync: () => notifier.updateChantier(chantier),
                         ),
                       ),
-                      if (state.hasError)
+                      if (hasError)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16.0),
                           child: Text(
@@ -153,7 +152,9 @@ class ChantierDetailScreen extends ConsumerWidget {
                       // Infos Dolibarrr
                       buildSection(
                         "Connexion Dolibarr",
-                        DolibarrSection(onSync: () => notifier.syncNow()),
+                        DolibarrSection(
+                          onSync: () => notifier.updateChantier(chantier),
+                        ),
                       ),
                       const SizedBox(height: 16),
 
@@ -161,9 +162,9 @@ class ChantierDetailScreen extends ConsumerWidget {
                       buildSection(
                         "Informations générales",
                         ChantierCardInfo(
-                          chantier: state.data,
+                          chantier: chantier,
                           dateFormat: dateFormat,
-                          onChanged: notifier.update,
+                          onChanged: notifier.updateChantier,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -196,20 +197,21 @@ class ChantierDetailScreen extends ConsumerWidget {
                       // Étapes avec timeline interactive
                       buildSection(
                         "Étapes du chantier",
-                        chantierEstTermine
+                        chantierEstTermine(chantier)
                             ? ChantiersEtapeKanbanReadOnly(
                               etapes: chantier.etapes,
                             )
                             : ChantiersEtapeKanbanInteractive(
                               etapes: chantier.etapes,
-                              canEditEtape: canModifyEtape,
-                              onReorder:
-                                  (reordered) =>
-                                      _reorderEtapes(reordered, notifier),
-                              onDelete: (id) => _deleteEtape(id, notifier),
-                              onUpdate:
-                                  (updatedEtape) =>
-                                      _updateEtape(updatedEtape, notifier),
+                              canEditEtape:
+                                  (etape) => canModifyEtape(etape, chantier),
+                              onReorder: (reordered) {
+                                notifier.updateChantier(
+                                  chantier.copyWith(etapes: reordered),
+                                );
+                              },
+                              onDelete: notifier.deleteEtape,
+                              onUpdate: notifier.updateEtape,
                             ),
                       ),
                     ],
@@ -224,7 +226,7 @@ class ChantierDetailScreen extends ConsumerWidget {
           children: [
             FloatingActionButton.extended(
               heroTag: 'syncNow',
-              onPressed: notifier.syncNow,
+              onPressed: () => notifier.updateChantier(chantier),
               label: const Text("Forcer la synchro"),
               icon: const Icon(Icons.sync),
             ),

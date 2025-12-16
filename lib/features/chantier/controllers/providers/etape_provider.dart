@@ -2,10 +2,14 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
-import '../../../../data/local/providers/hive_provider.dart';
+import '../../../../data/remote/providers/chantier_provider.dart';
 
 final etapeProvider = Provider.family<ChantierEtape?, String>((ref, etapeId) {
-  final chantier = ref.watch(chantierNotifierProvider('chantierId'));
+  final chantierAsync = ref.watch(
+    chantierAdvancedNotifierProvider('chantierId'),
+  );
+
+  final chantier = chantierAsync.value;
   return chantier?.etapes.firstWhereOrNull((e) => e.id == etapeId);
 });
 
@@ -19,22 +23,38 @@ EtapeStatut getEtapeStatut(ChantierEtape e) {
   return EtapeStatut.aFaire;
 }
 
-final etapesParStatutProvider = FutureProvider.family<
-  Map<EtapeStatut, List<ChantierEtape>>,
+final etapesParStatutProvider = Provider.family<
+  AsyncValue<Map<EtapeStatut, List<ChantierEtape>>>,
   String
->((ref, chantierId) async {
-  final box = await ref.watch(chantierEtapeBoxProvider);
-  final etapes = box.values.where((e) => e.chantierId == chantierId).toList();
+>((ref, chantierId) {
+  final chantierAsync = ref.watch(chantierAdvancedNotifierProvider(chantierId));
 
-  final grouped = <EtapeStatut, List<ChantierEtape>>{
-    EtapeStatut.aFaire: [],
-    EtapeStatut.enCours: [],
-    EtapeStatut.terminee: [],
-  };
+  return chantierAsync.when(
+    loading: () => const AsyncValue.loading(),
+    error: (err, stack) => AsyncValue.error(err, stack),
+    data: (chantier) {
+      if (chantier == null) {
+        return const AsyncValue.data({
+          EtapeStatut.aFaire: [],
+          EtapeStatut.enCours: [],
+          EtapeStatut.terminee: [],
+        });
+      }
 
-  for (final e in etapes) {
-    grouped[getEtapeStatut(e)]!.add(e);
-  }
+      // On utilise les étapes chargées dans le Chantier
+      final etapes = chantier.etapes;
 
-  return grouped;
+      final grouped = <EtapeStatut, List<ChantierEtape>>{
+        EtapeStatut.aFaire: [],
+        EtapeStatut.enCours: [],
+        EtapeStatut.terminee: [],
+      };
+
+      for (final e in etapes) {
+        grouped[getEtapeStatut(e)]!.add(e);
+      }
+
+      return AsyncValue.data(grouped);
+    },
+  );
 });

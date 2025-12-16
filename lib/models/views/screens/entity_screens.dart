@@ -6,7 +6,7 @@ import '../../services/logged_entity_service.dart';
 
 class EntityScreen<T extends UnifiedModel> extends StatelessWidget {
   final String title;
-  final ProviderBase<LoggedEntityService<T>> serviceProvider;
+  final ProviderBase<SafeAndLoggedEntityService<T>> serviceProvider;
   final T Function() createEmpty;
 
   const EntityScreen({

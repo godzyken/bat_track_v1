@@ -1,18 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../core/services/unified_entity_service.dart';
 import '../../data/core/unified_model.dart';
-import '../../data/local/providers/hive_provider.dart';
-import '../services/entity_service.dart';
 
 abstract class EntityListNotifier<T extends UnifiedModel>
     extends AsyncNotifier<List<T>> {
-  late final EntityService<T> service;
+  late final UnifiedEntityService<T> service;
 
   @override
   Future<List<T>> build() async {
-    service = ref.read(entityServiceProvider<T>());
-    return service.getAll();
+    // service = ref.read(entityServiceProvider<T>());
+
+    return service.watchAll().first;
   }
 
   Future<void> add(T entity) async {
@@ -25,26 +25,26 @@ abstract class EntityListNotifier<T extends UnifiedModel>
 
     final alreadyExists = await service.exists(id);
     if (alreadyExists) {
-      await service.update(safeEntity, id);
+      await service.save(safeEntity);
     } else {
-      await service.save(safeEntity, id);
+      await service.save(safeEntity);
     }
 
-    state = AsyncValue.data(await service.getAll());
+    state = AsyncValue.data(await service.getAllRemote());
   }
 
   Future<void> save(T entity) async {
-    await service.save(entity, entity.id);
-    state = AsyncValue.data(await service.getAll());
+    await service.save(entity);
+    state = AsyncValue.data(await service.getAllRemote());
   }
 
   Future<void> updateEntity(T entity) async {
-    await service.update(entity, entity.id);
-    state = AsyncValue.data(await service.getAll());
+    await service.save(entity);
+    state = AsyncValue.data(await service.getAllRemote());
   }
 
   Future<void> delete(String id) async {
     await service.delete(id);
-    state = AsyncValue.data(await service.getAll());
+    state = AsyncValue.data(await service.getAllRemote());
   }
 }

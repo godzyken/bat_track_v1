@@ -1,16 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
-
-import '../../../data/core/unified_model.dart';
-import '../../notifiers/entity_notifier.dart';
-import '../../services/entity_service.dart';
-
-final entityNotifierProviderFamily = <Type, dynamic>{};
+/*final entityNotifierProviderFamily = <Type, dynamic>{};
 
 StateNotifierProviderFamily<EntityNotifier<T>, T?, String>
 createEntityNotifierProvider<T extends UnifiedModel>({
   required String hiveBoxName,
-  required Provider<EntityService<T>> serviceProvider,
+  required Provider<UnifiedEntityService<T>> serviceProvider,
 }) {
   final provider = StateNotifierProvider.family<EntityNotifier<T>, T?, String>((
     ref,
@@ -25,4 +18,15 @@ createEntityNotifierProvider<T extends UnifiedModel>({
   entityNotifierProviderFamily[T] = provider;
 
   return provider;
-}
+}*/
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../data/core/unified_model.dart';
+
+typedef EntityNotifierProviderFamily<T extends UnifiedModel> =
+    AsyncNotifierProviderFamily<
+      FamilyAsyncNotifier<T?, String>, // Le Notifier gère T?
+      T?,
+      String // L'ID pour la famille
+    >;

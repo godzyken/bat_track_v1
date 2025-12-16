@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/responsive/wrapper/responsive_card_layout.dart';
 import '../../../../data/local/models/index_model_extention.dart';
+import '../../../../data/remote/providers/chantier_provider.dart';
 import '../../../../models/views/widgets/entity_form.dart';
-import '../../controllers/notifiers/chantier_notifier.dart';
 import '../widgets/etape_card.dart';
 import '../widgets/piece_card.dart';
 
@@ -64,12 +64,12 @@ class ChantierEtapesScreen extends ConsumerWidget {
     final chantier = ref.watch(chantierAdvancedNotifierProvider(chantierId));
     final info = context.responsiveInfo(ref);
 
-    if (chantier == null) {
+    if (chantier.value == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final models = chantier.etapes;
-    final pieces = chantier.etapes.expand((e) => e.pieces).toList();
+    final models = chantier.value?.etapes;
+    final pieces = chantier.value?.etapes.expand((e) => e.pieces).toList();
 
     return Scaffold(
       appBar: AppBar(title: const Text("Étapes & Pièces")),
@@ -82,7 +82,7 @@ class ChantierEtapesScreen extends ConsumerWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
-          if (models.isEmpty)
+          if (models!.isEmpty)
             const Center(child: Text("Aucune étape pour l'instant"))
           else if (info.isTablet || info.isDesktop)
             Column(
@@ -126,7 +126,7 @@ class ChantierEtapesScreen extends ConsumerWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
-          if (pieces.isEmpty)
+          if (pieces!.isEmpty)
             const Center(child: Text("Aucune pièce définie"))
           else
             GridView.count(

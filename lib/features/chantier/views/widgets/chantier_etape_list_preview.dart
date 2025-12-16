@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
-import '../../../../data/local/providers/hive_provider.dart';
+import '../../../../data/remote/providers/chantier_provider.dart';
 import '../../../../models/views/widgets/entity_etape_form.dart';
 
 class ChantiersEtapeListPreview extends ConsumerWidget {
@@ -81,7 +81,7 @@ class ChantiersEtapeListPreview extends ConsumerWidget {
                     ),
                     onTap: () {
                       final chantier = ref.read(
-                        chantierProvider(etape.chantierId),
+                        chantierAdvancedNotifierProvider(etape.chantierId),
                       );
                       context.goNamed(
                         'chantier-etape-detail',

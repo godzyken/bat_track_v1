@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/services/service_type.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/core/unified_model.dart';
@@ -14,7 +15,7 @@ AutoDisposeProvider<Stream<List<T>>> watchVisibleEntitiesProvider<
     if (user == null) return const Stream.empty();
 
     final service = ref.watch(args.serviceProvider);
-    return service.watchByChantier(args.chantierId).map((entities) {
+    return service.watchByProjects(args.chantierId).map((entities) {
       final u = AppUser(
         uid: user.id,
         name: user.name,

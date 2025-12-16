@@ -6,17 +6,17 @@ import 'dart:io';
 import 'package:bat_track_v1/data/remote/services/base_storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/services/unified_entity_service.dart';
 import '../../data/core/unified_model.dart';
 import '../../data/local/models/base/has_acces_control.dart';
 import '../../data/remote/services/firebase_storage_service.dart';
 import '../../data/remote/services/storage_service.dart';
 import '../data/maperror/proxy.dart';
 import '../data/state_wrapper/wrappers.dart';
-import '../services/entity_service.dart';
 
 class SyncEntityNotifier<T extends UnifiedModel>
     extends StateNotifier<SyncedState<T>> {
-  final EntityService<T> entityService;
+  final UnifiedEntityService<T> entityService;
   final BaseStorageService<File> storageService;
   final bool autoSync;
   Timer? _debounceTimer;
@@ -33,9 +33,9 @@ class SyncEntityNotifier<T extends UnifiedModel>
     state = state.copyWith(data: updated);
 
     if (updated.id.isEmpty) {
-      await entityService.save(updated, state.data.id);
+      await entityService.save(updated);
     } else {
-      await entityService.update(updated, updated.id);
+      await entityService.sync(updated);
     }
 
     if (autoSync) {
@@ -124,7 +124,7 @@ class SyncEntityNotifier<T extends UnifiedModel>
 class SyncEntityNotifierDebug<T extends UnifiedModel>
     extends SyncEntityNotifier<T> {
   SyncEntityNotifierDebug({
-    required EntityService<T> entityService,
+    required UnifiedEntityService<T> entityService,
     required StorageService storageService,
     required super.initialState,
     super.autoSync,
@@ -132,12 +132,12 @@ class SyncEntityNotifierDebug<T extends UnifiedModel>
     CallInterceptor? interceptor,
   }) : super(
          entityService:
-             DebugProxy<EntityService<T>>(
+             DebugProxy<UnifiedEntityService<T>>(
                    entityService,
                    logFilter: logFilter,
                    interceptor: interceptor,
                  )
-                 as EntityService<T>,
+                 as UnifiedEntityService<T>,
          storageService:
              DebugProxy<StorageService>(
                    storageService,

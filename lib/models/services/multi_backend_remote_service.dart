@@ -1,7 +1,6 @@
 import 'package:async/async.dart';
 import 'package:bat_track_v1/data/local/services/service_type.dart';
 import 'package:bat_track_v1/models/services/firestore_entity_service.dart';
-import 'package:bat_track_v1/models/services/supabase_entity_service.dart';
 
 import '../../data/core/unified_model.dart';
 import 'cloud_flare_entity_service.dart';
@@ -13,7 +12,6 @@ class MultiBackendRemoteService<T extends UnifiedModel>
   final List<StorageMode> enabledBackends;
   final FirestoreEntityService<T>? firestoreService;
   final FirebaseEntityService<T>? firebaseService;
-  final SupabaseEntityService<T>? supabaseService;
   final CloudflareEntityService<T>? cloudflareService;
   // TODO: Ajouter DolibarrRemoteService<T>? dolibarrService;
 
@@ -21,7 +19,6 @@ class MultiBackendRemoteService<T extends UnifiedModel>
     required this.enabledBackends,
     this.firestoreService,
     this.firebaseService,
-    this.supabaseService,
     this.cloudflareService,
   });
 
@@ -32,10 +29,6 @@ class MultiBackendRemoteService<T extends UnifiedModel>
     if (enabledBackends.contains(StorageMode.firestore) &&
         firestoreService != null) {
       futures.add(firestoreService!.save(item, id));
-    }
-    if (enabledBackends.contains(StorageMode.supabase) &&
-        supabaseService != null) {
-      futures.add(supabaseService!.save(item, id));
     }
     if (enabledBackends.contains(StorageMode.firebase) &&
         firebaseService != null) {
@@ -55,9 +48,6 @@ class MultiBackendRemoteService<T extends UnifiedModel>
       if (enabledBackends.contains(StorageMode.firestore) &&
           firestoreService != null)
         firestoreService!,
-      if (enabledBackends.contains(StorageMode.supabase) &&
-          supabaseService != null)
-        supabaseService!,
       if (enabledBackends.contains(StorageMode.firebase) &&
           firebaseService != null)
         firebaseService!,
@@ -67,7 +57,7 @@ class MultiBackendRemoteService<T extends UnifiedModel>
     ];
 
     for (final backend in backends) {
-      final result = await backend.getById(id);
+      final result = await backend.get(id);
       if (result != null) return result;
     }
 
@@ -80,9 +70,6 @@ class MultiBackendRemoteService<T extends UnifiedModel>
       if (enabledBackends.contains(StorageMode.firestore) &&
           firestoreService != null)
         firestoreService!,
-      if (enabledBackends.contains(StorageMode.supabase) &&
-          supabaseService != null)
-        supabaseService!,
       if (enabledBackends.contains(StorageMode.firebase) &&
           firebaseService != null)
         firebaseService!,
@@ -92,8 +79,8 @@ class MultiBackendRemoteService<T extends UnifiedModel>
     ];
 
     for (final backend in backends) {
-      final result = await backend.getAll();
-      if (result.isNotEmpty) return result;
+      final result = backend.watchAll();
+      return result.first;
     }
 
     return [];
@@ -106,10 +93,6 @@ class MultiBackendRemoteService<T extends UnifiedModel>
     if (enabledBackends.contains(StorageMode.firestore) &&
         firestoreService != null) {
       futures.add(firestoreService!.delete(id));
-    }
-    if (enabledBackends.contains(StorageMode.supabase) &&
-        supabaseService != null) {
-      futures.add(supabaseService!.delete(id));
     }
     if (enabledBackends.contains(StorageMode.firebase) &&
         firebaseService != null) {
@@ -130,10 +113,6 @@ class MultiBackendRemoteService<T extends UnifiedModel>
     if (enabledBackends.contains(StorageMode.firestore) &&
         firestoreService != null) {
       streams.add(firestoreService!.watchAll());
-    }
-    if (enabledBackends.contains(StorageMode.supabase) &&
-        supabaseService != null) {
-      streams.add(supabaseService!.watchAll());
     }
     if (enabledBackends.contains(StorageMode.firebase) &&
         firebaseService != null) {

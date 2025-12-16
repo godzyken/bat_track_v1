@@ -9,7 +9,6 @@ import 'package:bat_track_v1/models/services/cloud_flare_entity_service.dart';
 import 'package:bat_track_v1/models/services/firebase_entity_service.dart';
 import 'package:bat_track_v1/models/services/firestore_entity_service.dart';
 import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapter.dart';
-import 'package:bat_track_v1/models/services/supabase_entity_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -246,11 +245,6 @@ class SyncServiceFactory {
       collectionPath: collectionPath,
     );
 
-    final supabaseService = SupabaseEntityService<T>(
-      table: collectionPath,
-      fromJson: fromJson,
-    );
-
     final cloudFlareService = CloudflareEntityService<T>(
       collectionName: collectionPath,
       fromJson: fromJson,
@@ -260,7 +254,6 @@ class SyncServiceFactory {
       enabledBackends: backends,
       firestoreService: firestoreService,
       firebaseService: firebaseService,
-      supabaseService: supabaseService,
       cloudflareService: cloudFlareService,
     );
 
@@ -311,9 +304,14 @@ abstract class SyncableEntityService<T extends UnifiedModel>
 }
 
 /// Provider générique pour construire un EntitySyncService
-Provider<EntitySyncService<T>> entitySyncServiceProvider<
-  T extends UnifiedModel
->(String boxName, T Function(Map<String, dynamic>) fromJson) {
+Provider<EntitySyncService<T>>
+entitySyncServiceProvider<T extends UnifiedModel>(
+  String boxName,
+  T Function(Map<String, dynamic>) fromJson, {
+  // Ajout d'arguments pour configurer les backends si nécessaire
+  List<StorageMode> backends = const [StorageMode.firestore],
+  Query<Map<String, dynamic>> Function(dynamic)? queryBuilder,
+}) {
   return Provider<EntitySyncService<T>>((ref) {
     final local = HiveEntityService<T>(boxName: boxName, fromJson: fromJson);
     final remote = RemoteEntityServiceAdapter<T>(

@@ -14,7 +14,7 @@ final chantierInitialProvider = FutureProvider.family<Chantier, String>((
   id,
 ) async {
   final chantierService = ref.watch(chantierServiceProvider);
-  final chantier = await chantierService.getById(id);
+  final chantier = await chantierService.get(id);
 
   return chantier?.id == id
       ? Chantier(

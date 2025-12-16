@@ -5,9 +5,9 @@ import 'logged_entity_service.dart';
 
 class DashboardService {
   final AppUser user;
-  final LoggedEntityService<Projet> projetService;
-  final LoggedEntityService<Chantier> chantierService;
-  final LoggedEntityService<Intervention> interventionService;
+  final SafeAndLoggedEntityService<Projet> projetService;
+  final SafeAndLoggedEntityService<Chantier> chantierService;
+  final SafeAndLoggedEntityService<Intervention> interventionService;
 
   DashboardService({
     required this.user,

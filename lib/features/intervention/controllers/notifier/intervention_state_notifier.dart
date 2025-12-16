@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/core/services/unified_entity_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
@@ -24,7 +25,7 @@ class InterventionState {
 }
 
 class InterventionStateNotifier extends StateNotifier<InterventionState> {
-  final EntityServices<Intervention> interventionService;
+  final UnifiedEntityService<Intervention> interventionService;
 
   InterventionStateNotifier(this.interventionService)
     : super(InterventionState()) {
@@ -35,7 +36,7 @@ class InterventionStateNotifier extends StateNotifier<InterventionState> {
     try {
       state = state.copyWith(isLoading: true, error: null);
 
-      final interventions = await interventionService.getAll();
+      final interventions = await interventionService.getAllRemote();
 
       final Map<String, int> stats = {
         'Terminée': 0,
