@@ -2,7 +2,6 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/data/local/models/base/access_policy_interface.dart';
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
-import 'package:bat_track_v1/features/chantier/controllers/providers/chantier_sync_provider.dart';
 import 'package:bat_track_v1/features/documents/controllers/providers/facture_list_provider.dart';
 import 'package:bat_track_v1/features/documents/controllers/providers/pdr_generator_provider.dart';
 import 'package:bat_track_v1/models/providers/synchrones/facture_sync_provider.dart';
@@ -103,7 +102,7 @@ class FacturesScreen extends ConsumerWidget {
                     }
                   },
                   onSubmit: (updated) async {
-                    await ref.read(invoiceSyncServiceProvider).syncOne(updated);
+                    await ref.read(factureSyncServiceProvider).syncOne(updated);
                   },
                   createEmpty: () => facture,
                 ),
@@ -132,7 +131,7 @@ class FacturesScreen extends ConsumerWidget {
                 (_) => EntityForm<Facture>(
                   fromJson: (json) => Facture.fromJson(json),
                   onSubmit: (facture) async {
-                    await ref.read(invoiceSyncServiceProvider).syncOne(facture);
+                    await ref.read(factureSyncServiceProvider).syncOne(facture);
                   },
                   createEmpty: () => Facture.mock(),
                 ),

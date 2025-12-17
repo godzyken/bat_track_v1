@@ -13,7 +13,6 @@ class MultiBackendRemoteService<T extends UnifiedModel>
   final FirestoreEntityService<T>? firestoreService;
   final FirebaseEntityService<T>? firebaseService;
   final CloudflareEntityService<T>? cloudflareService;
-  // TODO: Ajouter DolibarrRemoteService<T>? dolibarrService;
 
   MultiBackendRemoteService({
     required this.enabledBackends,

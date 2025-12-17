@@ -6,6 +6,7 @@ import '../../../../data/local/providers/hive_provider.dart';
 import '../../../../data/local/services/service_type.dart';
 import '../../../../models/data/state_wrapper/wrappers.dart';
 import '../../../../models/notifiers/sync_entity_notifier.dart';
+import '../../../../models/providers/synchrones/facture_sync_provider.dart';
 import '../../../../models/services/entity_sync_services.dart';
 import '../../../auth/data/providers/current_user_provider.dart';
 
@@ -99,11 +100,6 @@ final chantierEtapeSyncServiceProvider =
       'chantierEtapes',
       ChantierEtape.fromJson,
     );
-
-final factureSyncServiceProvider = entitySyncServiceProvider<Facture>(
-  'factures',
-  Facture.fromJson,
-);
 
 final projetSyncServiceProvider = entitySyncServiceProvider<Projet>(
   'projets',

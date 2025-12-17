@@ -5,6 +5,7 @@ import '../../../data/remote/services/dolibarr_services.dart';
 import '../../../features/auth/data/providers/current_user_provider.dart';
 import '../../../features/chantier/controllers/providers/chantier_sync_provider.dart';
 import '../../providers/asynchrones/error_logger_provider.dart';
+import '../../providers/synchrones/facture_sync_provider.dart';
 
 extension UserImportPermissions on UserModel {
   bool get canImportClients => role.can('import_clients');

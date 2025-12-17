@@ -276,9 +276,8 @@ Future<void> syncAllEntitiesFromFirestore(Ref ref) async {
     ref.read(clientSyncServiceProvider).syncFromRemote(),
     ref.read(interventionSyncServiceProvider).syncFromRemote(),
     ref.read(pieceSyncServiceProvider).syncFromRemote(),
-    ref.read(factureSyncServiceProvider).syncFromRemote(),
     ref.read(projetSyncServiceProvider).syncFromRemote(),
-    ref.read(invoiceSyncServiceProvider).syncFromRemote(),
+    ref.read(factureSyncServiceProvider).syncFromRemote(),
   ];
 
   await Future.wait(syncs);

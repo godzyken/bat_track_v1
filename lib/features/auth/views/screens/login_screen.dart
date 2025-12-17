@@ -2,7 +2,7 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../models/providers/asynchrones/login_provider.dart';
+import '../../../../core/providers/login_providers.dart';
 import '../../data/repository/auth_repository.dart';
 import '../widgets/role_selector.dart';
 
@@ -33,7 +33,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> login(BuildContext context) async {
-    final role = ref.read(selectedRoleProvider);
+    final role = ref.read(selectedRoleNotifierProvider);
     if (role == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Veuillez sélectionner un rôle")),
@@ -43,7 +43,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (!formKey.currentState!.validate()) return;
 
-    ref.read(loginLoadingProvider.notifier).state = true;
+    ref.read(loginLoadingNotifierProvider.notifier).setLoading(true);
 
     try {
       await ref
@@ -56,13 +56,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ).showSnackBar(SnackBar(content: Text("Erreur : $e")));
       }
     } finally {
-      ref.read(loginLoadingProvider.notifier).state = false;
+      ref.read(loginLoadingNotifierProvider.notifier).setLoading(false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final loading = ref.watch(loginLoadingProvider);
+    final loading = ref.watch(loginLoadingNotifierProvider);
     final info = context.responsiveInfo(ref);
     final isWide = info.isTablet || info.isDesktop;
 

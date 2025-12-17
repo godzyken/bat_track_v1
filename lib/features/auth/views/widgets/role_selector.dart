@@ -2,15 +2,15 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/login_providers.dart';
 import '../../../../data/local/models/utilisateurs/user.dart';
-import '../../../../models/providers/asynchrones/login_provider.dart';
 
 class RoleSelector extends ConsumerWidget {
   const RoleSelector({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedRole = ref.watch(selectedRoleProvider);
+    final selectedRole = ref.watch(selectedRoleNotifierProvider);
     final roles = UserRole.values;
     final info = context.responsiveInfo(ref);
 
@@ -36,7 +36,9 @@ class RoleSelector extends ConsumerWidget {
         final isSelected = selectedRole == role;
 
         return GestureDetector(
-          onTap: () => ref.read(selectedRoleProvider.notifier).state = role,
+          onTap:
+              () =>
+                  ref.read(selectedRoleNotifierProvider.notifier).setRole(role),
           child: AnimatedScale(
             scale: isSelected ? 1.05 : 1.0,
             duration: const Duration(milliseconds: 200),

@@ -2,6 +2,7 @@ import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 
@@ -51,30 +52,4 @@ final usersByRoleProvider = FutureProvider.family<List<UserModel>, String>((
 /// Fournisseur du flux d'authentification
 final firebaseUserProvider = StreamProvider<User?>((ref) {
   return ref.watch(firebaseAuthProvider).authStateChanges();
-});
-
-/// Fournisseur de AppUser (convertit FirebaseUser -> AppUser)
-final appUserProvider = FutureProvider<AppUser>((ref) async {
-  final firebaseUser = await ref.watch(firebaseUserProvider.future);
-  if (firebaseUser == null) {
-    return AppUser.empty();
-  }
-
-  final userDoc =
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(firebaseUser.uid)
-          .get();
-
-  if (!userDoc.exists) {
-    return AppUser(
-      uid: firebaseUser.uid,
-      role: 'client',
-      email: firebaseUser.email,
-      name: firebaseUser.displayName ?? '',
-      createdAt: firebaseUser.metadata.creationTime ?? DateTime.now(),
-    );
-  }
-
-  return AppUser.fromJson(userDoc.data()!);
 });
