@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/models/extensions/budget_extentions.dart';
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -9,7 +10,7 @@ part 'chantier.freezed.dart';
 part 'chantier.g.dart';
 
 @freezed
-class Chantier
+sealed class Chantier
     with _$Chantier, AccessControlMixin, ValidationMixin
     implements UnifiedModel {
   const Chantier._();
@@ -36,12 +37,15 @@ class Chantier
     @Default(false) bool techniciensValides,
     @Default(false) bool superUtilisateurValide,
     @Default(false) bool isCloudOnly,
+    double? remiseParDefaut, // Ajout
+    @Default(20.0) double tauxTVAParDefaut, // Ajout (ex: 20%)
   }) = _Chantier;
 
-  @override
+  /// Génération JSON
   factory Chantier.fromJson(Map<String, dynamic> json) =>
       _$ChantierFromJson(json);
 
+  /// Mock
   factory Chantier.mock() => Chantier(
     id: const Uuid().v4(),
     nom: 'Villa Categate',
@@ -50,6 +54,18 @@ class Chantier
     dateDebut: DateTime.now(),
   );
 
+  /// 🔹 Getters concrets pour les mixins
+  @override
+  String? get ownerId => chefDeProjetId;
+
+  @override
+  bool get isUpdated => updatedAt != null;
+
+  /// 🔹 Copier avec nouvel ID
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
+
+  /// 🔹 Méthode de parsing sécurisé si besoin
   factory Chantier.fromJsonSafe(Map<String, dynamic> json, {ImportLog? log}) {
     try {
       return Chantier(
@@ -76,19 +92,15 @@ class Chantier
         ),
         etat: json['etat'],
         technicienIds: List<String>.from(json['technicienIds'] ?? []),
-        documents: [],
-        // à parser si nécessaire
-        etapes: [],
-        // à parser si nécessaire
+        documents: [], // parser si nécessaire
+        etapes: [], // parser si nécessaire
         commentaire: json['commentaire'],
-        budgetPrevu:
-            (json['budgetPrevu'] is num)
-                ? (json['budgetPrevu'] as num).toDouble()
-                : null,
-        budgetReel:
-            (json['budgetReel'] is num)
-                ? (json['budgetReel'] as num).toDouble()
-                : null,
+        budgetPrevu: (json['budgetPrevu'] is num)
+            ? (json['budgetPrevu'] as num).toDouble()
+            : null,
+        budgetReel: (json['budgetReel'] is num)
+            ? (json['budgetReel'] as num).toDouble()
+            : null,
         interventions: [],
         chefDeProjetId: json['chefDeProjetId'],
         clientValide: json['clientValide'] ?? false,
@@ -103,10 +115,12 @@ class Chantier
     }
   }
 
+  /// Vérifie si toutes les parties ont validé ce chantier
   @override
-  bool get isUpdated => updatedAt != null;
-
-  @override
-  @override
-  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
+  bool get toutesPartiesOntValide => ValidationHelper.computeValidationStatus(
+    clientValide: clientValide,
+    chefDeProjetValide: chefDeProjetValide,
+    techniciensValides: techniciensValides,
+    superUtilisateurValide: superUtilisateurValide,
+  );
 }

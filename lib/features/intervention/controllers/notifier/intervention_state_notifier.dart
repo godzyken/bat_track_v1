@@ -1,6 +1,7 @@
 import 'package:bat_track_v1/core/services/unified_entity_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../data/local/models/entities/intervention_entity.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/services/service_type.dart';
 
@@ -25,7 +26,8 @@ class InterventionState {
 }
 
 class InterventionStateNotifier extends StateNotifier<InterventionState> {
-  final UnifiedEntityService<Intervention> interventionService;
+  final UnifiedEntityService<Intervention, InterventionEntity>
+  interventionService;
 
   InterventionStateNotifier(this.interventionService)
     : super(InterventionState()) {

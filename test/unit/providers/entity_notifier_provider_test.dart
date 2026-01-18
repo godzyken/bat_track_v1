@@ -1,5 +1,7 @@
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:bat_track_v1/data/local/providers/hive_provider.dart';
+import 'package:bat_track_v1/features/chantier/controllers/providers/chantier_sync_provider.dart';
+import 'package:bat_track_v1/models/providers/asynchrones/generic_adapter_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -20,7 +22,7 @@ void main() {
     group('CRUD Operations via Notifier', () {
       testProvider<AsyncValue<List<Projet>>>(
         'should handle create operation',
-        provider: projetNotifierProvider,
+        provider: allProjectsProvider,
 
         overrides: [projetServiceProvider.overrideWith((ref) => mockService)],
 
@@ -41,21 +43,20 @@ void main() {
           await notifier.create(testProjets[0]);
         },
 
-        expect:
-            () => [
-              isA<AsyncLoading<List<Projet>>>(),
-              predicate<AsyncValue<List<Projet>>>(
-                (state) => state.hasValue && state.value!.isEmpty,
-                'Initial empty state',
-              ),
-              predicate<AsyncValue<List<Projet>>>(
-                (state) =>
-                    state.hasValue &&
-                    state.value!.length == 1 &&
-                    state.value!.first.id == testProjets[0].id,
-                'State after creation',
-              ),
-            ],
+        expect: () => [
+          isA<AsyncLoading<List<Projet>>>(),
+          predicate<AsyncValue<List<Projet>>>(
+            (state) => state.hasValue && state.value!.isEmpty,
+            'Initial empty state',
+          ),
+          predicate<AsyncValue<List<Projet>>>(
+            (state) =>
+                state.hasValue &&
+                state.value!.length == 1 &&
+                state.value!.first.id == testProjets[0].id,
+            'State after creation',
+          ),
+        ],
       );
 
       testProvider<AsyncValue<List<Projet>>>(
@@ -87,22 +88,19 @@ void main() {
           await notifier.update(updatedProjet);
         },
 
-        expect:
-            () => [
-              isA<AsyncLoading<List<Projet>>>(),
-              predicate<AsyncValue<List<Projet>>>(
-                (state) =>
-                    state.hasValue &&
-                    state.value!.first.nom == testProjets[0].nom,
-                'Initial state',
-              ),
-              predicate<AsyncValue<List<Projet>>>(
-                (state) =>
-                    state.hasValue &&
-                    state.value!.first.nom == 'Projet Modifié',
-                'State after update',
-              ),
-            ],
+        expect: () => [
+          isA<AsyncLoading<List<Projet>>>(),
+          predicate<AsyncValue<List<Projet>>>(
+            (state) =>
+                state.hasValue && state.value!.first.nom == testProjets[0].nom,
+            'Initial state',
+          ),
+          predicate<AsyncValue<List<Projet>>>(
+            (state) =>
+                state.hasValue && state.value!.first.nom == 'Projet Modifié',
+            'State after update',
+          ),
+        ],
       );
 
       testProvider<AsyncValue<List<Projet>>>(
@@ -126,18 +124,17 @@ void main() {
           await notifier.delete(testProjets[0].id);
         },
 
-        expect:
-            () => [
-              isA<AsyncLoading<List<Projet>>>(),
-              predicate<AsyncValue<List<Projet>>>(
-                (state) => state.hasValue && state.value!.length == 1,
-                'State with one projet',
-              ),
-              predicate<AsyncValue<List<Projet>>>(
-                (state) => state.hasValue && state.value!.isEmpty,
-                'State after deletion',
-              ),
-            ],
+        expect: () => [
+          isA<AsyncLoading<List<Projet>>>(),
+          predicate<AsyncValue<List<Projet>>>(
+            (state) => state.hasValue && state.value!.length == 1,
+            'State with one projet',
+          ),
+          predicate<AsyncValue<List<Projet>>>(
+            (state) => state.hasValue && state.value!.isEmpty,
+            'State after deletion',
+          ),
+        ],
       );
     });
 
@@ -166,14 +163,13 @@ void main() {
           }
         },
 
-        expect:
-            () => [
-              isA<AsyncLoading<List<Projet>>>(),
-              predicate<AsyncValue<List<Projet>>>(
-                (state) => state.hasValue && state.value!.isEmpty,
-                'Should maintain empty state after failed creation',
-              ),
-            ],
+        expect: () => [
+          isA<AsyncLoading<List<Projet>>>(),
+          predicate<AsyncValue<List<Projet>>>(
+            (state) => state.hasValue && state.value!.isEmpty,
+            'Should maintain empty state after failed creation',
+          ),
+        ],
       );
     });
   });

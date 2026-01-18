@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/models/projets/projet_extension.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
@@ -13,8 +14,9 @@ class ProjetListNotifier extends StateNotifier<AsyncValue<List<Projet>>> {
   void _init() {
     final firestore = ref.read(firestoreProvider);
     firestore.collection('projects').snapshots().listen((snapshot) {
-      final projets =
-          snapshot.docs.map((doc) => Projet.fromJson(doc.data())).toList();
+      final projets = snapshot.docs
+          .map((doc) => Projet.fromJson(doc.data()))
+          .toList();
       state = AsyncValue.data(projets);
     });
   }

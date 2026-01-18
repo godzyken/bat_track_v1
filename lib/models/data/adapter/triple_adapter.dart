@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../data/core/unified_model.dart';
@@ -40,8 +40,9 @@ class TripleAdapter<T extends UnifiedModel> {
   }
 
   Future<List<T>> fetchFromFirebase() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection(collectionPath).get();
+    final snapshot = await FirebaseFirestore.instance
+        .collection(collectionPath)
+        .get();
     return snapshot.docs
         .map((doc) => fromJson({...doc.data(), "id": doc.id}))
         .toList();

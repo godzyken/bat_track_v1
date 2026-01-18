@@ -4,12 +4,13 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/unified_model.dart';
+import '../extensions/budget_extentions.dart';
 
 part 'facture_draft.freezed.dart';
 part 'facture_draft.g.dart';
 
 @freezed
-class FactureDraft
+sealed class FactureDraft
     with _$FactureDraft, AccessControlMixin, ValidationMixin
     implements UnifiedModel {
   const factory FactureDraft({
@@ -32,21 +33,21 @@ class FactureDraft
       _$FactureDraftFromJson(json);
 
   // --- Getters calculés ---
-  double get totalHT => lignesManuelles.fold(
+  double get totalHT =>
+      lignesManuelles.fold(0.0, (sum, ligne) => sum + ligne.totalLigneHT);
+
+  double get totalTVA => lignesManuelles.fold(
     0.0,
-    (sum, ligne) => sum + ligne.montant * ligne.quantite,
+    (sum, ligne) => sum + (ligne.totalLigneHT * (ligne.tauxTVA / 100)),
   );
 
-  double get remiseAmount => remise;
-
-  double get totalApresRemise => totalHT - remiseAmount;
-
-  double get tvaAmount => totalApresRemise * (tauxTVA / 100.0);
-
-  double get totalTTC => totalApresRemise + tvaAmount;
+  double get totalTTC => totalHT + tauxTVA;
 
   @override
   String get id => factureId;
+
+  @override
+  String? get ownerId => clientId;
 
   @override
   DateTime? get updatedAt => dateDerniereModification;
@@ -69,14 +70,11 @@ class FactureDraft
   bool get isUpdated => updatedAt != null;
 
   @override
-  UnifiedModel copyWithId(String newId) {
-    // TODO: implement copyWithId
-    throw UnimplementedError();
-  }
+  UnifiedModel copyWithId(String newId) => copyWith(factureId: newId);
 }
 
 @freezed
-class CustomLigneFacture
+sealed class CustomLigneFacture
     with _$CustomLigneFacture, AccessControlMixin, ValidationMixin
     implements UnifiedModel {
   const factory CustomLigneFacture({
@@ -86,6 +84,15 @@ class CustomLigneFacture
     required int quantite,
     required double total,
     DateTime? ctlUpdatedAt,
+    @Default(0.0) double remisePourcentage,
+    @Default(20.0) double tauxTVA,
+    @Default('materiel') String type,
+    @Default(false) bool clientValide,
+    @Default(false) bool chefDeProjetValide,
+    @Default(false) bool techniciensValides,
+    @Default(false) bool superUtilisateurValide,
+
+    @Default(false) bool isCloudOnly,
   }) = _CustomLigneFacture;
 
   factory CustomLigneFacture.fromJson(Map<String, dynamic> json) =>
@@ -97,6 +104,9 @@ class CustomLigneFacture
   String get id => ctlId;
 
   @override
+  String? get ownerId => ctlId;
+
+  @override
   DateTime? get updatedAt => ctlUpdatedAt;
 
   factory CustomLigneFacture.mock() => CustomLigneFacture(
@@ -106,15 +116,27 @@ class CustomLigneFacture
     quantite: 2,
     total: 600,
     ctlUpdatedAt: DateTime.now(),
+    remisePourcentage: 10,
+    tauxTVA: 20,
+    type: 'materiel',
   );
 
   @override
-  UnifiedModel copyWithId(String newId) {
-    // TODO: implement copyWithId
-    throw UnimplementedError();
-  }
+  UnifiedModel copyWithId(String newId) => copyWith(ctlId: newId);
 
   @override
-  // TODO: implement isUpdated
-  bool get isUpdated => throw UnimplementedError();
+  bool get isUpdated => updatedAt != null;
+
+  @override
+  bool get toutesPartiesOntValide => ValidationHelper.computeValidationStatus(
+    clientValide: clientValide,
+    chefDeProjetValide: chefDeProjetValide,
+    techniciensValides: techniciensValides,
+    superUtilisateurValide: superUtilisateurValide,
+  );
+
+  // Calcul pour la ligne spécifique
+  double get totalLigneHT =>
+      (montant * quantite) * (1 - remisePourcentage / 100);
+  double get totalLigneTTC => totalLigneHT * (1 + tauxTVA / 100);
 }

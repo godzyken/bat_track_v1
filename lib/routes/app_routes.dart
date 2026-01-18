@@ -11,13 +11,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../data/local/models/base/access_policy_interface.dart';
-import '../features/auth/data/notifiers/auth_notifier.dart';
+import '../features/auth/data/providers/auth_notifier_provider.dart';
+import '../features/auth/data/providers/go_route_notifier_provider.dart';
 import '../features/auth/views/screens/login_screen.dart';
 import '../features/auth/views/screens/register_screen.dart';
 import '../features/auth/views/screens/user_profile_screen.dart';
 import '../features/auth/views/widgets/access_shell.dart';
 import '../features/chantier/views/screens/chantier_extensions_screens.dart';
-import '../features/documents/views/screens/factureDetailScreen.dart';
+import '../features/documents/views/screens/facture_detail_screen.dart';
 import '../features/documents/views/screens/factures_screen.dart';
 import '../features/intervention/views/screens/interventions_screen.dart';
 import '../features/projet/views/screens/projet_detail_screen.dart';
@@ -135,13 +136,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/error',
-        builder:
-            (_, _) => const ErrorApp(message: 'Erreur d\'authentification'),
+        builder: (_, _) =>
+            const ErrorApp(message: 'Erreur d\'authentification'),
       ),
       ShellRoute(
-        builder:
-            (context, state, child) =>
-                AccessShell(policy: policy, state: state, child: child),
+        builder: (context, state, child) =>
+            AccessShell(policy: policy, state: state, child: child),
         routes: [
           GoRoute(
             path: '/',

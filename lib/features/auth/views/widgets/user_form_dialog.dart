@@ -14,18 +14,18 @@ class UserFormDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return EntityForm<AppUser>(
-      chantierId:
-          initialUser == null ? 'Créer un utilisateur' : 'Modifier utilisateur',
+      chantierId: initialUser == null
+          ? 'Créer un utilisateur'
+          : 'Modifier utilisateur',
       initialValue: initialUser,
-      createEmpty:
-          () => AppUser(
-            uid: const Uuid().v4(),
-            name: '',
-            email: '',
-            role: 'client',
-            company: '',
-            createdAt: DateTime.now(),
-          ),
+      createEmpty: () => AppUser(
+        uid: const Uuid().v4(),
+        name: '',
+        email: '',
+        role: 'client',
+        company: '',
+        createdAt: DateTime.now(),
+      ),
       fromJson: (json) => AppUser.fromJson(json),
       onSubmit: (user) async {
         final doc = ref
@@ -33,35 +33,34 @@ class UserFormDialog extends ConsumerWidget {
             .collection('users')
             .doc(user.id);
         await doc.set(user.toJson());
-        Navigator.of(context).pop();
-      },
-      customFieldBuilder: (
-        context,
-        key,
-        value,
-        controller,
-        onChanged,
-        expertMode,
-      ) {
-        if (key == 'role') {
-          return DropdownButtonFormField<String>(
-            initialValue: value ?? 'client',
-            decoration: const InputDecoration(labelText: 'Rôle'),
-            items: const [
-              DropdownMenuItem(value: 'admin', child: Text('Admin')),
-              DropdownMenuItem(value: 'technicien', child: Text('Technicien')),
-              DropdownMenuItem(value: 'client', child: Text('Client')),
-            ],
-            onChanged: (val) {
-              if (val != null) {
-                controller?.text = val;
-                onChanged(val);
-              }
-            },
-          );
+        if (context.mounted) {
+          Navigator.of(context).pop();
         }
-        return null;
       },
+      customFieldBuilder:
+          (context, key, value, controller, onChanged, expertMode) {
+            if (key == 'role') {
+              return DropdownButtonFormField<String>(
+                value: value ?? 'client',
+                decoration: const InputDecoration(labelText: 'Rôle'),
+                items: const [
+                  DropdownMenuItem(value: 'admin', child: Text('Admin')),
+                  DropdownMenuItem(
+                    value: 'technicien',
+                    child: Text('Technicien'),
+                  ),
+                  DropdownMenuItem(value: 'client', child: Text('Client')),
+                ],
+                onChanged: (val) {
+                  if (val != null) {
+                    controller?.text = val;
+                    onChanged(val);
+                  }
+                },
+              );
+            }
+            return null;
+          },
     );
   }
 }

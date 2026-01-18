@@ -1,16 +1,19 @@
+import 'package:bat_track_v1/core/services/unified_entity_service_impl.dart';
+import 'package:bat_track_v1/data/local/models/adapters/hive_entity_factory.dart';
+import 'package:bat_track_v1/data/local/models/entities/index_entity_extention.dart';
 import 'package:bat_track_v1/data/local/services/service_type.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
-import 'package:bat_track_v1/models/providers/asynchrones/remote_service_provider.dart';
 import 'package:bat_track_v1/models/services/hive_entity_service.dart';
 import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/adapters.dart';
+import 'package:hive_ce_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../../../core/services/unified_entity_service.dart';
 import '../../../models/services/dashboard_data_service.dart';
 import '../../../models/services/entity_service_registry.dart';
 import '../../../models/services/logged_entity_service.dart';
+import '../../remote/providers/chantier_provider.dart';
+import '../../remote/providers/multi_backend_remote_provider.dart';
 import '../models/index_model_extention.dart';
 import '../services/hive_service.dart';
 
@@ -124,21 +127,21 @@ final dashboardServiceProvider = Provider.family<DashboardService, AppUser>((
   user,
 ) {
   final projetService = ref.watch(
-    buildLoggedEntityServiceProvider<Projet>(
+    buildLoggedEntityServiceProvider<Projet, ProjetEntity>(
       boxName: 'projets',
-      fromJson: (json) => Projet.fromJson(json),
+      factory: ProjetEntityFactory(),
     ),
   );
   final chantierService = ref.watch(
-    buildLoggedEntityServiceProvider<Chantier>(
+    buildLoggedEntityServiceProvider<Chantier, ChantierEntity>(
       boxName: 'chantiers',
-      fromJson: (json) => Chantier.fromJson(json),
+      factory: ChantierEntityFactory(),
     ),
   );
   final interventionService = ref.watch(
-    buildLoggedEntityServiceProvider<Intervention>(
+    buildLoggedEntityServiceProvider<Intervention, InterventionEntity>(
       boxName: 'interventions',
-      fromJson: (json) => Intervention.fromJson(json),
+      factory: InterventionEntityFactory(),
     ),
   );
 
@@ -151,30 +154,30 @@ final dashboardServiceProvider = Provider.family<DashboardService, AppUser>((
 });
 
 final appUserEntityServiceProvider =
-    buildLoggedEntitySyncServiceProvider<AppUser>(
-      collectionOrBoxName: 'users',
-      fromJson: AppUser.fromJson,
+    buildLoggedEntitySyncServiceProvider<AppUser, AppUserEntity>(
+      collectionName: 'users',
+      factory: AppUserEntityFactory(),
     );
 
 final filteredAppUserServiceProvider =
-    Provider<SafeAndLoggedEntityService<AppUser>>((ref) {
+    Provider<SafeAndLoggedEntityService<AppUser, AppUserEntity>>((ref) {
       final authUser = ref.watch(currentUserProvider).value;
       final local = HiveEntityService<AppUser>(
         fromJson: (json) => AppUser.fromJson(authUser!.toJson()),
         boxName: 'users',
       );
 
-      final remoteStorageService = ref.watch(remoteStorageServiceProvider);
+      final remoteStorageService = ref.watch(multiBackendRemoteProvider);
       final remote = RemoteEntityServiceAdapter<AppUser>(
         fromJson: (json) => AppUser.fromJson(authUser!.toJson()),
         collection: 'users',
         storage: remoteStorageService,
       );
 
-      final delegate = UnifiedEntityService<AppUser>(
+      final delegate = UnifiedEntityServiceImpl<AppUser, AppUserEntity>(
         collectionName: local.boxName,
         remoteStorage: remote.storage,
-        fromJson: local.fromJson,
+        factory: AppUserEntityFactory(),
       );
       return SafeAndLoggedEntityService(delegate, ref);
     });
@@ -203,78 +206,94 @@ final watchPiecesByChantierProvider = StreamProvider.autoDispose
 *
 * */
 
-final chantierServiceProvider = buildLoggedEntitySyncServiceProvider<Chantier>(
-  collectionOrBoxName: 'chantiers',
-  fromJson: (json) => Chantier.fromJson(json),
-);
+final clientServiceProvider =
+    buildLoggedEntitySyncServiceProvider<Client, ClientEntity>(
+      collectionName: 'clients',
+      factory: ClientEntityFactory(),
+    );
 
-final clientServiceProvider = buildLoggedEntitySyncServiceProvider<Client>(
-  collectionOrBoxName: 'clients',
-  fromJson: (json) => Client.fromJson(json),
-);
 final technicienServiceProvider =
-    buildLoggedEntitySyncServiceProvider<Technicien>(
-      collectionOrBoxName: 'techniciens',
-      fromJson: (json) => Technicien.fromJson(json),
+    buildLoggedEntitySyncServiceProvider<Technicien, TechnicienEntity>(
+      collectionName: 'techniciens',
+      factory: TechnicienEntityFactory(),
     );
+
 final interventionServiceProvider =
-    buildLoggedEntitySyncServiceProvider<Intervention>(
-      collectionOrBoxName: 'interventions',
-      fromJson: (json) => Intervention.fromJson(json),
+    buildLoggedEntitySyncServiceProvider<Intervention, InterventionEntity>(
+      collectionName: 'interventions',
+      factory: InterventionEntityFactory(),
     );
+
 final chantierEtapeServiceProvider =
-    buildLoggedEntitySyncServiceProvider<ChantierEtape>(
-      collectionOrBoxName: 'etapes',
-      fromJson: (json) => ChantierEtape.fromJson(json),
+    buildLoggedEntitySyncServiceProvider<ChantierEtape, ChantierEtapesEntity>(
+      collectionName: 'etapes',
+      factory: ChantierEtapeEntityFactory(),
     );
+
 final pieceJointeServiceProvider =
-    buildLoggedEntitySyncServiceProvider<PieceJointe>(
-      collectionOrBoxName: 'pieceJointes',
-      fromJson: (json) => PieceJointe.fromJson(json),
+    buildLoggedEntitySyncServiceProvider<PieceJointe, PieceJointeEntity>(
+      collectionName: 'pieceJointes',
+      factory: PieceJointeEntityFactory(),
     );
-final pieceServiceProvider = buildLoggedEntitySyncServiceProvider<Piece>(
-  collectionOrBoxName: 'pieces',
-  fromJson: (json) => Piece.fromJson(json),
-);
-final materielServiceProvider = buildLoggedEntitySyncServiceProvider<Materiel>(
-  collectionOrBoxName: 'materiels',
-  fromJson: (json) => Materiel.fromJson(json),
-);
-final materiauServiceProvider = buildLoggedEntitySyncServiceProvider<Materiau>(
-  collectionOrBoxName: 'materiaux',
-  fromJson: (json) => Materiau.fromJson(json),
-);
+
+final pieceServiceProvider =
+    buildLoggedEntitySyncServiceProvider<Piece, PieceEntity>(
+      collectionName: 'pieces',
+      factory: PieceEntityFactory(),
+    );
+
+final materielServiceProvider =
+    buildLoggedEntitySyncServiceProvider<Materiel, MaterielEntity>(
+      collectionName: 'materiels',
+      factory: MaterielEntityFactory(),
+    );
+
+final materiauServiceProvider =
+    buildLoggedEntitySyncServiceProvider<Materiau, MateriauEntity>(
+      collectionName: 'materiaux',
+      factory: MateriauEntityFactory(),
+    );
+
 final mainOeuvreServiceProvider =
-    buildLoggedEntitySyncServiceProvider<MainOeuvre>(
-      collectionOrBoxName: 'intervenants',
-      fromJson: (json) => MainOeuvre.fromJson(json),
+    buildLoggedEntitySyncServiceProvider<MainOeuvre, MainOeuvreEntity>(
+      collectionName: 'intervenants',
+      factory: MainOeuvreEntityFactory(),
     );
+
 final factureDraftServiceProvider =
-    buildLoggedEntitySyncServiceProvider<FactureDraft>(
-      collectionOrBoxName: 'factureDrafts',
-      fromJson: (json) => FactureDraft.fromJson(json),
+    buildLoggedEntitySyncServiceProvider<FactureDraft, FactureDraftEntity>(
+      collectionName: 'factureDrafts',
+      factory: FactureDraftEntityFactory(),
     );
+
 final factureModelServiceProvider =
-    buildLoggedEntitySyncServiceProvider<FactureModel>(
-      collectionOrBoxName: 'factureModel',
-      fromJson: (json) => FactureModel.fromJson(json),
+    buildLoggedEntitySyncServiceProvider<FactureModel, FactureModelEntity>(
+      collectionName: 'factureModel',
+      factory: FactureModelEntityFactory(),
     );
-final factureServiceProvider = buildLoggedEntitySyncServiceProvider<Facture>(
-  collectionOrBoxName: 'factures',
-  fromJson: (json) => Facture.fromJson(json),
-);
-final projetServiceProvider = buildLoggedEntitySyncServiceProvider<Projet>(
-  collectionOrBoxName: 'projets',
-  fromJson: (json) => Projet.fromJson(json),
-);
-final userServiceProvider = buildLoggedEntitySyncServiceProvider<UserModel>(
-  collectionOrBoxName: 'userModel',
-  fromJson: (json) => UserModel.fromJson(json),
-);
+
+final factureServiceProvider =
+    buildLoggedEntitySyncServiceProvider<Facture, FactureEntity>(
+      collectionName: 'factures',
+      factory: FactureEntityFactory(),
+    );
+
+final projetServiceProvider =
+    buildLoggedEntitySyncServiceProvider<Projet, ProjetEntity>(
+      collectionName: 'projets',
+      factory: ProjetEntityFactory(),
+    );
+
+final userServiceProvider =
+    buildLoggedEntitySyncServiceProvider<UserModel, UserEntity>(
+      collectionName: 'userModel',
+      factory: UserEntityFactory(),
+    );
+
 final equipementServiceProvider =
-    buildLoggedEntitySyncServiceProvider<Equipement>(
-      collectionOrBoxName: 'equipements',
-      fromJson: (json) => Equipement.fromJson(json),
+    buildLoggedEntitySyncServiceProvider<Equipement, EquipementEntity>(
+      collectionName: 'equipements',
+      factory: EquipementEntityFactory(),
     );
 
 final _serviceRegistry = <Type, ProviderBase>{
@@ -294,4 +313,7 @@ final _serviceRegistry = <Type, ProviderBase>{
   Projet: projetServiceProvider,
   UserModel: userServiceProvider,
   Equipement: equipementServiceProvider,
+  AppUser: appUserEntityServiceProvider,
+
+  // AppUser: filteredAppUserServiceProvider,
 };

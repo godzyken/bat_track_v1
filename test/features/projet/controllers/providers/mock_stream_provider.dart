@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,7 +21,7 @@ Stream<List<T>> Function(Ref) mockStreamProvider<T>({
 
       if (errors != null && errors.containsKey(i)) {
         final err = errors[i]!;
-        print('⚠️ Simulated error at snapshot $i: $err');
+        developer.log('⚠️ Simulated error at snapshot $i: $err');
 
         // Yield last snapshot or empty to continue the stream
         yield lastValidSnapshot ?? [];
@@ -32,7 +33,7 @@ Stream<List<T>> Function(Ref) mockStreamProvider<T>({
       final snapshot = snapshots[i];
       yield snapshot;
       lastValidSnapshot = snapshot;
-      print('✅ Yield snapshot $i: $snapshot');
+      developer.log('✅ Yield snapshot $i: $snapshot');
     }
   };
 }

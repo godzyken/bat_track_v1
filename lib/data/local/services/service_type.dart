@@ -1,15 +1,15 @@
-import 'package:bat_track_v1/models/services/firestore_entity_service.dart';
-import 'package:bat_track_v1/models/services/multi_backend_remote_service.dart';
+import 'package:bat_track_v1/core/services/unified_entity_service_impl.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../../../core/services/unified_entity_service.dart';
-import '../../../models/providers/adapter/hive_remote_storage_wrapper.dart';
-import '../../../models/services/cloud_flare_entity_service.dart';
+import '../../../models/data/hive_model.dart';
 import '../../../models/services/entity_service_registry.dart';
-import '../../../models/services/firebase_entity_service.dart';
+import '../../../models/services/remote/remote_storage_service.dart';
 import '../../core/unified_model.dart';
 import '../../remote/services/firestore_service.dart';
 import '../../remote/services/storage_service.dart';
+import '../models/adapters/hive_entity_factory.dart';
+import '../models/entities/index_entity_extention.dart';
 import '../models/index_model_extention.dart';
 import 'hive_service.dart';
 
@@ -20,192 +20,110 @@ class AppConfig {
   static List<StorageMode> enabledBackends = [storageMode];
 }
 
-/*mixin StorageHandlerMixin<T extends UnifiedModel> on Object {
-  String get boxName;
-
-  StorageMode get storageMode => AppConfig.storageMode;
-
-  StorageService get storage => StorageService(FirebaseStorage.instance);
-
-  Future<void> put(String id, T item) async {
-    switch (storageMode) {
-      case StorageMode.hive:
-        await HiveService.put<T>(boxName, id, item);
-        break;
-      case StorageMode.firebase:
-      case StorageMode.firestore:
-      case StorageMode.cloudflare:
-        if (item is HasFile) {
-          developer.log('[ITEM] message :${item.toJson()}');
-          final file = (item as HasFile).getFile();
-          final path = '$boxName/$id/${file.path.split('/').last}';
-          await storage.uploadFile(file, path);
-        }
-        await FirestoreService.setData<T>(
-          collectionPath: boxName,
-          docId: id,
-          data: item,
-        );
-        break;
-      case StorageMode.supabase:
-        throw UnimplementedError('Supabase not yet implemented');
-    }
-  }
-
-  Future<void> remove(String id) async {
-    switch (storageMode) {
-      case StorageMode.hive:
-        await HiveService.delete<T>(boxName, id);
-        break;
-      case StorageMode.firebase:
-      case StorageMode.firestore:
-      case StorageMode.cloudflare:
-        await FirestoreService.deleteData(collectionPath: boxName, docId: id);
-        break;
-      case StorageMode.supabase:
-        await SupabaseService.instance.deleteRaw(boxName, id);
-        break;
-    }
-  }
-
-  Future<List<T>> fetchAll({T Function(Map<String, dynamic>)? fromJson}) async {
-    switch (storageMode) {
-      case StorageMode.hive:
-        return HiveService.getAll<T>(boxName);
-      case StorageMode.firebase:
-      case StorageMode.firestore:
-      case StorageMode.cloudflare:
-        return FirestoreService.getAll<T>(
-          collectionPath: boxName,
-          fromJson: fromJson!,
-        );
-      case StorageMode.supabase:
-        return SupabaseService.instance.getAll<T>(boxName, fromJson!);
-    }
-  }
-}*/
-
 class EntityServiceFactory {
   EntityServiceFactory._(); // private constructor
 
   static final EntityServiceFactory instance = EntityServiceFactory._();
 
   /// Crée un service adapté au mode de stockage choisi
-  UnifiedEntityService<T> create<T extends UnifiedModel>({
-    required String boxNameOrCollectionName,
-    required T Function(Map<String, dynamic>) fromJson,
-    String? supabaseTable,
+  UnifiedEntityService<M, E>
+  createSyncedService<M extends UnifiedModel, E extends HiveModel<M>>({
+    required String collectionName,
+    required HiveEntityFactory<M, E> factory,
+    required RemoteStorageService remoteStorageService,
   }) {
-    switch (AppConfig.storageMode) {
-      case StorageMode.hive:
-      case StorageMode.firestore:
-      case StorageMode.firebase:
-      case StorageMode.cloudflare:
-        // Définir les backends activés à partir de AppConfig
+    final baseService = UnifiedEntityServiceImpl<M, E>(
+      collectionName: collectionName,
+      factory: factory,
+      remoteStorage: remoteStorageService,
+    );
 
-        final multiBackend = MultiBackendRemoteService<T>(
-          enabledBackends: AppConfig.enabledBackends,
-          firestoreService: FirestoreEntityService(
-            collectionPath: boxNameOrCollectionName,
-            fromJson: fromJson,
-          ),
-          firebaseService: FirebaseEntityService(
-            collectionPath: boxNameOrCollectionName,
-            fromJson: fromJson,
-          ),
-          cloudflareService: CloudflareEntityService(
-            collectionName: boxNameOrCollectionName,
-            fromJson: fromJson,
-          ),
-        );
-
-        final remoteStorageWrapper = HiveRemoteStorageWrapper<T>(
-          multiBackend: multiBackend,
-        );
-
-        return UnifiedEntityService<T>(
-          collectionName: boxNameOrCollectionName,
-          fromJson: fromJson,
-          remoteStorage: remoteStorageWrapper,
-        );
-    }
+    return baseService;
   }
 }
 
-final chantierService = buildEntityServiceProvider<Chantier>(
+final chantierService = buildEntityServiceProvider<Chantier, ChantierEntity>(
   collectionOrBoxName: 'chantiers',
-  fromJson: Chantier.fromJson,
+  factory: ChantierEntityFactory(),
 );
 
-final clientService = buildEntityServiceProvider<Client>(
+final clientService = buildEntityServiceProvider<Client, ClientEntity>(
   collectionOrBoxName: 'clients',
-  fromJson: Client.fromJson,
+  factory: ClientEntityFactory(),
 );
-final technicienService = buildEntityServiceProvider<Technicien>(
-  collectionOrBoxName: 'techniciens',
-  fromJson: Technicien.fromJson,
-);
-final interventionService = buildEntityServiceProvider<Intervention>(
-  collectionOrBoxName: 'interventions',
-  fromJson: Intervention.fromJson,
-);
-final chantierEtapeService = buildEntityServiceProvider<ChantierEtape>(
-  collectionOrBoxName: 'chantierEtapes',
-  fromJson: ChantierEtape.fromJson,
-);
-final pieceJointeService = buildEntityServiceProvider<PieceJointe>(
-  collectionOrBoxName: 'piecesJointes',
-  fromJson: PieceJointe.fromJson,
-);
-final pieceService = buildEntityServiceProvider<Piece>(
+final technicienService =
+    buildEntityServiceProvider<Technicien, TechnicienEntity>(
+      collectionOrBoxName: 'techniciens',
+      factory: TechnicienEntityFactory(),
+    );
+final interventionService =
+    buildEntityServiceProvider<Intervention, InterventionEntity>(
+      collectionOrBoxName: 'interventions',
+      factory: InterventionEntityFactory(),
+    );
+final chantierEtapeService =
+    buildEntityServiceProvider<ChantierEtape, ChantierEtapesEntity>(
+      collectionOrBoxName: 'chantierEtapes',
+      factory: ChantierEtapeEntityFactory(),
+    );
+final pieceJointeService =
+    buildEntityServiceProvider<PieceJointe, PieceJointeEntity>(
+      collectionOrBoxName: 'piecesJointes',
+      factory: PieceJointeEntityFactory(),
+    );
+final pieceService = buildEntityServiceProvider<Piece, PieceEntity>(
   collectionOrBoxName: 'pieces',
-  fromJson: Piece.fromJson,
+  factory: PieceEntityFactory(),
 );
-final materielService = buildEntityServiceProvider<Materiel>(
+final materielService = buildEntityServiceProvider<Materiel, MaterielEntity>(
   collectionOrBoxName: 'materiels',
-  fromJson: Materiel.fromJson,
+  factory: MaterielEntityFactory(),
 );
-final materiauService = buildEntityServiceProvider<Materiau>(
+final materiauService = buildEntityServiceProvider<Materiau, MateriauEntity>(
   collectionOrBoxName: 'materiau',
-  fromJson: Materiau.fromJson,
+  factory: MateriauEntityFactory(),
 );
-final mainOeuvreService = buildEntityServiceProvider<MainOeuvre>(
-  collectionOrBoxName: 'mainOeuvre',
-  fromJson: MainOeuvre.fromJson,
-);
-final projetService = buildEntityServiceProvider<Projet>(
+final mainOeuvreService =
+    buildEntityServiceProvider<MainOeuvre, MainOeuvreEntity>(
+      collectionOrBoxName: 'mainOeuvre',
+      factory: MainOeuvreEntityFactory(),
+    );
+final projetService = buildEntityServiceProvider<Projet, ProjetEntity>(
   collectionOrBoxName: 'projets',
-  fromJson: Projet.fromJson,
+  factory: ProjetEntityFactory(),
 );
-final factureService = buildEntityServiceProvider<Facture>(
+final factureService = buildEntityServiceProvider<Facture, FactureEntity>(
   collectionOrBoxName: 'factures',
-  fromJson: Facture.fromJson,
+  factory: FactureEntityFactory(),
 );
-final factureModelService = buildEntityServiceProvider<FactureModel>(
-  collectionOrBoxName: 'factureModels',
-  fromJson: FactureModel.fromJson,
-);
-final factureDraftService = buildEntityServiceProvider<FactureDraft>(
-  collectionOrBoxName: 'factureDrafts',
-  fromJson: FactureDraft.fromJson,
-);
-final userService = buildEntityServiceProvider<UserModel>(
+final factureModelService =
+    buildEntityServiceProvider<FactureModel, FactureModelEntity>(
+      collectionOrBoxName: 'factureModels',
+      factory: FactureModelEntityFactory(),
+    );
+final factureDraftService =
+    buildEntityServiceProvider<FactureDraft, FactureDraftEntity>(
+      collectionOrBoxName: 'factureDrafts',
+      factory: FactureDraftEntityFactory(),
+    );
+final userService = buildEntityServiceProvider<UserModel, UserEntity>(
   collectionOrBoxName: 'users',
-  fromJson: UserModel.fromJson,
+  factory: UserEntityFactory(),
 );
-final equipementService = buildEntityServiceProvider<Equipement>(
-  collectionOrBoxName: 'equipements',
-  fromJson: Equipement.fromJson,
-);
+final equipementService =
+    buildEntityServiceProvider<Equipement, EquipementEntity>(
+      collectionOrBoxName: 'equipements',
+      factory: EquipementEntityFactory(),
+    );
 
 final storageService = StorageService(FirebaseStorage.instance);
 final firebaseService = FirestoreService();
 
-extension EntityServicesFilters<T extends UnifiedModel>
-    on UnifiedEntityService<T> {
+extension EntityServicesFilters<M extends UnifiedModel, E extends HiveModel<M>>
+    on UnifiedEntityService<M, E> {
   /// Observe tous les items liés à un technicien spécifique
-  Stream<List<T>> watchByTechnicien(String technicienId) async* {
-    final box = await HiveService.box<T>(collectionName);
+  Stream<List<M>> watchByTechnicien(String technicienId) async* {
+    final box = await HiveService.box<M>(collectionName);
     yield* box.watch().asyncMap((_) async {
       final allItems = await getAllRemote();
       return allItems.where((item) {
@@ -216,8 +134,8 @@ extension EntityServicesFilters<T extends UnifiedModel>
   }
 
   /// Observe tous les items appartenant à un propriétaire spécifique
-  Stream<List<T>> watchByOwner(String ownerId) async* {
-    final box = await HiveService.box<T>(collectionName);
+  Stream<List<M>> watchByOwner(String ownerId) async* {
+    final box = await HiveService.box<M>(collectionName);
     yield* box.watch().asyncMap((_) async {
       final allItems = await getAllLocal();
       return allItems.where((item) {
@@ -228,8 +146,8 @@ extension EntityServicesFilters<T extends UnifiedModel>
   }
 
   /// Observe tous les items liés à un projet spécifique
-  Stream<List<T>> watchByProjects(String projectId) async* {
-    final box = await HiveService.box<T>(collectionName);
+  Stream<List<M>> watchByProjects(String projectId) async* {
+    final box = await HiveService.box<M>(collectionName);
     yield* box.watch().asyncMap((_) async {
       final allItems = await getAllRemote();
       return allItems.where((item) {
@@ -240,11 +158,11 @@ extension EntityServicesFilters<T extends UnifiedModel>
   }
 
   /// Observe tous les items d'un propriétaire dans un projet spécifique
-  Stream<List<T>> watchByOwnerProjects(
+  Stream<List<M>> watchByOwnerProjects(
     String ownerId,
     String projectId,
   ) async* {
-    final box = await HiveService.box<T>(collectionName);
+    final box = await HiveService.box<M>(collectionName);
     yield* box.watch().asyncMap((_) async {
       final allItems = await getAllRemote();
       return allItems.where((item) {

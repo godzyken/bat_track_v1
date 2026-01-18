@@ -2,9 +2,9 @@ import 'dart:typed_data';
 
 import 'package:bat_track_v1/data/local/adapters/mappers.dart';
 import 'package:bat_track_v1/data/local/models/entities/facture_draft_entity.dart';
-import 'package:bat_track_v1/models/data/hive_model.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
+import '../../../../models/data/hive_model.dart';
 import '../documents/facture_model.dart';
 
 part 'facture_model_entity.g.dart';
@@ -59,10 +59,9 @@ class FactureModelEntity extends HiveObject implements HiveModel<FactureModel> {
       factId: model.id,
       chantierId: model.chantierId,
       reference: model.reference,
-      lignes:
-          model.lignes
-              .map((e) => CustomLigneFactureEntity.fromModel(e))
-              .toList(),
+      lignes: model.lignes
+          .map((e) => CustomLigneFactureEntity.fromModel(e))
+          .toList(),
       montant: model.montant,
       clientId: model.clientId,
       date: model.createdAt,

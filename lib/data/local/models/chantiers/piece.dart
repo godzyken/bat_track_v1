@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../features/documents/controllers/generator/calculator.dart';
 import '../../../core/unified_model.dart';
+import '../extensions/budget_extentions.dart';
 import '../index_model_extention.dart';
 
 part 'piece.freezed.dart';
@@ -24,6 +25,12 @@ class Piece
     List<MainOeuvre>? mainOeuvre,
     DateTime? updatedAt,
     bool? validatedByTech,
+    @Default(false) bool clientValide,
+    @Default(false) bool chefDeProjetValide,
+    @Default(false) bool techniciensValides,
+    @Default(false) bool superUtilisateurValide,
+
+    @Default(false) bool isCloudOnly,
   }) = _Piece;
 
   /// Factory JSON corrigée pour forcer la présence de 'id'
@@ -92,12 +99,82 @@ class Piece
   }
 
   @override
-  UnifiedModel copyWithId(String newId) {
-    // TODO: implement copyWithId
+  bool get isUpdated => updatedAt != null;
+
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
+
+  @override
+  bool get toutesPartiesOntValide => ValidationHelper.computeValidationStatus(
+    clientValide: clientValide,
+    chefDeProjetValide: chefDeProjetValide,
+    techniciensValides: techniciensValides,
+    superUtilisateurValide: superUtilisateurValide,
+  );
+
+  @override
+  // TODO: implement addedBy
+  String get addedBy => throw UnimplementedError();
+
+  @override
+  // TODO: implement chefDeProjetValide
+  bool get chefDeProjetValide => throw UnimplementedError();
+
+  @override
+  // TODO: implement clientValide
+  bool get clientValide => throw UnimplementedError();
+
+  @override
+  // TODO: implement id
+  String get id => throw UnimplementedError();
+
+  @override
+  // TODO: implement isCloudOnly
+  bool get isCloudOnly => throw UnimplementedError();
+
+  @override
+  // TODO: implement mainOeuvre
+  List<MainOeuvre>? get mainOeuvre => throw UnimplementedError();
+
+  @override
+  // TODO: implement materiaux
+  List<Materiau>? get materiaux => throw UnimplementedError();
+
+  @override
+  // TODO: implement materiels
+  List<Materiel>? get materiels => throw UnimplementedError();
+
+  @override
+  // TODO: implement nom
+  String get nom => throw UnimplementedError();
+
+  @override
+  // TODO: implement ownerId
+  String? get ownerId => throw UnimplementedError();
+
+  @override
+  // TODO: implement superUtilisateurValide
+  bool get superUtilisateurValide => throw UnimplementedError();
+
+  @override
+  // TODO: implement surface
+  double get surface => throw UnimplementedError();
+
+  @override
+  // TODO: implement techniciensValides
+  bool get techniciensValides => throw UnimplementedError();
+
+  @override
+  Map<String, dynamic> toJson() {
+    // TODO: implement toJson
     throw UnimplementedError();
   }
 
   @override
-  // TODO: implement isUpdated
-  bool get isUpdated => throw UnimplementedError();
+  // TODO: implement updatedAt
+  DateTime? get updatedAt => throw UnimplementedError();
+
+  @override
+  // TODO: implement validatedByTech
+  bool? get validatedByTech => throw UnimplementedError();
 }

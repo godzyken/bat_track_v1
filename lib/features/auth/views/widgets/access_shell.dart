@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../models/views/screens/exeception_screens.dart';
-import '../../data/notifiers/auth_notifier.dart';
+import '../../data/providers/auth_notifier_provider.dart';
 import '../screens/login_screen.dart';
 import '../screens/unauthorized_screen.dart';
 
@@ -53,10 +53,8 @@ class AccessShell extends ConsumerWidget {
 
           return MainLayout(child: child); // Layout commun avec menu & app bar
         },
-        loading:
-            () => const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
+        loading: () =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
         error: (_, _) => const UnauthorizedScreen(),
       ),
     };

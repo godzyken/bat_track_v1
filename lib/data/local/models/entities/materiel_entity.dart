@@ -1,5 +1,5 @@
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
 import '../../../../models/data/hive_model.dart';
 

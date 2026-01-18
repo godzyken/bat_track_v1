@@ -53,8 +53,57 @@ class UserModel
   String get roleName => role.asString;
 
   @override
-  @override
   UnifiedModel copyWithId(String newId) => copyWith(id: newId);
+
+  @override
+  // TODO: implement company
+  String? get company => throw UnimplementedError();
+
+  @override
+  // TODO: implement createAt
+  DateTime get createAt => throw UnimplementedError();
+
+  @override
+  // TODO: implement email
+  String get email => throw UnimplementedError();
+
+  @override
+  // TODO: implement id
+  String get id => throw UnimplementedError();
+
+  @override
+  // TODO: implement instanceId
+  String? get instanceId => throw UnimplementedError();
+
+  @override
+  // TODO: implement isCloudOnly
+  bool get isCloudOnly => throw UnimplementedError();
+
+  @override
+  // TODO: implement isDolibarrValidated
+  bool? get isDolibarrValidated => throw UnimplementedError();
+
+  @override
+  // TODO: implement lastTimeConnect
+  DateTime? get lastTimeConnect => throw UnimplementedError();
+
+  @override
+  // TODO: implement name
+  String get name => throw UnimplementedError();
+
+  @override
+  // TODO: implement role
+  UserRole get role => throw UnimplementedError();
+
+  @override
+  Map<String, dynamic> toJson() {
+    // TODO: implement toJson
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement updatedAt
+  DateTime? get updatedAt => throw UnimplementedError();
 }
 
 enum UserRole { client, chefDeProjet, technicien, superUtilisateur }

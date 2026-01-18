@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/core/services/unified_entity_service.dart';
+import 'package:bat_track_v1/data/local/models/entities/projet_entity.dart';
 import 'package:bat_track_v1/data/local/models/projets/projet.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -10,16 +11,16 @@ void main() {
   group('SyncedEntityService<Projet>', () {
     late MockHiveEntityService<Projet> mockLocal;
     late MockRemoteEntityServiceAdapter<Projet> mockRemote;
-    late UnifiedEntityService<Projet> syncedService;
+    late UnifiedEntityService<Projet, ProjetEntity> syncedService;
     late List<Projet> testProjets;
 
     setUp(() {
       mockLocal = MockHiveEntityService<Projet>();
       mockRemote = MockRemoteEntityServiceAdapter<Projet>();
-      syncedService = UnifiedEntityService<Projet>(
+      syncedService = UnifiedEntityService<Projet, ProjetEntity>(
         collectionName: mockRemote.collection,
         remoteStorage: mockRemote.storage,
-        fromJson: mockLocal.fromJson,
+        factory: MockDataFactories(),
       );
 
       testProjets = MockDataFactories.createProjetList(3);

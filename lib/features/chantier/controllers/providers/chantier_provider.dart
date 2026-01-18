@@ -13,7 +13,7 @@ final chantiersProvider =
 
       switch (role) {
         case 'admin':
-          return repo.getAll(limit: 50);
+          return repo.getAll(/*limit: 50*/);
         case 'tech':
           return repo.getForTechnicien(uid);
         case 'client':

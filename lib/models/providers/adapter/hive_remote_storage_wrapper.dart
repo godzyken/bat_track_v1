@@ -1,11 +1,10 @@
 import '../../../data/core/unified_model.dart';
-import '../../data/json_model.dart';
 import '../../services/multi_backend_remote_service.dart';
 import '../../services/remote/remote_storage_service.dart';
 
 class HiveRemoteStorageWrapper<T extends UnifiedModel>
     extends RemoteStorageService {
-  final MultiBackendRemoteService<T> multiBackend;
+  final MultiBackendRemoteService multiBackend;
 
   HiveRemoteStorageWrapper({required this.multiBackend});
 
@@ -14,11 +13,11 @@ class HiveRemoteStorageWrapper<T extends UnifiedModel>
     String collectionOrTable,
     String id,
   ) async {
-    final item = await multiBackend.getById(id);
-    if (item == null) {
+    final item = await multiBackend.getRaw(collectionOrTable, id);
+    if (item.isEmpty) {
       throw Exception('Item not found in remote backends: $id');
     }
-    return item.toJson();
+    return item;
   }
 
   @override
@@ -27,13 +26,12 @@ class HiveRemoteStorageWrapper<T extends UnifiedModel>
     String id,
     Map<String, dynamic> data,
   ) async {
-    final item = JsonModelFactory.fromDynamicOrThrow<T>(data);
-    await multiBackend.save(item, id);
+    await multiBackend.saveRaw(collectionOrTable, id, data);
   }
 
   @override
   Future<void> deleteRaw(String collectionOrTable, String id) async {
-    await multiBackend.delete(id);
+    await multiBackend.deleteRaw(collectionOrTable, id);
   }
 
   @override
@@ -42,8 +40,12 @@ class HiveRemoteStorageWrapper<T extends UnifiedModel>
     DateTime? updatedAfter,
     int? limit,
   }) async {
-    final listT = await multiBackend.getAll();
-    return listT.map((t) => t.toJson()).toList();
+    final listT = await multiBackend.getAllRaw(
+      collectionOrTable,
+      updatedAfter: updatedAfter,
+      limit: limit,
+    );
+    return listT.map((t) => t).toList();
   }
 
   @override
@@ -51,9 +53,9 @@ class HiveRemoteStorageWrapper<T extends UnifiedModel>
     String collectionOrTable, {
     dynamic Function(dynamic query)? queryBuilder,
   }) {
-    return multiBackend.watchAll().map(
-      (listT) => listT.map((t) => t.toJson()).toList(),
-    );
+    return multiBackend
+        .watchCollectionRaw(collectionOrTable, queryBuilder: queryBuilder)
+        .map((listT) => listT.map((t) => t).toList());
   }
 
   Future<bool> fileExists(String path) {

@@ -1,11 +1,11 @@
 import 'package:bat_track_v1/data/local/models/utilisateurs/user.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
 import '../../../../models/data/hive_model.dart';
 
 part 'user_entity.g.dart';
 
-@HiveType(typeId: 15, adapterName: 'UserAdapter')
+@HiveType(typeId: 18)
 class UserEntity extends HiveObject implements HiveModel<UserModel> {
   @HiveField(0)
   final String uid;
@@ -43,7 +43,7 @@ class UserEntity extends HiveObject implements HiveModel<UserModel> {
       uid: model.id,
       name: model.name,
       email: model.email,
-      role: model.role.toEntity(),
+      role: UserRoleEntity.values[model.role.index],
       createdAt: model.createAt,
       isDolibarrValidated: model.isDolibarrValidated,
       isCloudOnly: model.isCloudOnly,
@@ -85,10 +85,6 @@ enum UserRoleEntity {
   technicien,
   @HiveField(3)
   superUtilisateur,
-}
-
-extension UserRoleX on UserRole {
-  UserRoleEntity toEntity() => UserRoleEntity.values[index];
 }
 
 extension UserRoleEntityX on UserRoleEntity {

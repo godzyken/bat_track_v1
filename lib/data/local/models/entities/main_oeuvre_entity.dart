@@ -1,6 +1,6 @@
-import 'package:bat_track_v1/models/data/hive_model.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
+import '../../../../models/data/hive_model.dart';
 import '../chantiers/main_oeuvre.dart';
 
 part 'main_oeuvre_entity.g.dart';

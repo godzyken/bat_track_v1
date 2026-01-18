@@ -17,39 +17,35 @@ class FacturePdfGenerator {
 
     final totalHT = facture.totalHT;
     final tauxTVA = facture.tauxTVA;
-    final tva = facture.tvaAmount;
+    final tva = facture.totalTVA;
     final totalTTC = facture.totalTTC;
 
     pdf.addPage(
       pw.MultiPage(
-        build:
-            (context) => [
-              pw.Header(
-                level: 0,
-                child: pw.Text(
-                  'FACTURE',
-                  style: pw.TextStyle(
-                    fontSize: 28,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-              ),
-              _buildClientSection(client),
-              pw.SizedBox(height: 20),
-              _buildChantierSection(chantier),
-              pw.SizedBox(height: 20),
-              pw.Text(
-                'Date de facture : ${formatter.format(facture.dateDerniereModification!)}',
-              ),
-              pw.SizedBox(height: 20),
-              _buildLignesFacture(facture),
-              pw.SizedBox(height: 12),
-              _buildTotaux(totalHT, tauxTVA, tva, totalTTC),
-              pw.SizedBox(height: 24),
-              if (piecesJointes != null && piecesJointes.isNotEmpty)
-                _buildPiecesJointes(piecesJointes),
-              _buildSignature(facture.signature),
-            ],
+        build: (context) => [
+          pw.Header(
+            level: 0,
+            child: pw.Text(
+              'FACTURE',
+              style: pw.TextStyle(fontSize: 28, fontWeight: pw.FontWeight.bold),
+            ),
+          ),
+          _buildClientSection(client),
+          pw.SizedBox(height: 20),
+          _buildChantierSection(chantier),
+          pw.SizedBox(height: 20),
+          pw.Text(
+            'Date de facture : ${formatter.format(facture.dateDerniereModification!)}',
+          ),
+          pw.SizedBox(height: 20),
+          _buildLignesFacture(facture),
+          pw.SizedBox(height: 12),
+          _buildTotaux(totalHT, tauxTVA, tva, totalTTC),
+          pw.SizedBox(height: 24),
+          if (piecesJointes != null && piecesJointes.isNotEmpty)
+            _buildPiecesJointes(piecesJointes),
+          _buildSignature(facture.signature),
+        ],
       ),
     );
 
@@ -63,26 +59,25 @@ class FacturePdfGenerator {
 
     pdf.addPage(
       pw.Page(
-        build:
-            (context) => pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Text("Facture pour l'intervention : ${intervention.titre}"),
-                pw.Text("Technicien : ${intervention.technicienId}"),
-                pw.Text("Date : ${intervention.create.toIso8601String()}"),
-                if (intervention.facture != null) ...[
-                  pw.Text("Montant HT : ${intervention.facture!.totalHT}"),
-                  pw.Text("Montant TTC : ${intervention.facture!.totalTTC}"),
-                  if (intervention.facture!.isFinalized)
-                    pw.Text("Facture FINALISÉE"),
-                ],
-                if ((intervention.document).isNotEmpty) ...[
-                  pw.SizedBox(height: 16),
-                  pw.Text("Documents joints :"),
-                  ...(intervention.document).map((p) => pw.Text("- ${p.nom}")),
-                ],
-              ],
-            ),
+        build: (context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text("Facture pour l'intervention : ${intervention.titre}"),
+            pw.Text("Technicien : ${intervention.technicienId}"),
+            pw.Text("Date : ${intervention.create.toIso8601String()}"),
+            if (intervention.facture != null) ...[
+              pw.Text("Montant HT : ${intervention.facture!.totalHT}"),
+              pw.Text("Montant TTC : ${intervention.facture!.totalTTC}"),
+              if (intervention.facture!.isFinalized)
+                pw.Text("Facture FINALISÉE"),
+            ],
+            if ((intervention.document).isNotEmpty) ...[
+              pw.SizedBox(height: 16),
+              pw.Text("Documents joints :"),
+              ...(intervention.document).map((p) => pw.Text("- ${p.nom}")),
+            ],
+          ],
+        ),
       ),
     );
 
@@ -126,15 +121,9 @@ class FacturePdfGenerator {
   static pw.Widget _buildLignesFacture(FactureDraft facture) {
     return pw.TableHelper.fromTextArray(
       headers: ['Description', 'Montant (€)'],
-      data:
-          facture.lignesManuelles
-              .map(
-                (ligne) => [
-                  ligne.description,
-                  ligne.montant.toStringAsFixed(2),
-                ],
-              )
-              .toList(),
+      data: facture.lignesManuelles
+          .map((ligne) => [ligne.description, ligne.montant.toStringAsFixed(2)])
+          .toList(),
       border: pw.TableBorder.all(),
       headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
     );

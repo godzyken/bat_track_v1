@@ -1,5 +1,4 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../data/local/models/utilisateurs/app_user.dart';
@@ -12,6 +11,26 @@ class AuthNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
   Future<AppUser?> build() async {
     // Initialisation identique à currentUserProvider ou récupération via ref.watch
     return ref.watch(currentUserProvider.future);
+  }
+
+  Future<UserCredential?> signUpWithEmail({
+    required String email,
+    required String password,
+    required String name,
+    required String role,
+    required String company,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final credential = await ref
+          .read(firebaseAuthProvider)
+          .createUserWithEmailAndPassword(email: email, password: password);
+      // Le state sera mis à jour via le build() et le stream de Firebase
+      return credential;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return null;
+    }
   }
 
   Future<void> signIn(String email, String password) async {
@@ -30,7 +49,8 @@ class AuthNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
   }
 
   /// 🔹 Recharge manuelle
-  /*  Future<void> reload() async {
+  /*
+  Future<void> reload() async {
     final user = _auth.currentUser;
     if (user == null) {
       state = const AsyncValue.data(null);
@@ -57,27 +77,6 @@ class AuthNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
-  }*/
-}
-
-final authNotifierProvider =
-    AsyncNotifierProvider.autoDispose<AuthNotifier, AppUser?>(AuthNotifier.new);
-
-/// Notifier pour rafraîchir le GoRouter quand auth change
-class GoRouterRefreshNotifier extends ChangeNotifier {
-  GoRouterRefreshNotifier(this.ref) {
-    ref.listen<AsyncValue<AppUser?>>(authNotifierProvider, (previous, next) {
-      if (previous?.value?.uid != next.value?.uid) {
-        notifyListeners();
-      }
-    });
   }
-
-  final Ref ref;
+*/
 }
-
-final goRouterRefreshNotifierProvider = Provider<GoRouterRefreshNotifier>((
-  ref,
-) {
-  return GoRouterRefreshNotifier(ref);
-});

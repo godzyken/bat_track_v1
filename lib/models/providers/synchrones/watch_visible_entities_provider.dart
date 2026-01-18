@@ -5,11 +5,13 @@ import '../../../data/core/unified_model.dart';
 import '../../../data/local/models/base/has_acces_control.dart';
 import '../../../data/local/models/utilisateurs/app_user.dart';
 import '../../../features/auth/data/providers/current_user_provider.dart';
+import '../../data/hive_model.dart';
 import '../adapter/wath_entities_args.dart';
 
 AutoDisposeProvider<Stream<List<T>>> watchVisibleEntitiesProvider<
-  T extends UnifiedModel
->(WatchEntitiesArgs<T> args) {
+  T extends UnifiedModel,
+  E extends HiveModel<T>
+>(WatchEntitiesArgs<T, E> args) {
   return Provider.autoDispose<Stream<List<T>>>((ref) {
     final user = ref.watch(currentUserProvider).value;
     if (user == null) return const Stream.empty();

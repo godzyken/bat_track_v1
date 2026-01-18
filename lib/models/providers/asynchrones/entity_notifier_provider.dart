@@ -23,10 +23,15 @@ createEntityNotifierProvider<T extends UnifiedModel>({
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/core/unified_model.dart';
+import '../../data/hive_model.dart';
+import '../../notifiers/sync_entity_notifier.dart';
 
-typedef EntityNotifierProviderFamily<T extends UnifiedModel> =
+typedef EntityNotifierProviderFamily<
+  M extends UnifiedModel,
+  E extends HiveModel<M>
+> =
     AsyncNotifierProviderFamily<
-      FamilyAsyncNotifier<T?, String>, // Le Notifier gère T?
-      T?,
-      String // L'ID pour la famille
+      SyncEntityNotifier<M, E>, // On précise le type exact du Notifier ici
+      M?, // Le type de donnée (AsyncValue<M?>)
+      String // L'argument (ID)
     >;

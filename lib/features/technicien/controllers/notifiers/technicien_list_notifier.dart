@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/models/entities/index_entity_extention.dart';
 import 'package:bat_track_v1/models/notifiers/entity_list_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,7 +11,8 @@ final techniciensListProvider =
       TechniciensNotifier.new,
     );
 
-class TechniciensNotifier extends EntityListNotifier<Technicien> {
+class TechniciensNotifier
+    extends EntityListNotifier<Technicien, TechnicienEntity> {
   @override
   Future<List<Technicien>> build() async {
     final service = ref.read(technicienServiceProvider);

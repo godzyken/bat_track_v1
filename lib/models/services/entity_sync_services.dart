@@ -3,11 +3,7 @@ import 'dart:developer' as developer;
 import 'package:async/async.dart';
 import 'package:bat_track_v1/data/core/unified_model.dart';
 import 'package:bat_track_v1/data/local/services/hive_service.dart';
-import 'package:bat_track_v1/models/providers/asynchrones/remote_service_provider.dart';
 import 'package:bat_track_v1/models/providers/synchrones/facture_sync_provider.dart';
-import 'package:bat_track_v1/models/services/cloud_flare_entity_service.dart';
-import 'package:bat_track_v1/models/services/firebase_entity_service.dart';
-import 'package:bat_track_v1/models/services/firestore_entity_service.dart';
 import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -16,10 +12,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local/models/index_model_extention.dart';
 import '../../data/local/services/service_type.dart';
+import '../../data/remote/providers/multi_backend_remote_provider.dart';
 import '../../data/remote/services/storage_service.dart';
 import '../../features/chantier/controllers/providers/chantier_sync_provider.dart';
 import 'hive_entity_service.dart';
-import 'multi_backend_remote_service.dart';
 
 abstract class EntityLocalService<T> implements HiveService {
   Future<void> put(String id, T item);
@@ -222,45 +218,6 @@ class EntitySyncService<T extends UnifiedModel> {
   }
 }
 
-// ============================================================================
-// FACTORY POUR CRÉER LES SERVICES
-// ============================================================================
-
-class SyncServiceFactory {
-  static EntitySyncService<T> create<T extends UnifiedModel>({
-    required EntityLocalService<T> localService,
-    required String collectionPath,
-    required T Function(Map<String, dynamic>) fromJson,
-    Query<Map<String, dynamic>> Function(dynamic)? queryBuilder,
-    List<StorageMode> backends = const [StorageMode.cloudflare],
-  }) {
-    final firestoreService = FirestoreEntityService<T>(
-      collectionPath: collectionPath,
-      fromJson: fromJson,
-      queryBuilder: queryBuilder,
-    );
-
-    final firebaseService = FirebaseEntityService<T>(
-      fromJson: fromJson,
-      collectionPath: collectionPath,
-    );
-
-    final cloudFlareService = CloudflareEntityService<T>(
-      collectionName: collectionPath,
-      fromJson: fromJson,
-    );
-
-    final remoteService = MultiBackendRemoteService<T>(
-      enabledBackends: backends,
-      firestoreService: firestoreService,
-      firebaseService: firebaseService,
-      cloudflareService: cloudFlareService,
-    );
-
-    return EntitySyncService<T>(localService, remoteService);
-  }
-}
-
 /// 🔁 Synchroniser toutes les entités en une seule commande
 Future<void> syncAllEntitiesFromFirestore(Ref ref) async {
   final sw = Stopwatch()..start();
@@ -316,7 +273,7 @@ entitySyncServiceProvider<T extends UnifiedModel>(
     final remote = RemoteEntityServiceAdapter<T>(
       collection: boxName,
       fromJson: fromJson,
-      storage: ref.read(remoteStorageServiceProvider),
+      storage: ref.read(multiBackendRemoteProvider),
     );
     return EntitySyncService<T>(local, remote);
   });

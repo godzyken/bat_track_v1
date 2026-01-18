@@ -4,13 +4,14 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/unified_model.dart';
+import '../extensions/budget_extentions.dart';
 import 'facture_draft.dart';
 
 part 'facture_model.freezed.dart';
 part 'facture_model.g.dart';
 
 @freezed
-class FactureModel
+sealed class FactureModel
     with _$FactureModel, AccessControlMixin, ValidationMixin
     implements UnifiedModel {
   const FactureModel._();
@@ -27,6 +28,12 @@ class FactureModel
     @Uint8ListBase64Converter() Uint8List? signature,
     required FactureStatus status,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @Default(false) bool clientValide,
+    @Default(false) bool chefDeProjetValide,
+    @Default(false) bool techniciensValides,
+    @Default(false) bool superUtilisateurValide,
+
+    @Default(false) bool isCloudOnly,
   }) = _FactureModel;
 
   factory FactureModel.fromJson(Map<String, dynamic> json) =>
@@ -78,10 +85,18 @@ class FactureModel
   bool get isUpdated => updatedAt != null;
 
   @override
-  UnifiedModel copyWithId(String newId) {
-    // TODO: implement copyWithId
-    throw UnimplementedError();
-  }
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
+
+  @override
+  bool get toutesPartiesOntValide => ValidationHelper.computeValidationStatus(
+    clientValide: clientValide,
+    chefDeProjetValide: chefDeProjetValide,
+    techniciensValides: techniciensValides,
+    superUtilisateurValide: superUtilisateurValide,
+  );
+
+  @override
+  String? get ownerId => clientId;
 }
 
 enum FactureStatus { brouillon, validee, envoyee, payee }

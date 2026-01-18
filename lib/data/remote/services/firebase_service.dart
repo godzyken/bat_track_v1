@@ -32,10 +32,11 @@ class FirebaseService implements RemoteStorageService {
     Map<String, dynamic> data,
   ) async {
     try {
+      final dataToSave = {...data, 'id': id};
       await _firestore
           .collection(collection)
           .doc(id)
-          .set(data, SetOptions(merge: true));
+          .set(dataToSave, SetOptions(merge: true));
     } catch (e, st) {
       developer.log('FirebaseService.saveRaw error: $e\n$st');
       rethrow;

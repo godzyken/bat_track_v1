@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/unified_model.dart';
+import '../extensions/budget_extentions.dart';
 
 part 'projet.freezed.dart';
 part 'projet.g.dart';
@@ -24,7 +25,6 @@ class Projet
     @DateTimeIsoConverter() required DateTime dateDebut,
     @DateTimeIsoConverter() required DateTime dateFin,
     @NullableDateTimeIsoConverter() DateTime? deadLine,
-
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
 
     /// Entreprise associée
@@ -42,25 +42,26 @@ class Projet
     /// État du projet (workflow)
     @Default(ProjetStatus.draft) ProjetStatus status,
 
-    /// Validations explicites (optionnelles si tu gardes ton système booléen)
-    required bool clientValide,
-    required bool chefDeProjetValide,
-    required bool techniciensValides,
-    required bool superUtilisateurValide,
+    /// Validations explicites
+    @Default(false) bool clientValide,
+    @Default(false) bool chefDeProjetValide,
+    @Default(false) bool techniciensValides,
+    @Default(false) bool superUtilisateurValide,
 
     /// Gestion des versions
     required Map<String, dynamic> cloudVersion,
-    required Map<String, dynamic>? localDraft,
-    String? specialite, // 🔹 métier principal demandé
-    String? localisation, // 🔹 zone géographique du projet
+    Map<String, dynamic>? localDraft,
+    String? specialite,
+    String? localisation,
     double? budgetEstime,
     String? currentUserId,
     List<Chantier>? chantiers,
   }) = _Projet;
 
-  @override
+  /// JSON
   factory Projet.fromJson(Map<String, dynamic> json) => _$ProjetFromJson(json);
 
+  /// Mock
   factory Projet.mock() => Projet(
     id: const Uuid().v4(),
     nom: 'Categate',
@@ -91,30 +92,29 @@ class Projet
     chantiers: [],
   );
 
+  /// 🔹 Getters concrets pour les mixins
   @override
   String get ownerId => createdBy;
 
   @override
   bool get isUpdated => updatedAt != null;
+
+  bool get toutesPartiesValide => ValidationHelper.computeValidationStatus(
+    clientValide: clientValide,
+    chefDeProjetValide: chefDeProjetValide,
+    techniciensValides: techniciensValides,
+    superUtilisateurValide: superUtilisateurValide,
+  );
+
+  @override
+  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
+
   bool get isDraft => status == ProjetStatus.draft;
 
-  /// Droits de validation
-  bool canValidate(AppUser user) {
-    return user.isAdmin; // seul admin valide officiellement
-  }
-
-  /// Droits d’assignation des techniciens
-  bool canAssignTech(AppUser user) {
-    return user.isAdmin || user.isChefDeProjet;
-  }
-
-  /// Détermine si l'utilisateur peut valider/merge vers le cloud
-  bool canMergeToCloud(AppUser user) {
-    // Seul admin ou chef de projet valide
-    return user.isAdmin || user.isChefDeProjet;
-  }
-
-  /// Détermine si l'utilisateur peut editer
+  /// Droits
+  bool canValidate(AppUser user) => user.isAdmin;
+  bool canAssignTech(AppUser user) => user.isAdmin || user.isChefDeProjet;
+  bool canMergeToCloud(AppUser user) => user.isAdmin || user.isChefDeProjet;
   bool canEditUser(AppUser user, Projet projet) {
     if (user.isAdmin) return true;
     if (user.isClient &&
@@ -127,78 +127,80 @@ class Projet
   }
 
   @override
-  UnifiedModel copyWithId(String newId) => copyWith(id: newId);
-}
+  // TODO: implement budgetEstime
+  double? get budgetEstime => throw UnimplementedError();
 
-extension ProjetWorkflow on Projet {
-  /// 🔹 Vérifie si l'utilisateur peut modifier le projet
-  bool canEditProject(AppUser user) {
-    if (user.isAdmin || user.isChefDeProjet) return true;
-    if (user.isClient && ownerId == user.uid && !chefDeProjetValide) {
-      return true;
-    }
-    if (user.isTechnicien && members.contains(user.uid) && clientValide) {
-      return true;
-    }
-    return false;
+  @override
+  // TODO: implement chantiers
+  List<Chantier>? get chantiers => throw UnimplementedError();
+
+  @override
+  // TODO: implement cloudVersion
+  Map<String, dynamic> get cloudVersion => throw UnimplementedError();
+
+  @override
+  // TODO: implement company
+  String get company => throw UnimplementedError();
+
+  @override
+  // TODO: implement createdBy
+  String get createdBy => throw UnimplementedError();
+
+  @override
+  // TODO: implement currentUserId
+  String? get currentUserId => throw UnimplementedError();
+
+  @override
+  // TODO: implement dateDebut
+  DateTime get dateDebut => throw UnimplementedError();
+
+  @override
+  // TODO: implement dateFin
+  DateTime get dateFin => throw UnimplementedError();
+
+  @override
+  // TODO: implement deadLine
+  DateTime? get deadLine => throw UnimplementedError();
+
+  @override
+  // TODO: implement description
+  String get description => throw UnimplementedError();
+
+  @override
+  // TODO: implement id
+  String get id => throw UnimplementedError();
+
+  @override
+  // TODO: implement localDraft
+  Map<String, dynamic>? get localDraft => throw UnimplementedError();
+
+  @override
+  // TODO: implement localisation
+  String? get localisation => throw UnimplementedError();
+
+  @override
+  // TODO: implement members
+  List<String> get members => throw UnimplementedError();
+
+  @override
+  // TODO: implement nom
+  String get nom => throw UnimplementedError();
+
+  @override
+  // TODO: implement specialite
+  String? get specialite => throw UnimplementedError();
+
+  @override
+  // TODO: implement status
+  ProjetStatus get status => throw UnimplementedError();
+
+  @override
+  Map<String, dynamic> toJson() {
+    // TODO: implement toJson
+    throw UnimplementedError();
   }
 
-  /// 🔹 Vérifie si l'utilisateur peut valider le projet
-  bool canValidateProject(AppUser user) {
-    return user.isAdmin || user.isChefDeProjet;
-  }
-
-  /// 🔹 Vérifie si l'utilisateur peut être assigné comme technicien
-  bool canBeAssigned(AppUser user) {
-    return user.isTechnicien && clientValide && !members.contains(user.uid);
-  }
-
-  /// 🔹 Marque le projet comme validé par le client
-  Projet validateByClient(String clientId) {
-    if (ownerId != clientId) throw Exception("Seul le créateur peut valider.");
-    return copyWith(clientValide: true);
-  }
-
-  /// 🔹 Marque le projet comme validé par le chef de projet / admin
-  Projet validateByAdminOrChef(AppUser user) {
-    if (!canValidateProject(user)) throw Exception("Utilisateur non autorisé.");
-    return copyWith(chefDeProjetValide: true);
-  }
-
-  /// 🔹 Assignation d'un technicien
-  Projet assignTechnician(AppUser tech) {
-    if (!canBeAssigned(tech)) {
-      throw Exception("Technicien non valide ou déjà assigné.");
-    }
-    final updatedMembers = List<String>.from(members)..add(tech.uid);
-    return copyWith(members: updatedMembers);
-  }
-
-  /// 🔹 Statut global du projet
-  String get status {
-    if (!clientValide) return 'draft';
-    if (clientValide && !chefDeProjetValide) return 'pendingValidation';
-    if (clientValide && chefDeProjetValide && !techniciensValides) {
-      return 'validatedWithoutTechnicians';
-    }
-    if (clientValide && chefDeProjetValide && techniciensValides) {
-      return 'fullyValidated';
-    }
-    return 'unknown';
-  }
-}
-
-extension ProjetCopy on Projet {
-  Projet copyWithField(String key, dynamic value) {
-    switch (key) {
-      case 'specialite':
-        return copyWith(specialite: value as String);
-      case 'localisation':
-        return copyWith(localisation: value as String);
-      case 'technicienIds':
-        return copyWith(assignedUserIds: List<String>.from(value));
-      default:
-        return this;
-    }
-  }
+  @override
+  // TODO: implement updatedAt
+  DateTime? get updatedAt => throw UnimplementedError();
 }

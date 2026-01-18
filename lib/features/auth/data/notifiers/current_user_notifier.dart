@@ -12,12 +12,11 @@ class CurrentUserNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
     if (authState == null) return null;
 
     // On écoute le flux Firestore
-    final stream =
-        ref
-            .watch(firestoreProvider)
-            .collection("users")
-            .doc(authState.uid)
-            .snapshots();
+    final stream = ref
+        .watch(firestoreProvider)
+        .collection("users")
+        .doc(authState.uid)
+        .snapshots();
 
     // On transforme le flux en Future pour le build initial,
     // puis on gère les mises à jour via le stream.
@@ -50,8 +49,9 @@ class CurrentUserNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
 
   dynamic _convert(dynamic value) {
     if (value is Timestamp) return value.toDate().toIso8601String();
-    if (value is Map<String, dynamic>)
+    if (value is Map<String, dynamic>) {
       return value.map((k, v) => MapEntry(k, _convert(v)));
+    }
     if (value is List) return value.map(_convert).toList();
     return value;
   }

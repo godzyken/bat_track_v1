@@ -1,6 +1,6 @@
 import 'package:bat_track_v1/data/core/unified_model.dart';
 import 'package:bat_track_v1/models/services/entity_sync_services.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
 class HiveEntityService<T extends UnifiedModel>
     implements EntityLocalService<T> {
@@ -29,10 +29,9 @@ class HiveEntityService<T extends UnifiedModel>
   @override
   Stream<List<T>> watchAll() {
     return _box!.watch().map(
-      (_) =>
-          _box!.values
-              .map((json) => fromJson(Map<String, dynamic>.from(json)))
-              .toList(),
+      (_) => _box!.values
+          .map((json) => fromJson(Map<String, dynamic>.from(json)))
+          .toList(),
     );
   }
 
@@ -66,25 +65,23 @@ class HiveEntityService<T extends UnifiedModel>
 
   Stream<List<T>> watchByQuery(Map<String, dynamic> query) {
     return _box!.watch().map(
-      (_) =>
-          _box!.values
-              .map((json) => fromJson(Map<String, dynamic>.from(json)))
-              .where(
-                (item) =>
-                    query.entries.every((e) => item.toJson()[e.key] == e.value),
-              )
-              .toList(),
+      (_) => _box!.values
+          .map((json) => fromJson(Map<String, dynamic>.from(json)))
+          .where(
+            (item) =>
+                query.entries.every((e) => item.toJson()[e.key] == e.value),
+          )
+          .toList(),
     );
   }
 
   Future<void> deleteByQuery(Map<String, dynamic> query) async {
-    final idsToDelete =
-        _box!.keys.where((key) {
-          final json = _box!.get(key);
-          if (json == null) return false;
-          final entity = fromJson(Map<String, dynamic>.from(json));
-          return query.entries.every((e) => entity.toJson()[e.key] == e.value);
-        }).toList();
+    final idsToDelete = _box!.keys.where((key) {
+      final json = _box!.get(key);
+      if (json == null) return false;
+      final entity = fromJson(Map<String, dynamic>.from(json));
+      return query.entries.every((e) => entity.toJson()[e.key] == e.value);
+    }).toList();
     for (final id in idsToDelete) {
       await _box!.delete(id);
     }

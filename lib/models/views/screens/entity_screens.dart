@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/core/unified_model.dart';
+import '../../data/hive_model.dart';
 import '../../services/logged_entity_service.dart';
 
-class EntityScreen<T extends UnifiedModel> extends StatelessWidget {
+class EntityScreen<T extends UnifiedModel, N extends HiveModel<T>>
+    extends StatelessWidget {
   final String title;
-  final ProviderBase<SafeAndLoggedEntityService<T>> serviceProvider;
+  final ProviderBase<SafeAndLoggedEntityService<T, N>> serviceProvider;
   final T Function() createEmpty;
 
   const EntityScreen({

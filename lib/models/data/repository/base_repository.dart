@@ -1,57 +1,43 @@
 import '../../../data/core/unified_model.dart';
-import '../../../data/remote/services/firestore_service.dart';
-import '../adapter/typedefs.dart';
+import '../../services/logged_entity_service.dart';
+import '../hive_model.dart';
 
-abstract class BaseRepository<T extends UnifiedModel> {
-  final String collectionPath;
-  final T Function(Map<String, dynamic>) fromJson;
+abstract class BaseRepository<M extends UnifiedModel, E extends HiveModel<M>> {
+  /// Le service qui gère déjà la sécurité, les logs, Hive et le Multi-Remote
+  final SafeAndLoggedEntityService<M, E> service;
 
-  const BaseRepository(this.collectionPath, this.fromJson);
+  const BaseRepository(this.service);
 
-  Future<T?> getById(String id) {
-    return FirestoreService.getData(
-      collectionPath: collectionPath,
-      docId: id,
-      fromJson: fromJson,
-    );
+  // 🔍 READ - Utilise la méthode hybride (Local avec fallback Remote)
+  Future<M?> getById(String id) => service.get(id);
+
+  // 📜 READ ALL - Utilise la méthode hybride
+  Future<List<M>> getAll() => service.getAll();
+
+  // 📡 WATCH - Le flux fusionné Local + Remote
+  Stream<List<M>> watchAll() => service.watchAll();
+
+  // 💾 SAVE - Sauvegarde synchronisée (Hive + Cloud)
+  Future<void> save(M data) => service.save(data);
+
+  // 🗑 DELETE - Suppression synchronisée
+  Future<void> delete(String id) => service.delete(id);
+
+  // 🔄 SYNC - Forcer la synchronisation depuis le serveur
+  Future<void> refreshFromServer() => service.syncAllFromRemote();
+
+  /// Récupère des données filtrées (Remote)
+  Future<List<M>> getFiltered({
+    required dynamic Function(dynamic query) queryBuilder,
+  }) async {
+    // On délègue au service qui gère le Multi-Backend
+    return await service.getRemoteFiltered(queryBuilder: queryBuilder);
   }
 
-  Future<List<T>> getAll({int limit = 20}) {
-    return FirestoreService.getAll(
-      collectionPath: collectionPath,
-      fromJson: fromJson,
-      limitTo: limit,
-    );
-  }
-
-  Future<List<T>> getFiltered({required QueryBuilder queryBuilder}) {
-    return FirestoreService.getFiltered(
-      collectionPath: collectionPath,
-      fromJson: fromJson,
-      queryBuilder: queryBuilder,
-    );
-  }
-
-  Stream<List<T>> watchFiltered({required QueryBuilder queryBuilder}) {
-    return FirestoreService.watchCollection(
-      collectionPath: collectionPath,
-      fromJson: fromJson,
-      queryBuilder: queryBuilder,
-    );
-  }
-
-  Future<void> set(T data) {
-    return FirestoreService.setData(
-      collectionPath: collectionPath,
-      docId: data.id,
-      data: data,
-    );
-  }
-
-  Future<void> delete(String id) {
-    return FirestoreService.deleteData(
-      collectionPath: collectionPath,
-      docId: id,
-    );
+  /// Écoute des données filtrées (Remote)
+  Stream<List<M>> watchFiltered({
+    required dynamic Function(dynamic query) queryBuilder,
+  }) {
+    return service.watchRemoteFiltered(queryBuilder: queryBuilder);
   }
 }

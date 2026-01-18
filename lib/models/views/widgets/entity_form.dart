@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/core/unified_model.dart';
-import '../../../features/auth/data/notifiers/auth_notifier.dart';
+import '../../../features/auth/data/providers/auth_notifier_provider.dart';
 import '../../../features/auth/views/widgets/multi_user_dropdown_field.dart';
 import '../../../features/auth/views/widgets/user_dropdown_field.dart';
 import '../../data/adapter/typedefs.dart';
@@ -222,11 +222,9 @@ class _EntityFormState<T extends UnifiedModel>
       final raw = _rawOverrides[key]!.text;
       result[key] =
           (_expertMode &&
-                  (original is Map ||
-                      original is List ||
-                      original is UnifiedModel))
-              ? json.decode(raw)
-              : _parseValue(original, _controllers[key]!.text);
+              (original is Map || original is List || original is UnifiedModel))
+          ? json.decode(raw)
+          : _parseValue(original, _controllers[key]!.text);
     }
     // 🔐 Création spécifique Firebase pour AppUser
     if (T.toString() == 'AppUser') {
@@ -252,9 +250,13 @@ class _EntityFormState<T extends UnifiedModel>
             );
 
         if (userCredential == null || userCredential.user == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Échec de création de l'utilisateur")),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Échec de création de l'utilisateur"),
+              ),
+            );
+          }
           return;
         }
 
@@ -264,14 +266,18 @@ class _EntityFormState<T extends UnifiedModel>
         // Enlever le mot de passe (ne doit pas être sauvegardé)
         result.remove('motDePasse');
       } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Erreur : ${e.toString()}")));
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Erreur : ${e.toString()}")));
+        }
         return;
       }
     }
     widget.onSubmit(widget.fromJson(result));
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   List<Widget> _buildFields() {

@@ -2,10 +2,7 @@ import 'package:bat_track_v1/features/chantier/controllers/notifiers/chantiers_l
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
-import '../../../../data/local/providers/hive_provider.dart';
-import '../../../../data/local/services/service_type.dart';
-import '../../../../models/data/state_wrapper/wrappers.dart';
-import '../../../../models/notifiers/sync_entity_notifier.dart';
+import '../../../../data/remote/providers/chantier_provider.dart';
 import '../../../../models/providers/synchrones/facture_sync_provider.dart';
 import '../../../../models/services/entity_sync_services.dart';
 import '../../../auth/data/providers/current_user_provider.dart';
@@ -19,26 +16,14 @@ final chantierInitialProvider = FutureProvider.family<Chantier, String>((
 
   return chantier?.id == id
       ? Chantier(
-        id: chantier!.id,
-        nom: chantier.nom,
-        adresse: chantier.adresse,
-        clientId: chantier.clientId,
-        dateDebut: chantier.dateDebut,
-      )
+          id: chantier!.id,
+          nom: chantier.nom,
+          adresse: chantier.adresse,
+          clientId: chantier.clientId,
+          dateDebut: chantier.dateDebut,
+        )
       : Chantier.mock();
 });
-
-final chantierSyncProvider = StateNotifierProvider.autoDispose
-    .family<SyncEntityNotifier<Chantier>, SyncedState<Chantier>, Chantier>((
-      ref,
-      chantier,
-    ) {
-      return SyncEntityNotifier<Chantier>(
-        entityService: chantierService,
-        storageService: storageService,
-        initialState: chantier,
-      );
-    });
 
 final chantierEtapesTempProvider = FutureProvider.autoDispose
     .family<List<ChantierEtape>, String>((ref, id) async {

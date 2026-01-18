@@ -50,6 +50,63 @@ class Client
   bool get isUpdated => updatedAt != null;
 
   @override
-  @override
   UnifiedModel copyWithId(String newId) => copyWith(id: newId);
+
+  @override
+  // TODO: implement adresse
+  String get adresse => throw UnimplementedError();
+
+  @override
+  // TODO: implement budgetPrevu
+  double? get budgetPrevu => throw UnimplementedError();
+
+  @override
+  // TODO: implement contactName
+  String? get contactName => throw UnimplementedError();
+
+  @override
+  // TODO: implement email
+  String get email => throw UnimplementedError();
+
+  @override
+  // TODO: implement id
+  String get id => throw UnimplementedError();
+
+  @override
+  // TODO: implement interventionsCount
+  int get interventionsCount => throw UnimplementedError();
+
+  @override
+  // TODO: implement lastInterventionDate
+  DateTime get lastInterventionDate => throw UnimplementedError();
+
+  @override
+  // TODO: implement nom
+  String get nom => throw UnimplementedError();
+
+  @override
+  // TODO: implement ownerId
+  String? get ownerId => throw UnimplementedError();
+
+  @override
+  // TODO: implement priority
+  String get priority => throw UnimplementedError();
+
+  @override
+  // TODO: implement status
+  String get status => throw UnimplementedError();
+
+  @override
+  // TODO: implement telephone
+  String get telephone => throw UnimplementedError();
+
+  @override
+  Map<String, dynamic> toJson() {
+    // TODO: implement toJson
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement updatedAt
+  DateTime? get updatedAt => throw UnimplementedError();
 }

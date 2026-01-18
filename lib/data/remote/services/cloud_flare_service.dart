@@ -37,10 +37,11 @@ class CloudFlareService extends RemoteStorageService with NoSuchMethodLogger {
     Map<String, dynamic> data,
   ) async {
     try {
+      final dataToSave = {...data, 'id': id};
       await _db
           .collection(collectionPath)
           .doc(id)
-          .set(data, SetOptions(merge: true));
+          .set(dataToSave, SetOptions(merge: true));
     } catch (e, st) {
       developer.log('CloudFlareService.saveRaw error: $e\n$st');
       rethrow;

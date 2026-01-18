@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:bat_track_v1/data/local/models/documents/pieces_jointes.dart';
 import 'package:bat_track_v1/models/data/hive_model.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
 import '../base/has_files.dart';
 
 part 'pieces_jointes_entity.g.dart';
 
-@HiveType(typeId: 5, adapterName: 'PieceJointeAdapter')
+@HiveType(typeId: 5)
 class PieceJointeEntity extends HiveObject
     implements HiveModel<PieceJointe>, HasFile {
   @HiveField(0)

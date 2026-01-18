@@ -2,10 +2,9 @@ import 'dart:developer' as developer;
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 
-import '../adapters/hive_adapters.dart';
 import '../models/index_model_extention.dart';
 
 class HiveService {
@@ -14,7 +13,6 @@ class HiveService {
   /// Initialise Hive et enregistre les adaptateurs
   static Future<void> init() async {
     await Hive.initFlutter();
-    await registerHiveAdapters();
   }
 
   /// Ouvre une box typée et la met en cache
@@ -140,7 +138,9 @@ class HiveService {
         try {
           final box = await _openBox<T>(boxName);
           final image = NetworkImage(pj.url);
-          await precacheImage(image, c);
+          if (c.mounted) {
+            await precacheImage(image, c);
+          }
           await box.put(pj.id, pj);
           developer.log('[✔] Image précachée: $url');
         } catch (e) {

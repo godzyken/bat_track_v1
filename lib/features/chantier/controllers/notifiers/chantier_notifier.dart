@@ -1,9 +1,13 @@
+import 'dart:typed_data' show Uint8List;
+
 import 'package:bat_track_v1/core/providers/entity_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/services/unified_entity_service.dart';
+import '../../../../data/local/models/entities/index_entity_extention.dart';
 import '../../../../data/local/models/index_model_extention.dart';
+import '../../../../data/remote/providers/chantier_provider.dart';
 
 // J'utilise le nom de classe 'ChantierNotifier' qui était implicitement votre intention.
 class ChantierNotifier
@@ -12,12 +16,14 @@ class ChantierNotifier
 
   // Champs internes
   late String _id;
-  late UnifiedEntityService<Chantier> _chantierService;
-  late UnifiedEntityService<ChantierEtape> _etapeService;
-  late UnifiedEntityService<Piece> _pieceService;
-  late UnifiedEntityService<PieceJointe> _pieceJointeService;
-  late UnifiedEntityService<FactureDraft> _factureDraftService;
-  late UnifiedEntityService<Intervention> _interventionService;
+  late UnifiedEntityService<Chantier, ChantierEntity> _chantierService;
+  late UnifiedEntityService<ChantierEtape, ChantierEtapesEntity> _etapeService;
+  late UnifiedEntityService<Piece, PieceEntity> _pieceService;
+  late UnifiedEntityService<PieceJointe, PieceJointeEntity> _pieceJointeService;
+  late UnifiedEntityService<FactureDraft, FactureDraftEntity>
+  _factureDraftService;
+  late UnifiedEntityService<Intervention, InterventionEntity>
+  _interventionService;
 
   @override
   Future<Chantier?> build(String id) async {
@@ -222,16 +228,18 @@ class ChantierNotifier
     }
 
     final facture = FactureDraft(
-      factureId:
-          _id, // L'ID de la facture est le même que celui du chantier pour la retrouver
+      factureId: _id, // L'ID de la facture
       chantierId: chantier.id,
       clientId: clientId,
       lignesManuelles: lignes,
       signature: Uint8List(0), // Signature vide par défaut
       isFinalized: false,
-      remise: chantier.remise ?? 0, // Hypothèse: Chantier a un champ 'remise'
+      remise:
+          chantier.remiseParDefaut ??
+          0, // Hypothèse: Chantier a un champ 'remise'
       tauxTVA:
-          chantier.tauxTVA ?? 1.20, // Hypothèse: Chantier a un champ 'tauxTVA'
+          chantier.tauxTVAParDefaut ??
+          1.20, // Hypothèse: Chantier a un champ 'tauxTVA'
       dateDerniereModification: DateTime.now(),
     );
 

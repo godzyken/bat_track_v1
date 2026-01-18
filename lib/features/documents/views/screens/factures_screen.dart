@@ -37,19 +37,22 @@ class FacturesScreen extends ConsumerWidget {
             tooltip: 'Exporter les factures en pdf',
             onPressed: () async {
               try {
-                final factures =
-                    await ref.read(factureSyncServiceProvider).getAll();
+                final factures = await ref
+                    .read(factureSyncServiceProvider)
+                    .getAll();
                 final service = ref.read(pdfGeneratorProvider);
                 final pdfDoc = await service.generatePdfDocument(factures);
                 final bytes = await pdfDoc.save();
                 await Printing.layoutPdf(onLayout: (_) => bytes);
               } catch (e, st) {
                 debugPrint('Erreur PDF : $e\n$st');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Erreur lors de la génération du PDF'),
-                  ),
-                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Erreur lors de la génération du PDF'),
+                    ),
+                  );
+                }
               }
             },
           ),
@@ -61,18 +64,11 @@ class FacturesScreen extends ConsumerWidget {
         onEdit: (facture) {
           showDialog(
             context: context,
-            builder:
-                (_) => EntityForm<Facture>(
-                  fromJson: (json) => Facture.fromJson(json),
-                  initialValue: facture,
-                  customFieldBuilder: (
-                    context,
-                    key,
-                    value,
-                    controller,
-                    onChanged,
-                    expertMode,
-                  ) {
+            builder: (_) => EntityForm<Facture>(
+              fromJson: (json) => Facture.fromJson(json),
+              initialValue: facture,
+              customFieldBuilder:
+                  (context, key, value, controller, onChanged, expertMode) {
                     // Options a personnaliser ici
                     switch (key) {
                       case 'numero':
@@ -82,11 +78,9 @@ class FacturesScreen extends ConsumerWidget {
                             labelText: 'Numéro de facture',
                           ),
                           onChanged: onChanged,
-                          validator:
-                              (value) =>
-                                  value == null || value.isEmpty
-                                      ? 'Champs requis'
-                                      : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'Champs requis'
+                              : null,
                         );
                       case 'total':
                         return TextFormField(
@@ -101,23 +95,22 @@ class FacturesScreen extends ConsumerWidget {
                         return null;
                     }
                   },
-                  onSubmit: (updated) async {
-                    await ref.read(factureSyncServiceProvider).syncOne(updated);
-                  },
-                  createEmpty: () => facture,
-                ),
+              onSubmit: (updated) async {
+                await ref.read(factureSyncServiceProvider).syncOne(updated);
+              },
+              createEmpty: () => facture,
+            ),
           );
         },
-        onDelete:
-            isClient && isTech
-                ? (id) async {
-                  await ref
-                      .read(firestoreProvider)
-                      .collection('factures')
-                      .doc(id)
-                      .delete();
-                }
-                : null,
+        onDelete: isClient && isTech
+            ? (id) async {
+                await ref
+                    .read(firestoreProvider)
+                    .collection('factures')
+                    .doc(id)
+                    .delete();
+              }
+            : null,
         infoOverride: info,
         policy: MultiRolePolicy(),
         currentRole: user.role,
@@ -127,14 +120,13 @@ class FacturesScreen extends ConsumerWidget {
         onPressed: () {
           showDialog(
             context: context,
-            builder:
-                (_) => EntityForm<Facture>(
-                  fromJson: (json) => Facture.fromJson(json),
-                  onSubmit: (facture) async {
-                    await ref.read(factureSyncServiceProvider).syncOne(facture);
-                  },
-                  createEmpty: () => Facture.mock(),
-                ),
+            builder: (_) => EntityForm<Facture>(
+              fromJson: (json) => Facture.fromJson(json),
+              onSubmit: (facture) async {
+                await ref.read(factureSyncServiceProvider).syncOne(facture);
+              },
+              createEmpty: () => Facture.mock(),
+            ),
           );
         },
         child: const Icon(Icons.add),

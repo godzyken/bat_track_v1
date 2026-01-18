@@ -1,3 +1,4 @@
+import 'package:bat_track_v1/data/local/models/entities/index_entity_extention.dart';
 import 'package:bat_track_v1/data/local/services/service_type.dart';
 
 import '../../data/local/models/index_model_extention.dart';
@@ -5,9 +6,10 @@ import 'logged_entity_service.dart';
 
 class DashboardService {
   final AppUser user;
-  final SafeAndLoggedEntityService<Projet> projetService;
-  final SafeAndLoggedEntityService<Chantier> chantierService;
-  final SafeAndLoggedEntityService<Intervention> interventionService;
+  final SafeAndLoggedEntityService<Projet, ProjetEntity> projetService;
+  final SafeAndLoggedEntityService<Chantier, ChantierEntity> chantierService;
+  final SafeAndLoggedEntityService<Intervention, InterventionEntity>
+  interventionService;
 
   DashboardService({
     required this.user,

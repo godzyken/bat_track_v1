@@ -1,17 +1,17 @@
 import 'package:bat_track_v1/data/local/models/entities/chantier_etapes_entity.dart';
 import 'package:bat_track_v1/data/local/models/entities/intervention_entity.dart';
 import 'package:bat_track_v1/data/local/models/entities/pieces_jointes_entity.dart';
-import 'package:bat_track_v1/models/data/hive_model.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
+import '../../../../models/data/hive_model.dart';
 import '../chantiers/chantier.dart';
 
 part 'chantier_entity.g.dart';
 
-@HiveType(typeId: 0, adapterName: 'ChantierEntityAdapter')
+@HiveType(typeId: 0)
 class ChantierEntity extends HiveObject implements HiveModel<Chantier> {
   @HiveField(0)
-  final String chId;
+  final String cid;
   @HiveField(1)
   final String nom;
   @HiveField(2)
@@ -52,9 +52,13 @@ class ChantierEntity extends HiveObject implements HiveModel<Chantier> {
   final bool superUtilisateurValide;
   @HiveField(20)
   final bool isCloudOnly;
+  @HiveField(21)
+  final double tauxTVA;
+  @HiveField(22)
+  final double? remise;
 
   ChantierEntity({
-    required this.chId,
+    required this.cid,
     required this.nom,
     required this.adresse,
     required this.clientId,
@@ -74,7 +78,9 @@ class ChantierEntity extends HiveObject implements HiveModel<Chantier> {
     required this.techniciensValides,
     required this.superUtilisateurValide,
     required this.isCloudOnly,
+    required this.tauxTVA,
     this.chUpdatedAt,
+    this.remise = 0.0,
   });
 
   @override
@@ -100,17 +106,19 @@ class ChantierEntity extends HiveObject implements HiveModel<Chantier> {
     superUtilisateurValide: superUtilisateurValide,
     isCloudOnly: isCloudOnly,
     updatedAt: updatedAt,
+    tauxTVAParDefaut: tauxTVA,
+    remiseParDefaut: remise,
   );
 
   @override
-  String get id => chId;
+  String get id => cid;
 
   @override
   DateTime? get updatedAt => chUpdatedAt;
 
   factory ChantierEntity.fromModel(Chantier model) {
     return ChantierEntity(
-      chId: model.id,
+      cid: model.id,
       nom: model.nom,
       adresse: model.adresse,
       clientId: model.clientId,
@@ -118,17 +126,18 @@ class ChantierEntity extends HiveObject implements HiveModel<Chantier> {
       dateFin: model.dateFin,
       etat: model.etat,
       technicienIds: model.technicienIds,
-      documents:
-          model.documents.map((e) => PieceJointeEntity.fromModel(e)).toList(),
-      etapes:
-          model.etapes.map((e) => ChantierEtapesEntity.fromModel(e)).toList(),
+      documents: model.documents
+          .map((e) => PieceJointeEntity.fromModel(e))
+          .toList(),
+      etapes: model.etapes
+          .map((e) => ChantierEtapesEntity.fromModel(e))
+          .toList(),
       commentaire: model.commentaire,
       budgetPrevu: model.budgetPrevu,
       budgetReel: model.budgetReel,
-      interventions:
-          model.interventions
-              .map((e) => InterventionEntity.fromModel(e))
-              .toList(),
+      interventions: model.interventions
+          .map((e) => InterventionEntity.fromModel(e))
+          .toList(),
       chefDeProjetId: model.chefDeProjetId,
       clientValide: model.clientValide,
       chefDeProjetValide: model.chefDeProjetValide,
@@ -136,6 +145,8 @@ class ChantierEntity extends HiveObject implements HiveModel<Chantier> {
       superUtilisateurValide: model.superUtilisateurValide,
       isCloudOnly: model.isCloudOnly,
       chUpdatedAt: model.updatedAt,
+      tauxTVA: model.tauxTVAParDefaut,
+      remise: model.remiseParDefaut,
     );
   }
 

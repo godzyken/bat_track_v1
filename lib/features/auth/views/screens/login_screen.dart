@@ -50,7 +50,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           .read(authRepositoryProvider)
           .signIn(emailCtrl.text.trim(), passCtrl.text.trim());
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text("Erreur : $e")));
@@ -87,8 +87,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             decoration: const InputDecoration(
                               labelText: "Email",
                             ),
-                            validator:
-                                (v) => v!.isEmpty ? "Champ requis" : null,
+                            validator: (v) =>
+                                v!.isEmpty ? "Champ requis" : null,
                           ),
                           const SizedBox(height: 16),
                           TextFormField(
@@ -97,8 +97,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               labelText: "Mot de passe",
                             ),
                             obscureText: true,
-                            validator:
-                                (v) => v!.isEmpty ? "Champ requis" : null,
+                            validator: (v) =>
+                                v!.isEmpty ? "Champ requis" : null,
                           ),
                           const SizedBox(height: 24),
                           const Text(
@@ -114,10 +114,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             const SizedBox(height: 32),
                             ElevatedButton(
                               onPressed: loading ? null : () => login(context),
-                              child:
-                                  loading
-                                      ? const CircularProgressIndicator()
-                                      : const Text("Se connecter"),
+                              child: loading
+                                  ? const CircularProgressIndicator()
+                                  : const Text("Se connecter"),
                             ),
                           ],
                         ],
@@ -137,10 +136,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child:
-                      loading
-                          ? const CircularProgressIndicator()
-                          : const Text("Se connecter"),
+                  child: loading
+                      ? const CircularProgressIndicator()
+                      : const Text("Se connecter"),
                 ),
               ),
           ],

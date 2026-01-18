@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
-import '../../../../data/remote/providers/chantier_provider.dart';
+import '../../controllers/providers/chantier_sync_provider.dart';
 import 'chantier_details_screen.dart';
 
 class ChantierDetailLoader extends ConsumerWidget {
@@ -18,19 +18,17 @@ class ChantierDetailLoader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chantierAsync =
-        initialData != null
-            ? AsyncValue.data(initialData!)
-            : ref.watch(chantierFutureProvider(chantierId));
+    final chantierAsync = initialData != null
+        ? AsyncValue.data(initialData!)
+        : ref.watch(chantierInitialProvider(chantierId));
 
     return chantierAsync.when(
       loading: () => const LoadingApp(),
-      error:
-          (e, _) => ErrorApp(
-            message: "Erreur lors du chargement des détails du chantier : $e",
-          ),
+      error: (e, _) => ErrorApp(
+        message: "Erreur lors du chargement des détails du chantier : $e",
+      ),
       data: (chantier) {
-        if (chantier == null) {
+        if (chantier.id.isEmpty) {
           return const Scaffold(
             body: Center(child: Text('Chantier introuvable')),
           );

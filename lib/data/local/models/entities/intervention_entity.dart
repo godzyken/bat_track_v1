@@ -1,7 +1,8 @@
 import 'package:bat_track_v1/data/local/models/entities/pieces_jointes_entity.dart';
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
-import 'package:bat_track_v1/models/data/hive_model.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
+
+import '../../../../models/data/hive_model.dart';
 
 part 'intervention_entity.g.dart';
 
@@ -56,8 +57,9 @@ class InterventionEntity extends HiveObject implements HiveModel<Intervention> {
       description: model.description,
       date: model.create,
       statut: model.statut,
-      document:
-          model.document.map((e) => PieceJointeEntity.fromModel(e)).toList(),
+      document: model.document
+          .map((e) => PieceJointeEntity.fromModel(e))
+          .toList(),
       titre: model.titre,
       commentaire: model.commentaire,
       facture: model.facture,

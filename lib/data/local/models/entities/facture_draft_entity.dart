@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:bat_track_v1/data/local/models/documents/facture_draft.dart';
 import 'package:bat_track_v1/models/data/hive_model.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:uuid/uuid.dart';
 
 part 'facture_draft_entity.g.dart';
@@ -53,10 +53,9 @@ class FactureDraftEntity extends HiveObject implements HiveModel<FactureDraft> {
       factureId: model.id,
       chantierId: model.chantierId,
       clientId: model.clientId,
-      lignesManuelles:
-          model.lignesManuelles
-              .map((e) => CustomLigneFactureEntity.fromModel(e))
-              .toList(),
+      lignesManuelles: model.lignesManuelles
+          .map((e) => CustomLigneFactureEntity.fromModel(e))
+          .toList(),
       signature: model.signature,
       isFinalized: model.isFinalized,
       remise: model.remise,
@@ -104,11 +103,19 @@ class CustomLigneFactureEntity extends HiveObject
   @HiveField(3)
   double total;
 
+  @HiveField(4)
+  double remisePourcentage;
+
+  @HiveField(5)
+  double tauxTVA;
+
   CustomLigneFactureEntity({
     required this.description,
     required this.montant,
     required this.quantite,
     required this.total,
+    required this.remisePourcentage,
+    required this.tauxTVA,
   });
 
   factory CustomLigneFactureEntity.fromModel(CustomLigneFacture model) {
@@ -117,6 +124,8 @@ class CustomLigneFactureEntity extends HiveObject
       montant: model.montant,
       quantite: model.quantite,
       total: model.total,
+      remisePourcentage: model.remisePourcentage,
+      tauxTVA: model.tauxTVA,
     );
   }
 

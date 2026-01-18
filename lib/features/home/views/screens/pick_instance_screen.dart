@@ -1,9 +1,8 @@
-import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
+import 'package:bat_track_v1/providers/box_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../data/local/providers/hive_provider.dart';
 import '../../../../data/remote/providers/dolibarr_instance_provider.dart';
 import '../../../../data/remote/services/dolibarr_loader.dart';
 import '../../../auth/data/providers/current_user_provider.dart';
@@ -24,11 +23,10 @@ class PickInstanceScreen extends ConsumerWidget {
     if (user != null) {
       final updatedUser = user.copyWith(instanceId: instance.name);
 
-      final userBox = ref.read(userBoxProvider);
+      final userBox = ref.read(boxProvider('users'));
       await userBox.put(updatedUser.id, updatedUser);
 
-      ref.read(currentUserStateProvider.notifier).state =
-          updatedUser.toUserModel();
+      ref.read(currentUserStateProvider.notifier).state!;
     }
 
     // 3. Naviguer

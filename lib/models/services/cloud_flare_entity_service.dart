@@ -2,67 +2,56 @@ import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart'
 
 import '../../core/services/unified_entity_service.dart';
 import '../../data/core/unified_model.dart';
-import '../../data/remote/services/cloud_flare_service.dart';
 
-class CloudflareEntityService<T extends UnifiedModel>
-    implements UnifiedEntityService<T> {
+class CloudflareEntityService<M extends UnifiedModel>
+    implements BaseEntityService<M> {
   final String collectionName;
-  final T Function(Map<String, dynamic>) fromJson;
-
-  @override
-  final RemoteStorageService remoteStorage = CloudFlareService.instance;
+  final M Function(Map<String, dynamic>) fromJson;
+  final RemoteStorageService remoteStorage;
 
   CloudflareEntityService({
     required this.collectionName,
     required this.fromJson,
+    required this.remoteStorage,
   });
 
   @override
-  Future<void> save(T item, [String? id]) async {
-    await CloudFlareService.instance.saveRaw(
-      collectionName,
-      id ?? item.id,
-      item.toJson(),
-    );
+  Future<void> save(M model) async {
+    await remoteStorage.saveRaw(collectionName, model.id, model.toJson());
   }
 
-  @override
-  Future<void> update(T item, String id) async => save(item, id);
+  Future<void> update(M item, String id) async => save(item);
 
   @override
   Future<void> delete(String id) async {
-    await CloudFlareService.instance.deleteRaw(collectionName, id);
+    await remoteStorage.deleteRaw(collectionName, id);
   }
 
   @override
-  Future<List<T>> getAll() async {
-    final raws = await CloudFlareService.instance.getAllRaw(collectionName);
+  Future<List<M>> getAll() async {
+    final raws = await remoteStorage.getAllRaw(collectionName);
     return raws.map(fromJson).toList();
   }
 
   @override
-  Future<T?> get(String id) async {
-    final raw = await CloudFlareService.instance.getRaw(collectionName, id);
+  Future<M?> get(String id) async {
+    final raw = await remoteStorage.getRaw(collectionName, id);
     if (raw.isEmpty) return null;
     return fromJson(raw);
   }
 
-  @override
-  Future<T?> getById(String id) async => get(id);
+  Future<M?> getById(String id) async => get(id);
 
-  @override
   Future<bool> exists(String id) async {
-    final raw = await CloudFlareService.instance.getRaw(collectionName, id);
+    final raw = await remoteStorage.getRaw(collectionName, id);
     return raw.isNotEmpty;
   }
 
-  @override
   Future<List<String>> getKeys() async {
-    final raws = await CloudFlareService.instance.getAllRaw(collectionName);
+    final raws = await remoteStorage.getAllRaw(collectionName);
     return raws.map((r) => r['id'] as String).toList();
   }
 
-  @override
   Future<void> deleteAll() async {
     final keys = await getKeys();
     for (final id in keys) {
@@ -70,18 +59,15 @@ class CloudflareEntityService<T extends UnifiedModel>
     }
   }
 
-  @override
   Future<void> clear() async => deleteAll();
 
-  @override
-  Future<List<T>> where(bool Function(T) test) async {
+  Future<List<M>> where(bool Function(M) test) async {
     final all = await getAll();
     return all.where(test).toList();
   }
 
-  @override
-  Future<List<T>> sortedBy(
-    Comparable Function(T) selector, {
+  Future<List<M>> sortedBy(
+    Comparable Function(M) selector, {
     bool descending = false,
   }) async {
     final list = await getAll();
@@ -91,13 +77,11 @@ class CloudflareEntityService<T extends UnifiedModel>
     return list;
   }
 
-  @override
-  Future<List<T>> query(String query) async {
+  Future<List<M>> query(String query) async {
     final all = await getAll();
     return all.where((e) => e.toString().contains(query)).toList();
   }
 
-  @override
   Future<void> deleteByQuery(Map<String, dynamic> queryStr) async {
     if (queryStr.isEmpty) return;
 
@@ -107,149 +91,35 @@ class CloudflareEntityService<T extends UnifiedModel>
     }
   }
 
-  @override
-  Stream<List<T>> watchByChantier(String chantierId) {
-    return CloudFlareService.instance
+  Future<List<M>> getByQuery(Map<String, dynamic> query) async {
+    final all = await getAll();
+    return all.where((item) {
+      final json = item.toJson();
+      return query.entries.every((entry) => json[entry.key] == entry.value);
+    }).toList();
+  }
+
+  Stream<List<M>> watchByChantier(String chantierId) {
+    return remoteStorage
         .watchCollectionRaw(
           collectionName,
           queryBuilder: (q) => q.where('chantierId', isEqualTo: chantierId),
         )
         .map(
-          (items) =>
-              items
-                  .map((it) => fromJson(Map<String, dynamic>.from(it)))
-                  .toList(),
+          (items) => items
+              .map((it) => fromJson(Map<String, dynamic>.from(it)))
+              .toList(),
         );
   }
 
-  static const _unsupportedLocal =
-      'Non supporté : ce service est purement Cloudflare (Cloud-Only).';
-
   @override
-  Future<Map<String, dynamic>> getLocalRaw(String id) {
-    throw UnsupportedError(_unsupportedLocal);
-  }
-
-  @override
-  Future<Map<String, dynamic>> getRemoteRaw(String id) {
-    return CloudFlareService.instance.getRaw(collectionName, id);
-  }
-
-  @override
-  Future<void> saveRemoteRaw(String id, Map<String, dynamic> data) {
-    return CloudFlareService.instance.saveRaw(collectionName, id, data);
-  }
-
-  @override
-  Future<void> saveLocalRaw(String id, Map<String, dynamic> data) {
-    throw UnsupportedError(_unsupportedLocal);
-  }
-
-  @override
-  Future<List<T>> getByQuery(Map<String, dynamic> query) {
-    // TODO: implement getByQuery
-    throw UnimplementedError();
-  }
-
-  @override
-  Stream<List<T>> watchAll() {
-    // TODO: implement watchAll
-    throw UnimplementedError();
-  }
-
-  @override
-  Stream<List<T>> watchByQuery(Map<String, dynamic> query) {
-    // TODO: implement watchByQuery
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> close() {
-    // TODO: implement close
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> deleteLocal(String id) {
-    // TODO: implement deleteLocal
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> deleteRemote(String id) {
-    // TODO: implement deleteRemote
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<T>> getAllLocal() {
-    // TODO: implement getAllLocal
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<T>> getAllRemote() {
-    // TODO: implement getAllRemote
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<T?> getLocal(String id) {
-    // TODO: implement getLocal
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<T?> getRemote(String id) {
-    // TODO: implement getRemote
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> saveLocal(T entity) {
-    // TODO: implement saveLocal
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> saveRemote(T entity) {
-    // TODO: implement saveRemote
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> sync(T entity) {
-    // TODO: implement sync
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> syncAllFromRemote() {
-    // TODO: implement syncAllFromRemote
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> syncAllToRemote() {
-    // TODO: implement syncAllToRemote
-    throw UnimplementedError();
-  }
-
-  @override
-  Stream<T?> watch(String id) {
-    // TODO: implement watch
-    throw UnimplementedError();
-  }
-
-  @override
-  Stream<List<T>> watchLocal() {
-    // TODO: implement watchLocal
-    throw UnimplementedError();
-  }
-
-  @override
-  Stream<List<T>> watchRemote() {
-    // TODO: implement watchRemote
-    throw UnimplementedError();
+  Stream<List<M>> watchAll() {
+    return remoteStorage
+        .watchCollectionRaw(collectionName)
+        .map(
+          (list) => list
+              .map((json) => fromJson(Map<String, dynamic>.from(json)))
+              .toList(),
+        );
   }
 }

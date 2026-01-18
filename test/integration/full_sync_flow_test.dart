@@ -1,6 +1,6 @@
 import 'package:bat_track_v1/data/local/providers/hive_provider.dart';
+import 'package:bat_track_v1/data/remote/providers/multi_backend_remote_provider.dart';
 import 'package:bat_track_v1/features/projet/controllers/providers/projet_list_provider.dart';
-import 'package:bat_track_v1/models/providers/asynchrones/remote_service_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -23,7 +23,7 @@ void main() {
 
       container = ProviderContainer(
         overrides: [
-          remoteStorageServiceProvider.overrideWith((ref) => mockRemoteStorage),
+          multiBackendRemoteProvider.overrideWith((ref) => mockRemoteStorage),
         ],
       );
     });

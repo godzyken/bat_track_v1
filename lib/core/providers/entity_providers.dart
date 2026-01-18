@@ -1,38 +1,53 @@
+import 'package:bat_track_v1/data/local/models/entities/index_entity_extention.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/core/unified_model.dart';
+import '../../data/local/models/adapters/hive_entity_factory.dart';
 import '../../data/local/models/index_model_extention.dart';
-import '../../models/providers/asynchrones/remote_service_provider.dart';
+import '../../data/remote/providers/chantier_provider.dart';
+import '../../data/remote/providers/multi_backend_remote_provider.dart';
+import '../../models/data/hive_model.dart';
 import '../services/unified_entity_service.dart';
+import '../services/unified_entity_service_impl.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // PROVIDER GÉNÉRIQUE
 // ═══════════════════════════════════════════════════════════════
 
 /// Provider générique pour créer un UnifiedEntityService
-Provider<UnifiedEntityService<T>>
-entityServiceProvider<T extends UnifiedModel>({
-  required String collectionName,
-  required T Function(Map<String, dynamic>) fromJson,
-}) {
-  return Provider<UnifiedEntityService<T>>((ref) {
-    return UnifiedEntityService<T>(
+Provider<UnifiedEntityService<M, E>> unifiedEntityServiceProvider<
+  M extends UnifiedModel,
+  E extends HiveModel<M>
+>({required String collectionName, required HiveEntityFactory<M, E> factory}) {
+  return Provider<UnifiedEntityService<M, E>>((ref) {
+    final remote = ref.watch(multiBackendRemoteProvider);
+
+    return ConcreteUnifiedService<M, E>(
       collectionName: collectionName,
-      fromJson: fromJson,
-      remoteStorage: ref.watch(remoteStorageServiceProvider),
+      factory: factory,
+      remoteStorage: remote,
     );
   });
+}
+
+class ConcreteUnifiedService<M extends UnifiedModel, E extends HiveModel<M>>
+    extends UnifiedEntityService<M, E> {
+  ConcreteUnifiedService({
+    required super.collectionName,
+    required super.factory,
+    required super.remoteStorage,
+  });
+
+  @override
+  Future<List<M>> getAll() {
+    // TODO: implement getAll
+    throw UnimplementedError();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
 // PROVIDERS SPÉCIFIQUES (REMPLACE TOUS LES ANCIENS)
 // ═══════════════════════════════════════════════════════════════
-
-// Chantier
-final chantierServiceProvider = entityServiceProvider<Chantier>(
-  collectionName: 'chantiers',
-  fromJson: Chantier.fromJson,
-);
 
 final chantierListProvider = StreamProvider<List<Chantier>>((ref) {
   return ref.watch(chantierServiceProvider).watchAll();
@@ -52,39 +67,42 @@ final watchChantierProvider = StreamProvider.family<Chantier?, String>((
 });
 
 // Client
-final clientServiceProvider = entityServiceProvider<Client>(
-  collectionName: 'clients',
-  fromJson: Client.fromJson,
-);
+final clientServiceProvider =
+    unifiedEntityServiceProvider<Client, ClientEntity>(
+      collectionName: 'clients',
+      factory: ClientEntityFactory(),
+    );
 
 final clientListProvider = StreamProvider<List<Client>>((ref) {
   return ref.watch(clientServiceProvider).watchAll();
 });
 
 // ChantierEtape
-final chantierEtapeServiceProvider = entityServiceProvider<ChantierEtape>(
-  collectionName: 'chantierEtapes',
-  fromJson: ChantierEtape.fromJson,
-);
+final chantierEtapeServiceProvider =
+    unifiedEntityServiceProvider<ChantierEtape, ChantierEtapesEntity>(
+      collectionName: 'chantierEtapes',
+      factory: ChantierEtapeEntityFactory(),
+    );
 
 final chantierEtapeListProvider = StreamProvider<List<ChantierEtape>>((ref) {
   return ref.watch(chantierEtapeServiceProvider).watchAll();
 });
 
 // Technicien
-final technicienServiceProvider = entityServiceProvider<Technicien>(
-  collectionName: 'techniciens',
-  fromJson: Technicien.fromJson,
-);
+final technicienServiceProvider =
+    syncedEntityProvider<Technicien, TechnicienEntity>(
+      collectionName: 'techniciens',
+      factory: TechnicienEntityFactory(),
+    );
 
 final technicienListProvider = StreamProvider<List<Technicien>>((ref) {
   return ref.watch(technicienServiceProvider).watchAll();
 });
 
 // Piece
-final pieceServiceProvider = entityServiceProvider<Piece>(
+final pieceServiceProvider = syncedEntityProvider<Piece, PieceEntity>(
   collectionName: 'pieces',
-  fromJson: Piece.fromJson,
+  factory: PieceEntityFactory(),
 );
 
 final pieceListProvider = StreamProvider<List<Piece>>((ref) {
@@ -92,29 +110,31 @@ final pieceListProvider = StreamProvider<List<Piece>>((ref) {
 });
 
 // PieceJointe
-final pieceJointeServiceProvider = entityServiceProvider<PieceJointe>(
-  collectionName: 'piecesJointes',
-  fromJson: PieceJointe.fromJson,
-);
+final pieceJointeServiceProvider =
+    syncedEntityProvider<PieceJointe, PieceJointeEntity>(
+      collectionName: 'piecesJointes',
+      factory: PieceJointeEntityFactory(),
+    );
 
 final pieceJointeListProvider = StreamProvider<List<PieceJointe>>((ref) {
   return ref.watch(pieceJointeServiceProvider).watchAll();
 });
 
 // FactureDraft
-final factureDraftServiceProvider = entityServiceProvider<FactureDraft>(
-  collectionName: 'factureDraft',
-  fromJson: FactureDraft.fromJson,
-);
+final factureDraftServiceProvider =
+    syncedEntityProvider<FactureDraft, FactureDraftEntity>(
+      collectionName: 'factureDraft',
+      factory: FactureDraftEntityFactory(),
+    );
 
 final factureDraftListProvider = StreamProvider<List<FactureDraft>>((ref) {
   return ref.watch(factureDraftServiceProvider).watchAll();
 });
 
 // Projet
-final projetServiceProvider = entityServiceProvider<Projet>(
+final projetServiceProvider = syncedEntityProvider<Projet, ProjetEntity>(
   collectionName: 'projets',
-  fromJson: Projet.fromJson,
+  factory: ProjetEntityFactory(),
 );
 
 final projetListProvider = StreamProvider<List<Projet>>((ref) {
@@ -122,19 +142,20 @@ final projetListProvider = StreamProvider<List<Projet>>((ref) {
 });
 
 // Intervention
-final interventionServiceProvider = entityServiceProvider<Intervention>(
-  collectionName: 'interventions',
-  fromJson: Intervention.fromJson,
-);
+final interventionServiceProvider =
+    syncedEntityProvider<Intervention, InterventionEntity>(
+      collectionName: 'interventions',
+      factory: InterventionEntityFactory(),
+    );
 
 final interventionListProvider = StreamProvider<List<Intervention>>((ref) {
   return ref.watch(interventionServiceProvider).watchAll();
 });
 
 // Facture
-final factureServiceProvider = entityServiceProvider<Facture>(
+final factureServiceProvider = syncedEntityProvider<Facture, FactureEntity>(
   collectionName: 'factures',
-  fromJson: Facture.fromJson,
+  factory: FactureEntityFactory(),
 );
 
 final factureListProvider = StreamProvider<List<Facture>>((ref) {

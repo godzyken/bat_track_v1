@@ -71,34 +71,29 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
             .collection('projects')
             .doc(updatedProject.id);
         await doc.set(updatedProject.toJson());
-        context.pop();
-      },
-      customFieldBuilder: (
-        context,
-        key,
-        value,
-        controller,
-        onChanged,
-        expertMode,
-      ) {
-        // 🔹 Choix du client (toujours accessible au admin)
-        if (key == 'clientId' && (user.isAdmin || !isEditing)) {
-          return UserDropdownField(
-            role: 'client',
-            label: 'Client assigné',
-            selectedUserId: selectedClientId ?? '',
-            onChanged: (newId) => setState(() => selectedClientId = newId),
-          );
+        if (context.mounted) {
+          context.pop();
         }
+      },
+      customFieldBuilder:
+          (context, key, value, controller, onChanged, expertMode) {
+            // 🔹 Choix du client (toujours accessible au admin)
+            if (key == 'clientId' && (user.isAdmin || !isEditing)) {
+              return UserDropdownField(
+                role: 'client',
+                label: 'Client assigné',
+                selectedUserId: selectedClientId ?? '',
+                onChanged: (newId) => setState(() => selectedClientId = newId),
+              );
+            }
 
-        // 🔹 Multi-sélection technicien pour admin / chef de projet
-        if (key == 'technicienIds' &&
-            value is List &&
-            (user.isAdmin || user.isChefDeProjet)) {
-          return Wrap(
-            spacing: 8,
-            children:
-                techs.map((t) {
+            // 🔹 Multi-sélection technicien pour admin / chef de projet
+            if (key == 'technicienIds' &&
+                value is List &&
+                (user.isAdmin || user.isChefDeProjet)) {
+              return Wrap(
+                spacing: 8,
+                children: techs.map((t) {
                   final isSelected = selectedTechniciens.contains(t.id);
                   return FilterChip(
                     label: Text('${t.nom} (${t.specialite})'),
@@ -114,37 +109,38 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
                     },
                   );
                 }).toList(),
-          );
-        }
+              );
+            }
 
-        // 🔹 Validation par rôle
-        if (key == 'clientValide' && user.isClient) {
-          return CheckboxListTile(
-            title: const Text('Je valide le projet'),
-            value: clientValide,
-            onChanged: (v) => setState(() => clientValide = v ?? false),
-          );
-        }
+            // 🔹 Validation par rôle
+            if (key == 'clientValide' && user.isClient) {
+              return CheckboxListTile(
+                title: const Text('Je valide le projet'),
+                value: clientValide,
+                onChanged: (v) => setState(() => clientValide = v ?? false),
+              );
+            }
 
-        if (key == 'chefDeProjetValide' && user.isChefDeProjet) {
-          return CheckboxListTile(
-            title: const Text('Validation Chef de projet'),
-            value: chefDeProjetValide,
-            onChanged: (v) => setState(() => chefDeProjetValide = v ?? false),
-          );
-        }
+            if (key == 'chefDeProjetValide' && user.isChefDeProjet) {
+              return CheckboxListTile(
+                title: const Text('Validation Chef de projet'),
+                value: chefDeProjetValide,
+                onChanged: (v) =>
+                    setState(() => chefDeProjetValide = v ?? false),
+              );
+            }
 
-        if (key == 'superUtilisateurValide' && user.isAdmin) {
-          return CheckboxListTile(
-            title: const Text('Validation Super Utilisateur'),
-            value: superUtilisateurValide,
-            onChanged:
-                (v) => setState(() => superUtilisateurValide = v ?? false),
-          );
-        }
+            if (key == 'superUtilisateurValide' && user.isAdmin) {
+              return CheckboxListTile(
+                title: const Text('Validation Super Utilisateur'),
+                value: superUtilisateurValide,
+                onChanged: (v) =>
+                    setState(() => superUtilisateurValide = v ?? false),
+              );
+            }
 
-        return null;
-      },
+            return null;
+          },
     );
   }
 }

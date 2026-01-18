@@ -1,23 +1,38 @@
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
 import '../../data/core/unified_model.dart';
+import '../../data/local/models/adapters/hive_entity_factory.dart';
+import '../../models/data/hive_model.dart';
 import '../../models/services/remote/remote_storage_service.dart';
+
+/// Interface de base pour tous les services
+abstract class BaseEntityService<M extends UnifiedModel> {
+  Future<M?> get(String id);
+  Future<void> save(M model);
+  Future<void> delete(String id);
+  Stream<List<M>> watchAll();
+  Future<List<M>> getAll();
+}
 
 /// Service unifié remplaçant EntityService, EntityServices,
 /// EntitySyncService et SyncedEntityService
-class UnifiedEntityService<T extends UnifiedModel> {
+abstract class UnifiedEntityService<
+  M extends UnifiedModel,
+  E extends HiveModel<M>
+>
+    implements BaseEntityService<M> {
   final String collectionName;
-  final T Function(Map<String, dynamic>) fromJson;
+  final HiveEntityFactory<M, E> factory;
   final RemoteStorageService remoteStorage;
 
-  late final Box<Map> _localBox;
+  late final Box<E> _localBox;
   bool _isInitialized = false;
 
   UnifiedEntityService({
     required this.collectionName,
-    required this.fromJson,
+    required this.factory,
     required this.remoteStorage,
   });
 
@@ -29,9 +44,9 @@ class UnifiedEntityService<T extends UnifiedModel> {
     if (_isInitialized) return;
 
     if (!Hive.isBoxOpen(collectionName)) {
-      _localBox = await Hive.openBox<Map>(collectionName);
+      _localBox = await Hive.openBox<E>(collectionName);
     } else {
-      _localBox = Hive.box<Map>(collectionName);
+      _localBox = Hive.box<E>(collectionName);
     }
 
     _isInitialized = true;
@@ -41,22 +56,21 @@ class UnifiedEntityService<T extends UnifiedModel> {
   // OPÉRATIONS LOCALES (HIVE)
   // ═══════════════════════════════════════════════════════════════
 
-  Future<void> saveLocal(T entity) async {
+  Future<void> saveLocal(M model) async {
     await _ensureInitialized();
-    await _localBox.put(entity.id, entity.toJson());
+    final entity = factory.toEntity(model);
+    await _localBox.put(entity.id, entity);
   }
 
-  Future<T?> getLocal(String id) async {
+  Future<M?> getLocal(String id) async {
     await _ensureInitialized();
     final json = _localBox.get(id);
-    return json != null ? fromJson(Map<String, dynamic>.from(json)) : null;
+    return json != null ? factory.fromEntity(json) : null;
   }
 
-  Future<List<T>> getAllLocal() async {
+  Future<List<M>> getAllLocal() async {
     await _ensureInitialized();
-    return _localBox.values
-        .map((json) => fromJson(Map<String, dynamic>.from(json)))
-        .toList();
+    return factory.fromEntities(_localBox.values.toList());
   }
 
   Future<void> deleteLocal(String id) async {
@@ -64,12 +78,9 @@ class UnifiedEntityService<T extends UnifiedModel> {
     await _localBox.delete(id);
   }
 
-  Stream<List<T>> watchLocal() {
+  Stream<List<M>> watchLocal() {
     return _localBox.watch().map(
-      (_) =>
-          _localBox.values
-              .map((json) => fromJson(Map<String, dynamic>.from(json)))
-              .toList(),
+      (_) => factory.fromEntities(_localBox.values.toList()),
     );
   }
 
@@ -77,28 +88,28 @@ class UnifiedEntityService<T extends UnifiedModel> {
   // OPÉRATIONS DISTANTES (FIRESTORE/SUPABASE)
   // ═══════════════════════════════════════════════════════════════
 
-  Future<void> saveRemote(T entity) async {
+  Future<void> saveRemote(M entity) async {
     await remoteStorage.saveRaw(collectionName, entity.id, entity.toJson());
   }
 
-  Future<T?> getRemote(String id) async {
+  Future<M?> getRemote(String id) async {
     final json = await remoteStorage.getRaw(collectionName, id);
-    return json.isEmpty ? null : fromJson(json);
+    return json.isEmpty ? null : factory.fromRemote(json);
   }
 
-  Future<List<T>> getAllRemote() async {
+  Future<List<M>> getAllRemote() async {
     final raws = await remoteStorage.getAllRaw(collectionName);
-    return raws.map(fromJson).toList();
+    return raws.map((json) => factory.fromRemote(json)).toList();
   }
 
   Future<void> deleteRemote(String id) async {
     await remoteStorage.deleteRaw(collectionName, id);
   }
 
-  Stream<List<T>> watchRemote() {
+  Stream<List<M>> watchRemote() {
     return remoteStorage
         .watchCollectionRaw(collectionName)
-        .map((raws) => raws.map(fromJson).toList());
+        .map((raws) => raws.map((json) => factory.fromRemote(json)).toList());
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -106,7 +117,7 @@ class UnifiedEntityService<T extends UnifiedModel> {
   // ═══════════════════════════════════════════════════════════════
 
   /// Synchronise une entité (local → remote)
-  Future<void> sync(T entity) async {
+  Future<void> sync(M entity) async {
     await saveLocal(entity);
     await saveRemote(entity);
   }
@@ -128,7 +139,10 @@ class UnifiedEntityService<T extends UnifiedModel> {
   }
 
   /// Stream combiné (merge local + remote)
-  Stream<List<T>> watchAll() async* {
+  @override
+  Stream<List<M>> watchAll() async* {
+    await _ensureInitialized();
+
     final localStream = watchLocal();
     final remoteStream = watchRemote();
 
@@ -137,7 +151,7 @@ class UnifiedEntityService<T extends UnifiedModel> {
       final local = await getAllLocal();
       final remote = await getAllRemote();
 
-      final merged = <String, T>{};
+      final merged = <String, M>{};
 
       // Ajoute local d'abord
       for (final item in local) {
@@ -164,7 +178,8 @@ class UnifiedEntityService<T extends UnifiedModel> {
   // ═══════════════════════════════════════════════════════════════
 
   /// Récupère depuis local, fallback sur remote
-  Future<T?> get(String id) async {
+  @override
+  Future<M?> get(String id) async {
     var entity = await getLocal(id);
     if (entity == null) {
       entity = await getRemote(id);
@@ -176,11 +191,13 @@ class UnifiedEntityService<T extends UnifiedModel> {
   }
 
   /// Sauvegarde + sync automatique
-  Future<void> save(T entity) async {
+  @override
+  Future<void> save(M entity) async {
     await sync(entity);
   }
 
   /// Suppression locale + remote
+  @override
   Future<void> delete(String id) async {
     await deleteLocal(id);
     await deleteRemote(id);
@@ -208,8 +225,38 @@ class UnifiedEntityService<T extends UnifiedModel> {
     }
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // RECHERCHE ET FILTRAGE (REMOTE)
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Récupère une liste filtrée depuis le remote
+  Future<List<M>> getRemoteFiltered({
+    required dynamic Function(dynamic query) queryBuilder,
+  }) async {
+    // 1. On récupère les raws depuis le storage (ex: Firestore)
+    final _ = await remoteStorage.getAllRaw(
+      collectionName,
+      // On pourrait passer une extension de getAllRaw ou utiliser watchCollectionRaw
+    );
+
+    final filteredRaws = await remoteStorage
+        .watchCollectionRaw(collectionName, queryBuilder: queryBuilder)
+        .first;
+
+    return filteredRaws.map((json) => factory.fromRemote(json)).toList();
+  }
+
+  /// Stream distant filtré
+  Stream<List<M>> watchRemoteFiltered({
+    required dynamic Function(dynamic query) queryBuilder,
+  }) {
+    return remoteStorage
+        .watchCollectionRaw(collectionName, queryBuilder: queryBuilder)
+        .map((raws) => raws.map((json) => factory.fromRemote(json)).toList());
+  }
+
   /// Stream combiné pour une seule entité (local + remote)
-  Stream<T?> watch(String id) {
+  Stream<M?> watch(String id) {
     // Lit les deux streams de listes et filtre par ID
     return watchAll().map(
       (list) => list.firstWhereOrNull((item) => item.id == id),

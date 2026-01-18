@@ -1,38 +1,39 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/unified_model.dart';
+import '../extensions/budget_extentions.dart';
 
 part 'equipement.freezed.dart';
 part 'equipement.g.dart';
 
-@HiveType(typeId: 31)
 @freezed
-class Equipement
+sealed class Equipement
     with _$Equipement, AccessControlMixin, ValidationMixin
     implements UnifiedModel {
   const Equipement._();
 
   const factory Equipement({
-    @HiveField(0) required String id,
-    @HiveField(1) required String nom,
-    @HiveField(2) required String type, // extincteur, détecteur, etc.
-    @HiveField(3) String? localisation,
-    @HiveField(4) @DateTimeIsoConverter() required DateTime dateInstallation,
-    @HiveField(5)
-    @NullableDateTimeIsoConverter()
-    DateTime? dateProchaineVerification,
-    @HiveField(6)
-    @Default(false)
-    bool enService, // actif, hors service, à vérifier
-    @HiveField(7) String? homologation,
-    @HiveField(8) String? commentaire,
-    @HiveField(9) @NullableDateTimeIsoConverter() DateTime? updatedAt,
-    @HiveField(10) required String chantierId,
-    @HiveField(11) required String createdBy,
-    @HiveField(12) List<String>? technicienIds,
+    required String id,
+    required String nom,
+    required String type, // extincteur, détecteur, etc.
+    String? localisation,
+    @DateTimeIsoConverter() required DateTime dateInstallation,
+    @NullableDateTimeIsoConverter() DateTime? dateProchaineVerification,
+    @Default(false) bool enService, // actif, hors service, à vérifier
+    String? homologation,
+    String? commentaire,
+    @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    required String chantierId,
+    required String createdBy,
+    @Default([]) List<String>? technicienIds,
     int? count,
+    @Default(false) bool clientValide,
+    @Default(false) bool chefDeProjetValide,
+    @Default(false) bool techniciensValides,
+    @Default(false) bool superUtilisateurValide,
+
+    @Default(false) bool isCloudOnly,
   }) = _Equipement;
 
   factory Equipement.fromJson(Map<String, dynamic> json) =>
@@ -52,11 +53,27 @@ class Equipement
     chantierId: 'ch_007',
     createdBy: 'Bill Cosby',
     technicienIds: [],
+    chefDeProjetValide: true,
+    clientValide: true,
   );
+
+  @override
+  String? get ownerId => createdBy;
+
+  @override
+  List<String> get assignedUserIds => technicienIds ?? [];
 
   @override
   bool get isUpdated => updatedAt != null;
 
   @override
   UnifiedModel copyWithId(String newId) => copyWith(id: newId);
+
+  @override
+  bool get toutesPartiesOntValide => ValidationHelper.computeValidationStatus(
+    clientValide: clientValide,
+    chefDeProjetValide: chefDeProjetValide,
+    techniciensValides: techniciensValides,
+    superUtilisateurValide: superUtilisateurValide,
+  );
 }

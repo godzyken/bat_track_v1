@@ -79,6 +79,83 @@ class Technicien
   }
 
   @override
-  @override
   UnifiedModel copyWithId(String newId) => copyWith(id: newId);
+
+  @override
+  // TODO: implement chantiersAffectees
+  List<String> get chantiersAffectees => throw UnimplementedError();
+
+  @override
+  // TODO: implement competences
+  List<String> get competences => throw UnimplementedError();
+
+  @override
+  // TODO: implement createdAt
+  DateTime get createdAt => throw UnimplementedError();
+
+  @override
+  // TODO: implement dateDelete
+  DateTime? get dateDelete => throw UnimplementedError();
+
+  @override
+  // TODO: implement disponible
+  bool get disponible => throw UnimplementedError();
+
+  @override
+  // TODO: implement email
+  String get email => throw UnimplementedError();
+
+  @override
+  // TODO: implement etapesAffectees
+  List<String> get etapesAffectees => throw UnimplementedError();
+
+  @override
+  // TODO: implement id
+  String get id => throw UnimplementedError();
+
+  @override
+  // TODO: implement localisation
+  String? get localisation => throw UnimplementedError();
+
+  @override
+  // TODO: implement metiers
+  List<String>? get metiers => throw UnimplementedError();
+
+  @override
+  // TODO: implement nom
+  String get nom => throw UnimplementedError();
+
+  @override
+  // TODO: implement ownerId
+  String? get ownerId => throw UnimplementedError();
+
+  @override
+  // TODO: implement rating
+  double? get rating => throw UnimplementedError();
+
+  @override
+  // TODO: implement realisations
+  List<String>? get realisations => throw UnimplementedError();
+
+  @override
+  // TODO: implement region
+  String? get region => throw UnimplementedError();
+
+  @override
+  // TODO: implement specialite
+  String get specialite => throw UnimplementedError();
+
+  @override
+  // TODO: implement tauxHoraire
+  double get tauxHoraire => throw UnimplementedError();
+
+  @override
+  Map<String, dynamic> toJson() {
+    // TODO: implement toJson
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement updatedAt
+  DateTime? get updatedAt => throw UnimplementedError();
 }

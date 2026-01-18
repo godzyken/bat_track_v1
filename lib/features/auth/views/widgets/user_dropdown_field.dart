@@ -24,22 +24,19 @@ class UserDropdownField extends ConsumerWidget {
 
     return usersAsync.when(
       loading: () => const LoadingApp(),
-      error:
-          (e, _) => ErrorApp(
-            message: "Erreur lors de la selection d'utilisateur : $e",
-          ),
+      error: (e, _) =>
+          ErrorApp(message: "Erreur lors de la selection d'utilisateur : $e"),
       data: (users) {
         return DropdownButtonFormField<String>(
-          initialValue: selectedUserId?.isEmpty ?? true ? null : selectedUserId,
+          value: selectedUserId?.isEmpty ?? true ? null : selectedUserId,
           onChanged: onChanged,
           decoration: InputDecoration(labelText: label),
-          items:
-              users.map((user) {
-                return DropdownMenuItem(
-                  value: user.id,
-                  child: Text('${user.name} (${user.instanceId})'),
-                );
-              }).toList(),
+          items: users.map((user) {
+            return DropdownMenuItem(
+              value: user.id,
+              child: Text('${user.name} (${user.instanceId})'),
+            );
+          }).toList(),
         );
       },
     );

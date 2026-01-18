@@ -1,7 +1,10 @@
+export 'app_user_entity.dart';
 export 'chantier_entity.dart';
 export 'chantier_etapes_entity.dart';
 export 'client_entity.dart';
+export 'equipement_entity.dart';
 export 'facture_draft_entity.dart';
+export 'facture_entity.dart';
 export 'facture_model_entity.dart';
 export 'intervention_entity.dart';
 export 'main_oeuvre_entity.dart';

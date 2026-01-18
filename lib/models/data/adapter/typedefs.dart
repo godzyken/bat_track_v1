@@ -10,12 +10,12 @@ import '../state_wrapper/wrappers.dart';
 typedef QueryBuilder =
     Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>> query);
 
-typedef EntityDetailBuilder<T extends UnifiedModel> =
+typedef EntityDetailBuilder<M, E> =
     Widget Function(
       BuildContext context,
-      T entity,
-      SyncEntityNotifier<T> notifier,
-      SyncedState<T> state,
+      M entity,
+      SyncEntityNotifier notifier,
+      SyncedState<M> state,
     );
 typedef FieldBuilder =
     Widget? Function(
