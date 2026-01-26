@@ -1,17 +1,18 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:bat_track_v1/models/data/maperror/log_entry.dart';
 import 'package:bat_track_v1/models/notifiers/logged_notifier.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-import '../adapter/typedefs.dart';
-
 mixin LoggedAction {
-  late Reader _ref;
+  late dynamic _ref;
 
-  void initLogger(Reader ref) {
-    _ref = ref;
+  void initLogger(dynamic refRead) {
+    _ref = refRead;
+
+    developer.log("🛠 Logger Initialisé pour ${this.runtimeType}");
   }
 
   void logAction({
@@ -20,10 +21,13 @@ mixin LoggedAction {
     dynamic data,
     bool captureToSentry = true,
   }) {
+    final timestamp = DateTime.now();
+    developer.log(">>>> [CONSOLE CHECK] $timestamp | $action | $target");
+
     final message = LogEntry(
       timestamp: DateTime.now(),
       action: action,
-      target: target!,
+      target: target ?? 'unknown',
       data: data,
     );
 
@@ -39,7 +43,17 @@ mixin LoggedAction {
       );
     }
 
-    _ref(loggerNotifierProvider.notifier).log(message);
+    try {
+      if (_ref != null) {
+        _ref(loggerNotifierProvider.notifier).log(message);
+      }
+    } catch (e) {
+      developer.log("❌ Erreur lors de l'accès au loggerNotifierProvider: $e");
+    }
+
+    if (captureToSentry) {
+      Sentry.captureMessage('Action: $action on $target');
+    }
   }
 
   void logEvent({
