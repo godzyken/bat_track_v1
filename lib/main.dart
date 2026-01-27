@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bat_track_v1/models/views/widgets/debug_overlay.dart';
 import 'package:bat_track_v1/routes/app_routes.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,8 +13,8 @@ import 'core/responsive/wrapper/responsive_layout.dart';
 import 'data/local/providers/hive_provider.dart';
 import 'data/local/providers/shared_preferences_provider.dart';
 import 'data/remote/providers/catch_error_provider.dart';
-import 'data/remote/providers/firebase_providers.dart';
 import 'features/parametres/affichage/themes/theme.dart';
+import 'firebase_options.dart';
 import 'models/views/screens/exeception_screens.dart';
 
 void main() {
@@ -22,7 +23,7 @@ void main() {
       WidgetsFlutterBinding.ensureInitialized();
 
       // Initialisations asynchrones
-      await Future.delayed(Duration(milliseconds: 100));
+      /*await Future.delayed(Duration(milliseconds: 100));
 
       final firebaseContainer = ProviderContainer();
       try {
@@ -31,7 +32,10 @@ void main() {
         debugPrint('⚠️ Firebase initialization failed: $e');
       } finally {
         firebaseContainer.dispose();
-      }
+      }*/
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
       // Initialisation SharedPreferences
       final prefs = await SharedPreferences.getInstance();
@@ -164,15 +168,14 @@ class MyApp extends ConsumerWidget {
       darkTheme: darkTheme,
       themeMode: ThemeMode.system,
       routerConfig: router,
-      builder:
-          (context, child) => ResponsiveObserver(
-            child: Stack(
-              children: [
-                child ?? const SizedBox.shrink(),
-                if (kDebugMode) const DebugFloatingOverlay(),
-              ],
-            ),
-          ),
+      builder: (context, child) => ResponsiveObserver(
+        child: Stack(
+          children: [
+            child ?? const SizedBox.shrink(),
+            if (kDebugMode) const DebugFloatingOverlay(),
+          ],
+        ),
+      ),
     );
   }
 }

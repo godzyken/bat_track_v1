@@ -4,33 +4,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/local/models/utilisateurs/app_user.dart';
 import '../providers/auth_state_provider.dart';
 
-class CurrentUserNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
+class CurrentUserNotifier extends AutoDisposeStreamNotifier<AppUser?> {
   @override
-  Future<AppUser?> build() async {
+  Stream<AppUser?> build() {
+    // 1. On surveille l'état de l'auth
     final authState = ref.watch(authStateChangesProvider).value;
 
-    if (authState == null) return null;
+    // Si pas d'utilisateur connecté, on renvoie un flux vide (null)
+    if (authState == null) {
+      return Stream.value(null);
+    }
 
-    // On écoute le flux Firestore
-    final stream = ref
+    // 2. On retourne directement le flux Firestore transformé
+    return ref
         .watch(firestoreProvider)
         .collection("users")
         .doc(authState.uid)
-        .snapshots();
+        .snapshots()
+        .map((snap) {
+          if (!snap.exists) return AppUser.empty();
 
-    // On transforme le flux en Future pour le build initial,
-    // puis on gère les mises à jour via le stream.
-    return stream.map((snap) {
-      if (!snap.exists) return AppUser.empty();
-      return AppUser.fromJson(
-        _normalize(
-          snap.data() ?? {},
-          authState.uid,
-          authState.displayName,
-          authState.email,
-        ),
-      );
-    }).first;
+          return AppUser.fromJson(
+            _normalize(
+              snap.data() ?? {},
+              authState.uid,
+              authState.displayName,
+              authState.email,
+            ),
+          );
+        });
   }
 
   // Méthode de normalisation privée pour nettoyer le code
@@ -56,9 +58,3 @@ class CurrentUserNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
     return value;
   }
 }
-
-// Définition du Provider
-final currentUserProvider =
-    AsyncNotifierProvider.autoDispose<CurrentUserNotifier, AppUser?>(() {
-      return CurrentUserNotifier();
-    });

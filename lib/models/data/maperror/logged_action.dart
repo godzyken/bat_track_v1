@@ -12,7 +12,7 @@ mixin LoggedAction {
   void initLogger(dynamic refRead) {
     _ref = refRead;
 
-    developer.log("🛠 Logger Initialisé pour ${this.runtimeType}");
+    developer.log("🛠 Logger Initialisé pour $runtimeType");
   }
 
   void logAction({

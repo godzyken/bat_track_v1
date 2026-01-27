@@ -120,7 +120,7 @@ void main() {
       await projetService.syncAllFromRemote();
 
       // Assert - La version remote (plus récente) doit être conservée
-      final finalProjet = await projetService.watch('conflict_1');
+      final finalProjet = projetService.watch('conflict_1');
       expect(finalProjet.first, equals('Version Remote'));
     });
   });

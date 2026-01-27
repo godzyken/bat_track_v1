@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/features/client/views/screens/client_home_screen.dart';
@@ -38,85 +40,63 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     debugLogDiagnostics: true,
     redirect: (context, state) {
       final status = ref.read(userStatusProvider);
+      final location = state.matchedLocation;
+
+      // ✅ Routes publiques toujours accessibles
+      final publicRoutes = ['/login', '/register', '/loading', '/error'];
+      if (publicRoutes.contains(location)) {
+        return null;
+      }
 
       switch (status) {
         case UserStatus.guest:
-          // Seules les routes publiques sont accessibles
-          final isPublic = [
-            '/login',
-            '/register',
-            '/',
-          ].contains(state.matchedLocation);
-          return isPublic ? null : '/login';
+          developer.log('🔒 Guest détecté → redirection vers /login');
+          return '/login';
 
         case UserStatus.authenticated:
-          // Profil en cours de chargement → page de loading
-          return '/loading';
-        case UserStatus.loaded:
-          // Si l’utilisateur est sur une page d’auth alors qu’il est déjà chargé, on le redirige
-          final appUser = ref.read(currentUserProvider).value!;
-          final role = appUser.role.toLowerCase();
-
-          if (['/login', '/register'].contains(state.matchedLocation)) {
-            switch (role) {
-              case 'admin':
-              case 'superutilisateur':
-                return '/dashboard';
-              case 'technicien':
-                return '/techniciens';
-              case 'client':
-              case 'chefdeprojet':
-                return '/clients';
-              default:
-                return '/home';
-            }
+          if (location != '/loading') {
+            developer.log('⏳ Chargement profil → /loading');
+            return '/loading';
           }
           return null;
+        case UserStatus.loaded:
+          // ✅ Utilisateur chargé
+          final userAsync = ref.read(currentUserProvider);
+
+          if (userAsync.hasError) {
+            developer.log('❌ Erreur chargement user → /error');
+            return '/error';
+          }
+
+          final appUser = userAsync.value;
+          if (appUser == null) {
+            developer.log('⚠️ User null malgré status loaded → /login');
+            return '/login';
+          }
+
+          // ✅ Si sur page de loading, rediriger selon le rôle
+          if (location == '/loading') {
+            final role = appUser.role.toLowerCase();
+            developer.log(
+              '✅ User chargé (${appUser.email}) → redirection selon rôle: $role',
+            );
+
+            return switch (role) {
+              'admin' || 'superutilisateur' => '/dashboard',
+              'technicien' => '/techniciens',
+              'client' || 'chefdeprojet' => '/clients',
+              _ => '/home',
+            };
+          }
+
+          // ✅ Vérification des permissions
+          if (!policy.canAccess(appUser.role)) {
+            developer.log('🚫 Accès refusé pour ${appUser.role} → /error');
+            return '/error';
+          }
+
+          return null;
       }
-      /*
-      if (appUserAsync.isLoading) return '/loading';
-
-      // Erreur de chargement
-      if (appUserAsync.hasError) {
-        return state.matchedLocation == '/error' ? null : '/error';
-      }
-
-      final appUser = appUserAsync.value;
-      final isLoggedIn = appUser != null;
-
-      final isAuthRoute =
-          state.matchedLocation == '/login' ||
-          state.matchedLocation == '/register';
-
-      // Pas connecté -> rediriger vers login
-      if (!isLoggedIn) {
-        return isAuthRoute ? null : '/login';
-      }
-
-      // Connecté mais sur une page d'auth -> rediriger selon le rôle
-      if (isAuthRoute) {
-        final role = appUser.role.toLowerCase();
-
-        switch (role) {
-          case 'admin':
-          case 'superutilisateur':
-            return '/dashboard';
-          case 'technicien':
-            return '/techniciens';
-          case 'client':
-          case 'chefdeprojet':
-            return '/clients';
-          default:
-            return '/home';
-        }
-      }
-
-      // Vérifier les permissions pour les routes protégées
-      if (!isAuthRoute && !policy.canAccess(appUser.role)) {
-        return '/error';
-      }
-
-      return null;*/
     },
     routes: [
       GoRoute(

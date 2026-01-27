@@ -32,7 +32,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
     ChantierEtape etape,
   ) async {
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         allowMultiple: false,
         type: FileType.custom,
         allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
@@ -40,8 +40,9 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
 
       if (result != null && result.files.isNotEmpty) {
         final file = result.files.first;
-        final type =
-            (file.extension?.toLowerCase() ?? '') == 'pdf' ? 'pdf' : 'image';
+        final type = (file.extension?.toLowerCase() ?? '') == 'pdf'
+            ? 'pdf'
+            : 'image';
 
         final piece = PieceJointe(
           id: etape.id,
@@ -101,10 +102,9 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
         title: Text(etape.titre),
         actions: [
           IconButton(
-            tooltip:
-                etape.terminee
-                    ? 'Marquer comme non terminée'
-                    : 'Marquer comme terminée',
+            tooltip: etape.terminee
+                ? 'Marquer comme non terminée'
+                : 'Marquer comme terminée',
             icon: Icon(
               etape.terminee
                   ? Icons.check_circle
@@ -181,35 +181,33 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
         tooltip: 'Ajouter une pièce jointe',
         onPressed: () => _addPieceJointe(ref, context, etape),
       ),
-      child:
-          pieces.isEmpty
-              ? const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text('Aucune pièce jointe.'),
-              )
-              : LayoutBuilder(
-                builder: (context, constraints) {
-                  final crossAxisCount =
-                      info.isDesktop
-                          ? 4
-                          : info.isTablet && info.isLandscape
-                          ? 3
-                          : 2;
+      child: pieces.isEmpty
+          ? const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Text('Aucune pièce jointe.'),
+            )
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final crossAxisCount = info.isDesktop
+                    ? 4
+                    : info.isTablet && info.isLandscape
+                    ? 3
+                    : 2;
 
-                  return GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: pieces.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.9,
-                    ),
-                    itemBuilder: (_, i) => _buildPieceWidget(pieces[i], info),
-                  );
-                },
-              ),
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: pieces.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.9,
+                  ),
+                  itemBuilder: (_, i) => _buildPieceWidget(pieces[i], info),
+                );
+              },
+            ),
     );
   }
 
@@ -347,19 +345,19 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
               isImage
                   ? _buildClipRRect(piece, size)
                   : Container(
-                    width: size,
-                    height: size,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(12),
+                      width: size,
+                      height: size,
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.picture_as_pdf,
+                        size: 48,
+                        color: Colors.red,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.picture_as_pdf,
-                      size: 48,
-                      color: Colors.red,
-                    ),
-                  ),
               const SizedBox(height: 6),
               SizedBox(
                 width: size,
@@ -381,21 +379,20 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
     final isWeb = kIsWeb;
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child:
-          isWeb
-              ? CachedNetworkImage(
-                imageUrl: piece.url,
-                width: size,
-                height: size,
-                fit: BoxFit.contain,
-              )
-              : Image.file(
-                File(piece.url),
-                width: size,
-                height: size,
-                fit: BoxFit.contain,
-                errorBuilder: (_, _, _) => _buildErrorImage(size),
-              ),
+      child: isWeb
+          ? CachedNetworkImage(
+              imageUrl: piece.url,
+              width: size,
+              height: size,
+              fit: BoxFit.contain,
+            )
+          : Image.file(
+              File(piece.url),
+              width: size,
+              height: size,
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) => _buildErrorImage(size),
+            ),
     );
   }
 

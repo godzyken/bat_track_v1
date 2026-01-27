@@ -9,7 +9,7 @@ import 'auth_state_provider.dart';
 
 /// 🔑 Fournit l'utilisateur connecté (AppUser complet, ou null)
 final currentUserProvider =
-    AsyncNotifierProvider.autoDispose<CurrentUserNotifier, AppUser?>(() {
+    StreamNotifierProvider.autoDispose<CurrentUserNotifier, AppUser?>(() {
       return CurrentUserNotifier();
     });
 
