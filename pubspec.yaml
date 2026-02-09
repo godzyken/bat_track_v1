@@ -85,6 +85,8 @@ dependencies:
   sentry_flutter: ^9.5.0
   hive_ce: ^2.18.0
   hive_ce_flutter: ^2.3.4
+  extension_google_sign_in_as_googleapis_auth: ^3.0.0
+  googleapis: ^16.0.0
 
 dev_dependencies:
   flutter_test:
