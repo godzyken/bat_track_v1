@@ -215,9 +215,26 @@ class GoogleSheetsProductService {
 final googleAuthProvider = FutureProvider<AutoRefreshingAuthClient>((
   ref,
 ) async {
-  // TODO: Implémenter l'authentification OAuth2
-  // Voir: https://pub.dev/packages/googleapis_auth
-  throw UnimplementedError('Configurer OAuth2 pour Google Sheets');
+  const String githubOidcToken = String.fromEnvironment('GITHUB_0IDC_TOKEN');
+
+  if (githubOidcToken.isEmpty) {
+    throw Exception("Le jeton GITHUB_OIDC_TOKEN est manquant.");
+  }
+
+  throw UnimplementedError(
+    "Le SDK Dart googleapis_auth nécessite une clé JSON pour ServiceAccountCredentials. "
+    "Pour WIF, utilisez un échange REST vers l'API STS de Google d'abord.",
+  );
+
+  /*  final credentials = ServiceAccountCredentials(
+    'email',
+    'projects/55611526582/locations/global/workloadIdentityPools/github-pool/providers/github-provider',
+    'github-sheets-sync_@egoteback.iam.gserviceaccount.com',
+    githubOidcToken,
+    [sheets.SheetsApi.spreadsheetsScope],
+  );
+
+  return await clientViaApiKey(credentials, githubOidcToken);*/
 });
 
 /// Provider pour le service Google Sheets
