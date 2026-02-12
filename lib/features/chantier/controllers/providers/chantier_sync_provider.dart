@@ -1,5 +1,6 @@
 import 'package:bat_track_v1/features/chantier/controllers/notifiers/chantiers_list_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/remote/providers/chantier_provider.dart';

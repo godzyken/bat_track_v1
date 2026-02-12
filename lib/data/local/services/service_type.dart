@@ -1,11 +1,11 @@
 import 'package:bat_track_v1/core/services/unified_entity_service_impl.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../core/services/unified_entity_service.dart';
 import '../../../models/data/hive_model.dart';
 import '../../../models/services/entity_service_registry.dart';
 import '../../../models/services/remote/remote_storage_service.dart';
-import '../../core/unified_model.dart';
 import '../../remote/services/firestore_service.dart';
 import '../../remote/services/storage_service.dart';
 import '../models/adapters/hive_entity_factory.dart';

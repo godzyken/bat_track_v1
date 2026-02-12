@@ -5,9 +5,9 @@ import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:printing/printing.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../core/responsive/wrapper/responsive_layout.dart';
-import '../../../../data/core/unified_model.dart';
 import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
@@ -65,17 +65,16 @@ class EntityManagerScreen<T extends UnifiedModel> extends ConsumerWidget {
         onEdit: (item) {
           showDialog(
             context: context,
-            builder:
-                (_) => EntityForm<T>(
-                  fromJson: fromJson,
-                  initialValue: item,
-                  onSubmit: (updated) async {
-                    final service = ref.read(serviceProvider);
-                    await service.syncOne(updated);
-                    ref.invalidate(listProvider);
-                  },
-                  createEmpty: () => item,
-                ),
+            builder: (_) => EntityForm<T>(
+              fromJson: fromJson,
+              initialValue: item,
+              onSubmit: (updated) async {
+                final service = ref.read(serviceProvider);
+                await service.syncOne(updated);
+                ref.invalidate(listProvider);
+              },
+              createEmpty: () => item,
+            ),
           );
         },
         onDelete: (id) async {
@@ -95,16 +94,15 @@ class EntityManagerScreen<T extends UnifiedModel> extends ConsumerWidget {
         onPressed: () {
           showDialog(
             context: context,
-            builder:
-                (_) => EntityForm<T>(
-                  fromJson: fromJson,
-                  onSubmit: (item) async {
-                    final service = ref.read(serviceProvider);
-                    await service.syncOne(item);
-                    ref.invalidate(listProvider);
-                  },
-                  createEmpty: createEmpty,
-                ),
+            builder: (_) => EntityForm<T>(
+              fromJson: fromJson,
+              onSubmit: (item) async {
+                final service = ref.read(serviceProvider);
+                await service.syncOne(item);
+                ref.invalidate(listProvider);
+              },
+              createEmpty: createEmpty,
+            ),
           );
         },
         child: const Icon(Icons.add),

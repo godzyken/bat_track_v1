@@ -1,5 +1,6 @@
 import 'package:bat_track_v1/data/local/models/entities/index_entity_extention.dart';
 import 'package:bat_track_v1/data/local/services/service_type.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../data/local/models/index_model_extention.dart';
 import 'logged_entity_service.dart';

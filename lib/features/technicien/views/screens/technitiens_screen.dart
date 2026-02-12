@@ -2,9 +2,9 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/base/access_policy_interface.dart';
-import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/services/service_type.dart';
 import '../../../../models/views/widgets/entity_list.dart';
 import '../../controllers/notifiers/technicien_list_notifier.dart';
@@ -29,21 +29,20 @@ class TechniciensScreen extends ConsumerWidget {
       body: EntityList<Technicien>(
         items: techniciensAsync,
         boxName: 'techniciens',
-        onCreate:
-            isAdmin
-                ? () {
-                  showEntityFormDialog<Technicien>(
-                    context: context,
-                    ref: ref,
-                    role: user.role,
-                    onSubmit: (technicien) async {
-                      await technicienService.save(technicien);
-                    },
-                    fromJson: Technicien.fromJson,
-                    createEmpty: Technicien.mock,
-                  );
-                }
-                : () {},
+        onCreate: isAdmin
+            ? () {
+                showEntityFormDialog<Technicien>(
+                  context: context,
+                  ref: ref,
+                  role: user.role,
+                  onSubmit: (technicien) async {
+                    await technicienService.save(technicien);
+                  },
+                  fromJson: Technicien.fromJson,
+                  createEmpty: Technicien.mock,
+                );
+              }
+            : () {},
         onEdit: (technicien) {
           showEntityFormDialog<Technicien>(
             context: context,

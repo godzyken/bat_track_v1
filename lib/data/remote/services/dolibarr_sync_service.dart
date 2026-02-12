@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../models/data/adapter/triple_adapter.dart';
-import '../../core/unified_model.dart';
 import '../../local/models/index_model_extention.dart';
 
 class DolibarrSyncService {

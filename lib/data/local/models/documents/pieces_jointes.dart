@@ -3,9 +3,9 @@ import 'dart:typed_data';
 
 import 'package:bat_track_v1/data/local/models/base/has_files.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:shared_models/shared_models.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../core/unified_model.dart';
 import '../extensions/budget_extentions.dart';
 
 part 'pieces_jointes.freezed.dart';

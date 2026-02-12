@@ -1,6 +1,6 @@
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../data/core/unified_model.dart';
 import '../../../data/local/services/service_type.dart';
 import '../../services/entity_sync_services.dart';
 import '../../services/hive_entity_service.dart';

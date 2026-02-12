@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:googleapis/sheets/v4.dart' as sheets;
@@ -215,16 +216,20 @@ class GoogleSheetsProductService {
 final googleAuthProvider = FutureProvider<AutoRefreshingAuthClient>((
   ref,
 ) async {
-  const String githubOidcToken = String.fromEnvironment('GITHUB_0IDC_TOKEN');
+  // 1. Chercher le fichier de credentials (injecté par GitHub Actions ou manuellement)
+  final envPath = Platform.environment['GOOGLE_APPLICATION_CREDENTIALS'];
 
-  if (githubOidcToken.isEmpty) {
-    throw Exception("Le jeton GITHUB_OIDC_TOKEN est manquant.");
+  if (envPath == null || envPath.isEmpty) {
+    throw Exception(
+      "Configuration incomplète : GOOGLE_APPLICATION_CREDENTIALS manquant.",
+    );
   }
 
-  throw UnimplementedError(
-    "Le SDK Dart googleapis_auth nécessite une clé JSON pour ServiceAccountCredentials. "
-    "Pour WIF, utilisez un échange REST vers l'API STS de Google d'abord.",
-  );
+  final credentialsFile = File(envPath);
+  final jsonCredentials = await credentialsFile.readAsString();
+
+  // 2. Créer les credentials à partir du JSON temporaire
+  final credentials = ServiceAccountCredentials.fromJson(jsonCredentials);
 
   /*  final credentials = ServiceAccountCredentials(
     'email',

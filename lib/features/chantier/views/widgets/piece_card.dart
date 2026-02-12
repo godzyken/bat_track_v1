@@ -1,6 +1,8 @@
+import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:bat_track_v1/features/technicien/controllers/notifiers/technicien_list_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 
@@ -115,25 +117,23 @@ class PieceCard extends ConsumerWidget {
                   data: (list) {
                     final moList = piece.mainOeuvre ?? [];
 
-                    final mainOeuvreWidgets =
-                        moList.map((e) {
-                          final tech = list.firstWhere(
-                            (t) => t.id == e.idTechnicien,
-                            orElse: () => Technicien.mock(),
-                          );
-                          return _buildBullet(
-                            Icon(Icons.engineering),
-                            '${tech.nom} - ${e.heuresEstimees} h',
-                          );
-                        }).toList();
+                    final mainOeuvreWidgets = moList.map((e) {
+                      final tech = list.firstWhere(
+                        (t) => t.isTechnicien && e.isActive,
+                        orElse: () => Technicien.mock(),
+                      );
+                      return _buildBullet(
+                        Icon(Icons.engineering),
+                        '${tech.nom} - ${e.heuresEstimees} h',
+                      );
+                    }).toList();
 
                     return Column(children: mainOeuvreWidgets);
                   },
-                  orElse:
-                      () => Semantics(
-                        label: 'Chargement des techniciens...',
-                        child: Text('Chargement...'),
-                      ),
+                  orElse: () => Semantics(
+                    label: 'Chargement des techniciens...',
+                    child: Text('Chargement...'),
+                  ),
                 ),
               ],
             ),

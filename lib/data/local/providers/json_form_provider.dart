@@ -1,5 +1,6 @@
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../controllers/json_form_controller.dart';
 import '../models/adapters/json_adapter.dart';

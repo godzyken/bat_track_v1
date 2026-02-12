@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/providers/hive_provider.dart';
 
 class ListeDesUtilisateurs extends ConsumerWidget {
@@ -26,11 +26,10 @@ class ListeDesUtilisateurs extends ConsumerWidget {
 
         return ListView.builder(
           itemCount: users.length,
-          itemBuilder:
-              (_, i) => ListTile(
-                title: Text(users[i].name!),
-                subtitle: Text(users[i].email!),
-              ),
+          itemBuilder: (_, i) => ListTile(
+            title: Text(users[i].name!),
+            subtitle: Text(users[i].email!),
+          ),
         );
       },
     );

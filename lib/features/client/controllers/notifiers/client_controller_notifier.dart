@@ -2,8 +2,8 @@ import 'package:bat_track_v1/data/remote/providers/catch_error_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../../data/local/models/utilisateurs/client.dart';
 import '../../../../data/remote/providers/dolibarr_config_provider.dart';
 import '../../../../data/remote/services/dolibarr_services.dart';
 

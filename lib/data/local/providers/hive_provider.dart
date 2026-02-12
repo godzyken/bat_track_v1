@@ -8,6 +8,7 @@ import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapte
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../models/services/dashboard_data_service.dart';
 import '../../../models/services/entity_service_registry.dart';

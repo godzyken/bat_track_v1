@@ -1,4 +1,5 @@
-import '../../core/unified_model.dart';
+import 'package:shared_models/shared_models.dart';
+
 import '../models/adapters/json_adapter.dart';
 
 /// 🔧 Registre centralisé des adapters JSON dynamiques

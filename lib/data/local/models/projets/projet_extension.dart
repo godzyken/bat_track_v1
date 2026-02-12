@@ -1,8 +1,7 @@
 import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:bat_track_v1/data/local/models/projets/projet.dart';
+import 'package:shared_models/models/private/app_user.dart';
 import 'package:uuid/uuid.dart';
-
-import '../utilisateurs/app_user.dart';
 
 extension ProjetUtils on Projet {
   bool get toutesPartiesOntValide =>
@@ -42,11 +41,15 @@ extension ProjetUtils on Projet {
 extension ProjetWorkflow on Projet {
   /// 🔹 Vérifie si l'utilisateur peut modifier le projet
   bool canEditProject(AppUser user) {
-    if (user.isAdmin || user.isChefDeProjet) return true;
-    if (user.isClient && ownerId == user.uid && !chefDeProjetValide) {
+    if (AppUserAccessControl(user).isAdmin || user.isChefDeProjet) return true;
+    if (AppUserAccessControl(user).isClient &&
+        ownerId == user.uid &&
+        !chefDeProjetValide) {
       return true;
     }
-    if (user.isTechnicien && members.contains(user.uid) && clientValide) {
+    if (AppUserAccessControl(user).isTechnicien &&
+        members.contains(user.uid) &&
+        clientValide) {
       return true;
     }
     return false;
@@ -54,12 +57,14 @@ extension ProjetWorkflow on Projet {
 
   /// 🔹 Vérifie si l'utilisateur peut valider le projet
   bool canValidateProject(AppUser user) {
-    return user.isAdmin || user.isChefDeProjet;
+    return AppUserAccessControl(user).isAdmin || user.isChefDeProjet;
   }
 
   /// 🔹 Vérifie si l'utilisateur peut être assigné comme technicien
   bool canBeAssigned(AppUser user) {
-    return user.isTechnicien && clientValide && !members.contains(user.uid);
+    return AppUserAccessControl(user).isTechnicien &&
+        clientValide &&
+        !members.contains(user.uid);
   }
 
   /// 🔹 Marque le projet comme validé par le client

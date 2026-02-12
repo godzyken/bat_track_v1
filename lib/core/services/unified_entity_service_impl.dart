@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../core/services/unified_entity_service.dart';
-import '../../data/core/unified_model.dart';
 import '../../data/local/models/adapters/hive_entity_factory.dart';
 import '../../data/remote/providers/multi_backend_remote_provider.dart';
 import '../../models/data/hive_model.dart';

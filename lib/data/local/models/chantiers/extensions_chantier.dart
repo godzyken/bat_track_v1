@@ -1,3 +1,5 @@
+import 'package:shared_models/shared_models.dart';
+
 import '../index_model_extention.dart';
 
 /// Extensions utiles

@@ -1,9 +1,8 @@
 import 'package:bat_track_v1/data/local/services/service_type.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../data/core/unified_model.dart';
 import '../../../data/local/models/base/has_acces_control.dart';
-import '../../../data/local/models/utilisateurs/app_user.dart';
 import '../../../features/auth/data/providers/current_user_provider.dart';
 import '../../data/hive_model.dart';
 import '../adapter/wath_entities_args.dart';

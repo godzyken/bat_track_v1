@@ -14,7 +14,3 @@ export 'documents/facture_model.dart';
 export 'documents/pieces_jointes.dart';
 export 'produits/produit.dart';
 export 'projets/projet.dart';
-export 'utilisateurs/app_user.dart';
-export 'utilisateurs/client.dart';
-export 'utilisateurs/technicien.dart';
-export 'utilisateurs/user.dart';

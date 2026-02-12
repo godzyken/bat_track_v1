@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_models/shared_models.dart';
 
-import '../../../data/core/unified_model.dart';
 import '../../../data/remote/providers/dolibarr_instance_provider.dart';
 
 class TripleAdapter<T extends UnifiedModel> {

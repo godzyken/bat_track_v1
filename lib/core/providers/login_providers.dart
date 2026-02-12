@@ -1,7 +1,6 @@
 import 'package:bat_track_v1/core/notifiers/login_notifiers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../data/local/models/index_model_extention.dart';
+import 'package:shared_models/models/user_enums.dart';
 
 final selectedRoleNotifierProvider =
     NotifierProvider<SelectedRoleNotifier, UserRole?>(SelectedRoleNotifier.new);

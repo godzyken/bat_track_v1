@@ -11,6 +11,7 @@ import 'package:bat_track_v1/features/projet/views/screens/project_list_screen.d
 import 'package:bat_track_v1/features/technicien/views/screens/technicien_detail_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../data/local/models/base/access_policy_interface.dart';
 import '../features/auth/data/providers/auth_notifier_provider.dart';

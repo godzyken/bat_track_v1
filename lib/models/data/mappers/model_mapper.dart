@@ -1,4 +1,5 @@
-import '../../../data/core/unified_model.dart';
+import 'package:shared_models/shared_models.dart';
+
 import '../hive_model.dart';
 
 class ModelMapper<H extends HiveModel<T>, T extends UnifiedModel> {

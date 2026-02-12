@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/services/unified_entity_service.dart';
-import '../../data/core/unified_model.dart';
 import '../data/hive_model.dart';
 
 abstract class EntityListNotifier<

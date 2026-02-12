@@ -3,8 +3,8 @@ import 'dart:developer' as developer;
 
 import 'package:bat_track_v1/models/data/state_wrapper/wrappers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../data/core/unified_model.dart';
 import '../data/maperror/debug_config.dart';
 
 class SyncEntityNotifierLogger<T extends UnifiedModel>

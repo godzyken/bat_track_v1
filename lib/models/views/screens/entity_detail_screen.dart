@@ -3,8 +3,8 @@ import 'package:bat_track_v1/models/data/state_wrapper/wrappers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../data/core/unified_model.dart';
 import '../../data/adapter/typedefs.dart';
 import '../../providers/asynchrones/entity_notifier_provider.dart';
 

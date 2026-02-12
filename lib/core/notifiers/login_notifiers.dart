@@ -1,5 +1,5 @@
-import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_models/shared_models.dart';
 
 // Cette ligne est nécessaire pour la génération de code
 class SelectedRoleNotifier extends Notifier<UserRole?> {

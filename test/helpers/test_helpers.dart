@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:bat_track_v1/data/core/unified_model.dart';
+import 'package:bat_track_v1/data/core/unified_model_extension.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 

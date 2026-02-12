@@ -2,9 +2,9 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/base/access_policy_interface.dart';
-import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/services/service_type.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
@@ -30,21 +30,20 @@ class ClientsScreen extends ConsumerWidget {
         items: clientsAsync,
         boxName: 'clients',
         infoOverride: info,
-        onCreate:
-            isAdmin
-                ? () {
-                  showEntityFormDialog<Client>(
-                    context: context,
-                    ref: ref,
-                    role: user.role,
-                    onSubmit: (client) async {
-                      await clientService.save(client);
-                    },
-                    fromJson: Client.fromJson,
-                    createEmpty: Client.mock,
-                  );
-                }
-                : () {},
+        onCreate: isAdmin
+            ? () {
+                showEntityFormDialog<Client>(
+                  context: context,
+                  ref: ref,
+                  role: user.role,
+                  onSubmit: (client) async {
+                    await clientService.save(client);
+                  },
+                  fromJson: Client.fromJson,
+                  createEmpty: Client.mock,
+                );
+              }
+            : () {},
         onEdit: (client) {
           showEntityFormDialog<Client>(
             context: context,
@@ -67,14 +66,13 @@ class ClientsScreen extends ConsumerWidget {
         onPressed: () {
           showDialog(
             context: context,
-            builder:
-                (_) => EntityForm<Client>(
-                  fromJson: (json) => Client.fromJson(json),
-                  onSubmit: (client) async {
-                    await ref.read(clientListProvider.notifier).add(client);
-                  },
-                  createEmpty: () => Client.mock(),
-                ),
+            builder: (_) => EntityForm<Client>(
+              fromJson: (json) => Client.fromJson(json),
+              onSubmit: (client) async {
+                await ref.read(clientListProvider.notifier).add(client);
+              },
+              createEmpty: () => Client.mock(),
+            ),
           );
         },
         child: const Icon(Icons.add),

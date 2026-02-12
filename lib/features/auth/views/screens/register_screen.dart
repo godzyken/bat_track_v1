@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../../data/local/models/utilisateurs/user.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../data/repository/auth_repository.dart';
 
@@ -35,14 +35,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     children: [
                       EntityForm<UserModel>(
                         fromJson: UserModel.fromJson,
-                        createEmpty:
-                            () => UserModel(
-                              id: '',
-                              name: '',
-                              email: '',
-                              role: UserRole.technicien,
-                              createAt: DateTime.now(),
-                            ),
+                        createEmpty: () => UserModel(
+                          id: '',
+                          name: '',
+                          email: '',
+                          role: UserRole.technicien,
+                          createAt: DateTime.now(),
+                        ),
                         onSubmit: (user) async {
                           try {
                             await ref

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../../data/local/models/utilisateurs/app_user.dart';
 import '../providers/auth_notifier_provider.dart';
 
 /// Notifier pour rafraîchir le GoRouter quand auth change

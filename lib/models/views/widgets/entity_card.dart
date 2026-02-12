@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../data/core/unified_model.dart';
 import '../../../data/local/models/index_model_extention.dart';
 import '../../../data/local/providers/hive_provider.dart';
 import '../../../features/auth/data/providers/current_user_provider.dart';
@@ -75,11 +75,10 @@ class EntityCard<T extends UnifiedModel> extends ConsumerWidget {
                     child: Image.network(
                       entity.toJson()['imageUrl'],
                       fit: BoxFit.cover,
-                      errorBuilder:
-                          (_, _, _) => Container(
-                            color: Colors.grey.shade300,
-                            child: const Icon(Icons.image_not_supported),
-                          ),
+                      errorBuilder: (_, _, _) => Container(
+                        color: Colors.grey.shade300,
+                        child: const Icon(Icons.image_not_supported),
+                      ),
                     ),
                   ),
                   Positioned(top: 8, right: 8, child: _buildStatusBadge()),
@@ -116,19 +115,18 @@ class EntityCard<T extends UnifiedModel> extends ConsumerWidget {
             if (showActions)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child:
-                    isWide
-                        ? Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: _buildActionButtons(context, ref),
-                        )
-                        : Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const SizedBox(),
-                            Row(children: _buildActionButtons(context, ref)),
-                          ],
-                        ),
+                child: isWide
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: _buildActionButtons(context, ref),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const SizedBox(),
+                          Row(children: _buildActionButtons(context, ref)),
+                        ],
+                      ),
               ),
           ],
         ),
@@ -159,15 +157,14 @@ class EntityCard<T extends UnifiedModel> extends ConsumerWidget {
     return Wrap(
       spacing: 6,
       runSpacing: -8,
-      children:
-          tags.map((tag) {
-            return Chip(
-              label: Text(tag),
-              backgroundColor: Colors.blue.shade50,
-              labelStyle: const TextStyle(fontSize: 12),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            );
-          }).toList(),
+      children: tags.map((tag) {
+        return Chip(
+          label: Text(tag),
+          backgroundColor: Colors.blue.shade50,
+          labelStyle: const TextStyle(fontSize: 12),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        );
+      }).toList(),
     );
   }
 

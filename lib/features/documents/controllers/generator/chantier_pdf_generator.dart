@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/features/documents/controllers/generator/pdf_generator_interface.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 import 'facture_pdf_generator.dart';

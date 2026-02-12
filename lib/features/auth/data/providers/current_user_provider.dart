@@ -1,9 +1,8 @@
 import 'package:bat_track_v1/data/local/providers/hive_provider.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../../data/local/models/utilisateurs/app_user.dart';
-import '../../../../data/local/models/utilisateurs/user.dart';
 import '../notifiers/current_user_notifier.dart';
 import 'auth_state_provider.dart';
 

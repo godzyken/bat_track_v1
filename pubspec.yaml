@@ -31,6 +31,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+
+  shared_models:
+    path: ../shared_models/shared_models
+
   # Base UI
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
@@ -102,6 +106,9 @@ dev_dependencies:
   mocktail: ^1.0.4
   path_provider_platform_interface: ^2.1.2
   hive_ce_generator: ^1.9.3
+
+dependency_overrides:
+  freezed_annotation: ^2.4.4
 
 flutter:
 

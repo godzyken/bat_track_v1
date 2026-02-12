@@ -1,7 +1,7 @@
 import 'package:hive_ce/hive.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../models/data/hive_model.dart';
-import '../utilisateurs/client.dart';
 
 part 'client_entity.g.dart';
 

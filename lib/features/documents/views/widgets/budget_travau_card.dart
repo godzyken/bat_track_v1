@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../technicien/controllers/providers/technicien_providers.dart';
@@ -49,23 +50,22 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children:
-                  piece.mainOeuvre!.map((mo) {
-                    final tech = techniciens.firstWhere(
-                      (t) => t.id == mo.idTechnicien,
-                      orElse: () => Technicien.mock(),
-                    );
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: TextField(
-                        controller: controllerMap[mo.idTechnicien],
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: '${tech.nom} (heures)',
-                        ),
-                      ),
-                    );
-                  }).toList(),
+              children: piece.mainOeuvre!.map((mo) {
+                final tech = techniciens.firstWhere(
+                  (t) => t.id == mo.idTechnicien,
+                  orElse: () => Technicien.mock(),
+                );
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: TextField(
+                    controller: controllerMap[mo.idTechnicien],
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: '${tech.nom} (heures)',
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ),
           actions: [
@@ -92,11 +92,10 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
     );
 
     if (newValues != null) {
-      final updatedMainOeuvre =
-          piece.mainOeuvre!.map((mo) {
-            final heures = newValues[mo.idTechnicien];
-            return heures != null ? mo.copyWith(heuresEstimees: heures) : mo;
-          }).toList();
+      final updatedMainOeuvre = piece.mainOeuvre!.map((mo) {
+        final heures = newValues[mo.idTechnicien];
+        return heures != null ? mo.copyWith(heuresEstimees: heures) : mo;
+      }).toList();
 
       setState(() {
         piece = piece.copyWith(mainOeuvre: updatedMainOeuvre);

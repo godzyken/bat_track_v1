@@ -1,4 +1,4 @@
-import '../../data/core/unified_model.dart';
+import 'package:shared_models/shared_models.dart';
 
 abstract class HiveModel<T extends UnifiedModel> {
   String get id;

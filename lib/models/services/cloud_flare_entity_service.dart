@@ -1,7 +1,7 @@
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../core/services/unified_entity_service.dart';
-import '../../data/core/unified_model.dart';
 
 class CloudflareEntityService<M extends UnifiedModel>
     implements BaseEntityService<M> {

@@ -1,0 +1,67 @@
+# bat_track_v1/adapters/technicien_adapter.py
+
+from models import Artisan
+from typing import Dict, Any, List
+from datetime import datetime
+
+class TechnicienAdapter:
+    """Convertit Artisan → Technicien (privé) ou TechnicienPublic"""
+
+    @staticmethod
+    def artisan_to_technicien_public_json(artisan: Artisan) -> Dict[str, Any]:
+        """
+        Convertit en format TechnicienPublic (pour EMAP)
+        Sans données sensibles et sans champs de contrôle d'accès
+        """
+
+        nom_complet = f"{artisan.prenom} {artisan.nom}".strip()
+        metiers = [spec.value.lower() for spec in artisan.specialites]
+        specialite_principale = metiers[0] if metiers else "généraliste"
+
+        return {
+            'id': artisan.id,
+            'nom': nom_complet,
+            'email': artisan.email,  # Ou masquer partiellement
+            'competences': artisan.certifications or [],
+            'specialite': specialite_principale,
+            'disponible': artisan.disponible,
+            'localisation': artisan.ville,
+            'region': artisan.zones_intervention[0] if artisan.zones_intervention else None,
+            'tauxHoraire': float(artisan.tarif_horaire),
+            'rating': float(artisan.note_moyenne) if artisan.note_moyenne else None,
+            'metiers': metiers,
+            'realisations': [f"Réalisation {i+1}" for i in range(min(artisan.nombre_projets, 5))],
+            'createdAt': artisan.date_creation.isoformat() if artisan.date_creation else datetime.now().isoformat(),
+            'updatedAt': None,
+        }
+
+    @staticmethod
+    def artisan_to_technicien_private_json(artisan: Artisan) -> Dict[str, Any]:
+        """
+        Convertit en format Technicien complet (pour Bat_Track_V1)
+        Avec tous les champs et données sensibles
+        """
+
+        nom_complet = f"{artisan.prenom} {artisan.nom}".strip()
+        metiers = [spec.value.lower() for spec in artisan.specialites]
+        specialite_principale = metiers[0] if metiers else "généraliste"
+
+        return {
+            'id': artisan.id,
+            'nom': nom_complet,
+            'email': artisan.email,
+            'competences': artisan.certifications or [],
+            'specialite': specialite_principale,
+            'disponible': artisan.disponible,
+            'localisation': artisan.ville,
+            'region': artisan.zones_intervention[0] if artisan.zones_intervention else None,
+            'tauxHoraire': float(artisan.tarif_horaire),
+            'rating': float(artisan.note_moyenne) if artisan.note_moyenne else None,
+            'metiers': metiers,
+            'realisations': [f"Projet {i+1}" for i in range(artisan.nombre_projets)],
+            'chantiersAffectees': [],  # À charger depuis projets
+            'etapesAffectees': [],
+            'createdAt': artisan.date_creation.isoformat() if artisan.date_creation else datetime.now().isoformat(),
+            'dateDelete': None,
+            'updatedAt': None,
+        }

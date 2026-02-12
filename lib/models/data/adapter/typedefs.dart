@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../data/core/unified_model.dart';
 import '../../../data/local/models/index_model_extention.dart';
 import '../../notifiers/sync_entity_notifier.dart';
 import '../state_wrapper/wrappers.dart';

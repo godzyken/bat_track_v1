@@ -1,7 +1,6 @@
 import 'dart:developer' as developer;
 
 import 'package:async/async.dart';
-import 'package:bat_track_v1/data/core/unified_model.dart';
 import 'package:bat_track_v1/data/local/services/hive_service.dart';
 import 'package:bat_track_v1/models/providers/synchrones/facture_sync_provider.dart';
 import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapter.dart';
@@ -9,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../data/local/models/index_model_extention.dart';
 import '../../data/local/services/service_type.dart';

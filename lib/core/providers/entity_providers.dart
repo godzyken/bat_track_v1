@@ -1,7 +1,7 @@
 import 'package:bat_track_v1/data/local/models/entities/index_entity_extention.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../data/core/unified_model.dart';
 import '../../data/local/models/adapters/hive_entity_factory.dart';
 import '../../data/local/models/index_model_extention.dart';
 import '../../data/remote/providers/chantier_provider.dart';

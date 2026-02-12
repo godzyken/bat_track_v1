@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/models/private/technicien.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/providers/hive_provider.dart';
@@ -25,18 +26,15 @@ class TechnicienDetailScreen extends ConsumerWidget {
         final chantiers = chantierAsync.value ?? [];
         final etapes = etapesAsync.value ?? [];
 
-        final chantiersAffectes =
-            chantiers
-                .where(
-                  (chantier) =>
-                      technicien.chantiersAffectees.contains(chantier.id),
-                )
-                .toList();
+        final chantiersAffectes = chantiers
+            .where(
+              (chantier) => technicien.chantiersAffectees.contains(chantier.id),
+            )
+            .toList();
 
-        final etapesAffectees =
-            etapes
-                .where((etape) => technicien.etapesAffectees.contains(etape.id))
-                .toList();
+        final etapesAffectees = etapes
+            .where((etape) => technicien.etapesAffectees.contains(etape.id))
+            .toList();
 
         return Scaffold(
           appBar: AppBar(title: Text('Détail de ${technicien.nom}')),
@@ -49,9 +47,9 @@ class TechnicienDetailScreen extends ConsumerWidget {
                 chantierAsync.isLoading
                     ? const LinearProgressIndicator()
                     : _buildAffectations(
-                      'Chantiers affectés',
-                      chantiersAffectes,
-                    ),
+                        'Chantiers affectés',
+                        chantiersAffectes,
+                      ),
                 const SizedBox(height: 16),
                 etapesAsync.isLoading
                     ? const LinearProgressIndicator()
@@ -61,12 +59,10 @@ class TechnicienDetailScreen extends ConsumerWidget {
           ),
         );
       },
-      loading:
-          () =>
-              const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error:
-          (err, stack) =>
-              Scaffold(body: Center(child: Text('Erreur Technicien: $err'))),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (err, stack) =>
+          Scaffold(body: Center(child: Text('Erreur Technicien: $err'))),
     );
   }
 

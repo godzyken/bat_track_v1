@@ -5,6 +5,7 @@ import 'package:bat_track_v1/models/views/widgets/entity_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../auth/data/providers/auth_state_provider.dart';
 import '../../../auth/views/widgets/user_dropdown_field.dart';
@@ -78,7 +79,8 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
       customFieldBuilder:
           (context, key, value, controller, onChanged, expertMode) {
             // 🔹 Choix du client (toujours accessible au admin)
-            if (key == 'clientId' && (user.isAdmin || !isEditing)) {
+            if (key == 'clientId' &&
+                (AppUserAccess(user).isAdmin || !isEditing)) {
               return UserDropdownField(
                 role: 'client',
                 label: 'Client assigné',
@@ -90,7 +92,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
             // 🔹 Multi-sélection technicien pour admin / chef de projet
             if (key == 'technicienIds' &&
                 value is List &&
-                (user.isAdmin || user.isChefDeProjet)) {
+                (AppUserAccess(user).isAdmin || user.isChefDeProjet)) {
               return Wrap(
                 spacing: 8,
                 children: techs.map((t) {
@@ -113,7 +115,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
             }
 
             // 🔹 Validation par rôle
-            if (key == 'clientValide' && user.isClient) {
+            if (key == 'clientValide' && AppUserAccess(user).isClient) {
               return CheckboxListTile(
                 title: const Text('Je valide le projet'),
                 value: clientValide,
@@ -130,7 +132,8 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
               );
             }
 
-            if (key == 'superUtilisateurValide' && user.isAdmin) {
+            if (key == 'superUtilisateurValide' &&
+                AppUserAccess(user).isAdmin) {
               return CheckboxListTile(
                 title: const Text('Validation Super Utilisateur'),
                 value: superUtilisateurValide,

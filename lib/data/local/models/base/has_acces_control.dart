@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../features/auth/data/providers/current_user_provider.dart';
-import '../utilisateurs/app_user.dart';
 
 /// Interface de base pour le contrôle d'accès
 abstract class HasAccessControl {
@@ -11,17 +11,19 @@ abstract class HasAccessControl {
 /// Extension utilitaire pour des règles prédéfinies
 extension AccessControlRules on HasAccessControl {
   bool canAccessAll(AppUser user) =>
-      user.isAdmin || user.isTechnicien || user.isClient;
+      AppUserAccess(user).isAdmin ||
+      AppUserAccess(user).isTechnicien ||
+      AppUserAccess(user).isClient;
 
   bool canModifyAdminTechOnly(AppUser user) =>
-      user.isAdmin || user.isTechnicien;
+      AppUserAccess(user).isAdmin || AppUserAccess(user).isTechnicien;
 
   bool canModifyClientAndTechOnly(AppUser user) =>
-      user.isClient || user.isTechnicien;
+      AppUserAccess(user).isClient || AppUserAccess(user).isTechnicien;
 
-  bool canModifyClientOnly(AppUser user) => user.isClient;
+  bool canModifyClientOnly(AppUser user) => AppUserAccess(user).isClient;
 
-  bool canModifyAdminOnly(AppUser user) => user.isAdmin;
+  bool canModifyAdminOnly(AppUser user) => AppUserAccess(user).isAdmin;
 
   bool denyAll(AppUser user) => false;
 }
@@ -42,7 +44,7 @@ mixin RoleBasedAccess on HasAccessControl {
   bool canView(Ref ref) {
     final user = ref.read(currentUserProvider).value;
     if (user == null) return false;
-    if (user.isAdmin) return true;
+    if (AppUserAccess(user).isAdmin) return true;
     if (user.uid == ownerId) return true;
     return false;
   }
@@ -50,18 +52,18 @@ mixin RoleBasedAccess on HasAccessControl {
   bool canCreate(Ref ref) {
     final user = ref.read(currentUserProvider).value;
     if (user == null) return false;
-    return user.isAdmin || user.isClient;
+    return AppUserAccess(user).isAdmin || AppUserAccess(user).isClient;
   }
 
   bool canEdit(Ref ref) {
     final user = ref.read(currentUserProvider).value;
     if (user == null) return false;
 
-    if (user.isAdmin) return true;
+    if (AppUserAccess(user).isAdmin) return true;
 
-    if (user.isTechnicien && user.uid == ownerId) return true;
+    if (AppUserAccess(user).isTechnicien && user.uid == ownerId) return true;
 
-    if (user.isClient && user.uid == ownerId) return true;
+    if (AppUserAccess(user).isClient && user.uid == ownerId) return true;
 
     return false;
   }
@@ -69,13 +71,13 @@ mixin RoleBasedAccess on HasAccessControl {
   bool canDelete(Ref ref) {
     final user = ref.read(currentUserProvider).value;
     if (user == null) return false;
-    return user.isAdmin;
+    return AppUserAccess(user).isAdmin;
   }
 
   bool canMerge(Ref ref) {
     final user = ref.read(currentUserProvider).value;
     if (user == null) return false;
-    return user.isAdmin;
+    return AppUserAccess(user).isAdmin;
   }
 
   /// Merge local/cloud si autorisé

@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../data/core/unified_model.dart';
+import 'package:shared_models/shared_models.dart';
 
 class DolibarrImportEntry<T extends UnifiedModel> {
   final String endpoint;

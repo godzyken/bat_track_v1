@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../../data/local/models/utilisateurs/app_user.dart';
 import '../providers/auth_state_provider.dart';
 
 class CurrentUserNotifier extends AutoDisposeStreamNotifier<AppUser?> {

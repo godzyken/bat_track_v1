@@ -2,10 +2,10 @@ import 'package:bat_track_v1/data/local/services/service_type.dart';
 import 'package:bat_track_v1/data/remote/providers/multi_backend_remote_provider.dart';
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../core/services/unified_entity_service.dart';
 import '../../core/services/unified_entity_service_impl.dart';
-import '../../data/core/unified_model.dart';
 import '../../data/local/models/adapters/hive_entity_factory.dart';
 import '../data/hive_model.dart';
 import 'logged_entity_service.dart';

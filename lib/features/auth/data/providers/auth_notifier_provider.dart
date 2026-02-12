@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../../data/local/models/utilisateurs/app_user.dart';
+import 'package:shared_models/shared_models.dart';
 import '../notifiers/auth_notifier.dart';
 
 final authNotifierProvider =

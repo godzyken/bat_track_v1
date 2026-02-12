@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../core/responsive/wrapper/responsive_layout.dart';
-import '../../../data/core/unified_model.dart';
 import '../../../data/local/models/base/access_policy_interface.dart';
 import '../../../data/local/services/hive_service.dart';
 import '../../data/json_model.dart';
@@ -54,11 +54,10 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Erreur : $e')),
         data: (list) {
           // Filtrage des éléments accessibles
-          final filteredItems =
-              list
-                  .map(_withUserId)
-                  .where((e) => policy.canAccess(currentRole, entity: e))
-                  .toList();
+          final filteredItems = list
+              .map(_withUserId)
+              .where((e) => policy.canAccess(currentRole, entity: e))
+              .toList();
 
           if (filteredItems.isEmpty) {
             return const Center(child: Text('Aucun élément'));
@@ -70,15 +69,12 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
 
             return EntityCard<T>(
               entity: item,
-              onDelete:
-                  policy.canDelete(currentRole, entity: item)
-                      ? () =>
-                          onDelete?.call(id) ?? HiveService.delete(boxName, id)
-                      : null,
-              onEdit:
-                  policy.canEdit(currentRole, entity: item)
-                      ? () => onEdit?.call(item)
-                      : null,
+              onDelete: policy.canDelete(currentRole, entity: item)
+                  ? () => onDelete?.call(id) ?? HiveService.delete(boxName, id)
+                  : null,
+              onEdit: policy.canEdit(currentRole, entity: item)
+                  ? () => onEdit?.call(item)
+                  : null,
               showActions: showActions,
               readOnly: readOnly || !policy.canEdit(currentRole, entity: item),
             );
@@ -111,8 +107,8 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
                   mainAxisSpacing: 16,
                 ),
                 itemCount: filteredItems.length,
-                itemBuilder:
-                    (context, index) => buildCard(filteredItems[index]),
+                itemBuilder: (context, index) =>
+                    buildCard(filteredItems[index]),
               );
             },
           );
@@ -144,34 +140,33 @@ Future<void> showEntityFormDialog<T extends UnifiedModel>({
 }) {
   return showDialog(
     context: context,
-    builder:
-        (_) => EntityForm<T>(
-          initialValue: initialValue,
-          createEmpty: createEmpty,
-          fromJson: fromJson,
-          onSubmit: onSubmit,
-          customFieldBuilder: (ctx, key, value, controller, onChanged, expert) {
-            if (role == 'tech') {
-              final isDimension = editableKeysForTech.contains(key);
-              if (!isDimension) {
-                return TextFormField(
-                  controller: controller,
-                  enabled: false,
-                  decoration: InputDecoration(
-                    labelText: key,
-                    disabledBorder: const OutlineInputBorder(),
-                  ),
-                );
-              }
-            }
-            return null;
-          },
-          fieldVisibility: (key, _) {
-            if (role == 'tech' && hiddenKeysForTech.contains(key)) {
-              return false;
-            }
-            return true;
-          },
-        ),
+    builder: (_) => EntityForm<T>(
+      initialValue: initialValue,
+      createEmpty: createEmpty,
+      fromJson: fromJson,
+      onSubmit: onSubmit,
+      customFieldBuilder: (ctx, key, value, controller, onChanged, expert) {
+        if (role == 'tech') {
+          final isDimension = editableKeysForTech.contains(key);
+          if (!isDimension) {
+            return TextFormField(
+              controller: controller,
+              enabled: false,
+              decoration: InputDecoration(
+                labelText: key,
+                disabledBorder: const OutlineInputBorder(),
+              ),
+            );
+          }
+        }
+        return null;
+      },
+      fieldVisibility: (key, _) {
+        if (role == 'tech' && hiddenKeysForTech.contains(key)) {
+          return false;
+        }
+        return true;
+      },
+    ),
   );
 }

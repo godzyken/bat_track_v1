@@ -1,3 +1,5 @@
+import 'package:shared_models/shared_models.dart';
+
 import '../../../../data/local/models/index_model_extention.dart';
 
 class BudgetGen {
@@ -27,10 +29,9 @@ class BudgetGen {
   }) {
     final totalMateriaux = calculerCoutMateriaux(materiaux, surface: surface);
     final totalMateriels = calculerCoutMateriels(materiels);
-    final totalMainOeuvre =
-        mainOeuvre != null
-            ? estimationCoutTotalMainOeuvre(mainOeuvre, techniciens)
-            : 0.0;
+    final totalMainOeuvre = mainOeuvre != null
+        ? estimationCoutTotalMainOeuvre(mainOeuvre, techniciens)
+        : 0.0;
 
     return {
       'Matériaux': totalMateriaux,
@@ -94,11 +95,8 @@ class BudgetGen {
     return mainOeuvres.fold(0.0, (total, mo) {
       final tech = techniciens.firstWhere(
         (t) => t.id == mo.idTechnicien,
-        orElse:
-            () =>
-                throw Exception(
-                  'Technicien introuvable pour ${mo.idTechnicien}',
-                ),
+        orElse: () =>
+            throw Exception('Technicien introuvable pour ${mo.idTechnicien}'),
       );
       return total + (tech.tauxHoraire * mo.heuresEstimees);
     });

@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../core/unified_model.dart';
 import '../extensions/budget_extentions.dart';
 
 part 'materiau.freezed.dart';

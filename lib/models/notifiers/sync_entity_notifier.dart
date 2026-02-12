@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:bat_track_v1/models/data/hive_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../data/core/unified_model.dart';
 import '../services/logged_entity_service.dart';
 
 abstract class SyncEntityNotifier<

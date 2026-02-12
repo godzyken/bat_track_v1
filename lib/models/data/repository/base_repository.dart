@@ -1,4 +1,5 @@
-import '../../../data/core/unified_model.dart';
+import 'package:shared_models/shared_models.dart';
+
 import '../../services/logged_entity_service.dart';
 import '../hive_model.dart';
 

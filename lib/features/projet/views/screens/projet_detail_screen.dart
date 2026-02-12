@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 
@@ -41,7 +42,7 @@ class ProjectDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final canEdit = projet.canEdit(currentUser);
+    final canEdit = projet.canEditUser(currentUser, projet);
     final canValidate = projet.canMergeToCloud(currentUser);
 
     return Scaffold(

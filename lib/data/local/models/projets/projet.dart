@@ -1,15 +1,21 @@
 import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:shared_models/shared_models.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../core/unified_model.dart';
 import '../extensions/budget_extentions.dart';
 
 part 'projet.freezed.dart';
 part 'projet.g.dart';
 
-enum ProjetStatus { draft, pendingValidation, validated, rejected }
+enum ProjetStatus {
+  draft,
+  pendingValidation,
+  pendingMerge,
+  validated,
+  rejected,
+}
 
 @freezed
 class Projet
@@ -112,17 +118,20 @@ class Projet
   bool get isDraft => status == ProjetStatus.draft;
 
   /// Droits
-  bool canValidate(AppUser user) => user.isAdmin;
-  bool canAssignTech(AppUser user) => user.isAdmin || user.isChefDeProjet;
-  bool canMergeToCloud(AppUser user) => user.isAdmin || user.isChefDeProjet;
+  bool canValidate(AppUser user) => AppUserAccess(user).isAdmin;
+  bool canAssignTech(AppUser user) =>
+      AppUserAccess(user).isAdmin || user.isChefDeProjet;
+  bool canMergeToCloud(AppUser user) =>
+      AppUserAccess(user).isAdmin || user.isChefDeProjet;
   bool canEditUser(AppUser user, Projet projet) {
-    if (user.isAdmin) return true;
-    if (user.isClient &&
+    if (AppUserAccess(user).isAdmin) return true;
+    if (AppUserAccess(user).isClient &&
         projet.createdBy == user.uid &&
         projet.status == ProjetStatus.draft) {
       return true;
     }
-    if (user.isTechnicien && projet.members.contains(user.uid)) return true;
+    if (AppUserAccess(user).isTechnicien && projet.members.contains(user.uid))
+      return true;
     return false;
   }
 

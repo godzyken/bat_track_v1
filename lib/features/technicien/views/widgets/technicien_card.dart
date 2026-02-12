@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-
-import '../../../../data/local/models/index_model_extention.dart';
+import 'package:shared_models/shared_models.dart';
 
 class TechnicienCard extends StatelessWidget {
   final Technicien technicien;
@@ -42,8 +41,9 @@ class TechnicienCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor:
-                  technicien.disponible ? Colors.green : Colors.grey,
+              backgroundColor: technicien.disponible
+                  ? Colors.green
+                  : Colors.grey,
               child: const Icon(Icons.person, color: Colors.white, size: 28),
             ),
             const SizedBox(height: 8),
@@ -66,8 +66,8 @@ class TechnicienCard extends StatelessWidget {
             if (technicien.rating != null)
               RatingBarIndicator(
                 rating: double.tryParse(technicien.rating.toString()) ?? 0,
-                itemBuilder:
-                    (context, _) => const Icon(Icons.star, color: Colors.amber),
+                itemBuilder: (context, _) =>
+                    const Icon(Icons.star, color: Colors.amber),
                 itemSize: 14,
               ),
           ],

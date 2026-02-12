@@ -3,9 +3,9 @@ import 'dart:developer' as developer;
 import 'package:bat_track_v1/models/data/adapter/safe_async_mixin.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../core/services/unified_entity_service.dart';
-import '../../data/core/unified_model.dart';
 import '../data/hive_model.dart';
 import '../data/maperror/logged_action.dart';
 

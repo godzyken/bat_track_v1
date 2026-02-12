@@ -1,8 +1,8 @@
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../data/core/unified_model.dart';
 import '../../data/local/models/adapters/hive_entity_factory.dart';
 import '../../models/data/hive_model.dart';
 import '../../models/services/remote/remote_storage_service.dart';

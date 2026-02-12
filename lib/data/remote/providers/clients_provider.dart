@@ -1,8 +1,8 @@
 import 'package:bat_track_v1/data/remote/providers/multi_backend_remote_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../core/providers/entity_providers.dart';
-import '../../local/models/utilisateurs/client.dart';
 
 final clientsProvider = FutureProvider<List<Client>>((ref) async {
   final service = ref.watch(clientServiceProvider);

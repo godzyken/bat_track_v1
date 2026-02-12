@@ -1,5 +1,6 @@
 import 'package:bat_track_v1/data/local/models/projets/projet_extension.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../auth/data/providers/auth_state_provider.dart';

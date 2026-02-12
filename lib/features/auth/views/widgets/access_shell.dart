@@ -1,9 +1,9 @@
-import 'package:bat_track_v1/data/local/models/utilisateurs/user.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/routes/app_shell_route/frame_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../models/views/screens/exeception_screens.dart';

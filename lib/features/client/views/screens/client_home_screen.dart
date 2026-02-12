@@ -2,8 +2,8 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../../data/core/unified_model.dart';
 import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/services/service_type.dart';
@@ -73,31 +73,28 @@ class ClientHomeScreen extends ConsumerWidget {
             currentRole: currentUser.role,
             currentUserId: currentUser.id,
             readOnly: false,
-            onEdit:
-                (entity) =>
-                    canEdit(entity: entity, currentUser: currentUser)
-                        ? showEntityFormDialog<T>(
-                          context: context,
-                          ref: ref,
-                          role: currentUser.role,
-                          createEmpty: createEmpty,
-                          fromJson: fromJson,
-                          onSubmit:
-                              (updated) async =>
-                                  await update(updated, entity.id),
-                        )
-                        : null,
-            onCreate:
-                isOwner
-                    ? () => showEntityFormDialog<T>(
-                      context: context,
-                      ref: ref,
-                      role: currentUser.role,
-                      createEmpty: createEmpty,
-                      fromJson: fromJson,
-                      onSubmit: (entity) async => await save(entity, entity.id),
-                    )
-                    : null,
+            onEdit: (entity) =>
+                canEdit(entity: entity, currentUser: currentUser)
+                ? showEntityFormDialog<T>(
+                    context: context,
+                    ref: ref,
+                    role: currentUser.role,
+                    createEmpty: createEmpty,
+                    fromJson: fromJson,
+                    onSubmit: (updated) async =>
+                        await update(updated, entity.id),
+                  )
+                : null,
+            onCreate: isOwner
+                ? () => showEntityFormDialog<T>(
+                    context: context,
+                    ref: ref,
+                    role: currentUser.role,
+                    createEmpty: createEmpty,
+                    fromJson: fromJson,
+                    onSubmit: (entity) async => await save(entity, entity.id),
+                  )
+                : null,
             onDelete: (id) async {
               final entity = filteredItems.value!.firstWhere((e) => e.id == id);
               if (canDelete(entity)) await delete(id);
@@ -128,14 +125,9 @@ class ClientHomeScreen extends ConsumerWidget {
               save: (entity, id) => projetService.save(entity),
               delete: projetService.delete,
               update: (entity, id) => projetService.sync(entity),
-              filter:
-                  (list) =>
-                      list
-                          .where(
-                            (p) =>
-                                isOwner ? p.ownerId == currentUser.uid : true,
-                          )
-                          .toList(),
+              filter: (list) => list
+                  .where((p) => isOwner ? p.ownerId == currentUser.uid : true)
+                  .toList(),
             ),
             buildEntitySection<Chantier>(
               title: "Chantiers associés",
@@ -146,19 +138,17 @@ class ClientHomeScreen extends ConsumerWidget {
               save: (entity, id) => chantierService.save(entity),
               delete: chantierService.delete,
               update: (entity, id) => chantierService.sync(entity),
-              filter:
-                  (list) =>
-                      list
-                          .where(
-                            (c) =>
-                                projects.value?.any(
-                                  (p) =>
-                                      p.id == c.chefDeProjetId &&
-                                      p.ownerId == currentUser.uid,
-                                ) ??
-                                false,
-                          )
-                          .toList(),
+              filter: (list) => list
+                  .where(
+                    (c) =>
+                        projects.value?.any(
+                          (p) =>
+                              p.id == c.chefDeProjetId &&
+                              p.ownerId == currentUser.uid,
+                        ) ??
+                        false,
+                  )
+                  .toList(),
             ),
             buildEntitySection<Intervention>(
               title: "Interventions prévues",
@@ -169,23 +159,21 @@ class ClientHomeScreen extends ConsumerWidget {
               save: (entity, id) => interventionService.save(entity),
               delete: interventionService.delete,
               update: (entity, id) => interventionService.sync(entity),
-              filter:
-                  (list) =>
-                      list
-                          .where(
-                            (i) =>
-                                chantiers.value?.any(
-                                  (c) =>
-                                      projects.value?.any(
-                                        (p) =>
-                                            p.id == c.chefDeProjetId &&
-                                            p.ownerId == currentUser.uid,
-                                      ) ??
-                                      false,
-                                ) ??
-                                false,
-                          )
-                          .toList(),
+              filter: (list) => list
+                  .where(
+                    (i) =>
+                        chantiers.value?.any(
+                          (c) =>
+                              projects.value?.any(
+                                (p) =>
+                                    p.id == c.chefDeProjetId &&
+                                    p.ownerId == currentUser.uid,
+                              ) ??
+                              false,
+                        ) ??
+                        false,
+                  )
+                  .toList(),
             ),
             Center(
               child: ElevatedButton.icon(

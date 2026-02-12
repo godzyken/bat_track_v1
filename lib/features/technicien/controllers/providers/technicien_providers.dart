@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../auth/data/providers/auth_state_provider.dart';
@@ -27,8 +28,9 @@ final technicienSuggestionsProvider = FutureProvider<List<Technicien>>((
 
   final snapshot = await firestore.collection('techniciens').get();
 
-  final allTechs =
-      snapshot.docs.map((doc) => Technicien.fromJson(doc.data())).toList();
+  final allTechs = snapshot.docs
+      .map((doc) => Technicien.fromJson(doc.data()))
+      .toList();
 
   // 🔹 Filtrage par spécialité
   var filtered = allTechs.where(

@@ -5,9 +5,9 @@ import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:bat_track_v1/models/views/widgets/entity_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/projets/projet.dart';
-import '../../../../data/local/models/utilisateurs/technicien.dart';
 import '../../../auth/data/providers/auth_state_provider.dart';
 import '../../../auth/data/providers/current_user_provider.dart';
 import '../../../technicien/controllers/notifiers/technicien_list_notifier.dart';
@@ -57,19 +57,17 @@ class ProjectListScreen extends ConsumerWidget {
                 }
                 return EntityCard(
                   entity: project,
-                  onEdit:
-                      policy.canEdit(currentUser, project)
-                          ? () => _openProjectForm(
-                            context,
-                            ref,
-                            asyncTechniciens,
-                            project: project,
-                          )
-                          : null,
-                  onDelete:
-                      policy.canDelete(currentUser, project)
-                          ? () => _deleteProject(context, ref, project)
-                          : null,
+                  onEdit: policy.canEdit(currentUser, project)
+                      ? () => _openProjectForm(
+                          context,
+                          ref,
+                          asyncTechniciens,
+                          project: project,
+                        )
+                      : null,
+                  onDelete: policy.canDelete(currentUser, project)
+                      ? () => _deleteProject(context, ref, project)
+                      : null,
                   showActions: true,
                   trailingActions: [
                     if (policy.canValidate(currentUser, project))
@@ -84,8 +82,8 @@ class ProjectListScreen extends ConsumerWidget {
                       IconButton(
                         icon: const Icon(Icons.person_add),
                         tooltip: "Assigner technicien",
-                        onPressed:
-                            () => _assignTechnicien(context, ref, project),
+                        onPressed: () =>
+                            _assignTechnicien(context, ref, project),
                       ),
                   ],
                 );
@@ -110,13 +108,12 @@ class ProjectListScreen extends ConsumerWidget {
 
                 return EntityCard(
                   entity: projet,
-                  onEdit:
-                      () => _openProjectForm(
-                        context,
-                        ref,
-                        asyncTechniciens,
-                        project: projet,
-                      ),
+                  onEdit: () => _openProjectForm(
+                    context,
+                    ref,
+                    asyncTechniciens,
+                    project: projet,
+                  ),
                   onDelete: () => _deleteProject(context, ref, projet),
                   showActions: true,
                   trailingActions: [
@@ -132,8 +129,8 @@ class ProjectListScreen extends ConsumerWidget {
                       IconButton(
                         icon: const Icon(Icons.person_add),
                         tooltip: "Assigner technicien",
-                        onPressed:
-                            () => _assignTechnicien(context, ref, projet),
+                        onPressed: () =>
+                            _assignTechnicien(context, ref, projet),
                       ),
                   ],
                 );
@@ -166,21 +163,20 @@ class ProjectListScreen extends ConsumerWidget {
   ) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('Supprimer le projet ?'),
-            content: Text('Voulez-vous vraiment supprimer "${project.nom}" ?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Annuler'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Supprimer'),
-              ),
-            ],
+      builder: (ctx) => AlertDialog(
+        title: const Text('Supprimer le projet ?'),
+        content: Text('Voulez-vous vraiment supprimer "${project.nom}" ?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Annuler'),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
     );
     if (confirm == true) {
       final doc = ref

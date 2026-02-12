@@ -1,4 +1,5 @@
-import '../../../data/core/unified_model.dart';
+import 'package:shared_models/shared_models.dart';
+
 import '../../services/multi_backend_remote_service.dart';
 import '../../services/remote/remote_storage_service.dart';
 

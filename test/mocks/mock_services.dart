@@ -1,10 +1,10 @@
 import 'package:bat_track_v1/core/services/unified_entity_service_impl.dart';
-import 'package:bat_track_v1/data/core/unified_model.dart';
 import 'package:bat_track_v1/models/data/hive_model.dart';
 import 'package:bat_track_v1/models/services/hive_entity_service.dart';
 import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapter.dart';
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_models/shared_models.dart';
 
 class MockHiveEntityService<T extends UnifiedModel> extends Mock
     implements HiveEntityService<T> {}

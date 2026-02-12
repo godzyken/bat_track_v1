@@ -1,6 +1,6 @@
-import 'package:bat_track_v1/data/core/unified_model.dart';
 import 'package:bat_track_v1/models/services/entity_sync_services.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:shared_models/shared_models.dart';
 
 class HiveEntityService<T extends UnifiedModel>
     implements EntityLocalService<T> {

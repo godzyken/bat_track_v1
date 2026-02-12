@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../data/core/unified_model.dart';
+import 'package:shared_models/shared_models.dart';
 
 bool isPrimitive(dynamic value) =>
     value is String ||

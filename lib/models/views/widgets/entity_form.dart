@@ -4,8 +4,8 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../data/core/unified_model.dart';
 import '../../../features/auth/data/providers/auth_notifier_provider.dart';
 import '../../../features/auth/views/widgets/multi_user_dropdown_field.dart';
 import '../../../features/auth/views/widgets/user_dropdown_field.dart';

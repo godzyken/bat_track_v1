@@ -1,8 +1,8 @@
-import 'package:bat_track_v1/data/core/unified_model.dart';
 import 'package:bat_track_v1/data/local/models/adapters/json_adapter.dart';
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
 /// ════════════════════════════════════════════════════════════════════════
 /// 🎯 PROVIDERS POUR GenericJsonAdapter
@@ -57,58 +57,57 @@ final projetAdapterProvider = Provider<GenericJsonAdapter<Projet>>((ref) {
   return GenericJsonAdapter<Projet>(
     fromJsonFn: Projet.fromJson,
     toJsonFn: (model) => model.toJson(),
-    buildFields:
-        () => [
-          const JsonField(
-            name: 'nom',
-            label: 'Nom du projet',
-            type: FieldType.text,
-            icon: Icons.title,
-            required: true,
-          ),
-          const JsonField(
-            name: 'description',
-            label: 'Description',
-            type: FieldType.textarea,
-            icon: Icons.description,
-          ),
-          const JsonField(
-            name: 'dateDebut',
-            label: 'Date de début',
-            type: FieldType.date,
-            icon: Icons.calendar_today,
-          ),
-          const JsonField(
-            name: 'dateFin',
-            label: 'Date de fin prevue',
-            type: FieldType.date,
-            icon: Icons.event,
-          ),
-          const JsonField(
-            name: 'deadLine',
-            label: 'Date limite',
-            type: FieldType.date,
-            icon: Icons.calendar_view_month,
-          ),
-          const JsonField(
-            name: 'updatedAt',
-            label: 'Updated At',
-            type: FieldType.text,
-            icon: Icons.calendar_view_day_sharp,
-          ),
-          const JsonField(
-            name: 'createdBy',
-            label: 'Created By',
-            type: FieldType.text,
-            icon: Icons.person,
-          ),
-          const JsonField(
-            name: 'members',
-            label: 'Members',
-            type: FieldType.multiSelect,
-            icon: Icons.person,
-          ),
-        ],
+    buildFields: () => [
+      const JsonField(
+        name: 'nom',
+        label: 'Nom du projet',
+        type: FieldType.text,
+        icon: Icons.title,
+        required: true,
+      ),
+      const JsonField(
+        name: 'description',
+        label: 'Description',
+        type: FieldType.textarea,
+        icon: Icons.description,
+      ),
+      const JsonField(
+        name: 'dateDebut',
+        label: 'Date de début',
+        type: FieldType.date,
+        icon: Icons.calendar_today,
+      ),
+      const JsonField(
+        name: 'dateFin',
+        label: 'Date de fin prevue',
+        type: FieldType.date,
+        icon: Icons.event,
+      ),
+      const JsonField(
+        name: 'deadLine',
+        label: 'Date limite',
+        type: FieldType.date,
+        icon: Icons.calendar_view_month,
+      ),
+      const JsonField(
+        name: 'updatedAt',
+        label: 'Updated At',
+        type: FieldType.text,
+        icon: Icons.calendar_view_day_sharp,
+      ),
+      const JsonField(
+        name: 'createdBy',
+        label: 'Created By',
+        type: FieldType.text,
+        icon: Icons.person,
+      ),
+      const JsonField(
+        name: 'members',
+        label: 'Members',
+        type: FieldType.multiSelect,
+        icon: Icons.person,
+      ),
+    ],
   );
 });
 
@@ -117,28 +116,27 @@ final chantierAdapterProvider = Provider<GenericJsonAdapter<Chantier>>((ref) {
   return GenericJsonAdapter<Chantier>(
     fromJsonFn: Chantier.fromJson,
     toJsonFn: (model) => model.toJson(),
-    buildFields:
-        () => [
-          const JsonField(
-            name: 'nom',
-            label: 'Nom du chantier',
-            type: FieldType.text,
-            icon: Icons.construction,
-            required: true,
-          ),
-          const JsonField(
-            name: 'adresse',
-            label: 'Adresse',
-            type: FieldType.text,
-            icon: Icons.location_on,
-          ),
-          const JsonField(
-            name: 'projetId',
-            label: 'Projet associé',
-            type: FieldType.select,
-            icon: Icons.link,
-          ),
-        ],
+    buildFields: () => [
+      const JsonField(
+        name: 'nom',
+        label: 'Nom du chantier',
+        type: FieldType.text,
+        icon: Icons.construction,
+        required: true,
+      ),
+      const JsonField(
+        name: 'adresse',
+        label: 'Adresse',
+        type: FieldType.text,
+        icon: Icons.location_on,
+      ),
+      const JsonField(
+        name: 'projetId',
+        label: 'Projet associé',
+        type: FieldType.select,
+        icon: Icons.link,
+      ),
+    ],
   );
 });
 
@@ -149,29 +147,28 @@ final interventionAdapterProvider = Provider<GenericJsonAdapter<Intervention>>((
   return GenericJsonAdapter<Intervention>(
     fromJsonFn: Intervention.fromJson,
     toJsonFn: (model) => model.toJson(),
-    buildFields:
-        () => [
-          const JsonField(
-            name: 'titre',
-            label: 'Titre',
-            type: FieldType.text,
-            icon: Icons.work,
-            required: true,
-          ),
-          const JsonField(
-            name: 'dateIntervention',
-            label: 'Date d\'intervention',
-            type: FieldType.date,
-            icon: Icons.event,
-            required: true,
-          ),
-          const JsonField(
-            name: 'technicienIds',
-            label: 'Techniciens',
-            type: FieldType.multiSelect,
-            icon: Icons.people,
-          ),
-        ],
+    buildFields: () => [
+      const JsonField(
+        name: 'titre',
+        label: 'Titre',
+        type: FieldType.text,
+        icon: Icons.work,
+        required: true,
+      ),
+      const JsonField(
+        name: 'dateIntervention',
+        label: 'Date d\'intervention',
+        type: FieldType.date,
+        icon: Icons.event,
+        required: true,
+      ),
+      const JsonField(
+        name: 'technicienIds',
+        label: 'Techniciens',
+        type: FieldType.multiSelect,
+        icon: Icons.people,
+      ),
+    ],
   );
 });
 
@@ -180,35 +177,29 @@ final userAdapterProvider = Provider<GenericJsonAdapter<AppUser>>((ref) {
   return GenericJsonAdapter<AppUser>(
     fromJsonFn: AppUser.fromJson,
     toJsonFn: (model) => model.toJson(),
-    buildFields:
-        () => [
-          const JsonField(
-            name: 'nom',
-            label: 'Nom',
-            type: FieldType.text,
-            icon: Icons.person,
-            required: true,
-          ),
-          const JsonField(
-            name: 'email',
-            label: 'Email',
-            type: FieldType.text,
-            icon: Icons.email,
-            required: true,
-          ),
-          const JsonField(
-            name: 'role',
-            label: 'Rôle',
-            type: FieldType.select,
-            icon: Icons.badge,
-            options: [
-              'client',
-              'technicien',
-              'chefDeProjet',
-              'superUtilisateur',
-            ],
-          ),
-        ],
+    buildFields: () => [
+      const JsonField(
+        name: 'nom',
+        label: 'Nom',
+        type: FieldType.text,
+        icon: Icons.person,
+        required: true,
+      ),
+      const JsonField(
+        name: 'email',
+        label: 'Email',
+        type: FieldType.text,
+        icon: Icons.email,
+        required: true,
+      ),
+      const JsonField(
+        name: 'role',
+        label: 'Rôle',
+        type: FieldType.select,
+        icon: Icons.badge,
+        options: ['client', 'technicien', 'chefDeProjet', 'superUtilisateur'],
+      ),
+    ],
   );
 });
 
