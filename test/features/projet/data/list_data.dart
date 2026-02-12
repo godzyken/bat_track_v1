@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
+import 'package:shared_models/shared_models.dart';
 
 /// Projets :
 final projetA = Projet(

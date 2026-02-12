@@ -1,5 +1,4 @@
 import 'package:bat_track_v1/data/local/models/projets/projet.dart';
-import 'package:bat_track_v1/models/data/json_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_models/shared_models.dart';
 

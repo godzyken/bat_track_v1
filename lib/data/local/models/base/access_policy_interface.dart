@@ -1,5 +1,5 @@
-import '../../../../models/data/json_model.dart';
 import '../index_model_extention.dart';
+import 'has_acces_control.dart';
 
 abstract class AccessPolicy<T> {
   bool canAccess(String role, {dynamic entity});

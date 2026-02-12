@@ -1,4 +1,3 @@
-import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:bat_track_v1/features/technicien/controllers/notifiers/technicien_list_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -119,7 +118,7 @@ class PieceCard extends ConsumerWidget {
 
                     final mainOeuvreWidgets = moList.map((e) {
                       final tech = list.firstWhere(
-                        (t) => t.isTechnicien && e.isActive,
+                        (t) => t.id == e.idTechnicien,
                         orElse: () => Technicien.mock(),
                       );
                       return _buildBullet(

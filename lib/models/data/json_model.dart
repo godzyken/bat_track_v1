@@ -1,5 +1,4 @@
-import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
-import 'package:shared_models/shared_models.dart';
+/*
 
 mixin JsonModel<T> {
   String get id;
@@ -135,7 +134,8 @@ extension JsonModelFactory on JsonModel {
     return maybe;
   }
 
-  /*
+  */
+/*
   static T fromDynamic<T>(dynamic data) {
     if (data is T) return data;
     if (data is! Map<String, dynamic>) {
@@ -179,7 +179,8 @@ extension JsonModelFactory on JsonModel {
         throw UnimplementedError('fromDynamic non implémenté pour $T');
     }
   }
-*/
+*/ /*
+
 
   static T createEmptyEntity<T extends JsonModel>(String id) {
     final empty = fromDynamic<T>({'id': id});
@@ -190,3 +191,4 @@ extension JsonModelFactory on JsonModel {
 extension JsonModelExtension<T> on JsonModel<T> {
   bool get isUpdated => updatedAt != null;
 }
+*/

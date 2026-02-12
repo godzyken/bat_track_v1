@@ -44,8 +44,9 @@ class Produit
     @NullableDateTimeIsoConverter() DateTime? createdAt,
     String? createdBy,
     // Validation
-    @Default(false) bool clientValidated,
-    @Default(false) bool techValidated,
+    @Default(false) bool clientValide,
+    @Default(false) bool chefDeProjetValide,
+    @Default(false) bool techValide,
     @Default(false) bool superUtilisateurValide,
     @Default(false) bool isCloudOnly,
     // Source des donnees
@@ -90,6 +91,9 @@ class Produit
   String? get ownerId => createdBy;
 
   @override
+  bool get techniciensValides => techValide;
+
+  @override
   bool get isUpdated => updatedAt != null;
 
   @override
@@ -99,7 +103,110 @@ class Produit
   bool get toutesPartiesOntValide => ValidationHelper.computeValidationStatus(
     clientValide: clientValide,
     chefDeProjetValide: chefDeProjetValide,
-    techniciensValides: techniciensValides,
+    techniciensValides: techValide,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  @override
+  // TODO: implement caracteristiques
+  Map<String, dynamic>? get caracteristiques =>
+      (this as _Produit).caracteristiques;
+
+  @override
+  // TODO: implement categorie
+  String get categorie => (this as _Produit).categorie;
+
+  @override
+  // TODO: implement certifications
+  List<String>? get certifications => (this as _Produit).certifications;
+
+  @override
+  // TODO: implement consommationEnergetique
+  double? get consommationEnergetique =>
+      (this as _Produit).consommationEnergetique;
+
+  @override
+  // TODO: implement coutMaintenanceAnnuel
+  double? get coutMaintenanceAnnuel => (this as _Produit).coutMaintenanceAnnuel;
+
+  @override
+  // TODO: implement createdAt
+  DateTime? get createdAt => (this as _Produit).createdAt;
+
+  @override
+  // TODO: implement createdBy
+  String? get createdBy => (this as _Produit).createdBy;
+
+  @override
+  // TODO: implement description
+  String? get description => (this as _Produit).description;
+
+  @override
+  // TODO: implement dureeVieEstimee
+  double? get dureeVieEstimee => (this as _Produit).dureeVieEstimee;
+
+  @override
+  // TODO: implement fabricant
+  String? get fabricant => (this as _Produit).fabricant;
+
+  @override
+  // TODO: implement fournisseur
+  String? get fournisseur => (this as _Produit).fournisseur;
+
+  @override
+  // TODO: implement googleSheetsId
+  String? get googleSheetsId => (this as _Produit).googleSheetsId;
+
+  @override
+  // TODO: implement googleSheetsRow
+  int? get googleSheetsRow => (this as _Produit).googleSheetsRow;
+
+  @override
+  // TODO: implement id
+  String get id => (this as _Produit).id;
+
+  @override
+  // TODO: implement impactCarbone
+  double? get impactCarbone => (this as _Produit).impactCarbone;
+
+  @override
+  // TODO: implement isCloudOnly
+  bool get isCloudOnly => (this as _Produit).isCloudOnly;
+
+  @override
+  // TODO: implement nom
+  String get nom => (this as _Produit).nom;
+
+  @override
+  // TODO: implement normes
+  List<String>? get normes => (this as _Produit).normes;
+
+  @override
+  // TODO: implement prixUnitaire
+  double get prixUnitaire => (this as _Produit).prixUnitaire;
+
+  @override
+  // TODO: implement quantiteStock
+  int? get quantiteStock => (this as _Produit).quantiteStock;
+
+  @override
+  // TODO: implement reference
+  String? get reference => (this as _Produit).reference;
+
+  @override
+  // TODO: implement seuilAlerte
+  int? get seuilAlerte => (this as _Produit).seuilAlerte;
+
+  @override
+  // TODO: implement tauxTVA
+  double? get tauxTVA => (this as _Produit).tauxTVA;
+
+  @override
+  bool get techValide => (this as _Produit).techValide;
+
+  @override
+  String? get unite => (this as _Produit).unite;
+
+  @override
+  DateTime? get updatedAt => (this as _Produit).updatedAt;
 }

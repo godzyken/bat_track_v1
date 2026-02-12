@@ -4,8 +4,8 @@ import 'package:shared_models/shared_models.dart';
 
 import '../../../core/responsive/wrapper/responsive_layout.dart';
 import '../../../data/local/models/base/access_policy_interface.dart';
+import '../../../data/local/models/base/has_acces_control.dart';
 import '../../../data/local/services/hive_service.dart';
-import '../../data/json_model.dart';
 import 'entity_card.dart';
 import 'entity_form.dart';
 

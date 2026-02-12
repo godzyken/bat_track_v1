@@ -1,7 +1,6 @@
 import 'package:bat_track_v1/data/local/models/extensions/budget_extentions.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:shared_models/core/models/public_model.dart';
-import 'package:shared_models/core/models/unified_model.dart';
+import 'package:shared_models/shared_models.dart';
 import 'package:uuid/uuid.dart';
 
 import '../index_model_extention.dart';
@@ -11,8 +10,8 @@ part 'chantier_etapes.g.dart';
 
 @freezed
 class ChantierEtape
-    with _$ChantierEtape
-    implements UnifiedModel, AccessControlMixin, ValidationMixin {
+    with _$ChantierEtape, AccessControlMixin, ValidationMixin
+    implements UnifiedModel {
   const ChantierEtape._();
 
   const factory ChantierEtape({
@@ -33,7 +32,7 @@ class ChantierEtape
     List<String>? techniciens,
     @Default(false) bool clientValide,
     @Default(false) bool chefDeProjetValide,
-    @Default(false) bool techniciensValides,
+    @Default(false) bool techValide,
     @Default(false) bool superUtilisateurValide,
 
     @Default(false) bool isCloudOnly,
@@ -75,7 +74,7 @@ class ChantierEtape
   bool get toutesPartiesOntValide => ValidationHelper.computeValidationStatus(
     clientValide: clientValide,
     chefDeProjetValide: chefDeProjetValide,
-    techniciensValides: techniciensValides,
+    techniciensValides: techValide,
     superUtilisateurValide: superUtilisateurValide,
   );
 }

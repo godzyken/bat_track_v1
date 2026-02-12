@@ -1,4 +1,4 @@
-import 'package:bat_track_v1/data/core/unified_model_extension.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../entity_sync_services.dart';
 import 'remote_storage_service.dart';

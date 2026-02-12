@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:bat_track_v1/data/core/unified_model_extension.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_models/core/models/unified_model.dart';
 
 class TestHelpers {
   /// Helper pour attendre qu'un provider atteigne un état spécifique
