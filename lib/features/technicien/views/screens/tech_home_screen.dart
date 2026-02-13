@@ -3,7 +3,6 @@ import 'package:bat_track_v1/models/views/widgets/entity_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/services/service_type.dart';
 import '../../../../models/providers/asynchrones/entity_list_future_provider.dart';
@@ -67,21 +66,20 @@ class TechHomeScreen extends ConsumerWidget {
               items: assignedProjects,
               boxName: 'projectBox',
               infoOverride: info,
-              onCreate:
-                  isAdmin && isTech
-                      ? () {
-                        showEntityFormDialog<Projet>(
-                          context: context,
-                          ref: ref,
-                          role: currentUser.role,
-                          onSubmit: (projet) async {
-                            await projetService.save(projet);
-                          },
-                          fromJson: Projet.fromJson,
-                          createEmpty: Projet.mock,
-                        );
-                      }
-                      : () {},
+              onCreate: isAdmin && isTech
+                  ? () {
+                      showEntityFormDialog<Projet>(
+                        context: context,
+                        ref: ref,
+                        role: currentUser.role,
+                        onSubmit: (projet) async {
+                          await projetService.save(projet);
+                        },
+                        fromJson: Projet.fromJson,
+                        createEmpty: () => ProjetMock.mock(),
+                      );
+                    }
+                  : () {},
               onEdit: (projet) {
                 showEntityFormDialog<Projet>(
                   context: context,
@@ -91,15 +89,14 @@ class TechHomeScreen extends ConsumerWidget {
                     await projetService.save(updated);
                   },
                   fromJson: Projet.fromJson,
-                  createEmpty: Projet.mock,
+                  createEmpty: () => ProjetMock.mock(),
                 );
               },
-              onDelete:
-                  isAdmin && isTech ? (id) => projetService.delete(id) : null,
+              onDelete: isAdmin && isTech
+                  ? (id) => projetService.delete(id)
+                  : null,
               readOnly: !isAdmin && !isTech,
-              currentRole: currentUser.role,
-              currentUserId: currentUser.id,
-              policy: MultiRolePolicy(),
+              currentUser: currentUser,
             ),
             const SizedBox(height: 24),
 
@@ -112,21 +109,20 @@ class TechHomeScreen extends ConsumerWidget {
               items: assignedChantiers,
               boxName: 'chantierBox',
               infoOverride: info,
-              onCreate:
-                  isAdmin && isTech
-                      ? () {
-                        showEntityFormDialog<Chantier>(
-                          context: context,
-                          ref: ref,
-                          role: currentUser.role,
-                          onSubmit: (chantier) async {
-                            await chantierService.save(chantier);
-                          },
-                          fromJson: Chantier.fromJson,
-                          createEmpty: Chantier.mock,
-                        );
-                      }
-                      : () {},
+              onCreate: isAdmin && isTech
+                  ? () {
+                      showEntityFormDialog<Chantier>(
+                        context: context,
+                        ref: ref,
+                        role: currentUser.role,
+                        onSubmit: (chantier) async {
+                          await chantierService.save(chantier);
+                        },
+                        fromJson: Chantier.fromJson,
+                        createEmpty: Chantier.mock,
+                      );
+                    }
+                  : () {},
               onEdit: (chantier) {
                 showEntityFormDialog<Chantier>(
                   context: context,
@@ -139,12 +135,11 @@ class TechHomeScreen extends ConsumerWidget {
                   createEmpty: Chantier.mock,
                 );
               },
-              onDelete:
-                  isAdmin && isTech ? (id) => projetService.delete(id) : null,
+              onDelete: isAdmin && isTech
+                  ? (id) => projetService.delete(id)
+                  : null,
               readOnly: !isAdmin && !isTech,
-              currentRole: currentUser.role,
-              currentUserId: currentUser.id,
-              policy: MultiRolePolicy(),
+              currentUser: currentUser,
             ),
             const SizedBox(height: 24),
 
@@ -157,21 +152,20 @@ class TechHomeScreen extends ConsumerWidget {
               items: upcomingInterventions,
               boxName: 'interventionBox',
               infoOverride: info,
-              onCreate:
-                  isAdmin && isTech
-                      ? () {
-                        showEntityFormDialog<Projet>(
-                          context: context,
-                          ref: ref,
-                          role: currentUser.role,
-                          onSubmit: (projet) async {
-                            await projetService.save(projet);
-                          },
-                          fromJson: Projet.fromJson,
-                          createEmpty: Projet.mock,
-                        );
-                      }
-                      : () {},
+              onCreate: isAdmin && isTech
+                  ? () {
+                      showEntityFormDialog<Projet>(
+                        context: context,
+                        ref: ref,
+                        role: currentUser.role,
+                        onSubmit: (projet) async {
+                          await projetService.save(projet);
+                        },
+                        fromJson: Projet.fromJson,
+                        createEmpty: () => ProjetMock.mock(),
+                      );
+                    }
+                  : () {},
               onEdit: (projet) {
                 showEntityFormDialog<Projet>(
                   context: context,
@@ -181,15 +175,14 @@ class TechHomeScreen extends ConsumerWidget {
                     await projetService.save(updated);
                   },
                   fromJson: Projet.fromJson,
-                  createEmpty: Projet.mock,
+                  createEmpty: () => ProjetMock.mock(),
                 );
               },
-              onDelete:
-                  isAdmin && isTech ? (id) => projetService.delete(id) : null,
+              onDelete: isAdmin && isTech
+                  ? (id) => projetService.delete(id)
+                  : null,
               readOnly: !isAdmin && !isTech,
-              currentRole: currentUser.role,
-              currentUserId: currentUser.id,
-              policy: MultiRolePolicy(),
+              currentUser: currentUser,
             ),
             const SizedBox(height: 32),
 

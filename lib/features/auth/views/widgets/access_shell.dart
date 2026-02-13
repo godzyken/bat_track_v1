@@ -5,32 +5,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_models/shared_models.dart';
 
-import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../models/views/screens/exeception_screens.dart';
-import '../../data/providers/auth_notifier_provider.dart';
 import '../screens/login_screen.dart';
 import '../screens/unauthorized_screen.dart';
 
 class AccessShell extends ConsumerWidget {
   final Widget child;
-  final MultiRolePolicy policy;
   final GoRouterState state;
-  const AccessShell({
-    super.key,
-    required this.child,
-    required this.policy,
-    required this.state,
-  });
+  const AccessShell({super.key, required this.child, required this.state});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final status = ref.watch(userStatusProvider);
-    final authState = ref.watch(authNotifierProvider);
+    final currentUser = ref.watch(currentUserProvider);
 
     return switch (status) {
       UserStatus.guest => const LoginScreen(),
       UserStatus.authenticated => const LoadingApp(),
-      UserStatus.loaded => authState.when(
+      UserStatus.loaded => currentUser.when(
         data: (user) {
           if (user == null) {
             return Stack(
@@ -47,8 +39,24 @@ class AccessShell extends ConsumerWidget {
           final location = state.uri.toString();
           debugPrint("🔍 Navigation vers $location avec rôle ${user.role}");
 
-          if (!policy.canAccess(user.role)) {
+          // Vérification simple du rôle pour toutes les pages protégées
+          final allowedRoles = [
+            'admin',
+            'superutilisateur',
+            'technicien',
+            'client',
+            'chefdeprojet',
+          ];
+          if (!allowedRoles.contains(user.role.toLowerCase())) {
             return const UnauthorizedScreen();
+          }
+
+          // Ici tu peux vérifier l’accès sur une entité si `state.extra` est fourni
+          if (state.extra is AccessControlMixin) {
+            final entity = state.extra as AccessControlMixin;
+            if (!entity.canRead(user)) {
+              return const UnauthorizedScreen();
+            }
           }
 
           return MainLayout(child: child); // Layout commun avec menu & app bar

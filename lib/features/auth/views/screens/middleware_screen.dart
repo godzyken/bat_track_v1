@@ -3,21 +3,18 @@ import 'package:bat_track_v1/features/auth/views/screens/unauthorized_screen.dar
 import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../../data/local/models/base/access_policy_interface.dart';
+import 'package:shared_models/core/interface/projet.dart';
 
 class RoleGuard extends ConsumerWidget {
   final WidgetBuilder builder;
-  final AccessPolicy policy;
-  final String permission; // ex: access, edit, delete, create
-  final dynamic entity;
+  final IAccessible? policy;
+  final String permission;
   final Widget fallback;
 
   const RoleGuard({
     super.key,
     required this.builder,
     required this.policy,
-    this.entity,
     this.permission = 'access',
     this.fallback = const UnauthorizedScreen(),
   });
@@ -31,12 +28,11 @@ class RoleGuard extends ConsumerWidget {
         if (user == null) return fallback;
         debugPrint("✅ middleware = data : ${user.email} / role: ${user.role}");
 
-        final role = user.role;
         final ok = switch (permission) {
-          'access' => policy.canAccess(role),
-          'edit' => policy.canEdit(role),
-          'delete' => policy.canDelete(role),
-          'create' => policy.canCreate(role),
+          'access' => policy?.canAccess(user) ?? false,
+          'edit' => policy?.canEdit(user) ?? false,
+          'delete' => policy?.canDelete(user) ?? false,
+          'create' => policy?.canCreate(user) ?? false,
           _ => false,
         };
 

@@ -11,12 +11,10 @@ part 'facture_model.freezed.dart';
 part 'facture_model.g.dart';
 
 @freezed
-sealed class FactureModel
-    with _$FactureModel, AccessControlMixin, ValidationMixin
-    implements UnifiedModel {
-  const FactureModel._();
+sealed class FactureModel extends UnifiedModel with _$FactureModel {
+  FactureModel._();
 
-  const factory FactureModel({
+  factory FactureModel({
     required String id,
     required String chantierId,
     required String reference,

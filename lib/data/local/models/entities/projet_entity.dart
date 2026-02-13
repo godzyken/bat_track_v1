@@ -83,7 +83,7 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
       chefDeProjetValide: model.chefDeProjetValide,
       techniciensValides: model.techniciensValides,
       superUtilisateurValide: model.superUtilisateurValide,
-      createBy: model.ownerId,
+      createBy: model.createdBy,
       members: model.members,
       pupdatedAt: model.updatedAt,
       cloudVersion: model.cloudVersion,

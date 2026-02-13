@@ -9,12 +9,10 @@ part 'chantier_etapes.freezed.dart';
 part 'chantier_etapes.g.dart';
 
 @freezed
-class ChantierEtape
-    with _$ChantierEtape, AccessControlMixin, ValidationMixin
-    implements UnifiedModel {
-  const ChantierEtape._();
+sealed class ChantierEtape extends UnifiedModel with _$ChantierEtape {
+  ChantierEtape._();
 
-  const factory ChantierEtape({
+  factory ChantierEtape({
     required String id,
     required String chantierId,
     required List<PieceJointe> piecesJointes,

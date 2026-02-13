@@ -10,12 +10,10 @@ part 'chantier.freezed.dart';
 part 'chantier.g.dart';
 
 @freezed
-sealed class Chantier
-    with _$Chantier, AccessControlMixin, ValidationMixin
-    implements UnifiedModel {
-  const Chantier._();
+sealed class Chantier extends UnifiedModel with _$Chantier {
+  Chantier._();
 
-  const factory Chantier({
+  factory Chantier({
     required String id,
     required String nom,
     required String adresse,
@@ -76,18 +74,18 @@ sealed class Chantier
         dateDebut:
             tryParseDate(
               json['dateDebut'],
-              log: log,
+              fallback: DateTime.now(),
               context: 'Chantier.dateDebut',
             ) ??
             DateTime.now(),
         dateFin: tryParseDate(
           json['dateFin'],
-          log: log,
+          fallback: DateTime.now(),
           context: 'Chantier.dateFin',
         ),
         updatedAt: tryParseDate(
           json['updatedAt'],
-          log: log,
+          fallback: DateTime.now(),
           context: 'Chantier.updatedAt',
         ),
         etat: json['etat'],

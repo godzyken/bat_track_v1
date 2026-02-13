@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
-import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/local/services/service_type.dart';
 import '../../../../models/providers/asynchrones/entity_list_future_provider.dart';
@@ -70,8 +69,7 @@ class ClientHomeScreen extends ConsumerWidget {
             items: filteredItems,
             boxName: boxName,
             infoOverride: info,
-            currentRole: currentUser.role,
-            currentUserId: currentUser.id,
+            currentUser: currentUser,
             readOnly: false,
             onEdit: (entity) =>
                 canEdit(entity: entity, currentUser: currentUser)
@@ -99,7 +97,6 @@ class ClientHomeScreen extends ConsumerWidget {
               final entity = filteredItems.value!.firstWhere((e) => e.id == id);
               if (canDelete(entity)) await delete(id);
             },
-            policy: MultiRolePolicy(),
           ),
           const SizedBox(height: 24),
         ],
@@ -120,7 +117,7 @@ class ClientHomeScreen extends ConsumerWidget {
               title: "Mes projets",
               items: projects,
               boxName: 'project',
-              createEmpty: Projet.mock,
+              createEmpty: () => ProjetMock.mock(),
               fromJson: Projet.fromJson,
               save: (entity, id) => projetService.save(entity),
               delete: projetService.delete,

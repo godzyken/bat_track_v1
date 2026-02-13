@@ -8,12 +8,10 @@ part 'materiel.freezed.dart';
 part 'materiel.g.dart';
 
 @freezed
-class Materiel
-    with _$Materiel, AccessControlMixin, ValidationMixin
-    implements UnifiedModel {
-  const Materiel._();
+sealed class Materiel extends UnifiedModel with _$Materiel {
+  Materiel._();
 
-  const factory Materiel({
+  factory Materiel({
     required String id,
     required String nom,
     required double prixUnitaire,
@@ -46,6 +44,9 @@ class Materiel
   bool get isUpdated => updatedAt != null;
 
   @override
+  String? get ownerId => id;
+
+  @override
   UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 
   @override
@@ -55,62 +56,4 @@ class Materiel
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
-
-  @override
-  // TODO: implement chefDeProjetValide
-  bool get chefDeProjetValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement clientValide
-  bool get clientValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement id
-  String get id => throw UnimplementedError();
-
-  @override
-  // TODO: implement isCloudOnly
-  bool get isCloudOnly => throw UnimplementedError();
-
-  @override
-  // TODO: implement joursLocation
-  double? get joursLocation => throw UnimplementedError();
-
-  @override
-  // TODO: implement nom
-  String get nom => throw UnimplementedError();
-
-  @override
-  // TODO: implement prixLocation
-  double? get prixLocation => throw UnimplementedError();
-
-  @override
-  // TODO: implement prixUnitaire
-  double get prixUnitaire => throw UnimplementedError();
-
-  @override
-  // TODO: implement quantiteFixe
-  double get quantiteFixe => throw UnimplementedError();
-
-  @override
-  // TODO: implement superUtilisateurValide
-  bool get superUtilisateurValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement techniciensValides
-  bool get techniciensValides => throw UnimplementedError();
-
-  @override
-  Map<String, dynamic> toJson() {
-    // TODO: implement toJson
-    throw UnimplementedError();
-  }
-
-  @override
-  // TODO: implement updatedAt
-  DateTime? get updatedAt => throw UnimplementedError();
-
-  @override
-  // TODO: implement ownerId
-  String? get ownerId => throw UnimplementedError();
 }

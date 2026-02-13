@@ -10,10 +10,8 @@ part 'facture_draft.freezed.dart';
 part 'facture_draft.g.dart';
 
 @freezed
-sealed class FactureDraft
-    with _$FactureDraft, AccessControlMixin, ValidationMixin
-    implements UnifiedModel {
-  const factory FactureDraft({
+sealed class FactureDraft extends UnifiedModel with _$FactureDraft {
+  factory FactureDraft({
     required String chantierId,
     required String clientId,
     required List<CustomLigneFacture> lignesManuelles,
@@ -27,7 +25,7 @@ sealed class FactureDraft
     @Default(false) bool? isSigned,
   }) = _FactureDraft;
 
-  const FactureDraft._();
+  FactureDraft._();
 
   factory FactureDraft.fromJson(Map<String, dynamic> json) =>
       _$FactureDraftFromJson(json);
@@ -70,14 +68,12 @@ sealed class FactureDraft
   bool get isUpdated => updatedAt != null;
 
   @override
-  UnifiedModel copyWithId(String newId) => copyWith(factureId: newId);
+  FactureDraft copyWithId(String newId) => copyWith(factureId: newId);
 }
 
 @freezed
-sealed class CustomLigneFacture
-    with _$CustomLigneFacture, AccessControlMixin, ValidationMixin
-    implements UnifiedModel {
-  const factory CustomLigneFacture({
+sealed class CustomLigneFacture extends UnifiedModel with _$CustomLigneFacture {
+  factory CustomLigneFacture({
     required String ctlId,
     required String description,
     required double montant,
@@ -98,7 +94,7 @@ sealed class CustomLigneFacture
   factory CustomLigneFacture.fromJson(Map<String, dynamic> json) =>
       _$CustomLigneFactureFromJson(json);
 
-  const CustomLigneFacture._();
+  CustomLigneFacture._();
 
   @override
   String get id => ctlId;
@@ -122,7 +118,7 @@ sealed class CustomLigneFacture
   );
 
   @override
-  UnifiedModel copyWithId(String newId) => copyWith(ctlId: newId);
+  CustomLigneFacture copyWithId(String newId) => copyWith(ctlId: newId);
 
   @override
   bool get isUpdated => updatedAt != null;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shared_models/core/models/unified_model.dart';
 
-import '../../data/local/models/base/has_acces_control.dart';
 import '../../data/local/models/index_model_extention.dart';
 
-extension JsonModelDisplay on JsonSerializableModel {
+extension JsonModelDisplay on UnifiedModel {
   /// Renvoie le champ principal pour le titre (ex: nom, titre…)
   String get displayTitle {
     final json = toJson();

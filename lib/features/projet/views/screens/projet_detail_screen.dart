@@ -15,12 +15,6 @@ class ProjectDetailScreen extends ConsumerWidget {
     required this.currentUser,
   });
 
-  // Format date simple
-  String _formatDate(DateTime? date) {
-    if (date == null) return '-';
-    return DateFormat.yMMMMd().format(date);
-  }
-
   Widget _buildStatusChip(String label, bool isValid, Color color) {
     return Chip(
       label: Text(
@@ -42,8 +36,8 @@ class ProjectDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final canEdit = projet.canEditUser(currentUser, projet);
-    final canValidate = projet.canMergeToCloud(currentUser);
+    final canEdit = projet.canEdit(currentUser);
+    final canValidate = projet.canMerge(currentUser);
 
     return Scaffold(
       appBar: AppBar(

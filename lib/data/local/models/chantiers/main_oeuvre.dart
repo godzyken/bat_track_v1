@@ -7,12 +7,10 @@ part 'main_oeuvre.freezed.dart';
 part 'main_oeuvre.g.dart';
 
 @freezed
-class MainOeuvre
-    with _$MainOeuvre, AccessControlMixin, ValidationMixin
-    implements UnifiedModel {
-  const MainOeuvre._();
+sealed class MainOeuvre extends UnifiedModel with _$MainOeuvre {
+  MainOeuvre._();
 
-  const factory MainOeuvre({
+  factory MainOeuvre({
     required String id,
     required String chantierId,
     required String idTechnicien,
@@ -46,6 +44,10 @@ class MainOeuvre
   @override
   bool get isUpdated => updatedAt != null;
 
+  /// 🔹 Correction 1 : Implémentation du getter requis par AccessControlMixin
+  @override
+  String get ownerId => idTechnicien;
+
   @override
   UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 
@@ -56,66 +58,4 @@ class MainOeuvre
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
-
-  @override
-  // TODO: implement chantierId
-  String get chantierId => throw UnimplementedError();
-
-  @override
-  // TODO: implement chefDeProjetValide
-  bool get chefDeProjetValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement clientValide
-  bool get clientValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement dateDebut
-  DateTime get dateDebut => throw UnimplementedError();
-
-  @override
-  // TODO: implement heuresEstimees
-  double get heuresEstimees => throw UnimplementedError();
-
-  @override
-  // TODO: implement id
-  String get id => throw UnimplementedError();
-
-  @override
-  // TODO: implement idTechnicien
-  String get idTechnicien => throw UnimplementedError();
-
-  @override
-  // TODO: implement isActive
-  bool get isActive => throw UnimplementedError();
-
-  @override
-  // TODO: implement isCloudOnly
-  bool get isCloudOnly => throw UnimplementedError();
-
-  @override
-  // TODO: implement passedTime
-  DateTime? get passedTime => throw UnimplementedError();
-
-  @override
-  // TODO: implement superUtilisateurValide
-  bool get superUtilisateurValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement techniciensValides
-  bool get techniciensValides => throw UnimplementedError();
-
-  @override
-  Map<String, dynamic> toJson() {
-    // TODO: implement toJson
-    throw UnimplementedError();
-  }
-
-  @override
-  // TODO: implement updatedAt
-  DateTime? get updatedAt => throw UnimplementedError();
-
-  @override
-  // TODO: implement ownerId
-  String? get ownerId => throw UnimplementedError();
 }

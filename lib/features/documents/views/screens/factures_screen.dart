@@ -1,5 +1,4 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
-import 'package:bat_track_v1/data/local/models/base/access_policy_interface.dart';
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/features/documents/controllers/providers/facture_list_provider.dart';
@@ -112,9 +111,7 @@ class FacturesScreen extends ConsumerWidget {
               }
             : null,
         infoOverride: info,
-        policy: MultiRolePolicy(),
-        currentRole: user.role,
-        currentUserId: user.id,
+        currentUser: user,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

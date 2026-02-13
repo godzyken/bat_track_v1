@@ -8,7 +8,6 @@ import 'package:printing/printing.dart';
 import 'package:shared_models/shared_models.dart';
 
 import '../../../../core/responsive/wrapper/responsive_layout.dart';
-import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
 import '../../../home/views/widgets/app_drawer.dart';
@@ -86,9 +85,7 @@ class EntityManagerScreen<T extends UnifiedModel> extends ConsumerWidget {
         },
         infoOverride: info,
         readOnly: !isAdmin,
-        currentRole: user.role,
-        currentUserId: user.id,
-        policy: MultiRolePolicy(),
+        currentUser: user,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

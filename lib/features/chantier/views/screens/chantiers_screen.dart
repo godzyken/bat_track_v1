@@ -5,7 +5,6 @@ import 'package:bat_track_v1/features/chantier/controllers/providers/chantier_sy
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
@@ -51,55 +50,49 @@ class ChantiersScreen extends ConsumerWidget {
 
           showDialog(
             context: context,
-            builder:
-                (_) => EntityForm<Chantier>(
-                  fromJson: (json) => Chantier.fromJson(json),
-                  initialValue: chantier,
-                  onSubmit: (updated) async {
-                    await ref
-                        .read(chantierListProvider.notifier)
-                        .updateEntity(updated);
-                  },
-                  createEmpty: () => chantier,
-                ),
+            builder: (_) => EntityForm<Chantier>(
+              fromJson: (json) => Chantier.fromJson(json),
+              initialValue: chantier,
+              onSubmit: (updated) async {
+                await ref
+                    .read(chantierListProvider.notifier)
+                    .updateEntity(updated);
+              },
+              createEmpty: () => chantier,
+            ),
           );
         },
-        onDelete:
-            isClient && isAdmin
-                ? (id) async {
-                  await ref
-                      .read(firestoreProvider)
-                      .collection('chantiers')
-                      .doc(id)
-                      .delete();
-                }
-                : null,
-        currentRole: user.role,
-        currentUserId: user.id,
-        policy: MultiRolePolicy(),
+        onDelete: isClient && isAdmin
+            ? (id) async {
+                await ref
+                    .read(firestoreProvider)
+                    .collection('chantiers')
+                    .doc(id)
+                    .delete();
+              }
+            : null,
+        currentUser: user,
         infoOverride: info,
       ),
-      floatingActionButton:
-          isTechnicien
-              ? null
-              : FloatingActionButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder:
-                        (_) => EntityForm<Chantier>(
-                          fromJson: (json) => Chantier.fromJson(json),
-                          onSubmit: (chantier) async {
-                            await ref
-                                .read(chantierListProvider.notifier)
-                                .add(chantier);
-                          },
-                          createEmpty: () => Chantier.mock(),
-                        ),
-                  );
-                },
-                child: const Icon(Icons.add),
-              ),
+      floatingActionButton: isTechnicien
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => EntityForm<Chantier>(
+                    fromJson: (json) => Chantier.fromJson(json),
+                    onSubmit: (chantier) async {
+                      await ref
+                          .read(chantierListProvider.notifier)
+                          .add(chantier);
+                    },
+                    createEmpty: () => Chantier.mock(),
+                  ),
+                );
+              },
+              child: const Icon(Icons.add),
+            ),
     );
   }
 }

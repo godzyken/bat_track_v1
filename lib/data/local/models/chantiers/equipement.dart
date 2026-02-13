@@ -8,12 +8,10 @@ part 'equipement.freezed.dart';
 part 'equipement.g.dart';
 
 @freezed
-sealed class Equipement
-    with _$Equipement, AccessControlMixin, ValidationMixin
-    implements UnifiedModel {
-  const Equipement._();
+sealed class Equipement extends UnifiedModel with _$Equipement {
+  Equipement._();
 
-  const factory Equipement({
+  factory Equipement({
     required String id,
     required String nom,
     required String type, // extincteur, détecteur, etc.

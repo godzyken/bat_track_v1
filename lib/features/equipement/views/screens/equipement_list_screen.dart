@@ -1,6 +1,6 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
-import 'package:bat_track_v1/data/local/models/base/access_policy_interface.dart';
 import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
+import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/features/equipement/controllers/notifiers/equipements_list_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +16,7 @@ class EquipementScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
     final equipementAsync = ref.watch(equipementListProvider);
+    final currentUser = ref.watch(currentUserStateProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Équipements')),
@@ -25,17 +26,16 @@ class EquipementScreen extends ConsumerWidget {
         onEdit: (equipement) {
           showDialog(
             context: context,
-            builder:
-                (_) => EntityForm<Equipement>(
-                  fromJson: (json) => Equipement.fromJson(json),
-                  initialValue: equipement,
-                  onSubmit: (updated) async {
-                    await ref
-                        .read(equipementListProvider.notifier)
-                        .updateEntity(updated);
-                  },
-                  createEmpty: () => equipement,
-                ),
+            builder: (_) => EntityForm<Equipement>(
+              fromJson: (json) => Equipement.fromJson(json),
+              initialValue: equipement,
+              onSubmit: (updated) async {
+                await ref
+                    .read(equipementListProvider.notifier)
+                    .updateEntity(updated);
+              },
+              createEmpty: () => equipement,
+            ),
           );
         },
         onDelete: (id) async {
@@ -46,9 +46,7 @@ class EquipementScreen extends ConsumerWidget {
               .delete();
         },
         infoOverride: info,
-        policy: MultiRolePolicy(),
-        currentRole: '',
-        currentUserId: '',
+        currentUser: currentUser!,
         onCreate: () {},
       ),
 
@@ -62,13 +60,12 @@ class EquipementScreen extends ConsumerWidget {
   void _showForm(BuildContext context, WidgetRef ref, {Equipement? initial}) {
     showDialog(
       context: context,
-      builder:
-          (_) => EntityForm<Equipement>(
-            initialValue: initial,
-            fromJson: (json) => Equipement.fromJson(json),
-            createEmpty: () => Equipement.mock(),
-            onSubmit: (e) => ref.read(equipementListProvider.notifier).add(e),
-          ),
+      builder: (_) => EntityForm<Equipement>(
+        initialValue: initial,
+        fromJson: (json) => Equipement.fromJson(json),
+        createEmpty: () => Equipement.mock(),
+        onSubmit: (e) => ref.read(equipementListProvider.notifier).add(e),
+      ),
     );
   }
 }

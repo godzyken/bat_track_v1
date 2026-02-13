@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
 import '../../../core/responsive/wrapper/responsive_layout.dart';
-import '../../../data/local/models/base/access_policy_interface.dart';
-import '../../../data/local/models/base/has_acces_control.dart';
 import '../../../data/local/services/hive_service.dart';
 import 'entity_card.dart';
 import 'entity_form.dart';
@@ -15,9 +13,7 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
   final void Function(T)? onEdit;
   final void Function()? onCreate;
   final Future<void> Function(String id)? onDelete;
-  final AccessPolicy policy;
-  final String currentRole;
-  final String currentUserId;
+  final AppUser currentUser;
   final bool showActions;
   final bool readOnly;
   final ResponsiveInfo? infoOverride;
@@ -26,9 +22,7 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
     super.key,
     required this.items,
     required this.boxName,
-    required this.policy,
-    required this.currentRole,
-    required this.currentUserId,
+    required this.currentUser,
     this.onEdit,
     this.onCreate,
     this.onDelete,
@@ -45,7 +39,7 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
       appBar: AppBar(
         title: Text(boxName),
         actions: [
-          if (policy.canCreate(currentRole))
+          if (currentUser.canEdit(currentUser))
             IconButton(onPressed: onCreate, icon: const Icon(Icons.add)),
         ],
       ),
@@ -54,10 +48,9 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Erreur : $e')),
         data: (list) {
           // Filtrage des éléments accessibles
-          final filteredItems = list
-              .map(_withUserId)
-              .where((e) => policy.canAccess(currentRole, entity: e))
-              .toList();
+          final filteredItems = list.where((e) {
+            return e.canMerge(currentUser);
+          }).toList();
 
           if (filteredItems.isEmpty) {
             return const Center(child: Text('Aucun élément'));
@@ -69,14 +62,14 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
 
             return EntityCard<T>(
               entity: item,
-              onDelete: policy.canDelete(currentRole, entity: item)
+              onDelete: (item.canDelete(currentUser))
                   ? () => onDelete?.call(id) ?? HiveService.delete(boxName, id)
                   : null,
-              onEdit: policy.canEdit(currentRole, entity: item)
+              onEdit: (item.canEdit(currentUser))
                   ? () => onEdit?.call(item)
                   : null,
               showActions: showActions,
-              readOnly: readOnly || !policy.canEdit(currentRole, entity: item),
+              readOnly: readOnly || !item.canEdit(currentUser),
             );
           }
 
@@ -117,13 +110,7 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
     );
   }
 
-  /// Injecte `currentUserId` dans l'entité
-  T _withUserId(T entity) {
-    if (entity is JsonModelWithUser) {
-      return entity.copyWithId(currentUserId) as T;
-    }
-    return entity;
-  }
+  String get currentRole => currentUser.role;
 }
 
 /// Affiche un formulaire générique pour créer ou éditer une entité

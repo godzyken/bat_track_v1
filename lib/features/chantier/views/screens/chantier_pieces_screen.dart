@@ -1,5 +1,4 @@
 import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
-import 'package:bat_track_v1/data/local/models/base/access_policy_interface.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,42 +27,40 @@ class ChantierPiecesScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Pièces du chantier")),
-      floatingActionButton:
-          isClient
-              ? FloatingActionButton(
-                onPressed: () {
-                  showEntityFormDialog<Piece>(
-                    context: context,
-                    ref: ref,
-                    role: user.role,
-                    onSubmit: (piece) async {
-                      await pieceService.save(piece);
-                    },
-                    fromJson: Piece.fromJson,
-                    createEmpty: Piece.mock,
-                  );
-                },
-                child: const Icon(Icons.add),
-              )
-              : null,
+      floatingActionButton: isClient
+          ? FloatingActionButton(
+              onPressed: () {
+                showEntityFormDialog<Piece>(
+                  context: context,
+                  ref: ref,
+                  role: user.role,
+                  onSubmit: (piece) async {
+                    await pieceService.save(piece);
+                  },
+                  fromJson: Piece.fromJson,
+                  createEmpty: Piece.mock,
+                );
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: EntityList<Piece>(
         items: piecesAsync,
         boxName: 'pieces',
-        onCreate:
-            isClient
-                ? () {
-                  showEntityFormDialog<Piece>(
-                    context: context,
-                    ref: ref,
-                    role: user.role,
-                    onSubmit: (piece) async {
-                      await pieceService.save(piece);
-                    },
-                    fromJson: Piece.fromJson,
-                    createEmpty: Piece.mock,
-                  );
-                }
-                : () {},
+        onCreate: isClient
+            ? () {
+                showEntityFormDialog<Piece>(
+                  context: context,
+                  ref: ref,
+                  role: user.role,
+                  onSubmit: (piece) async {
+                    await pieceService.save(piece);
+                  },
+                  fromJson: Piece.fromJson,
+                  createEmpty: Piece.mock,
+                );
+              }
+            : () {},
         onEdit: (piece) {
           showEntityFormDialog<Piece>(
             context: context,
@@ -78,9 +75,7 @@ class ChantierPiecesScreen extends ConsumerWidget {
         },
         onDelete: isClient ? (id) => pieceService.delete(id) : null,
         readOnly: !isClient && !isTech,
-        currentRole: user.role,
-        currentUserId: user.id,
-        policy: MultiRolePolicy(),
+        currentUser: user,
         infoOverride: info,
       ),
     );

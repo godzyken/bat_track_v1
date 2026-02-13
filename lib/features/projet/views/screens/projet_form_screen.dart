@@ -1,10 +1,10 @@
-import 'package:bat_track_v1/data/local/models/base/has_acces_control.dart';
 import 'package:bat_track_v1/data/local/models/projets/projet.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/models/views/widgets/entity_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_models/core/controller/access_control.dart';
 import 'package:shared_models/shared_models.dart';
 
 import '../../../auth/data/providers/auth_state_provider.dart';
@@ -55,7 +55,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
     return EntityForm<Projet>(
       chantierId: isEditing ? 'Modifier le projet' : 'Créer un projet',
       initialValue: widget.project,
-      createEmpty: () => Projet.mock(),
+      createEmpty: () => ProjetMock.mock(),
       fromJson: (json) => Projet.fromJson(json),
       onSubmit: (project) async {
         // ⚡ Gestion validation par rôle
@@ -92,7 +92,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
             // 🔹 Multi-sélection technicien pour admin / chef de projet
             if (key == 'technicienIds' &&
                 value is List &&
-                (AppUserAccess(user).isAdmin || user.isChefDeProjet)) {
+                (AppUserAccess(user).isAdmin || user.isClient)) {
               return Wrap(
                 spacing: 8,
                 children: techs.map((t) {
@@ -123,7 +123,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
               );
             }
 
-            if (key == 'chefDeProjetValide' && user.isChefDeProjet) {
+            if (key == 'chefDeProjetValide' && user.isClient) {
               return CheckboxListTile(
                 title: const Text('Validation Chef de projet'),
                 value: chefDeProjetValide,

@@ -10,12 +10,10 @@ part 'piece.freezed.dart';
 part 'piece.g.dart';
 
 @freezed
-class Piece
-    with _$Piece, AccessControlMixin, ValidationMixin
-    implements UnifiedModel {
-  const Piece._();
+sealed class Piece extends UnifiedModel with _$Piece {
+  Piece._();
 
-  const factory Piece({
+  factory Piece({
     required String id,
     required String nom,
     required double surface,
@@ -101,6 +99,10 @@ class Piece
   @override
   bool get isUpdated => updatedAt != null;
 
+  /// 🔹 Correction 1 : Implémentation du getter requis par AccessControlMixin
+  @override
+  String get ownerId => addedBy;
+
   @override
   UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 
@@ -111,70 +113,4 @@ class Piece
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
-
-  @override
-  // TODO: implement addedBy
-  String get addedBy => throw UnimplementedError();
-
-  @override
-  // TODO: implement chefDeProjetValide
-  bool get chefDeProjetValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement clientValide
-  bool get clientValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement id
-  String get id => throw UnimplementedError();
-
-  @override
-  // TODO: implement isCloudOnly
-  bool get isCloudOnly => throw UnimplementedError();
-
-  @override
-  // TODO: implement mainOeuvre
-  List<MainOeuvre>? get mainOeuvre => throw UnimplementedError();
-
-  @override
-  // TODO: implement materiaux
-  List<Materiau>? get materiaux => throw UnimplementedError();
-
-  @override
-  // TODO: implement materiels
-  List<Materiel>? get materiels => throw UnimplementedError();
-
-  @override
-  // TODO: implement nom
-  String get nom => throw UnimplementedError();
-
-  @override
-  // TODO: implement ownerId
-  String? get ownerId => throw UnimplementedError();
-
-  @override
-  // TODO: implement superUtilisateurValide
-  bool get superUtilisateurValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement surface
-  double get surface => throw UnimplementedError();
-
-  @override
-  // TODO: implement techniciensValides
-  bool get techniciensValides => throw UnimplementedError();
-
-  @override
-  Map<String, dynamic> toJson() {
-    // TODO: implement toJson
-    throw UnimplementedError();
-  }
-
-  @override
-  // TODO: implement updatedAt
-  DateTime? get updatedAt => throw UnimplementedError();
-
-  @override
-  // TODO: implement validatedByTech
-  bool? get validatedByTech => throw UnimplementedError();
 }

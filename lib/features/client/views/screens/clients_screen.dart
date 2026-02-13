@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
-import '../../../../data/local/models/base/access_policy_interface.dart';
 import '../../../../data/local/services/service_type.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
@@ -58,9 +57,7 @@ class ClientsScreen extends ConsumerWidget {
         },
         onDelete: isAdmin ? (id) => clientService.delete(id) : null,
         readOnly: !isAdmin,
-        currentRole: user.role,
-        currentUserId: user.id,
-        policy: MultiRolePolicy(),
+        currentUser: user,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

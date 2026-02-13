@@ -4,11 +4,11 @@ import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/core/models/unified_model.dart';
 
 import '../../../models/data/state_wrapper/wrappers.dart';
-import '../../local/models/base/has_acces_control.dart';
 
-mixin AutoSync<T extends JsonSerializableModel<T>, Serializable>
+mixin AutoSync<T extends UnifiedModel, Serializable>
     on StateNotifier<SyncedState<T>> {
   Timer? _debounceTimer;
   String? _lastJsonCache;

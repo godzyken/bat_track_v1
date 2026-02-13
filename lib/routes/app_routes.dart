@@ -1,5 +1,3 @@
-import 'dart:developer' as developer;
-
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/features/client/views/screens/client_home_screen.dart';
@@ -11,9 +9,7 @@ import 'package:bat_track_v1/features/projet/views/screens/project_list_screen.d
 import 'package:bat_track_v1/features/technicien/views/screens/technicien_detail_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_models/shared_models.dart';
 
-import '../data/local/models/base/access_policy_interface.dart';
 import '../features/auth/data/providers/auth_notifier_provider.dart';
 import '../features/auth/data/providers/go_route_notifier_provider.dart';
 import '../features/auth/views/screens/login_screen.dart';
@@ -32,7 +28,6 @@ import '../providers/auth_provider.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final refresh = ref.watch(goRouterRefreshNotifierProvider);
-  final policy = MultiRolePolicy();
 
   return GoRouter(
     navigatorKey: ref.read(navigatorKeyProvider),
@@ -40,64 +35,35 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: refresh,
     debugLogDiagnostics: true,
     redirect: (context, state) {
-      final status = ref.read(userStatusProvider);
+      final userAsync = ref.read(currentUserProvider);
+      final currentUser = userAsync;
+
+      // Routes publiques
+      const publicRoutes = ['/login', '/register', '/loading', '/error'];
       final location = state.matchedLocation;
+      if (publicRoutes.contains(location)) return null;
 
-      // ✅ Routes publiques toujours accessibles
-      final publicRoutes = ['/login', '/register', '/loading', '/error'];
-      if (publicRoutes.contains(location)) {
-        return null;
+      // Pas connecté → login
+      if (currentUser.value == null) return '/login';
+
+      // Vérifier si on est sur /loading
+      if (location == '/loading') {
+        switch (currentUser.value?.role.toLowerCase()) {
+          case 'admin':
+          case 'superutilisateur':
+            return '/dashboard';
+          case 'technicien':
+            return '/techniciens';
+          case 'client':
+          case 'chefdeprojet':
+            return '/clients';
+          default:
+            return '/home';
+        }
       }
 
-      switch (status) {
-        case UserStatus.guest:
-          developer.log('🔒 Guest détecté → redirection vers /login');
-          return '/login';
-
-        case UserStatus.authenticated:
-          if (location != '/loading') {
-            developer.log('⏳ Chargement profil → /loading');
-            return '/loading';
-          }
-          return null;
-        case UserStatus.loaded:
-          // ✅ Utilisateur chargé
-          final userAsync = ref.read(currentUserProvider);
-
-          if (userAsync.hasError) {
-            developer.log('❌ Erreur chargement user → /error');
-            return '/error';
-          }
-
-          final appUser = userAsync.value;
-          if (appUser == null) {
-            developer.log('⚠️ User null malgré status loaded → /login');
-            return '/login';
-          }
-
-          // ✅ Si sur page de loading, rediriger selon le rôle
-          if (location == '/loading') {
-            final role = appUser.role.toLowerCase();
-            developer.log(
-              '✅ User chargé (${appUser.email}) → redirection selon rôle: $role',
-            );
-
-            return switch (role) {
-              'admin' || 'superutilisateur' => '/dashboard',
-              'technicien' => '/techniciens',
-              'client' || 'chefdeprojet' => '/clients',
-              _ => '/home',
-            };
-          }
-
-          // ✅ Vérification des permissions
-          if (!policy.canAccess(appUser.role)) {
-            developer.log('🚫 Accès refusé pour ${appUser.role} → /error');
-            return '/error';
-          }
-
-          return null;
-      }
+      // Fallback par rôle pour toutes les pages
+      return null;
     },
     routes: [
       GoRoute(
@@ -122,7 +88,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       ShellRoute(
         builder: (context, state, child) =>
-            AccessShell(policy: policy, state: state, child: child),
+            AccessShell(state: state, child: child),
         routes: [
           GoRoute(
             path: '/',
