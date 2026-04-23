@@ -1,16 +1,18 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 
+import 'package:bat_track_v1/models/data/adapter/typedefs.dart';
 import 'package:bat_track_v1/models/data/maperror/log_entry.dart';
 import 'package:bat_track_v1/models/notifiers/logged_notifier.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 mixin LoggedAction {
-  late dynamic _ref;
+  late Ref _ref;
 
-  void initLogger(dynamic refRead) {
-    _ref = refRead;
+  void initLogger(Reader refRead) {
+    _ref = refRead as Ref;
 
     developer.log("🛠 Logger Initialisé pour $runtimeType");
   }
@@ -18,11 +20,12 @@ mixin LoggedAction {
   void logAction({
     required String action,
     String? target,
-    dynamic data,
+    Map<String, dynamic>? data,
     bool captureToSentry = true,
   }) {
     final timestamp = DateTime.now();
     developer.log(">>>> [CONSOLE CHECK] $timestamp | $action | $target");
+    final logger = _ref.read(loggerNotifierProvider.notifier);
 
     final message = LogEntry(
       timestamp: DateTime.now(),
@@ -30,6 +33,8 @@ mixin LoggedAction {
       target: target ?? 'unknown',
       data: data,
     );
+
+    logger.log(message);
 
     debugPrint('LOGGED ACTION: ${jsonEncode(message)}');
 
@@ -45,7 +50,7 @@ mixin LoggedAction {
 
     try {
       if (_ref != null) {
-        _ref(loggerNotifierProvider.notifier).log(message);
+        _ref.watch(loggerNotifierProvider.notifier).log(message);
       }
     } catch (e) {
       developer.log("❌ Erreur lors de l'accès au loggerNotifierProvider: $e");
@@ -80,7 +85,7 @@ mixin LoggedAction {
         ),
       );
     }
-    _ref(loggerNotifierProvider.notifier).log(message);
+    _ref.read(loggerNotifierProvider.notifier).log(message);
   }
 
   void logError({
@@ -106,6 +111,6 @@ mixin LoggedAction {
         ),
       );
     }
-    _ref(loggerNotifierProvider.notifier).log(message);
+    _ref.read(loggerNotifierProvider.notifier).log(message);
   }
 }

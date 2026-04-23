@@ -1,16 +1,24 @@
+import 'package:bat_track_v1/features/auth/data/providers/auth_state_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
-import '../providers/auth_state_provider.dart';
 import '../providers/current_user_provider.dart';
 
-@riverpod
-class AuthNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
+class AuthNotifier extends AsyncNotifier<AppUser?> {
   @override
   Future<AppUser?> build() async {
     // Initialisation identique à currentUserProvider ou récupération via ref.watch
-    return ref.watch(currentUserProvider.future);
+    return _loadCurrentUser();
+  }
+
+  Future<AppUser?> _loadCurrentUser() async {
+    final firebaseUser = ref.read(firebaseAuthProvider).currentUser;
+
+    if (firebaseUser == null) return null;
+
+    final user = await ref.read(currentUserProvider.future);
+    return user;
   }
 
   Future<UserCredential?> signUpWithEmail({
@@ -25,10 +33,15 @@ class AuthNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
       final credential = await ref
           .read(firebaseAuthProvider)
           .createUserWithEmailAndPassword(email: email, password: password);
+      // 👉 optionnel: créer user Firestore ici
+
+      // 🔥 reload propre
+      state = await AsyncValue.guard(_loadCurrentUser);
+
       // Le state sera mis à jour via le build() et le stream de Firebase
       return credential;
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncError(e, st);
       return null;
     }
   }
@@ -36,16 +49,25 @@ class AuthNotifier extends AutoDisposeAsyncNotifier<AppUser?> {
   Future<void> signIn(String email, String password) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final res = await ref
+      await ref
           .read(firebaseAuthProvider)
           .signInWithEmailAndPassword(email: email, password: password);
       // Le build() sera automatiquement déclenché par le changement d'auth
-      return ref.read(currentUserProvider.future);
+      return _loadCurrentUser();
     });
   }
 
   Future<void> signOut() async {
     await ref.read(firebaseAuthProvider).signOut();
+
+    // 🔥 reset state propre
+    state = const AsyncData(null);
+  }
+
+  // 🔄 RELOAD MANUEL
+  Future<void> reload() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(_loadCurrentUser);
   }
 
   /// 🔹 Recharge manuelle

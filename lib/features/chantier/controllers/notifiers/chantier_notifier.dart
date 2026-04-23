@@ -1,4 +1,4 @@
-import 'dart:typed_data' show Uint8List;
+import 'dart:typed_data';
 
 import 'package:bat_track_v1/core/providers/entity_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,12 +10,11 @@ import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/remote/providers/chantier_provider.dart';
 
 // J'utilise le nom de classe 'ChantierNotifier' qui était implicitement votre intention.
-class ChantierNotifier
-    extends AutoDisposeFamilyAsyncNotifier<Chantier?, String> {
+class ChantierNotifier extends AsyncNotifier<Chantier?> {
   final _uuid = const Uuid();
 
-  // Champs internes
   late String _id;
+
   late UnifiedEntityService<Chantier, ChantierEntity> _chantierService;
   late UnifiedEntityService<ChantierEtape, ChantierEtapesEntity> _etapeService;
   late UnifiedEntityService<Piece, PieceEntity> _pieceService;
@@ -26,7 +25,11 @@ class ChantierNotifier
   _interventionService;
 
   @override
-  Future<Chantier?> build(String id) async {
+  Future<Chantier?> build() async {
+    throw UnimplementedError("Use buildWithId");
+  }
+
+  Future<Chantier?> buildWithId(String id) async {
     _id = id;
 
     _chantierService = ref.read(chantierServiceProvider);
@@ -37,7 +40,9 @@ class ChantierNotifier
     _interventionService = ref.read(interventionServiceProvider);
 
     ref.listen(watchChantierProvider(id), (_, next) {
-      state = next;
+      next.whenData((value) {
+        state = AsyncData(value);
+      });
     });
 
     return _chantierService.get(id);

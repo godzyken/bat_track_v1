@@ -5,91 +5,105 @@ import '../../../../data/local/models/index_model_extention.dart';
 import '../../../auth/data/providers/auth_state_provider.dart';
 import '../../../auth/data/providers/current_user_provider.dart';
 
-class ProjetListNotifier extends StateNotifier<AsyncValue<List<Projet>>> {
-  final Ref ref;
-  ProjetListNotifier(this.ref) : super(const AsyncValue.loading()) {
-    _init();
-  }
-
-  void _init() {
+class ProjetListNotifier extends AsyncNotifier<List<Projet>> {
+  @override
+  Future<List<Projet>> build() async {
     final firestore = ref.read(firestoreProvider);
-    firestore.collection('projects').snapshots().listen((snapshot) {
-      final projets = snapshot.docs
-          .map((doc) => Projet.fromJson(doc.data()))
-          .toList();
-      state = AsyncValue.data(projets);
-    });
+
+    // 🔥 Stream Firestore → state automatique
+    ref.listen(
+      StreamProvider((ref) {
+        return firestore.collection('projects').snapshots();
+      }),
+      (_, next) {
+        next.whenData((snapshot) {
+          final projets = snapshot.docs
+              .map((doc) => Projet.fromJson(doc.data()))
+              .toList();
+
+          state = AsyncData(projets);
+        });
+      },
+    );
+
+    // état initial
+    final snapshot = await firestore.collection('projects').get();
+
+    return snapshot.docs.map((doc) => Projet.fromJson(doc.data())).toList();
   }
 
-  /// Crée un nouveau projet
+  // ------------------------------------------------------------------
+  // CRUD
+  // ------------------------------------------------------------------
+
   Future<void> addProject(Projet projet) async {
-    try {
-      final firestore = ref.read(firestoreProvider);
+    final firestore = ref.read(firestoreProvider);
+
+    state = await AsyncValue.guard(() async {
       await firestore
           .collection('projects')
           .doc(projet.id)
           .set(projet.toJson());
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
+
+      return state.value ?? [];
+    });
   }
 
-  /// Met à jour un projet
   Future<void> updateProject(Projet projet) async {
-    try {
-      final firestore = ref.read(firestoreProvider);
+    final firestore = ref.read(firestoreProvider);
+
+    state = await AsyncValue.guard(() async {
       await firestore
           .collection('projects')
           .doc(projet.id)
           .update(projet.toJson());
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
+
+      return state.value ?? [];
+    });
   }
 
-  /// Supprime un projet
   Future<void> deleteProject(String id) async {
-    try {
-      final firestore = ref.read(firestoreProvider);
+    final firestore = ref.read(firestoreProvider);
+
+    state = await AsyncValue.guard(() async {
       await firestore.collection('projects').doc(id).delete();
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
+      return state.value ?? [];
+    });
   }
 
-  /// Validation par le client
+  // ------------------------------------------------------------------
+  // LOGIQUE MÉTIER
+  // ------------------------------------------------------------------
+
   Future<void> validateByClient(String projectId) async {
-    final currentUser = ref.read(currentUserProvider).value;
-    if (currentUser == null) return;
+    final user = ref.read(currentUserProvider).value;
+    if (user == null) return;
+
     final projet = state.value?.firstWhere((p) => p.id == projectId);
     if (projet == null) return;
 
-    final updated = projet.validateByClient(currentUser.uid);
-    await updateProject(updated);
+    await updateProject(projet.validateByClient(user.uid));
   }
 
-  /// Validation par admin / chef de projet
   Future<void> validateByAdminOrChef(String projectId) async {
-    final currentUser = ref.read(currentUserProvider).value;
-    if (currentUser == null) return;
+    final user = ref.read(currentUserProvider).value;
+    if (user == null) return;
+
     final projet = state.value?.firstWhere((p) => p.id == projectId);
     if (projet == null) return;
 
-    final updated = projet.validateByAdminOrChef(currentUser);
-    await updateProject(updated);
+    await updateProject(projet.validateByAdminOrChef(user));
   }
 
-  /// Assignation technicien
-  Future<void> assignTechnician(String projectId, AppUser technician) async {
+  Future<void> assignTechnician(String projectId, AppUser tech) async {
     final projet = state.value?.firstWhere((p) => p.id == projectId);
     if (projet == null) return;
 
-    final updated = projet.assignTechnician(technician);
-    await updateProject(updated);
+    await updateProject(projet.assignTechnician(tech));
   }
 }
 
 final projetListProvider =
-    StateNotifierProvider<ProjetListNotifier, AsyncValue<List<Projet>>>(
-      (ref) => ProjetListNotifier(ref),
+    AsyncNotifierProvider<ProjetListNotifier, List<Projet>>(
+      ProjetListNotifier.new,
     );

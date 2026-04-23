@@ -1,63 +1,48 @@
 import 'package:bat_track_v1/core/services/unified_entity_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/entity_providers.dart';
 import '../../../../data/local/models/entities/intervention_entity.dart';
 import '../../../../data/local/models/index_model_extention.dart';
-import '../../../../data/local/services/service_type.dart';
+import '../../../../models/controllers/states/intervention_state.dart';
 
-class InterventionState {
-  final bool isLoading;
-  final Map<String, int>? stats;
-  final String? error;
-
-  InterventionState({this.isLoading = false, this.stats, this.error});
-
-  InterventionState copyWith({
-    bool? isLoading,
-    Map<String, int>? stats,
-    String? error,
-  }) {
-    return InterventionState(
-      isLoading: isLoading ?? this.isLoading,
-      stats: stats ?? this.stats,
-      error: error ?? this.error,
-    );
-  }
-}
-
-class InterventionStateNotifier extends StateNotifier<InterventionState> {
-  final UnifiedEntityService<Intervention, InterventionEntity>
+class InterventionNotifier extends AsyncNotifier<InterventionState> {
+  late final UnifiedEntityService<Intervention, InterventionEntity>
   interventionService;
 
-  InterventionStateNotifier(this.interventionService)
-    : super(InterventionState()) {
-    loadStats();
+  @override
+  Future<InterventionState> build() async {
+    interventionService = ref.read(interventionServiceProvider);
+
+    final interventions = await interventionService.getAllRemote();
+
+    final Map<String, int> stats = {'Terminée': 0, 'En cours': 0, 'Annulée': 0};
+
+    for (final i in interventions) {
+      stats[i.statut] = (stats[i.statut] ?? 0) + 1;
+    }
+
+    return InterventionState(stats: stats);
   }
 
-  Future<void> loadStats() async {
-    try {
-      state = state.copyWith(isLoading: true, error: null);
+  Future<void> reload() async {
+    state = const AsyncLoading();
 
+    state = await AsyncValue.guard(() async {
       final interventions = await interventionService.getAllRemote();
 
-      final Map<String, int> stats = {
-        'Terminée': 0,
-        'En cours': 0,
-        'Annulée': 0,
-      };
+      final stats = <String, int>{};
 
       for (final i in interventions) {
         stats[i.statut] = (stats[i.statut] ?? 0) + 1;
       }
 
-      state = state.copyWith(isLoading: false, stats: stats);
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
+      return InterventionState(stats: stats);
+    });
   }
 }
 
 final interventionStateNotifierProvider =
-    StateNotifierProvider<InterventionStateNotifier, InterventionState>(
-      (ref) => InterventionStateNotifier(interventionService),
+    AsyncNotifierProvider<InterventionNotifier, InterventionState>(
+      InterventionNotifier.new,
     );
