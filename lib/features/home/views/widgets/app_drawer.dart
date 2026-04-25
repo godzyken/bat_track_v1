@@ -36,25 +36,24 @@ class AppDrawer extends ConsumerWidget {
               onTap: () async {
                 final confirm = await showDialog<bool>(
                   context: context,
-                  builder:
-                      (context) => AlertDialog(
-                        title: const Text('Confirmation'),
-                        content: const Text('Voulez-vous vous déconnecter ?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text('Annuler'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text('Déconnexion'),
-                          ),
-                        ],
+                  builder: (context) => AlertDialog(
+                    title: const Text('Confirmation'),
+                    content: const Text('Voulez-vous vous déconnecter ?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Annuler'),
                       ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Déconnexion'),
+                      ),
+                    ],
+                  ),
                 );
 
                 if (confirm == true && context.mounted) {
-                  ref.read(authProvider.notifier).state = false;
+                  ref.read(authProvider);
                   context.go('/login'); // redirection après déconnexion
                 }
               },
