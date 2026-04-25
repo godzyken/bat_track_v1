@@ -12,9 +12,9 @@ class DolibarrSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final instance = ref.watch(selectedInstanceProvider).value;
+    final instance = ref.watch(selectedInstanceProvider);
 
-    return instance == null
+    return instance.value == null
         ? const Text('⚠️ Aucune instance Dolibarr sélectionnée.')
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,9 +24,9 @@ class DolibarrSection extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      instance.name.isEmpty
+                      instance.value!.name.isEmpty
                           ? '⚠️ Aucune instance Dolibarr sélectionnée.'
-                          : 'Instance : ${instance.name}',
+                          : 'Instance : ${instance.value!.name}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -42,9 +42,9 @@ class DolibarrSection extends ConsumerWidget {
                   ),
                 ],
               ),
-              if (instance.name.isNotEmpty) ...[
+              if (instance.value!.name.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                Text('URL : ${instance.baseUrl}'),
+                Text('URL : ${instance.value!.baseUrl}'),
                 const SizedBox(height: 8),
                 ExpansionTile(
                   title: const Text("Explorateur avancé Dolibarr"),

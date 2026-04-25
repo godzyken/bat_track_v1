@@ -56,7 +56,7 @@ class ChantiersScreen extends ConsumerWidget {
               onSubmit: (updated) async {
                 await ref
                     .read(chantierListProvider.notifier)
-                    .updateEntity(updated);
+                    .updateItem(updated);
               },
               createEmpty: () => chantier,
             ),
@@ -85,7 +85,7 @@ class ChantiersScreen extends ConsumerWidget {
                     onSubmit: (chantier) async {
                       await ref
                           .read(chantierListProvider.notifier)
-                          .add(chantier);
+                          .addItem(chantier);
                     },
                     createEmpty: () => Chantier.mock(),
                   ),

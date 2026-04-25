@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_test/riverpod_test.dart';
 
@@ -8,7 +9,7 @@ class ProviderTestHelpers {
   /// Helper pour tester un provider avec overrides multiples
   static Future<void> testProviderWithOverrides<T>({
     required String description,
-    required ProviderBase<T> provider,
+    required Provider<T> provider,
     required List<Override> overrides,
     required List<dynamic> expectedStates,
     Duration? wait,

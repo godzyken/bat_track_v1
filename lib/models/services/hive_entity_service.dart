@@ -75,6 +75,15 @@ class HiveEntityService<T extends UnifiedModel>
     );
   }
 
+  Future<T?> getByQueryFirst(Map<String, dynamic> query) async {
+    await init();
+    final json = _box!.values.firstWhere(
+      (json) => query.entries.every((e) => json[e.key] == e.value),
+      orElse: () => _handleEntityNotFound(),
+    );
+    return fromJson(Map<String, dynamic>.from(json));
+  }
+
   Future<void> deleteByQuery(Map<String, dynamic> query) async {
     final idsToDelete = _box!.keys.where((key) {
       final json = _box!.get(key);
@@ -90,5 +99,58 @@ class HiveEntityService<T extends UnifiedModel>
   Future<void> deleteAll() async {
     await init();
     await _box!.clear();
+  }
+
+  Future<void> update(T item) async {
+    await init();
+    await _box!.put(item.id, item.toJson());
+  }
+
+  Future<void> create(T item) async {
+    await init();
+    await _box!.put(item.id, item.toJson());
+  }
+
+  Future<void> createBatch(List<T> items) async {
+    await init();
+    for (final item in items) {
+      await _box!.put(item.id, item.toJson());
+    }
+  }
+
+  Future<void> updateBatch(List<T> items) async {
+    await init();
+    for (final item in items) {
+      await _box!.put(item.id, item.toJson());
+    }
+  }
+
+  Future<void> deleteBatch(List<T> items) async {
+    await init();
+    for (final item in items) {
+      await _box!.delete(item.id);
+    }
+  }
+
+  Future<void> deleteByQueryBatch(Map<String, dynamic> query) async {
+    await init();
+    final idsToDelete = _box!.keys.where((key) {
+      final json = _box!.get(key);
+      if (json == null) return false;
+      final entity = fromJson(Map<String, dynamic>.from(json));
+      return query.entries.every((e) => entity.toJson()[e.key] == e.value);
+    }).toList();
+    for (final id in idsToDelete) {
+      await _box!.delete(id);
+    }
+  }
+
+  Future<void> deleteAllBatch() async {
+    await init();
+    await _box!.clear();
+  }
+
+  Map<String, dynamic> _handleEntityNotFound() {
+    throw Exception('Entity not found');
   }
 }

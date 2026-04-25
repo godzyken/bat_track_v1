@@ -1,7 +1,7 @@
 import 'package:bat_track_v1/data/local/models/projets/projet.dart';
 import 'package:bat_track_v1/models/services/hive_entity_service.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
 import '../../../helpers/hive_test_setup.dart';
 import '../../../mocks/mock_data_factories.dart';
@@ -38,7 +38,7 @@ void main() {
 
         // Act
         await service.create(projet);
-        final retrieved = await service.getById('test_1');
+        final retrieved = await service.get('test_1');
 
         // Assert
         expect(retrieved, isNotNull);
@@ -58,7 +58,7 @@ void main() {
 
         // Act
         await service.update(updatedProjet);
-        final retrieved = await service.getById('test_1');
+        final retrieved = await service.get('test_1');
 
         // Assert
         expect(retrieved!.nom, equals('Projet Modifié'));
@@ -72,7 +72,7 @@ void main() {
 
         // Act
         await service.delete('test_1');
-        final retrieved = await service.getById('test_1');
+        final retrieved = await service.get('test_1');
 
         // Assert
         expect(retrieved, isNull);

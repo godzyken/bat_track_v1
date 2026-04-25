@@ -1,6 +1,6 @@
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
-import 'package:bat_track_v1/data/local/models/projets/projet_extension.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../mocks/mock_data_factories.dart';
 

@@ -37,8 +37,8 @@ dependencies:
 
   # Base UI
   cupertino_icons: ^1.0.8
-  flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.6.1
+  flutter_riverpod: ^3.3.1
+  riverpod_annotation: ^4.0.2
 
   # Local storage / data
   drift: ^2.28.0
@@ -61,7 +61,7 @@ dependencies:
   # PDF / fichiers / média
   pdf: ^3.11.3
   printing: ^5.14.2
-  file_picker: ^10.2.0
+  file_picker: ^11.0.2
   open_filex: ^4.7.0
   image_picker: ^1.2.0
   model_viewer_plus: ^1.9.3
@@ -77,7 +77,7 @@ dependencies:
   go_router: ^17.0.0
   fl_chart: ^1.1.0
   table_calendar: ^3.2.0
-  timelines_plus: ^1.0.7
+  timelines_plus: ^2.0.0
   cached_network_image: ^3.4.1
   flutter_rating_bar: ^4.0.1
   implicitly_animated_reorderable_list_2: ^0.6.0
@@ -99,16 +99,14 @@ dev_dependencies:
   json_serializable: ^6.11.2
   freezed: ^3.2.3
   build_runner: ^2.7.1
-  dwds: ^25.1.0+2
+  dwds: ^27.0.3
   sentry_dart_plugin: ^3.1.1
-  riverpod_test: ^0.1.9
   test: ^1.25.15
   mocktail: ^1.0.4
   path_provider_platform_interface: ^2.1.2
   hive_ce_generator: ^1.9.3
 
-dependency_overrides:
-  freezed_annotation: ^2.4.4
+
 
 flutter:
 

@@ -2,6 +2,7 @@ import 'package:bat_track_v1/core/responsive/wrapper/responsive_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../models/notifiers/logged_notifier.dart';
 import '../../../../models/views/screens/exeception_screens.dart';
 import '../../../dolibarr/views/widgets/dolibarr_section.dart';
 import '../../../intervention/controllers/providers/intervention_stats_provider.dart';
@@ -22,24 +23,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final info = context.responsiveInfo(ref);
     final statsAsync = ref.watch(interventionStatsProvider);
+    final loggerState = ref.watch(loggerNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard')),
+      appBar: AppBar(
+        title: const Text('Dashboard intelligent'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              ref.invalidate(interventionStatsProvider);
+            },
+          ),
+        ],
+      ),
       body: statsAsync.when(
         loading: () => const LoadingApp(),
-        error:
-            (e, _) => ErrorApp(
-              message: "Erreur lors de la connexion au dashboard : $e",
-            ),
+        error: (e, _) => ErrorApp(message: "Erreur dashboard : $e"),
         data: (stats) {
-          // Filtrage dynamique selon projet/chantier
           final projets = stats.keys.toList();
-          final filteredChantiers =
-              selectedProjectId != null
-                  ? stats[selectedProjectId!]!.keys.toList()
-                  : stats.values.expand((e) => e.keys).toSet().toList();
 
-          // Données filtrées pour les graphiques
+          final filteredChantiers = selectedProjectId != null
+              ? stats[selectedProjectId!]!.keys.toList()
+              : stats.values.expand((e) => e.keys).toSet().toList();
+
           final pieData = <String, int>{};
           final barData = <String, int>{};
 
@@ -58,9 +65,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             }
           }
 
-          final pieChart = AnimatedInterventionChart(data: pieData);
+          /// 📡 LOG ANALYTICS
+          final logStats = loggerState.actionsCount;
+          final logTargets = loggerState.targetUsage;
 
-          final barChart = AnimatedInterventionChart(data: barData);
+          /// ⚠️ Détection anomalies
+          final tooManyDeletes = (logStats['delete'] ?? 0) > 5;
+
+          final highActivity = loggerState.totalLogs > 50;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -70,13 +82,28 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 const DolibarrSection(),
                 const SizedBox(height: 16),
 
-                // Barre de projets
+                /// 🚨 ALERTES INTELLIGENTES
+                if (tooManyDeletes || highActivity)
+                  Card(
+                    color: Colors.red.withValues(alpha: 0.1),
+                    child: ListTile(
+                      leading: const Icon(Icons.warning, color: Colors.red),
+                      title: const Text("Anomalie détectée"),
+                      subtitle: Text(
+                        tooManyDeletes
+                            ? "Trop de suppressions détectées"
+                            : "Activité très élevée",
+                      ),
+                    ),
+                  ),
+
+                /// 🎯 FILTRES PROJETS
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
                       ChoiceChip(
-                        label: const Text('Tous les projets'),
+                        label: const Text('Tous'),
                         selected: selectedProjectId == null,
                         onSelected: (_) {
                           setState(() {
@@ -85,10 +112,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           });
                         },
                       ),
-                      const SizedBox(width: 8),
                       ...projets.map(
                         (p) => Padding(
-                          padding: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.only(left: 8),
                           child: ChoiceChip(
                             label: Text(p),
                             selected: selectedProjectId == p,
@@ -107,13 +133,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
                 const SizedBox(height: 8),
 
-                // Barre de chantiers
+                /// 🎯 FILTRES CHANTIERS
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
                       ChoiceChip(
-                        label: const Text('Tous les chantiers'),
+                        label: const Text('Tous chantiers'),
                         selected: selectedChantierId == null,
                         onSelected: (_) {
                           setState(() {
@@ -121,10 +147,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           });
                         },
                       ),
-                      const SizedBox(width: 8),
                       ...filteredChantiers.map(
                         (c) => Padding(
-                          padding: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.only(left: 8),
                           child: ChoiceChip(
                             label: Text(c),
                             selected: selectedChantierId == c,
@@ -142,24 +167,68 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
                 const SizedBox(height: 16),
 
-                // Graphiques
+                /// 📊 CHARTS METIER
                 if (info.screenSize == ScreenSize.tablet)
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: pieChart),
+                      Expanded(child: AnimatedInterventionChart(data: pieData)),
                       const SizedBox(width: 16),
-                      Expanded(child: barChart),
+                      Expanded(child: AnimatedInterventionChart(data: barData)),
                     ],
                   )
                 else
                   Column(
-                    children: [pieChart, const SizedBox(height: 16), barChart],
+                    children: [
+                      AnimatedInterventionChart(data: pieData),
+                      const SizedBox(height: 16),
+                      AnimatedInterventionChart(data: barData),
+                    ],
                   ),
+
+                const SizedBox(height: 24),
+
+                /// 📡 ANALYTICS LOGS
+                const Text(
+                  "Activité système",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+
+                const SizedBox(height: 12),
+
+                AnimatedInterventionChart(data: logStats),
+
+                const SizedBox(height: 16),
+
+                /// 📊 STATS RAPIDES
+                Wrap(
+                  spacing: 12,
+                  children: [
+                    _statCard("Logs", loggerState.totalLogs),
+                    _statCard("Actions", logStats.length),
+                    _statCard("Modules", logTargets.length),
+                  ],
+                ),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _statCard(String title, int value) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            Text(title),
+            Text(
+              value.toString(),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
       ),
     );
   }

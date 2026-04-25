@@ -12,9 +12,7 @@ part 'pieces_jointes.freezed.dart';
 part 'pieces_jointes.g.dart';
 
 @freezed
-class PieceJointe
-    with _$PieceJointe, AccessControlMixin, ValidationMixin
-    implements UnifiedModel, HasFile {
+class PieceJointe extends UnifiedModel with _$PieceJointe implements HasFile {
   const PieceJointe._();
 
   const factory PieceJointe({
@@ -81,76 +79,6 @@ class PieceJointe
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
-
-  @override
-  // TODO: implement chefDeProjetValide
-  bool get chefDeProjetValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement clientValide
-  bool get clientValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement createdAt
-  DateTime get createdAt => throw UnimplementedError();
-
-  @override
-  // TODO: implement id
-  String get id => throw UnimplementedError();
-
-  @override
-  // TODO: implement isCloudOnly
-  bool get isCloudOnly => throw UnimplementedError();
-
-  @override
-  // TODO: implement nom
-  String get nom => throw UnimplementedError();
-
-  @override
-  // TODO: implement ownerId
-  String? get ownerId => throw UnimplementedError();
-
-  @override
-  // TODO: implement parentId
-  String get parentId => throw UnimplementedError();
-
-  @override
-  // TODO: implement parentType
-  String get parentType => throw UnimplementedError();
-
-  @override
-  // TODO: implement superUtilisateurValide
-  bool get superUtilisateurValide => throw UnimplementedError();
-
-  @override
-  // TODO: implement taille
-  double get taille => throw UnimplementedError();
-
-  @override
-  // TODO: implement techniciensValides
-  bool get techniciensValides => throw UnimplementedError();
-
-  @override
-  Map<String, dynamic> toJson() {
-    // TODO: implement toJson
-    throw UnimplementedError();
-  }
-
-  @override
-  // TODO: implement type
-  String get type => throw UnimplementedError();
-
-  @override
-  // TODO: implement typeMime
-  String get typeMime => throw UnimplementedError();
-
-  @override
-  // TODO: implement updatedAt
-  DateTime? get updatedAt => throw UnimplementedError();
-
-  @override
-  // TODO: implement url
-  String get url => throw UnimplementedError();
 }
 
 // Extension personnalisée

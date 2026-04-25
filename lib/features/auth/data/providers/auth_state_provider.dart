@@ -2,7 +2,6 @@ import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_models/shared_models.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>(
