@@ -5,5 +5,5 @@ import '../models/adapters/json_adapter.dart';
 
 final jsonFormControllerProvider = NotifierProvider.autoDispose
     .family<JsonFormController, Map<String, dynamic>, JsonAdapter>(
-      (ref, adapter) => JsonFormController(adapter),
+      JsonFormController.new,
     );

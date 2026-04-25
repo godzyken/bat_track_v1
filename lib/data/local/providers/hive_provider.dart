@@ -297,7 +297,7 @@ final equipementServiceProvider =
       factory: EquipementEntityFactory(),
     );
 
-final _serviceRegistry = <Type, ProviderBase>{
+final _serviceRegistry = <Type, Provider>{
   Chantier: chantierServiceProvider,
   Client: clientServiceProvider,
   Technicien: technicienServiceProvider,

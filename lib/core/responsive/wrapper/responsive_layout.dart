@@ -54,8 +54,8 @@ class _ResponsiveObserverState extends ConsumerState<ResponsiveObserver>
         ? ScreenOrientation.portrait
         : ScreenOrientation.landscape;
 
-    ref.read(screenSizeProvider.notifier).state = screenSize;
-    ref.read(screenOrientationProvider.notifier).state = screenOrientation;
+    ref.read(screenSizeProvider.notifier).update(screenSize);
+    ref.read(screenOrientationProvider.notifier).update(screenOrientation);
   }
 
   @override

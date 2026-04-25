@@ -3,7 +3,6 @@ import 'dart:developer' as developer;
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../../adapter/typedefs.dart';
@@ -15,10 +14,9 @@ class CrashlyticsWrapper {
     Reader? ref,
   ) async {
     try {
-      final user = ref!(currentUserProvider).maybeWhen(
-        data: (user) => user,
-        orElse: () => null,
-      );
+      final user = ref!(
+        currentUserProvider,
+      ).maybeWhen(data: (user) => user, orElse: () => null);
 
       final userId = user?.id ?? 'anonymous';
 

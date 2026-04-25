@@ -7,7 +7,7 @@ import '../data/remote/providers/dolibarr_instance_provider.dart';
 import '../routes/app_routes.dart';
 
 final dioProvider = Provider<Dio>((ref) {
-  final instance = ref.watch(selectedInstanceProvider);
+  final instance = ref.watch(selectedInstanceProvider).value;
   final router = ref.watch(goRouterProvider);
   final logger = ref.read(loggerProvider);
 

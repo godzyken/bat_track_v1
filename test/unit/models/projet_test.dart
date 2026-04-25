@@ -54,7 +54,7 @@ void main() {
           isAdmin: true,
         );
 
-        expect(testProjet.canAccess(adminUser), isTrue);
+        expect(testProjet.canMerge(adminUser), isTrue);
         expect(testProjet.canEdit(adminUser), isTrue);
         expect(testProjet.canValidate(adminUser), isTrue);
       });
@@ -65,7 +65,7 @@ void main() {
           role: UserRole.client,
         );
 
-        expect(testProjet.canAccess(ownerUser), isTrue);
+        expect(testProjet.canEditProject(ownerUser), isTrue);
         expect(testProjet.canEdit(ownerUser), isTrue);
       });
 
@@ -92,7 +92,7 @@ void main() {
           status: ProjetStatus.validated,
         );
 
-        expect(projetWithTech.canAccess(techUser), isTrue);
+        expect(projetWithTech.canRead(techUser), isTrue);
         expect(projetWithTech.canEdit(techUser), isTrue);
         expect(projetWithTech.canValidate(techUser), isFalse);
       });
@@ -103,7 +103,7 @@ void main() {
           role: UserRole.client,
         );
 
-        expect(testProjet.canAccess(randomUser), isFalse);
+        expect(testProjet.canRead(randomUser), isFalse);
         expect(testProjet.canEdit(randomUser), isFalse);
       });
     });

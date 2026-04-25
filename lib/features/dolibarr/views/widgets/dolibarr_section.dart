@@ -14,61 +14,63 @@ class DolibarrSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final instance = ref.watch(selectedInstanceProvider);
 
-    return instance == null
+    return instance.value == null
         ? const Text('⚠️ Aucune instance Dolibarr sélectionnée.')
         : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    instance.name.isEmpty
-                        ? '⚠️ Aucune instance Dolibarr sélectionnée.'
-                        : 'Instance : ${instance.name}',
-                    style: Theme.of(context).textTheme.titleMedium,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      instance.value!.name.isEmpty
+                          ? '⚠️ Aucune instance Dolibarr sélectionnée.'
+                          : 'Instance : ${instance.value!.name}',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   ),
+                  IconButton(
+                    tooltip: 'Changer d\'instance',
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const InstanceSelectorDialog(),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              if (instance.value!.name.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text('URL : ${instance.value!.baseUrl}'),
+                const SizedBox(height: 8),
+                ExpansionTile(
+                  title: const Text("Explorateur avancé Dolibarr"),
+                  initiallyExpanded: true,
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: DolibarrRequestEditor(),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  tooltip: 'Changer d\'instance',
-                  icon: const Icon(Icons.edit),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => const InstanceSelectorDialog(),
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.sync),
+                  label: const Text('Synchroniser avec Dolibarr'),
+                  onPressed: () async {
+                    onSync?.call();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('✅ Synchronisation lancée.'),
+                      ),
                     );
                   },
                 ),
               ],
-            ),
-            if (instance.name.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text('URL : ${instance.baseUrl}'),
-              const SizedBox(height: 8),
-              ExpansionTile(
-                title: const Text("Explorateur avancé Dolibarr"),
-                initiallyExpanded: true,
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.all(16),
-                    child: DolibarrRequestEditor(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.sync),
-                label: const Text('Synchroniser avec Dolibarr'),
-                onPressed: () async {
-                  onSync?.call();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('✅ Synchronisation lancée.')),
-                  );
-                },
-              ),
             ],
-          ],
-        );
+          );
   }
 }

@@ -11,9 +11,13 @@ class LoggerNotifier extends Notifier<LoggerState> {
   final _listeners = <void Function(LogEntry)>[];
   late LoggerLocalService localService;
 
+  List<LogEntry> get _filterLogs => [];
+
   @override
   LoggerState build() {
     final logs = localService.load();
+    developer.log('logs: $logs');
+    _filterLogs.addAll(logs);
     return LoggerState(logs: logs);
   }
 
@@ -41,6 +45,7 @@ class LoggerNotifier extends Notifier<LoggerState> {
 
   void clear() {
     state = state.copyWith(logs: []);
+    _filterLogs.clear();
   }
 
   void setFilters({String? action, String? target, String? user}) {
@@ -54,7 +59,7 @@ class LoggerNotifier extends Notifier<LoggerState> {
 
 extension LoggerExport on LoggerNotifier {
   String exportJson() {
-    final filteredLogs = filtered;
+    final filteredLogs = _filterLogs;
     final list = filteredLogs
         .map(
           (log) => {

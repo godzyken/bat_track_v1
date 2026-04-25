@@ -11,18 +11,14 @@ class DolibarrInstanceSelector extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(selectedInstanceProvider);
+    final selected = ref.watch(selectedInstanceProvider).value;
 
     return DropdownButton<DolibarrInstance>(
       value: selected,
       hint: const Text('Sélectionnez une instance Dolibarr'),
-      items:
-          availableInstances.map((instance) {
-            return DropdownMenuItem(
-              value: instance,
-              child: Text(instance.name),
-            );
-          }).toList(),
+      items: availableInstances.map((instance) {
+        return DropdownMenuItem(value: instance, child: Text(instance.name));
+      }).toList(),
       onChanged: (newInstance) {
         if (newInstance != null) {
           ref

@@ -7,9 +7,4 @@ import '../../notifiers/sync_entity_notifier.dart';
 typedef EntityNotifierProviderFamily<
   M extends UnifiedModel,
   E extends HiveModel<M>
-> =
-    AsyncNotifierProviderFamily<
-      SyncEntityNotifier<M, E>, // On précise le type exact du Notifier ici
-      M?, // Le type de donnée (AsyncValue<M?>)
-      String // L'argument (ID)
-    >;
+> = AsyncNotifierProvider<SyncEntityNotifier<M, E>, M?> Function(String id);

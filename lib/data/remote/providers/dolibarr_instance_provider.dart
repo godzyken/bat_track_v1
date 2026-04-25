@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../local/providers/shared_preferences_provider.dart';
@@ -10,37 +12,23 @@ final dolibarrInstancesProvider = FutureProvider<List<DolibarrInstance>>((
 });
 
 final selectedInstanceProvider =
-    NotifierProvider<SelectedInstanceNotifier, DolibarrInstance?>(
+    AsyncNotifierProvider<SelectedInstanceNotifier, DolibarrInstance?>(
       SelectedInstanceNotifier.new,
     );
 
-class SelectedInstanceNotifier extends Notifier<DolibarrInstance?> {
-  late final Ref _ref;
-
+class SelectedInstanceNotifier extends AsyncNotifier<DolibarrInstance?> {
   @override
-  DolibarrInstance? build() {
-    _ref = ref;
-
-    // 🔥 side-effect safe via microtask
-    Future.microtask(_loadFromPrefs);
-
-    return null;
-  }
-
-  // ------------------------------------------------------------------
-  // LOAD
-  // ------------------------------------------------------------------
-
-  Future<void> _loadFromPrefs() async {
-    final prefs = await _ref.read(sharedPreferencesProvider.future);
+  FutureOr<DolibarrInstance?> build() async {
+    // Plus besoin de microtask ! Riverpod gère l'attente du futur.
+    final prefs = await ref.watch(sharedPreferencesProvider.future);
 
     final url = prefs.getString('dolibarr_baseUrl');
     final apiKey = prefs.getString('dolibarr_apiKey');
     final name = prefs.getString('dolibarr_name');
 
-    if (url == null || apiKey == null || name == null) return;
+    if (url == null || apiKey == null || name == null) return null;
 
-    state = DolibarrInstance(name: name, baseUrl: url, apiKey: apiKey);
+    return DolibarrInstance(name: name, baseUrl: url, apiKey: apiKey);
   }
 
   // ------------------------------------------------------------------
@@ -48,9 +36,9 @@ class SelectedInstanceNotifier extends Notifier<DolibarrInstance?> {
   // ------------------------------------------------------------------
 
   Future<void> selectInstance(DolibarrInstance instance) async {
-    state = instance;
+    state = AsyncData(instance);
 
-    final prefs = await _ref.read(sharedPreferencesProvider.future);
+    final prefs = await ref.read(sharedPreferencesProvider.future);
 
     await prefs.setString('dolibarr_name', instance.name);
     await prefs.setString('dolibarr_baseUrl', instance.baseUrl);
@@ -62,9 +50,9 @@ class SelectedInstanceNotifier extends Notifier<DolibarrInstance?> {
   // ------------------------------------------------------------------
 
   Future<void> clear() async {
-    state = null;
+    state = AsyncData(null);
 
-    final prefs = await _ref.read(sharedPreferencesProvider.future);
+    final prefs = await ref.read(sharedPreferencesProvider.future);
 
     await Future.wait([
       prefs.remove('dolibarr_name'),

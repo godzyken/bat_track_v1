@@ -1,6 +1,7 @@
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:bat_track_v1/data/local/providers/hive_provider.dart';
 import 'package:bat_track_v1/features/chantier/controllers/providers/chantier_sync_provider.dart';
+import 'package:bat_track_v1/models/data/hive_model.dart';
 import 'package:bat_track_v1/models/providers/asynchrones/generic_adapter_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,11 +12,11 @@ import '../../mocks/mock_data_factories.dart';
 
 void main() {
   group('EntityNotifierProvider Tests', () {
-    late MockLoggedEntitySyncService<Projet> mockService;
+    late MockLoggedEntitySyncService<Projet, HiveModel<Projet>> mockService;
     late List<Projet> testProjets;
 
     setUp(() {
-      mockService = MockLoggedEntitySyncService<Projet>();
+      mockService = MockLoggedEntitySyncService<Projet, HiveModel<Projet>>();
       testProjets = MockDataFactories.createProjetList(3);
     });
 

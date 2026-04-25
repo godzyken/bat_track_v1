@@ -28,7 +28,7 @@ typedef FieldBuilder =
     );
 
 typedef AsyncCallback<T> = Future<T> Function();
-typedef Reader = T Function<T>(ProviderListenable<T> provider);
+typedef Reader = T Function<T>(Provider<T> provider);
 typedef OnEtapeSubmit = void Function(ChantierEtape etape);
 typedef OnSubmit<T extends UnifiedModel> = void Function(T entity);
 typedef FieldVisibility = bool Function(String key, dynamic value);

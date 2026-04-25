@@ -9,9 +9,14 @@ import '../services/logged_entity_service.dart';
 
 class AppUserNotifier extends SyncEntityNotifier<AppUser, AppUserEntity> {
   @override
-  FutureOr<AppUser?> build(String id) async {
+  FutureOr<AppUser?> build() async {
     // Récupère l'utilisateur via le service (Hive first)
     return await ref.watch(appUserEntityServiceProvider).get(id);
+  }
+
+  FutureOr<AppUser?> buildId(String id) async {
+    // Récupère l'utilisateur via le service (Hive first)
+    return await ref.read(appUserEntityServiceProvider).get(id);
   }
 
   @override
@@ -19,15 +24,13 @@ class AppUserNotifier extends SyncEntityNotifier<AppUser, AppUserEntity> {
       ref.read(appUserEntityServiceProvider);
 
   @override
-  Future<void> refreshRemote() {
-    // TODO: implement refreshRemote
-    throw UnimplementedError();
+  Future<void> refreshRemote() async {
+    await service.getAllRemote();
   }
 
   @override
-  Future<void> updateEntity(AppUser model) {
-    // TODO: implement updateEntity
-    throw UnimplementedError();
+  Future<void> updateEntity(AppUser model) async {
+    await service.sync(model);
   }
 
   // Ajoute ici tes méthodes spécifiques (updateProfile, etc.)

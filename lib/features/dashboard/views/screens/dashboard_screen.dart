@@ -85,7 +85,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 /// 🚨 ALERTES INTELLIGENTES
                 if (tooManyDeletes || highActivity)
                   Card(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withValues(alpha: 0.1),
                     child: ListTile(
                       leading: const Icon(Icons.warning, color: Colors.red),
                       title: const Text("Anomalie détectée"),

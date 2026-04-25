@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bat_track_v1/models/views/screens/exeception_screens.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -123,6 +124,7 @@ class _DolibarrExplorerScreenState
   @override
   Widget build(BuildContext context) {
     final instance = ref.watch(selectedInstanceProvider);
+    if (instance.value == null) return ErrorApp(message: 'Pas d\'instance');
 
     return Scaffold(
       appBar: AppBar(
@@ -139,8 +141,9 @@ class _DolibarrExplorerScreenState
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            if (instance != null)
-              Text("Instance : ${instance.name} (${instance.baseUrl})"),
+            Text(
+              "Instance : ${instance.value?.name} (${instance.value!.baseUrl})",
+            ),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -164,19 +167,16 @@ class _DolibarrExplorerScreenState
             ),
             const SizedBox(height: 16),
             Expanded(
-              child:
-                  _response == null
-                      ? const Center(child: Text("Aucune requête effectuée."))
-                      : _response!.when(
-                        data: (res) => _buildFormattedJson(res.data),
-                        loading:
-                            () => const Center(
-                              child: CircularProgressIndicator.adaptive(),
-                            ),
-                        error:
-                            (err, _) =>
-                                Center(child: ErrorWidget('Erreur : $err')),
+              child: _response == null
+                  ? const Center(child: Text("Aucune requête effectuée."))
+                  : _response!.when(
+                      data: (res) => _buildFormattedJson(res.data),
+                      loading: () => const Center(
+                        child: CircularProgressIndicator.adaptive(),
                       ),
+                      error: (err, _) =>
+                          Center(child: ErrorWidget('Erreur : $err')),
+                    ),
             ),
           ],
         ),

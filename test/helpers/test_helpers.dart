@@ -8,7 +8,7 @@ class TestHelpers {
   /// Helper pour attendre qu'un provider atteigne un état spécifique
   static Future<T> waitForProviderState<T>(
     ProviderContainer container,
-    ProviderBase<AsyncValue<T>> provider,
+    Provider<AsyncValue<T>> provider,
     bool Function(AsyncValue<T>) condition, {
     Duration timeout = const Duration(seconds: 5),
   }) async {

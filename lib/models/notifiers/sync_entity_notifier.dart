@@ -10,9 +10,14 @@ abstract class SyncEntityNotifier<
   M extends UnifiedModel,
   E extends HiveModel<M>
 >
-    extends FamilyAsyncNotifier<M?, String> {
+    extends AsyncNotifier<M?> {
+  late final String id;
+
   // Cette méthode permettra à l'UI d'accéder au service si besoin
   SafeAndLoggedEntityService<M, E> get service;
+
+  @override
+  FutureOr<M?> build();
 
   Future<void> updateEntity(M model);
   Future<void> refreshRemote();

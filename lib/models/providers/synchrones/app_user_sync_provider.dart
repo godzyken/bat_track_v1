@@ -4,6 +4,6 @@ import 'package:shared_models/shared_models.dart';
 import '../../notifiers/app_user_notifier.dart';
 
 final appUserNotifierProvider =
-    AsyncNotifierProviderFamily<AppUserNotifier, AppUser?, String>(
-      () => AppUserNotifier(),
-    );
+    AsyncNotifierProvider.family<AppUserNotifier, AppUser?, String>((arg) {
+      return AppUserNotifier();
+    });
