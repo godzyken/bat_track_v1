@@ -8,7 +8,7 @@ import '../providers/current_user_provider.dart';
 class AuthNotifier extends AsyncNotifier<AppUser?> {
   @override
   Future<AppUser?> build() async {
-    // Initialisation identique à currentUserProvider ou récupération via ref.watch
+    // source unique de vérité
     return _loadCurrentUser();
   }
 
@@ -17,9 +17,17 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
 
     if (firebaseUser == null) return null;
 
-    final user = await ref.read(currentUserProvider.future);
-    return user;
+    try {
+      final result = ref.read(currentUserProvider);
+      return result.mapOrNull();
+    } catch (_) {
+      return null;
+    }
   }
+
+  // -------------------------------------------------
+  // SIGN UP
+  // -------------------------------------------------
 
   Future<UserCredential?> signUpWithEmail({
     required String email,
@@ -28,17 +36,15 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
     required String role,
     required String company,
   }) async {
-    state = const AsyncValue.loading();
+    state = const AsyncLoading();
+
     try {
       final credential = await ref
           .read(firebaseAuthProvider)
           .createUserWithEmailAndPassword(email: email, password: password);
-      // 👉 optionnel: créer user Firestore ici
 
-      // 🔥 reload propre
-      state = await AsyncValue.guard(_loadCurrentUser);
+      state = AsyncData(await _loadCurrentUser());
 
-      // Le state sera mis à jour via le build() et le stream de Firebase
       return credential;
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -46,59 +52,37 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
     }
   }
 
+  // -------------------------------------------------
+  // SIGN IN
+  // -------------------------------------------------
+
   Future<void> signIn(String email, String password) async {
-    state = const AsyncValue.loading();
+    state = const AsyncLoading();
+
     state = await AsyncValue.guard(() async {
       await ref
           .read(firebaseAuthProvider)
           .signInWithEmailAndPassword(email: email, password: password);
-      // Le build() sera automatiquement déclenché par le changement d'auth
+
       return _loadCurrentUser();
     });
   }
 
+  // -------------------------------------------------
+  // SIGN OUT
+  // -------------------------------------------------
+
   Future<void> signOut() async {
     await ref.read(firebaseAuthProvider).signOut();
-
-    // 🔥 reset state propre
     state = const AsyncData(null);
   }
 
-  // 🔄 RELOAD MANUEL
+  // -------------------------------------------------
+  // REFRESH EXPLICITE
+  // -------------------------------------------------
+
   Future<void> reload() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(_loadCurrentUser);
   }
-
-  /// 🔹 Recharge manuelle
-  /*
-  Future<void> reload() async {
-    final user = _auth.currentUser;
-    if (user == null) {
-      state = const AsyncValue.data(null);
-      return;
-    }
-
-    state = const AsyncValue.loading();
-    try {
-      final doc = await _firestore.collection('users').doc(user.uid).get();
-      if (!doc.exists) {
-        state = const AsyncValue.data(null);
-        return;
-      }
-
-      final data = _normalizeData(
-        doc.data() ?? {},
-        user.uid,
-        user.displayName,
-        user.email,
-      );
-
-      final appUser = AppUser.fromJson(data);
-      state = AsyncValue.data(appUser);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }
-*/
 }

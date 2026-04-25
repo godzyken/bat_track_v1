@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_models/core/controller/access_control.dart';
-import 'package:shared_models/shared_models.dart';
+import 'package:shared_models/models/private/app_user.dart';
 
 import '../../../auth/data/providers/auth_state_provider.dart';
 import '../../../auth/views/widgets/user_dropdown_field.dart';

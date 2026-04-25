@@ -6,46 +6,70 @@ import '../services/dolibarr_loader.dart';
 final dolibarrInstancesProvider = FutureProvider<List<DolibarrInstance>>((
   ref,
 ) async {
-  return await DolibarrConfigLoader.loadInstances();
+  return DolibarrConfigLoader.loadInstances();
 });
 
 final selectedInstanceProvider =
-    StateNotifierProvider<SelectedInstanceNotifier, DolibarrInstance?>((ref) {
-      return SelectedInstanceNotifier(ref);
-    });
+    NotifierProvider<SelectedInstanceNotifier, DolibarrInstance?>(
+      SelectedInstanceNotifier.new,
+    );
 
-class SelectedInstanceNotifier extends StateNotifier<DolibarrInstance?> {
-  final Ref ref;
+class SelectedInstanceNotifier extends Notifier<DolibarrInstance?> {
+  late final Ref _ref;
 
-  SelectedInstanceNotifier(this.ref) : super(null) {
-    _loadFromPrefs();
+  @override
+  DolibarrInstance? build() {
+    _ref = ref;
+
+    // 🔥 side-effect safe via microtask
+    Future.microtask(_loadFromPrefs);
+
+    return null;
   }
 
+  // ------------------------------------------------------------------
+  // LOAD
+  // ------------------------------------------------------------------
+
   Future<void> _loadFromPrefs() async {
-    final prefs = await ref.read(sharedPreferencesProvider.future);
+    final prefs = await _ref.read(sharedPreferencesProvider.future);
+
     final url = prefs.getString('dolibarr_baseUrl');
     final apiKey = prefs.getString('dolibarr_apiKey');
     final name = prefs.getString('dolibarr_name');
 
-    if (url != null && apiKey != null && name != null) {
-      state = DolibarrInstance(name: name, baseUrl: url, apiKey: apiKey);
-    }
+    if (url == null || apiKey == null || name == null) return;
+
+    state = DolibarrInstance(name: name, baseUrl: url, apiKey: apiKey);
   }
 
+  // ------------------------------------------------------------------
+  // SELECT
+  // ------------------------------------------------------------------
+
   Future<void> selectInstance(DolibarrInstance instance) async {
-    final prefs = await ref.read(sharedPreferencesProvider.future);
+    state = instance;
+
+    final prefs = await _ref.read(sharedPreferencesProvider.future);
+
     await prefs.setString('dolibarr_name', instance.name);
     await prefs.setString('dolibarr_baseUrl', instance.baseUrl);
     await prefs.setString('dolibarr_apiKey', instance.apiKey);
-    state = instance;
   }
+
+  // ------------------------------------------------------------------
+  // CLEAR
+  // ------------------------------------------------------------------
 
   Future<void> clear() async {
     state = null;
-    final prefs = await ref.read(sharedPreferencesProvider.future);
 
-    await prefs.remove('dolibarr_name');
-    await prefs.remove('dolibarr_baseUrl');
-    await prefs.remove('dolibarr_apiKey');
+    final prefs = await _ref.read(sharedPreferencesProvider.future);
+
+    await Future.wait([
+      prefs.remove('dolibarr_name'),
+      prefs.remove('dolibarr_baseUrl'),
+      prefs.remove('dolibarr_apiKey'),
+    ]);
   }
 }

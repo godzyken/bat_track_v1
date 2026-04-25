@@ -5,7 +5,7 @@ import '../../../../data/local/models/index_model_extention.dart';
 import '../../../auth/data/providers/auth_state_provider.dart';
 import '../../../chantier/controllers/providers/chantier_sync_provider.dart';
 
-final editingProjetProvider = StateProvider<Projet?>((ref) => null);
+final editingProjetProvider = Provider<Projet?>((ref) => null);
 
 final techniciensStreamProvider = StreamProvider<List<Technicien>>((ref) {
   final service = ref.watch(techSyncServiceProvider);
@@ -52,7 +52,7 @@ final technicienSuggestionsProvider = FutureProvider<List<Technicien>>((
   return filtered.toList();
 });
 
-final technicienFilterProvider = StateProvider<TechFilter>((ref) {
+final technicienFilterProvider = Provider<TechFilter>((ref) {
   return TechFilter();
 });
 

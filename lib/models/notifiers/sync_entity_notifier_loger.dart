@@ -41,8 +41,7 @@ class SyncEntityNotifierLogger<T extends UnifiedModel>
     _log('set state');
   }
 
-  @override
-  void dispose() {
+  void cancel() {
     _log('dispose');
     _inner.dispose();
   }

@@ -10,11 +10,11 @@ import '../../../../data/local/models/entities/index_entity_extention.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/remote/providers/chantier_provider.dart';
 
-class ChantierNotifierV2 extends BaseEntityNotifier<Chantier> {
+class ChantierNotifier extends BaseEntityNotifier<Chantier> {
   final _uuid = const Uuid();
   final String chantierId;
 
-  ChantierNotifierV2(this.chantierId);
+  ChantierNotifier(this.chantierId);
 
   // ─────────────────────────────────────────────
   // BaseEntityNotifier contrat

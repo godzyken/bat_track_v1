@@ -1,45 +1,78 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 
+import 'package:bat_track_v1/models/controllers/states/auto_sync_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../models/data/maperror/log_entry.dart';
+import '../../../models/notifiers/logged_notifier.dart';
 import '../../../models/services/entity_sync_services.dart';
 
-class AutoSyncNotifier extends StateNotifier<void> {
-  AutoSyncNotifier(this.ref) : super(null) {
-    _startAutoSync();
+class AutoSyncNotifier extends Notifier<AutoSyncState> {
+  DateTime? _lastSync;
+
+  @override
+  AutoSyncState build() {
     _initialSync();
+    return const AutoSyncState();
   }
 
-  final Ref ref;
-  late final Timer _timer;
-
-  Future<void> _initialSync() async {
+  Future<void> _runSync({bool silent = false}) async {
     try {
+      if (!silent) {
+        state = state.copyWith(isSyncing: true, lastError: null);
+      }
+
       await syncAllEntitiesFromFirestore(ref);
-    } catch (e) {
-      developer.log('Initial sync failed: $e');
+
+      state = state.copyWith(isSyncing: false, lastSync: DateTime.now());
+
+      _log('sync_success');
+    } catch (e, st) {
+      state = state.copyWith(isSyncing: false, lastError: e);
+
+      _log('sync_error', data: {'error': e.toString()});
+      developer.log('Auto-sync error: $e', stackTrace: st);
     }
   }
 
-  void _startAutoSync() {
-    _timer = Timer.periodic(const Duration(minutes: 10), (_) async {
-      try {
-        await syncAllEntitiesFromFirestore(ref);
-      } catch (e, stack) {
-        developer.log('Auto-sync error: $e', stackTrace: stack);
-      }
-    });
+  Future<void> _initialSync() async {
+    await _runSync();
   }
 
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
+  Future<void> syncNow() async {
+    final now = DateTime.now();
+
+    if (_lastSync != null &&
+        now.difference(_lastSync!) < const Duration(minutes: 5)) {
+      return;
+    }
+    _lastSync = now;
+
+    await _runSync();
+  }
+
+  Future<void> retry() async {
+    if (state.lastError != null) {
+      await _runSync();
+    }
+  }
+
+  void _log(String action, {Map<String, dynamic>? data}) {
+    ref
+        .read(loggerNotifierProvider.notifier)
+        .log(
+          LogEntry(
+            action: action,
+            target: 'AutoSync',
+            data: data,
+            timestamp: DateTime.now(),
+          ),
+        );
   }
 }
 
 final autoSyncProvider =
-    StateNotifierProvider.autoDispose<AutoSyncNotifier, void>(
-      (ref) => AutoSyncNotifier(ref),
+    NotifierProvider.autoDispose<AutoSyncNotifier, AutoSyncState>(
+      AutoSyncNotifier.new,
     );
