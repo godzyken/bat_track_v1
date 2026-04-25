@@ -26,7 +26,7 @@ class PickInstanceScreen extends ConsumerWidget {
       final userBox = ref.read(boxProvider('users'));
       await userBox.put(updatedUser.id, updatedUser);
 
-      ref.read(currentUserStateProvider.notifier).state!;
+      ref.read(currentUserStateProvider);
     }
 
     // 3. Naviguer

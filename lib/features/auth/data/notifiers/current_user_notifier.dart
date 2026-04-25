@@ -1,41 +1,65 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
 import '../providers/auth_state_provider.dart';
 
-class CurrentUserNotifier extends AutoDisposeStreamNotifier<AppUser?> {
+class CurrentUserNotifier extends Notifier<AsyncValue<AppUser?>> {
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _sub;
+
   @override
-  Stream<AppUser?> build() {
-    // 1. On surveille l'état de l'auth
+  AsyncValue<AppUser?> build() {
     final authState = ref.watch(authStateChangesProvider).value;
 
-    // Si pas d'utilisateur connecté, on renvoie un flux vide (null)
     if (authState == null) {
-      return Stream.value(null);
+      _sub?.cancel();
+      return const AsyncData(null);
     }
 
-    // 2. On retourne directement le flux Firestore transformé
-    return ref
-        .watch(firestoreProvider)
+    final firestore = ref.read(firestoreProvider);
+
+    _sub?.cancel();
+
+    state = const AsyncLoading();
+
+    _sub = firestore
         .collection("users")
         .doc(authState.uid)
         .snapshots()
-        .map((snap) {
-          if (!snap.exists) return AppUser.empty();
+        .listen(
+          (snap) {
+            if (!snap.exists) {
+              state = const AsyncData(null);
+              return;
+            }
 
-          return AppUser.fromJson(
-            _normalize(
+            final data = _normalize(
               snap.data() ?? {},
               authState.uid,
               authState.displayName,
               authState.email,
-            ),
-          );
-        });
+            );
+
+            state = AsyncData(AppUser.fromJson(data));
+          },
+          onError: (e, st) {
+            state = AsyncError(e, st);
+          },
+        );
+
+    return const AsyncLoading();
   }
 
-  // Méthode de normalisation privée pour nettoyer le code
+  void cancel() {
+    _sub?.cancel();
+  }
+
+  // ----------------------------
+  // utils
+  // ----------------------------
+
   Map<String, dynamic> _normalize(
     Map<String, dynamic> data,
     String uid,

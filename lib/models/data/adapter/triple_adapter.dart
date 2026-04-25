@@ -50,7 +50,7 @@ class TripleAdapter<T extends UnifiedModel> {
 
   /// 🔹 Dolibarr
   Future<List<T>> fetchFromDolibarr() async {
-    final instance = ref.read(selectedInstanceProvider);
+    final instance = ref.read(selectedInstanceProvider).value;
     if (instance == null) {
       throw Exception("Aucune instance Dolibarr sélectionnée");
     }
@@ -70,7 +70,7 @@ class TripleAdapter<T extends UnifiedModel> {
   }
 
   Future<void> pushToDolibarr(T model) async {
-    final instance = ref.read(selectedInstanceProvider);
+    final instance = ref.read(selectedInstanceProvider).value;
     if (instance == null) {
       throw Exception("Aucune instance Dolibarr sélectionnée");
     }

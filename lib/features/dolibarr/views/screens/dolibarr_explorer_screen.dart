@@ -122,7 +122,7 @@ class _DolibarrExplorerScreenState
 
   @override
   Widget build(BuildContext context) {
-    final instance = ref.watch(selectedInstanceProvider);
+    final instance = ref.watch(selectedInstanceProvider).value;
 
     return Scaffold(
       appBar: AppBar(
@@ -164,19 +164,16 @@ class _DolibarrExplorerScreenState
             ),
             const SizedBox(height: 16),
             Expanded(
-              child:
-                  _response == null
-                      ? const Center(child: Text("Aucune requête effectuée."))
-                      : _response!.when(
-                        data: (res) => _buildFormattedJson(res.data),
-                        loading:
-                            () => const Center(
-                              child: CircularProgressIndicator.adaptive(),
-                            ),
-                        error:
-                            (err, _) =>
-                                Center(child: ErrorWidget('Erreur : $err')),
+              child: _response == null
+                  ? const Center(child: Text("Aucune requête effectuée."))
+                  : _response!.when(
+                      data: (res) => _buildFormattedJson(res.data),
+                      loading: () => const Center(
+                        child: CircularProgressIndicator.adaptive(),
                       ),
+                      error: (err, _) =>
+                          Center(child: ErrorWidget('Erreur : $err')),
+                    ),
             ),
           ],
         ),

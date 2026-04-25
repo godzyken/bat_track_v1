@@ -1,223 +1,243 @@
-import 'dart:typed_data' show Uint8List;
+import 'dart:typed_data';
 
 import 'package:bat_track_v1/core/providers/entity_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/riverpod/base_entity_notifier.dart';
 import '../../../../core/services/unified_entity_service.dart';
 import '../../../../data/local/models/entities/index_entity_extention.dart';
 import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/remote/providers/chantier_provider.dart';
 
-// J'utilise le nom de classe 'ChantierNotifier' qui était implicitement votre intention.
-class ChantierNotifier
-    extends AutoDisposeFamilyAsyncNotifier<Chantier?, String> {
+class ChantierNotifier extends BaseEntityNotifier<Chantier> {
   final _uuid = const Uuid();
+  final String chantierId;
 
-  // Champs internes
-  late String _id;
-  late UnifiedEntityService<Chantier, ChantierEntity> _chantierService;
-  late UnifiedEntityService<ChantierEtape, ChantierEtapesEntity> _etapeService;
-  late UnifiedEntityService<Piece, PieceEntity> _pieceService;
-  late UnifiedEntityService<PieceJointe, PieceJointeEntity> _pieceJointeService;
-  late UnifiedEntityService<FactureDraft, FactureDraftEntity>
-  _factureDraftService;
-  late UnifiedEntityService<Intervention, InterventionEntity>
-  _interventionService;
+  ChantierNotifier(this.chantierId);
+
+  // ─────────────────────────────────────────────
+  // BaseEntityNotifier contrat
+  // ─────────────────────────────────────────────
 
   @override
-  Future<Chantier?> build(String id) async {
-    _id = id;
+  String get entityId => chantierId;
 
-    _chantierService = ref.read(chantierServiceProvider);
-    _etapeService = ref.read(chantierEtapeServiceProvider);
-    _pieceService = ref.read(pieceServiceProvider);
-    _pieceJointeService = ref.read(pieceJointeServiceProvider);
-    _factureDraftService = ref.read(factureDraftServiceProvider);
-    _interventionService = ref.read(interventionServiceProvider);
+  @override
+  Future<Chantier?> fetchById(String id) =>
+      ref.read(chantierServiceProvider).get(id);
 
-    ref.listen(watchChantierProvider(id), (_, next) {
-      state = next;
+  @override
+  Future<void> save(Chantier item) =>
+      ref.read(chantierServiceProvider).save(item);
+
+  @override
+  Future<void> delete(String id) =>
+      ref.read(chantierServiceProvider).delete(id);
+
+  // ─────────────────────────────────────────────
+  // Override build() pour ajouter le stream temps réel
+  // ─────────────────────────────────────────────
+
+  @override
+  Future<Chantier?> build() async {
+    if (chantierId.isEmpty) return null;
+
+    // Écoute temps réel — auto-annulé par Riverpod à chaque rebuild
+    ref.listen(watchChantierProvider(chantierId), (_, next) {
+      next.whenData((value) => state = AsyncData(value));
     });
 
-    return _chantierService.get(id);
+    return fetchById(chantierId);
   }
 
-  Future<void> _updateChantierLastModified() async {
-    final currentChantier = state.value;
-    if (currentChantier == null) return;
+  // ─────────────────────────────────────────────
+  // Accès aux services (lazy, via ref)
+  // ─────────────────────────────────────────────
 
-    // Mise à jour de la date sans autre modification
-    final updatedChantier = currentChantier.copyWith(updatedAt: DateTime.now());
-    await _chantierService.save(updatedChantier);
+  UnifiedEntityService<ChantierEtape, ChantierEtapesEntity> get _etapeService =>
+      ref.read(chantierEtapeServiceProvider);
+
+  UnifiedEntityService<Piece, PieceEntity> get _pieceService =>
+      ref.read(pieceServiceProvider);
+
+  UnifiedEntityService<PieceJointe, PieceJointeEntity>
+  get _pieceJointeService => ref.read(pieceJointeServiceProvider);
+
+  UnifiedEntityService<FactureDraft, FactureDraftEntity>
+  get _factureDraftService => ref.read(factureDraftServiceProvider);
+
+  UnifiedEntityService<Intervention, InterventionEntity>
+  get _interventionService => ref.read(interventionServiceProvider);
+
+  // ─────────────────────────────────────────────
+  // Guard central — étend updateEntity de la base
+  // ─────────────────────────────────────────────
+
+  Future<void> _guard(Future<void> Function() fn) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await fn();
+      return fetchById(chantierId);
+    });
   }
 
-  // Ajout d'une nouvelle Étape
-  Future<void> addEtape(ChantierEtape etape) async {
-    final newEtape = etape.copyWith(
-      id: _uuid.v4(),
-      chantierId: _id,
-      updatedAt: DateTime.now(),
+  Future<void> _touchUpdatedAt() async {
+    final current = state.value;
+    if (current == null) return;
+    await save(current.copyWith(updatedAt: DateTime.now()));
+  }
+
+  // ─────────────────────────────────────────────
+  // Étapes
+  // ─────────────────────────────────────────────
+
+  Future<void> addEtape(ChantierEtape etape) => _guard(() async {
+    await _etapeService.save(
+      etape.copyWith(
+        id: _uuid.v4(),
+        chantierId: chantierId,
+        updatedAt: DateTime.now(),
+      ),
     );
-
-    await _etapeService.save(newEtape);
     await recalculateFactureDraft();
-    await _updateChantierLastModified();
-  }
+    await _touchUpdatedAt();
+  });
 
-  // Ajout d'une nouvelle Pièce
-  Future<void> addPiece(Piece piece) async {
-    final newPiece = piece.copyWith(
-      id: _uuid.v4(),
-      addedBy: _id,
-      updatedAt: DateTime.now(),
-    );
-
-    await _pieceService.save(newPiece);
-    await recalculateFactureDraft();
-    await _updateChantierLastModified();
-  }
-
-  // Ajout d'une nouvelle Pièce Jointe
-  Future<void> addPieceJointe(PieceJointe piece) async {
-    final newPiece = piece.copyWith(
-      id: _uuid.v4(),
-      parentId: _id,
-      updatedAt: DateTime.now(),
-    );
-
-    await _pieceJointeService.save(newPiece);
-    await _updateChantierLastModified();
-  }
-
-  // Ajout d'une nouvelle Intervention
-  Future<void> addIntervention(Intervention intervention) async {
-    final newIntervention = intervention.copyWith(
-      id: _uuid.v4(),
-      chantierId: _id,
-      updatedAt: DateTime.now(),
-    );
-
-    await _interventionService.save(newIntervention);
-    await recalculateFactureDraft();
-    await _updateChantierLastModified();
-  }
-
-  /// Met à jour le Chantier. Utilise la méthode save() complète du service unifié.
-  Future<void> updateChantier(Chantier chantier) async {
-    final isNew = chantier.id.isEmpty;
-
-    // Le service unifié gère la persistance (local/remote/sync).
-    await _chantierService.save(chantier.copyWith(updatedAt: DateTime.now()));
-
-    // Logique métier
-    if (isNew) {
-      await createFactureDraft();
-    }
-  }
-
-  /// Met à jour une Étape.
-  Future<void> updateEtape(ChantierEtape etape) async {
+  Future<void> updateEtape(ChantierEtape etape) => _guard(() async {
     await _etapeService.save(etape);
     await recalculateFactureDraft();
-    await _updateChantierLastModified();
-  }
+    await _touchUpdatedAt();
+  });
 
-  /// Met à jour une Pièce.
-  Future<void> updatePiece(Piece piece) async {
-    await _pieceService.save(piece);
-    await recalculateFactureDraft();
-    await _updateChantierLastModified();
-  }
-
-  /// Met à jour une Pièce Jointe.
-  Future<void> updatePieceJointe(PieceJointe piece) async {
-    await _pieceJointeService.save(piece);
-    await _updateChantierLastModified();
-  }
-
-  /// Suppression d'une Étape.
-  Future<void> deleteEtape(String etapeId) async {
+  Future<void> deleteEtape(String etapeId) => _guard(() async {
     await _etapeService.delete(etapeId);
     await recalculateFactureDraft();
-    await _updateChantierLastModified();
+    await _touchUpdatedAt();
+  });
+
+  Future<void> toggleTerminee(String etapeId) async {
+    final e = await _etapeService.get(etapeId);
+    if (e == null) return;
+    await updateEtape(
+      e.copyWith(terminee: !e.terminee, updatedAt: DateTime.now()),
+    );
   }
 
-  /// Suppression d'une Pièce.
-  Future<void> deletePiece(String pieceId) async {
+  // ─────────────────────────────────────────────
+  // Pièces
+  // ─────────────────────────────────────────────
+
+  Future<void> addPiece(Piece piece) => _guard(() async {
+    await _pieceService.save(
+      piece.copyWith(
+        id: _uuid.v4(),
+        addedBy: chantierId,
+        updatedAt: DateTime.now(),
+      ),
+    );
+    await recalculateFactureDraft();
+    await _touchUpdatedAt();
+  });
+
+  Future<void> updatePiece(Piece piece) => _guard(() async {
+    await _pieceService.save(piece);
+    await recalculateFactureDraft();
+    await _touchUpdatedAt();
+  });
+
+  Future<void> deletePiece(String pieceId) => _guard(() async {
     await _pieceService.delete(pieceId);
     await recalculateFactureDraft();
-    await _updateChantierLastModified();
-  }
+    await _touchUpdatedAt();
+  });
 
-  /// Suppression d'une Pièce Jointe.
-  Future<void> deletePieceJointe(String pieceId) async {
-    await _pieceJointeService.delete(pieceId);
-    await _updateChantierLastModified();
-  }
+  // ─────────────────────────────────────────────
+  // Pièces Jointes
+  // ─────────────────────────────────────────────
 
-  void toggleTerminee(String etapeId) {
-    _etapeService.get(etapeId).then((e) async {
-      if (e == null) return;
-      final updated = e.copyWith(
-        terminee: !e.terminee,
+  Future<void> addPieceJointe(PieceJointe piece) => _guard(() async {
+    await _pieceJointeService.save(
+      piece.copyWith(
+        id: _uuid.v4(),
+        parentId: chantierId,
         updatedAt: DateTime.now(),
-      );
-      await updateEtape(updated);
-    });
-  }
+      ),
+    );
+    await _touchUpdatedAt();
+  });
 
-  // ------------------------------------------------------------------
-  // LOGIQUE MÉTIER COMPLEXE (FACTURE)
-  // ------------------------------------------------------------------
+  Future<void> updatePieceJointe(PieceJointe piece) => _guard(() async {
+    await _pieceJointeService.save(piece);
+    await _touchUpdatedAt();
+  });
+
+  Future<void> deletePieceJointe(String pieceId) => _guard(() async {
+    await _pieceJointeService.delete(pieceId);
+    await _touchUpdatedAt();
+  });
+
+  // ─────────────────────────────────────────────
+  // Interventions
+  // ─────────────────────────────────────────────
+
+  Future<void> addIntervention(Intervention intervention) => _guard(() async {
+    await _interventionService.save(
+      intervention.copyWith(
+        id: _uuid.v4(),
+        chantierId: chantierId,
+        updatedAt: DateTime.now(),
+      ),
+    );
+    await recalculateFactureDraft();
+    await _touchUpdatedAt();
+  });
+
+  // ─────────────────────────────────────────────
+  // Chantier
+  // ─────────────────────────────────────────────
+
+  Future<void> updateChantier(Chantier chantier) => _guard(() async {
+    final isNew = chantier.id.isEmpty;
+    await save(chantier.copyWith(updatedAt: DateTime.now()));
+    if (isNew) await createFactureDraft();
+  });
+
+  // ─────────────────────────────────────────────
+  // Facture Draft
+  // ─────────────────────────────────────────────
 
   Future<void> createFactureDraft() async {
     final chantier = state.value;
     if (chantier == null) return;
 
-    final clientId = chantier.clientId;
-    final lignes = <CustomLigneFacture>[];
-
-    // Lecture des dépendances (Étapes, Pièces, Interventions)
-    // Nous utilisons getAllLocal() pour la rapidité et car le service sync les garde à jour.
     final allEtapes = await _etapeService.getAllLocal();
     final allPieces = await _pieceService.getAllLocal();
     final allInterventions = await _interventionService.getAllLocal();
+    final lignes = <CustomLigneFacture>[];
 
-    // Étapes (main d'œuvre)
-    final etapesChantier = allEtapes.where((e) => e.chantierId == _id);
-    for (final e in etapesChantier) {
-      final piecesEtape = allPieces.where(
-        (p) => p.id == e.id,
-      ); // Nouvelle hypothèse de filtre: p.etapeId
-
-      final montantPieces = piecesEtape.fold<double>(
-        0,
-        (total, p) =>
-            total + (p.getBudgetTotalSansMainOeuvre()), // Méthode du modèle
-      );
+    for (final e in allEtapes.where((e) => e.chantierId == chantierId)) {
+      final montant = allPieces
+          .where((p) => p.id == e.id)
+          .fold<double>(0, (t, p) => t + p.getBudgetTotalSansMainOeuvre());
 
       lignes.add(
         CustomLigneFacture(
-          ctlId: const Uuid().v4(), // Nouvel ID unique pour la ligne
+          ctlId: _uuid.v4(),
           description: 'Étape: ${e.description}',
-          montant: montantPieces,
-          quantite: 1, // L'étape est une unité de travail
-          total: montantPieces,
+          montant: montant,
+          quantite: 1,
+          total: montant,
           ctlUpdatedAt: DateTime.now(),
         ),
       );
     }
 
-    // Interventions (matériel/supplémentaires)
-    final interventions = allInterventions.where((i) => i.chantierId == _id);
-    for (final i in interventions) {
-      final montant =
-          i.facture?.totalHT ??
-          0; // Hypothèse: Intervention a un champ 'facture'
+    for (final i in allInterventions.where((i) => i.chantierId == chantierId)) {
+      final montant = i.facture?.totalHT ?? 0;
       lignes.add(
         CustomLigneFacture(
-          ctlId: const Uuid().v4(),
+          ctlId: _uuid.v4(),
           description: 'Intervention: ${i.description}',
           montant: montant,
           quantite: 1,
@@ -227,32 +247,25 @@ class ChantierNotifier
       );
     }
 
-    final facture = FactureDraft(
-      factureId: _id, // L'ID de la facture
-      chantierId: chantier.id,
-      clientId: clientId,
-      lignesManuelles: lignes,
-      signature: Uint8List(0), // Signature vide par défaut
-      isFinalized: false,
-      remise:
-          chantier.remiseParDefaut ??
-          0, // Hypothèse: Chantier a un champ 'remise'
-      tauxTVA:
-          chantier.tauxTVAParDefaut ??
-          1.20, // Hypothèse: Chantier a un champ 'tauxTVA'
-      dateDerniereModification: DateTime.now(),
+    await _factureDraftService.save(
+      FactureDraft(
+        factureId: chantierId,
+        chantierId: chantier.id,
+        clientId: chantier.clientId,
+        lignesManuelles: lignes,
+        signature: Uint8List(0),
+        isFinalized: false,
+        remise: chantier.remiseParDefaut ?? 0,
+        tauxTVA: chantier.tauxTVAParDefaut ?? 1.20,
+        dateDerniereModification: DateTime.now(),
+      ),
     );
-
-    // ✅ La seule ligne pour enregistrer la facture
-    await _factureDraftService.save(facture);
   }
 
   Future<void> recalculateFactureDraft() async {
-    // Lecture de la facture existante via le service unifié
-    final existing = await _factureDraftService.get(_id);
-
+    final existing = await _factureDraftService.get(chantierId);
     if (existing != null && !existing.isFinalized) {
-      await createFactureDraft(); // Recrée et écrase l'ancienne (car ID est le même)
+      await createFactureDraft();
     }
   }
 }

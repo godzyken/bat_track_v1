@@ -8,8 +8,8 @@ import 'package:shared_models/shared_models.dart';
 import '../data/maperror/debug_config.dart';
 
 class SyncEntityNotifierLogger<T extends UnifiedModel>
-    implements StateNotifier<SyncedState<T>> {
-  final StateNotifier<SyncedState<T>> _inner;
+    implements Notifier<SyncedState<T>> {
+  final Notifier<SyncedState<T>> _inner;
 
   SyncEntityNotifierLogger(this._inner);
 
@@ -41,10 +41,8 @@ class SyncEntityNotifierLogger<T extends UnifiedModel>
     _log('set state');
   }
 
-  @override
-  void dispose() {
+  void cancel() {
     _log('dispose');
-    _inner.dispose();
   }
 
   @override

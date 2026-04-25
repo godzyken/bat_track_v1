@@ -9,7 +9,7 @@ final dolibarrConfigProvider = FutureProvider<DolibarrConfig>((ref) async {
 });
 
 final dolibarrApiProvider = Provider<DolibarrApiService>((ref) {
-  final instance = ref.watch(selectedInstanceProvider);
+  final instance = ref.watch(selectedInstanceProvider).value;
   if (instance == null) throw Exception("Instance Dolibarr non sélectionnée.");
   return DolibarrApiService(baseUrl: instance.baseUrl, token: instance.apiKey);
 });

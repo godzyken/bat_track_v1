@@ -43,7 +43,7 @@ class DolibarrSyncScheduler {
     final logger = ref.read(errorLoggerProvider);
 
     try {
-      final instance = ref.read(selectedInstanceProvider);
+      final instance = ref.read(selectedInstanceProvider).value;
       if (instance == null) {
         logger.logInfo('⛔ Aucune instance Dolibarr disponible.');
         return;

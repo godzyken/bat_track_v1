@@ -8,9 +8,9 @@ import 'auth_state_provider.dart';
 
 /// 🔑 Fournit l'utilisateur connecté (AppUser complet, ou null)
 final currentUserProvider =
-    StreamNotifierProvider.autoDispose<CurrentUserNotifier, AppUser?>(() {
-      return CurrentUserNotifier();
-    });
+    NotifierProvider<CurrentUserNotifier, AsyncValue<AppUser?>>(
+      CurrentUserNotifier.new,
+    );
 
 /// Fournit l’état global de l’utilisateur (Guest / Auth / Loaded)
 final userStatusProvider = Provider<UserStatus>((ref) {
@@ -25,7 +25,7 @@ final userStatusProvider = Provider<UserStatus>((ref) {
 });
 
 /// Fournisseur modifiable en local (ex: ajout instanceId)
-final currentUserStateProvider = StateProvider<AppUser?>((ref) {
+final currentUserStateProvider = Provider<AppUser?>((ref) {
   return ref.watch(currentUserProvider).value;
 });
 
