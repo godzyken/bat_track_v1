@@ -9,51 +9,34 @@ import '../models/adapters/json_adapter.dart';
 
 /// Provider pour Chantier Form
 final chantierFormControllerProvider =
-    StateNotifierProvider.autoDispose<JsonFormController, Map<String, dynamic>>(
-      (ref) {
-        final adapter = GenericJsonAdapter<Chantier>(
-          fromJsonFn: Chantier.fromJson,
-          toJsonFn: (model) => model.toJson(),
-        );
-        return JsonFormController(adapter);
-      },
+    NotifierProvider.autoDispose<JsonFormController, Map<String, dynamic>>(
+      JsonFormController.new,
     );
 
 /// Provider pour Projet Form
 final projetFormControllerProvider =
-    StateNotifierProvider.autoDispose<JsonFormController, Map<String, dynamic>>(
-      (ref) {
-        final adapter = GenericJsonAdapter<Projet>(
-          fromJsonFn: Projet.fromJson,
-          toJsonFn: (model) => model.toJson(),
-        );
-        return JsonFormController(adapter);
-      },
+    NotifierProvider.autoDispose<JsonFormController, Map<String, dynamic>>(
+      JsonFormController.new,
     );
 
 /// Provider pour Client Form
 final clientFormControllerProvider =
-    StateNotifierProvider.autoDispose<JsonFormController, Map<String, dynamic>>(
-      (ref) {
-        final adapter = GenericJsonAdapter<Client>(
-          fromJsonFn: Client.fromJson,
-          toJsonFn: (model) => model.toJson(),
-        );
-        return JsonFormController(adapter);
-      },
+    NotifierProvider.autoDispose<JsonFormController, Map<String, dynamic>>(
+      JsonFormController.new,
     );
 
 /// Provider pour Technicien Form
 final technicienFormControllerProvider =
-    StateNotifierProvider.autoDispose<JsonFormController, Map<String, dynamic>>(
-      (ref) {
-        final adapter = GenericJsonAdapter<Technicien>(
-          fromJsonFn: Technicien.fromJson,
-          toJsonFn: (model) => model.toJson(),
-        );
-        return JsonFormController(adapter);
-      },
-    );
+    NotifierProvider.autoDispose<JsonFormController, Map<String, dynamic>>((
+      ref,
+      model,
+    ) {
+      final adapter = GenericJsonAdapter<Technicien>(
+        fromJsonFn: Technicien.fromJson,
+        toJsonFn: (model) => model.toJson(),
+      );
+      return JsonFormController(adapter);
+    });
 
 /// Provider pour ChantierEtape Form
 final chantierEtapeFormControllerProvider =

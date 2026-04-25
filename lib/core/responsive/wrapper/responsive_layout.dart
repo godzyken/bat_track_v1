@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../notifiers/responsive_notifier.dart';
+
 enum ScreenSize { mobile, tablet, desktop }
 
 enum ScreenOrientation { portrait, landscape }
 
-final screenSizeProvider = StateProvider<ScreenSize>(
-  (ref) => ScreenSize.mobile,
+final screenSizeProvider = NotifierProvider<ScreenSizeNotifier, ScreenSize>(
+  ScreenSizeNotifier.new,
 );
-final screenOrientationProvider = StateProvider<ScreenOrientation>(
-  (ref) => ScreenOrientation.portrait,
-);
+
+final screenOrientationProvider =
+    NotifierProvider<ScreenOrientationNotifier, ScreenOrientation>(
+      ScreenOrientationNotifier.new,
+    );
 
 class ResponsiveInfo {
   final ScreenSize screenSize;
@@ -40,17 +44,15 @@ class _ResponsiveObserverState extends ConsumerState<ResponsiveObserver>
     final mq = MediaQuery.of(context);
     final width = mq.size.width;
 
-    final screenSize =
-        width < 600
-            ? ScreenSize.mobile
-            : width < 1024
-            ? ScreenSize.tablet
-            : ScreenSize.desktop;
+    final screenSize = width < 600
+        ? ScreenSize.mobile
+        : width < 1024
+        ? ScreenSize.tablet
+        : ScreenSize.desktop;
 
-    final screenOrientation =
-        mq.orientation == Orientation.portrait
-            ? ScreenOrientation.portrait
-            : ScreenOrientation.landscape;
+    final screenOrientation = mq.orientation == Orientation.portrait
+        ? ScreenOrientation.portrait
+        : ScreenOrientation.landscape;
 
     ref.read(screenSizeProvider.notifier).state = screenSize;
     ref.read(screenOrientationProvider.notifier).state = screenOrientation;
