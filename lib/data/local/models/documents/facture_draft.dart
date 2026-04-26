@@ -22,6 +22,7 @@ sealed class FactureDraft extends UnifiedModel with _$FactureDraft {
     required double tauxTVA,
     @NullableDateTimeIsoConverter() DateTime? dateDerniereModification,
     @NullableDateTimeIsoConverter() DateTime? signedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     @Default(false) bool? isSigned,
   }) = _FactureDraft;
 
@@ -69,6 +70,11 @@ sealed class FactureDraft extends UnifiedModel with _$FactureDraft {
 
   @override
   FactureDraft copyWithId(String newId) => copyWith(factureId: newId);
+
+  @override
+  FactureDraft markDeleted(DateTime date) {
+    return copyWith(dateDerniereModification: date, deletedAt: date);
+  }
 }
 
 @freezed
@@ -79,7 +85,8 @@ sealed class CustomLigneFacture extends UnifiedModel with _$CustomLigneFacture {
     required double montant,
     required int quantite,
     required double total,
-    DateTime? ctlUpdatedAt,
+    @NullableDateTimeIsoConverter() DateTime? ctlUpdatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     @Default(0.0) double remisePourcentage,
     @Default(20.0) double tauxTVA,
     @Default('materiel') String type,
@@ -135,4 +142,9 @@ sealed class CustomLigneFacture extends UnifiedModel with _$CustomLigneFacture {
   double get totalLigneHT =>
       (montant * quantite) * (1 - remisePourcentage / 100);
   double get totalLigneTTC => totalLigneHT * (1 + tauxTVA / 100);
+
+  @override
+  CustomLigneFacture markDeleted(DateTime date) {
+    return copyWith(ctlUpdatedAt: date, deletedAt: date);
+  }
 }

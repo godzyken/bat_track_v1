@@ -46,9 +46,7 @@ void main() {
       // ✅ Initialise le gestionnaire d'erreurs global
       if (!kIsWeb) {
         try {
-          container
-              .read(errorLoggerProvider)
-              .catcherFlutterError(container.read);
+          container.read(errorLoggerProvider).catcherFlutterError;
         } catch (e) {
           debugPrint('⚠️ Error logger initialization failed: $e');
         }

@@ -18,7 +18,8 @@ class Facture extends UnifiedModel with _$Facture {
     required double montant,
     required String clientId,
     required DateTime date,
-    DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     @Default(false) bool clientValide,
     @Default(false) bool chefDeProjetValide,
     @Default(false) bool techniciensValides,
@@ -79,4 +80,9 @@ class Facture extends UnifiedModel with _$Facture {
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  @override
+  Facture markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }

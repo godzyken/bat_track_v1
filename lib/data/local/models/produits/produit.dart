@@ -40,6 +40,7 @@ sealed class Produit extends UnifiedModel with _$Produit {
     // Metadonnees
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
     @NullableDateTimeIsoConverter() DateTime? createdAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     String? createdBy,
     // Validation
     @Default(false) bool clientValide,
@@ -104,4 +105,9 @@ sealed class Produit extends UnifiedModel with _$Produit {
     techniciensValides: techValide,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  @override
+  Produit markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }

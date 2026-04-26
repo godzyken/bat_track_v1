@@ -183,7 +183,8 @@ abstract class UnifiedEntityService<
   Stream<List<M>> watchAll() async* {
     await _ensureInitialized();
 
-    yield factory.fromEntities(_localBox.values.toList());
+    final initialLocal = await getAllLocal();
+    yield initialLocal;
 
     yield* _localBox.watch().map(
       (_) => factory.fromEntities(_localBox.values.toList()),
@@ -205,6 +206,33 @@ abstract class UnifiedEntityService<
       }
     }
     return entity;
+  }
+
+  /// Récupère depuis remote, fallback sur local
+  @override
+  Future<List<M>> getAll() async {
+    // 1. On s'assure que Hive est prêt
+    await _ensureInitialized();
+
+    try {
+      // 2. On récupère les données distantes (Raw JSON)
+      final raws = await remoteStorage.getAllRaw(collectionName);
+
+      // 3. Conversion via la factory (Remote JSON -> Model)
+      final remoteModels = raws
+          .map((json) => factory.fromRemote(json))
+          .toList();
+
+      // 4. Synchronisation : On met à jour le cache local Hive
+      for (final model in remoteModels) {
+        await saveLocal(model);
+      }
+
+      return remoteModels;
+    } catch (e) {
+      // 5. Fallback : Si le réseau échoue, on renvoie les données locales
+      return await getAllLocal();
+    }
   }
 
   /// Sauvegarde + sync automatique
@@ -391,6 +419,7 @@ abstract class UnifiedEntityService<
   }
 
   M markDeleted(M entity) {
-    return entity.copyWith(isDeleted: true, updatedAt: DateTime.now());
+    final now = DateTime.now();
+    return entity.markDeleted(now) as M;
   }
 }

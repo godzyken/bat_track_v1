@@ -34,7 +34,9 @@ class FrameSyncQueue<M> {
     try {
       await onBatch(batch);
     } catch (e) {
-      _buffer.addAll(batch); // retry plus tard
+      _buffer.addAll(
+        Map.from({for (final item in batch) item: item}),
+      ); // retry plus tard
     }
   }
 }

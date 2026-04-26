@@ -27,6 +27,7 @@ sealed class Projet extends UnifiedModel with _$Projet {
     @DateTimeIsoConverter() required DateTime dateFin,
     @NullableDateTimeIsoConverter() DateTime? deadLine,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     required String company,
     required String createdBy,
     required List<String> members,
@@ -54,6 +55,12 @@ sealed class Projet extends UnifiedModel with _$Projet {
   /// 🔹 Correction 2 : Implémentation de la méthode requise par UnifiedModel
   @override
   Projet copyWithId(String newId) => copyWith(id: newId);
+
+  /// 🔹 Correction 3 : Implémentation de la méthode requise par UnifiedModel
+  @override
+  Projet markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }
 
 /// 🔹 Extensions pour la logique métier

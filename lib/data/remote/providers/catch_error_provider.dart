@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-import '../../../models/data/adapter/typedefs.dart';
 import '../../../models/data/state_wrapper/analitics/crashlytics_wrapper.dart';
 
 final loggerProvider = Provider<Logger>((ref) {
@@ -56,24 +55,28 @@ class ErrorLogger {
     Sentry.captureMessage(verbose);
   }
 
-  void catcherFlutterError(Reader read) {
+  void catcherFlutterError(Ref ref) {
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
-      read(
-        loggerProvider,
-      ).e('Flutter Error', error: details.exception, stackTrace: details.stack);
+      ref
+          .read(loggerProvider)
+          .e(
+            'Flutter Error',
+            error: details.exception,
+            stackTrace: details.stack,
+          );
       CrashlyticsWrapper.captureException(
         details.exception,
         details.stack ?? StackTrace.fromString(details.stack.toString()),
-        read,
+        ref,
       );
     };
 
     PlatformDispatcher.instance.onError = (error, stack) {
       try {
-        read(
-          loggerProvider,
-        ).e('Platform Error', error: error, stackTrace: stack);
+        ref
+            .read(loggerProvider)
+            .e('Platform Error', error: error, stackTrace: stack);
         SentryWrapper.captureException(error, stack);
       } catch (e, s) {
         developer.log('Erreur lors de la capture Sentry: $e', stackTrace: s);

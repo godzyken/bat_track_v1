@@ -26,6 +26,7 @@ sealed class Intervention extends UnifiedModel with _$Intervention {
     String? commentaire,
     FactureDraft? facture,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     int? count,
     @Default(false) bool clientValide,
     @Default(false) bool chefDeProjetValide,
@@ -67,4 +68,9 @@ sealed class Intervention extends UnifiedModel with _$Intervention {
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  @override
+  Intervention markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }

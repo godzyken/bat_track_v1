@@ -26,6 +26,7 @@ sealed class FactureModel extends UnifiedModel with _$FactureModel {
     @Uint8ListBase64Converter() Uint8List? signature,
     required FactureStatus status,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     @Default(false) bool clientValide,
     @Default(false) bool chefDeProjetValide,
     @Default(false) bool techniciensValides,
@@ -95,6 +96,11 @@ sealed class FactureModel extends UnifiedModel with _$FactureModel {
 
   @override
   String? get ownerId => clientId;
+
+  @override
+  FactureModel markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }
 
 enum FactureStatus { brouillon, validee, envoyee, payee }

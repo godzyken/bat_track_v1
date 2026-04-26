@@ -26,6 +26,7 @@ class PieceJointe extends UnifiedModel with _$PieceJointe implements HasFile {
     required String parentId,
     required double taille,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     @Default(false) bool clientValide,
     @Default(false) bool chefDeProjetValide,
     @Default(false) bool techniciensValides,
@@ -79,6 +80,11 @@ class PieceJointe extends UnifiedModel with _$PieceJointe implements HasFile {
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  @override
+  PieceJointe markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }
 
 // Extension personnalisée

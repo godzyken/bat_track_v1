@@ -38,10 +38,8 @@ abstract class HiveEntityFactory<
   }
 
   M markDeleted(M entity) {
-    return entity.copyWith(
-      isDeleted: true,
-      updatedAt: DateTime.now().toIso8601String(),
-    );
+    final date = DateTime.now();
+    return entity.markDeleted(date) as M;
   }
 }
 

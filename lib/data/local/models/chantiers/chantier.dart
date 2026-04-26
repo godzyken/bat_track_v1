@@ -30,11 +30,13 @@ sealed class Chantier extends UnifiedModel with _$Chantier {
     @Default([]) List<Intervention> interventions,
     String? chefDeProjetId,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     @Default(false) bool clientValide,
     @Default(false) bool chefDeProjetValide,
     @Default(false) bool techniciensValides,
     @Default(false) bool superUtilisateurValide,
     @Default(false) bool isCloudOnly,
+    @Default(false) bool isDeleted,
     double? remiseParDefaut, // Ajout
     @Default(20.0) double tauxTVAParDefaut, // Ajout (ex: 20%)
   }) = _Chantier;
@@ -121,4 +123,13 @@ sealed class Chantier extends UnifiedModel with _$Chantier {
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  /// 🔹 Méthode de suppression
+  /// Marquer l'entité comme supprimée
+  /// @param date La date de suppression
+  /// @return Une copie de l'entité avec la date de suppression mise à jour
+  @override
+  Chantier markDeleted(DateTime date) {
+    return copyWith(deletedAt: date, updatedAt: date);
+  }
 }

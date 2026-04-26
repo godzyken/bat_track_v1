@@ -22,6 +22,7 @@ sealed class Equipement extends UnifiedModel with _$Equipement {
     String? homologation,
     String? commentaire,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     required String chantierId,
     required String createdBy,
     @Default([]) List<String>? technicienIds,
@@ -74,4 +75,9 @@ sealed class Equipement extends UnifiedModel with _$Equipement {
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  @override
+  Equipement markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }

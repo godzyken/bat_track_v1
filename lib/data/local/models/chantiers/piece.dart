@@ -21,13 +21,13 @@ sealed class Piece extends UnifiedModel with _$Piece {
     List<Materiau>? materiaux,
     List<Materiel>? materiels,
     List<MainOeuvre>? mainOeuvre,
-    DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     bool? validatedByTech,
     @Default(false) bool clientValide,
     @Default(false) bool chefDeProjetValide,
     @Default(false) bool techniciensValides,
     @Default(false) bool superUtilisateurValide,
-
     @Default(false) bool isCloudOnly,
   }) = _Piece;
 
@@ -113,4 +113,9 @@ sealed class Piece extends UnifiedModel with _$Piece {
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  @override
+  Piece markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }

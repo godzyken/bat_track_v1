@@ -15,7 +15,8 @@ sealed class Materiau extends UnifiedModel with _$Materiau {
     required String unite,
     double? coefficientSurface,
     double? quantiteFixe,
-    DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     @Default(false) bool clientValide,
     @Default(false) bool chefDeProjetValide,
     @Default(false) bool techniciensValides,
@@ -60,4 +61,9 @@ sealed class Materiau extends UnifiedModel with _$Materiau {
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  @override
+  Materiau markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }

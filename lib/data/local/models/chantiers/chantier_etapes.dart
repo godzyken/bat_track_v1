@@ -26,6 +26,7 @@ sealed class ChantierEtape extends UnifiedModel with _$ChantierEtape {
     required List<Piece> pieces,
     required int ordre,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     required String statut,
     List<String>? techniciens,
     @Default(false) bool clientValide,
@@ -75,4 +76,9 @@ sealed class ChantierEtape extends UnifiedModel with _$ChantierEtape {
     techniciensValides: techValide,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  @override
+  ChantierEtape markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }

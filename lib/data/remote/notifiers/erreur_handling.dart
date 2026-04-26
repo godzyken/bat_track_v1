@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../models/data/adapter/typedefs.dart';
 import '../../../models/data/state_wrapper/analitics/crashlytics_wrapper.dart';
 import '../../../models/services/navigator_key_service.dart';
 import '../providers/catch_error_provider.dart';
 
 /// 🔐 Fournit une méthode `catchAsync()` pour gérer les erreurs dans AsyncNotifier
 extension SafeAsyncExtension<T> on Future<T> {
-  Future<T?> catchAsync(Reader read, {String? context}) async {
-    final logger = read(loggerProvider);
-    final ui = read(uiFeedbackProvider); // SnackBar, Alert, etc.
+  Future<T?> catchAsync(Ref ref, {String? context}) async {
+    final logger = ref.read(loggerProvider);
+    final ui = ref.watch(uiFeedbackProvider); // SnackBar, Alert, etc.
     try {
       return await this;
     } catch (error, stack) {
@@ -24,17 +23,17 @@ extension SafeAsyncExtension<T> on Future<T> {
 /// 🔧 Extension pour capturer les erreurs sur Future partout ailleurs
 extension SafeAsyncX<T> on Future<T> {
   Future<T?> catchAsync(
-    Reader read, {
+    Ref ref, {
     String? context,
     void Function(Object error, StackTrace stack)? onError,
   }) async {
     try {
       return await this;
     } catch (error, stack) {
-      read(
-        loggerProvider,
-      ).e('Future Error: \$context', error: error, stackTrace: stack);
-      CrashlyticsWrapper.captureException(error, stack, read);
+      ref
+          .read(loggerProvider)
+          .e('Future Error: \$context', error: error, stackTrace: stack);
+      CrashlyticsWrapper.captureException(error, stack, ref);
       onError?.call(error, stack);
       return null;
     }

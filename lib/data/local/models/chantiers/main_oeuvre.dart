@@ -18,6 +18,7 @@ sealed class MainOeuvre extends UnifiedModel with _$MainOeuvre {
     @DateTimeIsoConverter() required DateTime dateDebut,
     @NullableDateTimeIsoConverter() DateTime? passedTime,
     @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     @Default(false) bool isActive,
     @Default(false) bool clientValide,
     @Default(false) bool chefDeProjetValide,
@@ -58,4 +59,9 @@ sealed class MainOeuvre extends UnifiedModel with _$MainOeuvre {
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  @override
+  MainOeuvre markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
 
@@ -240,6 +241,8 @@ final googleAuthProvider = FutureProvider<AutoRefreshingAuthClient>((
   );
 
   return await clientViaApiKey(credentials, githubOidcToken);*/
+
+  return await clientViaServiceAccount(credentials);
 });
 
 /// Provider pour le service Google Sheets
@@ -248,16 +251,19 @@ final googleSheetsProductServiceProvider = Provider<GoogleSheetsProductService>(
     // TODO: Récupérer le spreadsheetId depuis la configuration
     const spreadsheetId = 'YOUR_SPREADSHEET_ID';
 
-    final authClient = ref.watch(googleAuthProvider).value;
-    if (authClient == null) {
-      throw Exception('Client Google non authentifié');
-    }
+    final authAsync = ref.watch(googleAuthProvider);
 
-    final sheetsApi = sheets.SheetsApi(authClient);
+    return authAsync.when(
+      data: (authClient) {
+        final sheetsApi = sheets.SheetsApi(authClient);
 
-    return GoogleSheetsProductService(
-      sheetsApi: sheetsApi,
-      spreadsheetId: spreadsheetId,
+        return GoogleSheetsProductService(
+          sheetsApi: sheetsApi,
+          spreadsheetId: spreadsheetId,
+        );
+      },
+      loading: () => throw Exception('Chargement auth Google...'),
+      error: (e, st) => throw Exception('Erreur auth Google: $e'),
     );
   },
 );

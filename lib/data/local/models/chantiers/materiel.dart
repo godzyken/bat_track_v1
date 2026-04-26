@@ -18,7 +18,8 @@ sealed class Materiel extends UnifiedModel with _$Materiel {
     required double quantiteFixe,
     double? joursLocation,
     double? prixLocation,
-    DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? updatedAt,
+    @NullableDateTimeIsoConverter() DateTime? deletedAt,
     @Default(false) bool clientValide,
     @Default(false) bool chefDeProjetValide,
     @Default(false) bool techniciensValides,
@@ -56,4 +57,9 @@ sealed class Materiel extends UnifiedModel with _$Materiel {
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
   );
+
+  @override
+  Materiel markDeleted(DateTime date) {
+    return copyWith(updatedAt: date, deletedAt: date);
+  }
 }
