@@ -1,4 +1,5 @@
-import 'package:async/async.dart';
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:shared_models/shared_models.dart';
@@ -6,6 +7,7 @@ import 'package:shared_models/shared_models.dart';
 import '../../data/local/models/adapters/hive_entity_factory.dart';
 import '../../models/data/hive_model.dart';
 import '../../models/services/remote/remote_storage_service.dart';
+import '../config/debounce.dart';
 
 /// Interface de base pour tous les services
 abstract class BaseEntityService<M extends UnifiedModel> {
@@ -30,11 +32,23 @@ abstract class UnifiedEntityService<
   late final Box<E> _localBox;
   bool _isInitialized = false;
 
+  StreamSubscription? _remoteSub;
+
+  late final FrameSyncQueue<M> _syncQueue;
+
   UnifiedEntityService({
     required this.collectionName,
     required this.factory,
     required this.remoteStorage,
-  });
+  }) {
+    _syncQueue = FrameSyncQueue<M>(
+      onBatch: (batch) async {
+        for (final item in batch) {
+          await saveRemote(item);
+        }
+      },
+    );
+  }
 
   // ═══════════════════════════════════════════════════════════════
   // INITIALISATION
@@ -50,6 +64,30 @@ abstract class UnifiedEntityService<
     }
 
     _isInitialized = true;
+  }
+
+  Future<void> startRemoteSync() async {
+    await _ensureInitialized();
+
+    _remoteSub?.cancel();
+
+    _remoteSub = watchRemote().listen((remoteItems) async {
+      final localMap = {for (final item in await getAllLocal()) item.id: item};
+
+      for (final remote in remoteItems) {
+        final local = localMap[remote.id];
+
+        final shouldUpdate =
+            local == null ||
+            (remote.updatedAt != null &&
+                local.updatedAt != null &&
+                remote.updatedAt!.isAfter(local.updatedAt!));
+
+        if (shouldUpdate) {
+          await _localBox.put(remote.id, factory.toEntity(remote));
+        }
+      }
+    });
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -78,8 +116,10 @@ abstract class UnifiedEntityService<
     await _localBox.delete(id);
   }
 
-  Stream<List<M>> watchLocal() {
-    return _localBox.watch().map(
+  Stream<List<M>> watchLocal() async* {
+    await _ensureInitialized();
+    yield factory.fromEntities(_localBox.values.toList()); // 👈 initial
+    yield* _localBox.watch().map(
       (_) => factory.fromEntities(_localBox.values.toList()),
     );
   }
@@ -143,34 +183,11 @@ abstract class UnifiedEntityService<
   Stream<List<M>> watchAll() async* {
     await _ensureInitialized();
 
-    final localStream = watchLocal();
-    final remoteStream = watchRemote();
+    yield factory.fromEntities(_localBox.values.toList());
 
-    await for (final _ in StreamGroup.merge([localStream, remoteStream])) {
-      // Merge strategy: priorité au plus récent (updatedAt)
-      final local = await getAllLocal();
-      final remote = await getAllRemote();
-
-      final merged = <String, M>{};
-
-      // Ajoute local d'abord
-      for (final item in local) {
-        merged[item.id] = item;
-      }
-
-      // Override avec remote si plus récent
-      for (final item in remote) {
-        final existing = merged[item.id];
-        if (existing == null ||
-            (item.updatedAt != null &&
-                existing.updatedAt != null &&
-                item.updatedAt!.isAfter(existing.updatedAt!))) {
-          merged[item.id] = item;
-        }
-      }
-
-      yield merged.values.toList();
-    }
+    yield* _localBox.watch().map(
+      (_) => factory.fromEntities(_localBox.values.toList()),
+    );
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -193,14 +210,21 @@ abstract class UnifiedEntityService<
   /// Sauvegarde + sync automatique
   @override
   Future<void> save(M entity) async {
-    await sync(entity);
+    await saveLocal(entity);
+    _syncQueue.add(entity);
   }
 
   /// Suppression locale + remote
   @override
   Future<void> delete(String id) async {
-    await deleteLocal(id);
-    await deleteRemote(id);
+    final existing = await getLocal(id);
+
+    if (existing == null) return;
+
+    final deleted = markDeleted(existing);
+
+    await saveLocal(deleted);
+    _syncQueue.add(deleted);
   }
 
   /// Vérifie l'existence (local d'abord)
@@ -364,5 +388,9 @@ abstract class UnifiedEntityService<
     for (final entity in entities) {
       await save(entity);
     }
+  }
+
+  M markDeleted(M entity) {
+    return entity.copyWith(isDeleted: true, updatedAt: DateTime.now());
   }
 }

@@ -21,8 +21,8 @@ class SafeAndLoggedEntityService<M extends UnifiedModel, E extends HiveModel<M>>
         factory: _delegate.factory,
         remoteStorage: _delegate.remoteStorage,
       ) {
-    initLogger(ref.read);
-    initSafeAsync(ref.read);
+    initLogger(ref);
+    initSafeAsync(ref);
   }
 
   // 1. DÉLÉGATION ET SÉCURITÉ POUR LES MÉTHODES D'ÉCRITURE (Sync)

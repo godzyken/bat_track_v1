@@ -1,18 +1,18 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 
-import 'package:bat_track_v1/models/data/adapter/typedefs.dart';
-import 'package:bat_track_v1/models/data/maperror/log_entry.dart';
 import 'package:bat_track_v1/models/notifiers/logged_notifier.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+import 'log_entry.dart';
+
 mixin LoggedAction {
   late Ref _ref;
 
-  void initLogger(Reader refRead) {
-    _ref = refRead as Ref;
+  void initLogger(Ref ref) {
+    _ref = ref;
 
     developer.log("🛠 Logger Initialisé pour $runtimeType");
   }
@@ -49,9 +49,7 @@ mixin LoggedAction {
     }
 
     try {
-      if (_ref != null) {
-        _ref.watch(loggerNotifierProvider.notifier).log(message);
-      }
+      _ref.watch(loggerNotifierProvider.notifier).log(message);
     } catch (e) {
       developer.log("❌ Erreur lors de l'accès au loggerNotifierProvider: $e");
     }

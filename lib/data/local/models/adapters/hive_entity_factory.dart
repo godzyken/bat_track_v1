@@ -28,6 +28,21 @@ abstract class HiveEntityFactory<
 
   /// Convertit un JSON en entité Hive
   M fromRemote(Map<String, dynamic> json);
+
+  M createDeleted(String id) {
+    return fromRemote({
+      'id': id,
+      'isDeleted': true,
+      'updatedAt': DateTime.now().toIso8601String(),
+    });
+  }
+
+  M markDeleted(M entity) {
+    return entity.copyWith(
+      isDeleted: true,
+      updatedAt: DateTime.now().toIso8601String(),
+    );
+  }
 }
 
 /// Exemple : Factory pour Chantier

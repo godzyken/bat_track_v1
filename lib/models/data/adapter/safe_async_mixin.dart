@@ -1,15 +1,15 @@
 import 'package:bat_track_v1/data/remote/providers/catch_error_provider.dart';
-import 'package:bat_track_v1/models/data/adapter/typedefs.dart';
 import 'package:bat_track_v1/models/data/maperror/logged_action.dart';
 import 'package:bat_track_v1/models/data/state_wrapper/analitics/crashlytics_wrapper.dart';
 import 'package:bat_track_v1/models/data/state_wrapper/wrappers_errors.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/remote/notifiers/erreur_handling.dart';
 
 mixin SafeAsyncMixin<T> on LoggedAction {
-  late Reader _ref;
+  late Ref _ref;
 
-  void initSafeAsync(Reader ref) {
+  void initSafeAsync(Ref ref) {
     _ref = ref;
     initLogger(ref);
   }
@@ -65,8 +65,8 @@ mixin SafeAsyncMixin<T> on LoggedAction {
   }
 
   Future<R?> catchAsync<R>(Future<R> Function() fn, {String? context}) async {
-    final logger = _ref(loggerProvider);
-    final ui = _ref(uiFeedbackProvider);
+    final logger = _ref.read(loggerProvider);
+    final ui = _ref.watch(uiFeedbackProvider);
     try {
       return await fn();
     } catch (error, stack) {

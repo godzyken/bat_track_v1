@@ -1,4 +1,6 @@
 import 'dart:developer' as developer;
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:async/async.dart';
 import 'package:bat_track_v1/data/local/services/hive_service.dart';
@@ -32,6 +34,9 @@ abstract class EntityRemoteService<T> {
   Future<void> delete(String id);
   Stream<List<T>> watchAll();
   Future fileExists(String path);
+  Future<void> deleteFile(String path);
+  Future<String> uploadFile(String path, File file);
+  Future<Uint8List?> downloadFile(String path);
 }
 
 class EntitySyncService<T extends UnifiedModel> {
@@ -170,7 +175,6 @@ class EntitySyncService<T extends UnifiedModel> {
   /// 🔁 Vérifie si un document existe en distant
   Future<bool> existsInFirestore(String id) async {
     final doc = await remote.getById(id);
-    // TODO : doc.exist.
     return doc!.isUpdated;
   }
 

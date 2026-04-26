@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../notifiers/responsive_notifier.dart';
+import '../../providers/responsive_provider.dart';
 
 enum ScreenSize { mobile, tablet, desktop }
 
@@ -28,6 +29,21 @@ class ResponsiveInfo {
 
   bool get isPortrait => orientation == ScreenOrientation.portrait;
   bool get isLandscape => orientation == ScreenOrientation.landscape;
+
+  int get gridColumns => switch (screenSize) {
+    ScreenSize.mobile => 1,
+    ScreenSize.tablet => 2,
+    ScreenSize.desktop => 3,
+  };
+
+  EdgeInsets get pagePadding => switch (screenSize) {
+    ScreenSize.mobile => const EdgeInsets.all(12),
+    ScreenSize.tablet => const EdgeInsets.all(20),
+    ScreenSize.desktop => const EdgeInsets.symmetric(
+      horizontal: 48,
+      vertical: 24,
+    ),
+  };
 }
 
 class ResponsiveObserver extends ConsumerStatefulWidget {
@@ -41,6 +57,7 @@ class ResponsiveObserver extends ConsumerStatefulWidget {
 class _ResponsiveObserverState extends ConsumerState<ResponsiveObserver>
     with WidgetsBindingObserver {
   void _updateScreenInfo() {
+    if (!mounted) return;
     final mq = MediaQuery.of(context);
     final width = mq.size.width;
 
@@ -62,6 +79,8 @@ class _ResponsiveObserverState extends ConsumerState<ResponsiveObserver>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateScreenInfo());
   }
 
   @override
@@ -80,7 +99,7 @@ class _ResponsiveObserverState extends ConsumerState<ResponsiveObserver>
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    _updateScreenInfo();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateScreenInfo());
   }
 
   @override
@@ -96,10 +115,9 @@ class AutoResponsiveLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final screenSize = ref.watch(screenSizeProvider);
-    final orientation = ref.watch(screenOrientationProvider);
+    final info = ref.watch(responsiveProvider);
 
-    return builder(context, ResponsiveInfo(screenSize, orientation));
+    return builder(context, info);
   }
 }
 

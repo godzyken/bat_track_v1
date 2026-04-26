@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_models/shared_models.dart';
+import 'package:shared_models/core/models/unified_model.dart';
 
 import '../../../data/local/models/index_model_extention.dart';
 import '../../notifiers/sync_entity_notifier.dart';
@@ -28,7 +27,6 @@ typedef FieldBuilder =
     );
 
 typedef AsyncCallback<T> = Future<T> Function();
-typedef Reader = T Function<T>(Provider<T> provider);
 typedef OnEtapeSubmit = void Function(ChantierEtape etape);
 typedef OnSubmit<T extends UnifiedModel> = void Function(T entity);
 typedef FieldVisibility = bool Function(String key, dynamic value);

@@ -1,5 +1,9 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:shared_models/shared_models.dart';
 
+import '../../../data/remote/services/firebase_storage_service.dart';
 import '../entity_sync_services.dart';
 import 'remote_storage_service.dart';
 
@@ -47,7 +51,37 @@ class RemoteEntityServiceAdapter<T extends UnifiedModel>
 
   @override
   Future fileExists(String path) {
-    // TODO: implement fileExists
-    throw UnimplementedError();
+    if (storage is FirebaseStorageService) {
+      return (storage as FirebaseStorageService).fileExists(path);
+    } else {
+      throw Exception('Unsupported storage type');
+    }
+  }
+
+  @override
+  Future<void> deleteFile(String path) {
+    if (storage is FirebaseStorageService) {
+      return (storage as FirebaseStorageService).deleteFile(path);
+    } else {
+      throw Exception('Unsupported storage type');
+    }
+  }
+
+  @override
+  Future<String> uploadFile(String path, File file) {
+    if (storage is FirebaseStorageService) {
+      return (storage as FirebaseStorageService).uploadFile(file, path);
+    } else {
+      throw Exception('Unsupported storage type');
+    }
+  }
+
+  @override
+  Future<Uint8List?> downloadFile(String path) {
+    if (storage is FirebaseStorageService) {
+      return (storage as FirebaseStorageService).downloadFile(path);
+    } else {
+      throw Exception('Unsupported storage type');
+    }
   }
 }
