@@ -16,9 +16,23 @@ class UnifiedEntityServiceImpl<M extends UnifiedModel, E extends HiveModel<M>>
   });
 
   @override
-  Future<List<M>> getAll() {
-    // TODO: implement getAll
-    throw UnimplementedError();
+  Future<List<M>> getAll() async {
+    await startRemoteSync();
+    try {
+      // 2. On récupère les données distantes (Raw JSON)
+      final raws = await remoteStorage.getAllRaw(collectionName);
+      // 3. Conversion via la factory (Remote JSON -> Model)
+      final remoteModels = raws
+          .map((json) => factory.fromRemote(json))
+          .toList();
+      // 4. Synchronisation : On met à jour le cache local Hive
+      for (final model in remoteModels) {
+        await saveLocal(model);
+      }
+      return remoteModels;
+    } catch (e) {
+      return await getAllLocal();
+    }
   }
 }
 

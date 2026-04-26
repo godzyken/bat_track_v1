@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
+import '../../../../core/providers/entity_providers.dart';
 import '../../../../data/local/services/service_type.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
-import '../../controllers/notifiers/clients_list_notifier.dart';
 
 class ClientsScreen extends ConsumerWidget {
   const ClientsScreen({super.key});
@@ -66,7 +66,7 @@ class ClientsScreen extends ConsumerWidget {
             builder: (_) => EntityForm<Client>(
               fromJson: (json) => Client.fromJson(json),
               onSubmit: (client) async {
-                await ref.read(clientListProvider.notifier).add(client);
+                await clientService.save(client);
               },
               createEmpty: () => Client.mock(),
             ),

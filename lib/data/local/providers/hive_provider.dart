@@ -315,6 +315,5 @@ final _serviceRegistry = <Type, Provider>{
   UserModel: userServiceProvider,
   Equipement: equipementServiceProvider,
   AppUser: appUserEntityServiceProvider,
-
   // AppUser: filteredAppUserServiceProvider,
 };

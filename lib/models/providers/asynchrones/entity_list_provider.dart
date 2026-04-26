@@ -2,11 +2,10 @@ import 'package:bat_track_v1/features/documents/controllers/notifiers/document_l
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
+import '../../../core/providers/entity_providers.dart';
 import '../../../data/local/models/index_model_extention.dart';
 import '../../../features/auth/data/providers/auth_state_provider.dart';
 import '../../../features/chantier/controllers/notifiers/chantier_etapes_list_notifier.dart';
-import '../../../features/chantier/controllers/notifiers/chantiers_list_notifier.dart';
-import '../../../features/client/controllers/notifiers/clients_list_notifier.dart';
 import '../../../features/equipement/controllers/notifiers/equipements_list_notifier.dart';
 import '../../../features/technicien/controllers/notifiers/technicien_list_notifier.dart';
 
