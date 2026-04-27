@@ -76,22 +76,27 @@ class ChantiersScreen extends ConsumerWidget {
       ),
       floatingActionButton: isTechnicien
           ? null
-          : FloatingActionButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (_) => EntityForm<Chantier>(
-                    fromJson: (json) => Chantier.fromJson(json),
-                    onSubmit: (chantier) async {
-                      await ref
-                          .read(chantierListProvider.notifier)
-                          .addItem(chantier);
-                    },
-                    createEmpty: () => Chantier.mock(),
-                  ),
-                );
-              },
-              child: const Icon(Icons.add),
+          : Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                child: FloatingActionButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => EntityForm<Chantier>(
+                        fromJson: (json) => Chantier.fromJson(json),
+                        onSubmit: (chantier) async {
+                          await ref
+                              .read(chantierListProvider.notifier)
+                              .addItem(chantier);
+                        },
+                        createEmpty: () => Chantier.mock(),
+                      ),
+                    );
+                  },
+                  child: const Icon(Icons.add),
+                ),
+              ),
             ),
     );
   }
