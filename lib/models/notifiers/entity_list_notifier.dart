@@ -1,11 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_models/shared_models.dart';
-import 'package:uuid/uuid.dart';
-
-import '../../core/services/unified_entity_service.dart';
-import '../data/hive_model.dart';
-
-abstract class EntityListNotifier<
+/*abstract class EntityListNotifier<
   M extends UnifiedModel,
   E extends HiveModel<M>
 >
@@ -51,4 +44,4 @@ abstract class EntityListNotifier<
     await service.delete(id);
     state = AsyncValue.data(await service.getAllRemote());
   }
-}
+}*/

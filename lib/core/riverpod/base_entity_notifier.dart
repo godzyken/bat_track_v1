@@ -1,19 +1,16 @@
-import 'dart:collection';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_models/core/models/unified_model.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../models/data/maperror/log_entry.dart';
 import '../../models/notifiers/logged_notifier.dart';
+import 'mutation_queue_mixin.dart';
+import 'undo_redo_mixin.dart';
 
 abstract class BaseEntityNotifier<T extends UnifiedModel>
-    extends AsyncNotifier<T?> {
-  // ------------------------------------------------------------------
-  // CONFIG
-  // ------------------------------------------------------------------
-
+    extends AsyncNotifier<T?>
+    with MutationQueueMixin, UndoRedoMixin<T?> {
+  // ── À implémenter ──────────────────────────────────────────────
   String get entityId;
-
   Future<T?> fetchById(String id);
   Future<void> save(T item);
   Future<void> delete(String id);
@@ -21,153 +18,57 @@ abstract class BaseEntityNotifier<T extends UnifiedModel>
   @override
   Future<T?> build() => fetchById(entityId);
 
-  // ------------------------------------------------------------------
-  // HISTORY (undo / redo)
-  // ------------------------------------------------------------------
-
-  final ListQueue<T?> _undoStack = ListQueue();
-  final ListQueue<T?> _redoStack = ListQueue();
-
-  void _pushToUndo(T? snapshot) {
-    _undoStack.addLast(snapshot);
-    _redoStack.clear();
-
-    if (_undoStack.length > 20) {
-      _undoStack.removeFirst();
-    }
-  }
-
-  // ------------------------------------------------------------------
-  // MUTATION QUEUE (offline-ready)
-  // ------------------------------------------------------------------
-
-  final List<Future<void> Function()> _mutationQueue = [];
-  bool _isProcessingQueue = false;
-
-  void _enqueueMutation(Future<void> Function() action) {
-    _mutationQueue.add(action);
-    _processQueue();
-  }
-
-  Future<void> _processQueue() async {
-    if (_isProcessingQueue) return;
-
-    _isProcessingQueue = true;
-
-    while (_mutationQueue.isNotEmpty) {
-      final action = _mutationQueue.first;
-
-      try {
-        await action();
-        _mutationQueue.removeAt(0);
-      } catch (e, st) {
-        _handleError(e, st);
-        break; // stop queue
-      }
-    }
-
-    _isProcessingQueue = false;
-  }
-
-  // ------------------------------------------------------------------
-  // UPDATE (optimistic)
-  // ------------------------------------------------------------------
-
+  // ── Mutations ──────────────────────────────────────────────────
   Future<void> updateEntity(T item) async {
-    final previous = state.value;
-
-    _pushToUndo(previous);
-
+    pushToUndo(state.value);
     state = AsyncData(item);
-
-    _enqueueMutation(() async {
+    await enqueueMutation(() async {
       await save(item);
       _log('update', id: item.id);
     });
   }
 
-  // ------------------------------------------------------------------
-  // DELETE (optimistic)
-  // ------------------------------------------------------------------
-
   Future<void> deleteEntity() async {
-    final previous = state.value;
-
-    _pushToUndo(previous);
-
+    pushToUndo(state.value);
     state = const AsyncData(null);
-
-    _enqueueMutation(() async {
+    await enqueueMutation(() async {
       await delete(entityId);
       _log('delete', id: entityId);
     });
   }
 
-  // ------------------------------------------------------------------
-  // REFRESH
-  // ------------------------------------------------------------------
-
   Future<void> refresh() async {
     try {
-      final result = await fetchById(entityId);
-      state = AsyncData(result);
+      state = AsyncData(await fetchById(entityId));
     } catch (e, st) {
       _handleError(e, st);
     }
   }
 
-  // ------------------------------------------------------------------
-  // UNDO / REDO
-  // ------------------------------------------------------------------
-
+  // ── Undo / Redo ────────────────────────────────────────────────
   void undo() {
-    if (_undoStack.isEmpty) return;
-
     final current = state.value;
-    _redoStack.addFirst(current);
-
-    final previous = _undoStack.removeLast();
+    final previous = popUndo();
+    if (previous == null && !canUndo) return;
+    pushToRedo(current);
     state = AsyncData(previous);
-
     _log('undo');
   }
 
   void redo() {
-    if (_redoStack.isEmpty) return;
-
     final current = state.value;
-    _undoStack.addLast(current);
-
-    final next = _redoStack.removeFirst();
+    final next = popRedo();
+    if (next == null) return;
+    pushToUndo(current);
     state = AsyncData(next);
-
     _log('redo');
   }
 
-  // ------------------------------------------------------------------
-  // REPLAY (debug)
-  // ------------------------------------------------------------------
+  // ── MutationQueueMixin impl ────────────────────────────────────
+  @override
+  void onMutationError(Object e, StackTrace st) => _handleError(e, st);
 
-  Future<void> replayQueue() async {
-    _log('replay_start');
-
-    final queueCopy = List.of(_mutationQueue);
-
-    for (final action in queueCopy) {
-      try {
-        await action();
-      } catch (e, st) {
-        _handleError(e, st);
-      }
-    }
-
-    _log('replay_end');
-  }
-
-  // ------------------------------------------------------------------
-  // LOGGING
-  // ------------------------------------------------------------------
-
+  // ── Logging ────────────────────────────────────────────────────
   void _log(String action, {String? id}) {
     ref
         .read(loggerNotifierProvider.notifier)
