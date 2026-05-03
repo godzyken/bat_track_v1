@@ -22,6 +22,7 @@ class CloudFlareService extends RemoteStorageService with NoSuchMethodLogger {
       if (!doc.exists || doc.data() == null) return {};
       final data = Map<String, dynamic>.from(doc.data()!);
       data['id'] = doc.id;
+
       return data;
     } catch (e, st) {
       developer.log('CloudFlareService.getRaw error: $e\n$st');
@@ -75,6 +76,7 @@ class CloudFlareService extends RemoteStorageService with NoSuchMethodLogger {
         query = query.limit(limit);
       }
       final snapshot = await query.get();
+
       return snapshot.docs.map((doc) {
         final data = Map<String, dynamic>.from(doc.data());
         data['id'] = doc.id;
@@ -95,10 +97,12 @@ class CloudFlareService extends RemoteStorageService with NoSuchMethodLogger {
     if (queryBuilder != null) {
       query = queryBuilder(query);
     }
+
     return query.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         final data = Map<String, dynamic>.from(doc.data());
         data['id'] = doc.id;
+
         return data;
       }).toList();
     });

@@ -61,7 +61,7 @@ class TechniciensScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ref.read(techniciensListProvider.notifier).add(Technicien.mock());
+          ref.read(techniciensListProvider.notifier).addItem(Technicien.mock());
         },
         child: const Icon(Icons.add),
       ),

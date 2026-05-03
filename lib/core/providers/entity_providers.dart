@@ -72,7 +72,7 @@ class ConcreteUnifiedService<M extends UnifiedModel, E extends HiveModel<M>>
 // PROVIDERS SPÉCIFIQUES (REMPLACE TOUS LES ANCIENS)
 // ═══════════════════════════════════════════════════════════════
 
-final chantierListProvider = StreamProvider<List<Chantier>>((ref) {
+final chantierStreamProvider = StreamProvider<List<Chantier>>((ref) {
   return ref.watch(chantierServiceProvider).watchAll();
 });
 
@@ -95,10 +95,6 @@ final clientServiceProvider =
       collectionName: 'clients',
       factory: ClientEntityFactory(),
     );
-
-final clientListProvider = StreamProvider<List<Client>>((ref) {
-  return ref.watch(clientServiceProvider).watchAll();
-});
 
 // ChantierEtape
 final chantierEtapeServiceProvider =

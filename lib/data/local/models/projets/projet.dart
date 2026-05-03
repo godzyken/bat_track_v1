@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:shared_models/models/private/app_user.dart';
 import 'package:shared_models/shared_models.dart';
 import 'package:uuid/uuid.dart';
 
@@ -81,7 +82,7 @@ extension ProjetLogic on Projet {
       case 'localisation':
         return copyWith(localisation: value as String?);
       case 'technicienIds':
-        return copyWith(assignedUserIds: List<String>.from(value));
+        return copyWith(assignedUserIds: List<String>.from(value as List));
       default:
         return this;
     }
@@ -103,6 +104,7 @@ extension ProjetAccess on Projet {
         clientValide) {
       return true;
     }
+
     return false;
   }
 
@@ -156,7 +158,7 @@ extension ProjetCopy on Projet {
       case 'localisation':
         return copyWith(company: value as String);
       case 'technicienIds':
-        return copyWith(assignedUserIds: List<String>.from(value));
+        return copyWith(assignedUserIds: List<String>.from(value as List));
       default:
         return this;
     }

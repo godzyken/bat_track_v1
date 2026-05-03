@@ -29,6 +29,7 @@ class GoogleSheetsProductService {
       final values = response.values;
       if (values == null || values.isEmpty) {
         developer.log('📊 Aucune donnée trouvée dans Google Sheets');
+
         return [];
       }
 
@@ -49,6 +50,7 @@ class GoogleSheetsProductService {
       developer.log(
         '✅ ${produits.length} produits importés depuis Google Sheets',
       );
+
       return produits;
     } catch (e, st) {
       developer.log(
@@ -82,6 +84,7 @@ class GoogleSheetsProductService {
     String? getString(int index) {
       if (index >= row.length) return null;
       final value = row[index];
+
       return value?.toString().trim().isEmpty == false
           ? value.toString()
           : null;
@@ -90,18 +93,21 @@ class GoogleSheetsProductService {
     double? getDouble(int index) {
       final str = getString(index);
       if (str == null) return null;
+
       return double.tryParse(str.replaceAll(',', '.'));
     }
 
     int? getInt(int index) {
       final str = getString(index);
       if (str == null) return null;
+
       return int.tryParse(str);
     }
 
     List<String>? getList(int index, {String separator = ';'}) {
       final str = getString(index);
       if (str == null) return null;
+
       return str
           .split(separator)
           .map((e) => e.trim())

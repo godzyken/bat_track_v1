@@ -55,6 +55,7 @@ class ProjectListScreen extends ConsumerWidget {
                 if (!policy.canRead(currentUser, project)) {
                   return const SizedBox.shrink();
                 }
+
                 return EntityCard(
                   entity: project,
                   onEdit: policy.canEdit(currentUser, project)
@@ -91,6 +92,7 @@ class ProjectListScreen extends ConsumerWidget {
             );
           } else {
             final crossAxisCount = info.isTablet ? 2 : 4;
+
             return GridView.builder(
               padding: const EdgeInsets.all(12),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -120,7 +122,7 @@ class ProjectListScreen extends ConsumerWidget {
                     if (policy.canValidate(currentUser, projet))
                       IconButton(
                         icon: const Icon(Icons.check_circle),
-                        tooltip: "Valider",
+                        tooltip: 'Valider',
                         onPressed: () async {
                           await _validateProject(ref, projet);
                         },
@@ -128,7 +130,7 @@ class ProjectListScreen extends ConsumerWidget {
                     if (policy.canAssignTech(currentUser, projet))
                       IconButton(
                         icon: const Icon(Icons.person_add),
-                        tooltip: "Assigner technicien",
+                        tooltip: 'Assigner technicien',
                         onPressed: () =>
                             _assignTechnicien(context, ref, projet),
                       ),
@@ -213,6 +215,7 @@ class ProjectListScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Vous n'avez pas les droits")),
       );
+
       return;
     }
 

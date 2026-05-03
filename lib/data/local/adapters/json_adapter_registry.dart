@@ -15,6 +15,7 @@ class JsonAdapterRegistry {
   JsonAdapter<T>? of<T extends UnifiedModel>() {
     final adapter = _registry[T];
     if (adapter == null) return null;
+
     return adapter as JsonAdapter<T>;
   }
 

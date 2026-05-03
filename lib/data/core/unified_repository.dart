@@ -47,6 +47,7 @@ class UnifiedRepository<T extends UnifiedModel>
 
   Future<Box<Map>> _getHiveBox() async {
     _hiveBox ??= await Hive.openBox<Map>(config.collectionPath);
+
     return _hiveBox!;
   }
 
@@ -140,6 +141,7 @@ class UnifiedRepository<T extends UnifiedModel>
       () async {
         final doc = await _getFirebaseCollection().doc(id).get();
         if (!doc.exists) return null;
+
         return config.fromJson({...doc.data()!, 'id': doc.id});
       },
       context: 'getFromFirebase',
@@ -153,6 +155,7 @@ class UnifiedRepository<T extends UnifiedModel>
     return safeAsync(
       () async {
         final snapshot = await _getFirebaseCollection().limit(limit).get();
+
         return snapshot.docs
             .map((doc) => config.fromJson({...doc.data(), 'id': doc.id}))
             .toList();
@@ -200,6 +203,7 @@ class UnifiedRepository<T extends UnifiedModel>
 
         if (res.statusCode == 200) {
           final data = jsonDecode(res.body) as List;
+
           return data
               .map((json) => config.fromJson(json as Map<String, dynamic>))
               .toList();
@@ -269,6 +273,7 @@ class UnifiedRepository<T extends UnifiedModel>
     if (remote != null) {
       await saveToHive(remote); // Mise en cache
     }
+
     return remote;
   }
 
@@ -281,6 +286,7 @@ class UnifiedRepository<T extends UnifiedModel>
     for (final item in remote) {
       await saveToHive(item);
     }
+
     return remote;
   }
 
@@ -301,6 +307,7 @@ class UnifiedRepository<T extends UnifiedModel>
           name: 'dolibarr_sync_complete',
           data: {'count': items.length, 'type': T.toString()},
         );
+
         return items.length;
       },
       context: 'syncFromDolibarr',

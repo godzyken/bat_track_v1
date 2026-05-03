@@ -18,7 +18,7 @@ class FrameSyncQueue<M> {
 
     _scheduled = true;
 
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       scheduleMicrotask(_flush);
     });
   }

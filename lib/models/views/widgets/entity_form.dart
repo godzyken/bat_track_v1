@@ -77,6 +77,7 @@ class _EntityFormState<T extends UnifiedModel>
     if (original is double) return double.tryParse(value);
     if (original is bool) return value.toLowerCase() == 'true';
     if (original is List) return value.split(',').map((e) => e.trim()).toList();
+
     return value;
   }
 
@@ -100,6 +101,7 @@ class _EntityFormState<T extends UnifiedModel>
     if (k.contains('username') || k.contains('identifiant')) {
       return [AutofillHints.username];
     }
+
     return null;
   }
 
@@ -200,6 +202,7 @@ class _EntityFormState<T extends UnifiedModel>
         obscureText: true,
         validator: (v) {
           if ((v ?? '').length < 6) return 'Mot de passe trop court';
+
           return null;
         },
       );
@@ -235,6 +238,7 @@ class _EntityFormState<T extends UnifiedModel>
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Email et mot de passe requis")),
           );
+
           return;
         }
 
@@ -257,6 +261,7 @@ class _EntityFormState<T extends UnifiedModel>
               ),
             );
           }
+
           return;
         }
 
@@ -271,6 +276,7 @@ class _EntityFormState<T extends UnifiedModel>
             context,
           ).showSnackBar(SnackBar(content: Text("Erreur : ${e.toString()}")));
         }
+
         return;
       }
     }
@@ -282,9 +288,11 @@ class _EntityFormState<T extends UnifiedModel>
 
   List<Widget> _buildFields() {
     final builder = widget.customFieldBuilder ?? _defaultFieldBuilder;
+
     return _json.keys.map((key) {
       final val = _json[key];
       final ctl = _controllers[key];
+
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: builder(

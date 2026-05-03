@@ -44,7 +44,7 @@ class CurrentUserNotifier extends Notifier<AsyncValue<AppUser?>> {
 
             state = AsyncData(AppUser.fromJson(data));
           },
-          onError: (e, st) {
+          onError: (Object e, StackTrace st) {
             state = AsyncError(e, st);
           },
         );
@@ -79,6 +79,7 @@ class CurrentUserNotifier extends Notifier<AsyncValue<AppUser?>> {
       return value.map((k, v) => MapEntry(k, _convert(v)));
     }
     if (value is List) return value.map(_convert).toList();
+
     return value;
   }
 }

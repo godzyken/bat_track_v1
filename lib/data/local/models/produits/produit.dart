@@ -76,6 +76,7 @@ sealed class Produit extends UnifiedModel with _$Produit {
   double get coutTotalVie {
     if (dureeVieEstimee == null) return prixUnitaire;
     final maintenance = (coutMaintenanceAnnuel ?? 0) * dureeVieEstimee!;
+
     return prixUnitaire + maintenance;
   }
 

@@ -55,6 +55,7 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
                   (t) => t.id == mo.idTechnicien,
                   orElse: () => Technicien.mock(),
                 );
+
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: TextField(
@@ -94,6 +95,7 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
     if (newValues != null) {
       final updatedMainOeuvre = piece.mainOeuvre!.map((mo) {
         final heures = newValues[mo.idTechnicien];
+
         return heures != null ? mo.copyWith(heuresEstimees: heures) : mo;
       }).toList();
 
@@ -133,6 +135,7 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
 
         List<PieChartSectionData> buildPieSections() {
           if (total == 0) return [];
+
           return [
             PieChartSectionData(
               value: totalMateriaux,

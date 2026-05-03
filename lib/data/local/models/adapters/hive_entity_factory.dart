@@ -39,6 +39,7 @@ abstract class HiveEntityFactory<
 
   M markDeleted(M entity) {
     final date = DateTime.now();
+
     return entity.markDeleted(date) as M;
   }
 }

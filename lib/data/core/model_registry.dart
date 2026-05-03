@@ -27,30 +27,35 @@ class ModelRegistry {
   static T Function(Map<String, dynamic>)?
   getFromJson<T extends UnifiedModel>() {
     final metadata = _registry[T] as _ModelMetadata<T>?;
+
     return metadata?.fromJson;
   }
 
   /// Récupère le mock factory
   static T Function()? getMock<T extends UnifiedModel>() {
     final metadata = _registry[T] as _ModelMetadata<T>?;
+
     return metadata?.mock;
   }
 
   /// Récupère la config du repository
   static RepositoryConfig<T>? getRepoConfig<T extends UnifiedModel>() {
     final metadata = _registry[T] as _ModelMetadata<T>?;
+
     return metadata?.repoConfig;
   }
 
   /// Crée une instance depuis JSON dynamique
   static T? fromJson<T extends UnifiedModel>(Map<String, dynamic> json) {
     final builder = getFromJson<T>();
+
     return builder?.call(json);
   }
 
   /// Crée un mock
   static T? createMock<T extends UnifiedModel>() {
     final factory = getMock<T>();
+
     return factory?.call();
   }
 

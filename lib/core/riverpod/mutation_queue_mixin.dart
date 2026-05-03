@@ -5,6 +5,7 @@ mixin MutationQueueMixin {
 
   Future<void> enqueueMutation(Future<void> Function() action) {
     _mutationQueue.add(action);
+
     return _processQueue();
   }
 

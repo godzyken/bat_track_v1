@@ -91,7 +91,7 @@ class TechnicienDetailScreen extends ConsumerWidget {
         Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         ...items.map(
           (e) => ListTile(
-            title: Text(e.titre ?? e.nom ?? 'Sans nom'),
+            title: e is ChantierEtape ? Text(e.titre) : const Text('Sans nom'),
             subtitle: e is ChantierEtape ? Text(e.description) : null,
           ),
         ),

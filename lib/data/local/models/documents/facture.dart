@@ -40,6 +40,7 @@ class Facture extends UnifiedModel with _$Facture {
       0,
       (prev, ligne) => prev + ligne.montant,
     );
+
     return Facture(
       id: const Uuid().v4(),
       reference: reference,

@@ -8,42 +8,6 @@ import '../../../features/chantier/controllers/providers/chantier_sync_provider.
 import '../../providers/asynchrones/error_logger_provider.dart';
 import '../../providers/synchrones/facture_sync_provider.dart';
 
-extension UserImportPermissions on UserModel {
-  bool get canImportClients => role.can('import_clients');
-
-  bool get canImportProduits => role.can('import_produits');
-
-  bool get canImportChantiers => role.can('import_chantiers');
-
-  bool get canImportProjets => role.can('import_projets');
-
-  bool get canImportFactures => role.can('import_factures');
-
-  bool get canImportTechniciens => role.can('import_techniciens');
-}
-
-extension UserRolePermissions on UserRole {
-  bool can(String permission) {
-    switch (this) {
-      case UserRole.superUtilisateur:
-        return true;
-      case UserRole.chefDeProjet:
-        return [
-          'import_clients',
-          'import_chantiers',
-          'import_projects',
-          'import_invoices',
-          'import_products',
-          'import_techniciens',
-        ].contains(permission);
-      case UserRole.technicien:
-        return ['import_chantiers'].contains(permission);
-      case UserRole.client:
-        return false;
-    }
-  }
-}
-
 class DolibarrImporter {
   final DolibarrApiService api;
   final Ref ref;
@@ -134,6 +98,7 @@ class DolibarrImporter {
     for (final item in items) {
       await service.save(item);
     }
+
     return items.length;
   }
 
@@ -144,6 +109,7 @@ class DolibarrImporter {
     for (final item in items) {
       await service.save(item);
     }
+
     return items.length;
   }
 
@@ -154,6 +120,7 @@ class DolibarrImporter {
     for (final item in items) {
       await service.save(item);
     }
+
     return items.length;
   }
 
@@ -164,6 +131,7 @@ class DolibarrImporter {
     for (final item in items) {
       await service.save(item);
     }
+
     return items.length;
   }
 
@@ -174,6 +142,7 @@ class DolibarrImporter {
     for (final item in items) {
       await service.save(item);
     }
+
     return items.length;
   }
 
@@ -184,6 +153,43 @@ class DolibarrImporter {
     for (final item in items) {
       await service.save(item);
     }
+
     return items.length;
+  }
+}
+
+extension UserImportPermissions on UserModel {
+  bool get canImportClients => role.can('import_clients');
+
+  bool get canImportProduits => role.can('import_produits');
+
+  bool get canImportChantiers => role.can('import_chantiers');
+
+  bool get canImportProjets => role.can('import_projets');
+
+  bool get canImportFactures => role.can('import_factures');
+
+  bool get canImportTechniciens => role.can('import_techniciens');
+}
+
+extension UserRolePermissions on UserRole {
+  bool can(String permission) {
+    switch (this) {
+      case UserRole.superUtilisateur:
+        return true;
+      case UserRole.chefDeProjet:
+        return [
+          'import_clients',
+          'import_chantiers',
+          'import_projects',
+          'import_invoices',
+          'import_products',
+          'import_techniciens',
+        ].contains(permission);
+      case UserRole.technicien:
+        return ['import_chantiers'].contains(permission);
+      case UserRole.client:
+        return false;
+    }
   }
 }

@@ -17,30 +17,32 @@ class ErrorLogger {
     await Sentry.captureException(
       error,
       stackTrace: stackTrace,
-      hint:
-          context != null
-              ? Hint.withScreenshot(
-                SentryAttachment.fromLoader(
-                  loader: error,
-                  filename: TypeCheckHint.currentStackTrace,
-                ),
-              )
-              : null,
+      hint: context != null
+          ? Hint.withScreenshot(
+              SentryAttachment.fromLoader(
+                loader: error,
+                filename: TypeCheckHint.currentStackTrace,
+              ),
+            )
+          : null,
     );
   }
 
   /// Simple log d'information
   void logInfo(String message) {
     developer.log('ℹ️ \$message');
+    Sentry.captureMessage(message);
   }
 
   /// Log de warning
   void logWarning(String message) {
     developer.log('⚠️ \$message');
+    Sentry.captureMessage(message);
   }
 
   /// Log de debug
   void logDebug(String message) {
     developer.log('🔎 \$message');
+    Sentry.captureMessage(message);
   }
 }

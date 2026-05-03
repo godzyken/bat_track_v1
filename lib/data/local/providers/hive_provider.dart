@@ -32,6 +32,7 @@ final hiveDirectoryProvider = FutureProvider<void>((ref) async {
 ////Liste tout les hiveProvider list
 final allProjectsProvider = StreamProvider.autoDispose<List<Projet>>((ref) {
   final service = ref.watch(projetServiceProvider);
+
   return service.watchAll();
 });
 
@@ -39,12 +40,14 @@ final allChantiersStreamProvider = StreamProvider.autoDispose<List<Chantier>>((
   ref,
 ) {
   final service = ref.watch(chantierServiceProvider);
+
   return service.watchAll();
 });
 
 final allEtapesStreamProvider = StreamProvider.autoDispose<List<ChantierEtape>>(
   (ref) {
     final service = ref.watch(chantierEtapeServiceProvider);
+
     return service.watchAll();
   },
 );
@@ -52,17 +55,20 @@ final allEtapesStreamProvider = StreamProvider.autoDispose<List<ChantierEtape>>(
 final allTechniciensStreamProvider =
     StreamProvider.autoDispose<List<Technicien>>((ref) {
       final service = ref.watch(technicienServiceProvider);
+
       return service.watchAll();
     });
 
 final allUsersStreamProvider = StreamProvider.autoDispose<List<AppUser>>((ref) {
   final service = ref.watch(appUserEntityServiceProvider);
+
   return service.watchAll();
 });
 
 final allEquipementsStreamProvider =
     StreamProvider.autoDispose<List<Equipement>>((ref) {
       final service = ref.watch(equipementServiceProvider);
+
       return service.watchAll();
     });
 
@@ -70,17 +76,20 @@ final allClientsStreamProvider = StreamProvider.autoDispose<List<Client>>((
   ref,
 ) {
   final service = ref.watch(clientServiceProvider);
+
   return service.watchAll();
 });
 
 final allPiecesStreamProvider = StreamProvider.autoDispose<List<Piece>>((ref) {
   final service = ref.watch(pieceServiceProvider);
+
   return service.watchAll();
 });
 
 final allInterventionsStreamProvider =
     StreamProvider.autoDispose<List<Intervention>>((ref) {
       final service = ref.watch(interventionServiceProvider);
+
       return service.watchAll();
     });
 
@@ -88,24 +97,28 @@ final allMaterielsStreamProvider = StreamProvider.autoDispose<List<Materiel>>((
   ref,
 ) {
   final service = ref.watch(materielServiceProvider);
+
   return service.watchAll();
 });
 
 final allFacturesDraftStreamProvider =
     StreamProvider.autoDispose<List<FactureDraft>>((ref) {
       final service = ref.watch(factureDraftServiceProvider);
+
       return service.watchAll();
     });
 
 final allFacturesModelStreamProvider =
     StreamProvider.autoDispose<List<FactureModel>>((ref) {
       final service = ref.watch(factureModelServiceProvider);
+
       return service.watchAll();
     });
 
 final allFacturesStreamProvider = StreamProvider.autoDispose
     .family<List<Facture>, String>((ref, chantierId) {
       final service = ref.watch(factureServiceProvider);
+
       return service.watchByProjects(chantierId);
     });
 
@@ -113,12 +126,14 @@ final allMateriauxStreamProvider = StreamProvider.autoDispose<List<Materiau>>((
   ref,
 ) {
   final service = ref.watch(materiauServiceProvider);
+
   return service.watchAll();
 });
 
 final allMainOeuvresStreamProvider =
     StreamProvider.autoDispose<List<MainOeuvre>>((ref) {
       final service = ref.watch(mainOeuvreServiceProvider);
+
       return service.watchAll();
     });
 
@@ -162,15 +177,20 @@ final appUserEntityServiceProvider =
 
 final filteredAppUserServiceProvider =
     Provider<SafeAndLoggedEntityService<AppUser, AppUserEntity>>((ref) {
-      final authUser = ref.watch(currentUserProvider).value;
+      final user = ref.watch(currentUserProvider);
+      final authUser = user.value;
+      if (authUser == null) {
+        throw Exception('Utilisateur non connecté');
+      }
+
       final local = HiveEntityService<AppUser>(
-        fromJson: (json) => AppUser.fromJson(authUser!.toJson()),
+        fromJson: (json) => AppUser.fromJson(authUser.toJson()),
         boxName: 'users',
       );
 
       final remoteStorageService = ref.watch(multiBackendRemoteProvider);
       final remote = RemoteEntityServiceAdapter<AppUser>(
-        fromJson: (json) => AppUser.fromJson(authUser!.toJson()),
+        fromJson: (json) => AppUser.fromJson(authUser.toJson()),
         collection: 'users',
         storage: remoteStorageService,
       );
@@ -180,6 +200,7 @@ final filteredAppUserServiceProvider =
         remoteStorage: remote.storage,
         factory: AppUserEntityFactory(),
       );
+
       return SafeAndLoggedEntityService(delegate, ref);
     });
 
@@ -192,12 +213,14 @@ final filteredAppUserServiceProvider =
 final watchTechnicienProvider = StreamProvider.autoDispose
     .family<Technicien?, String>((ref, id) {
       final service = ref.watch(technicienServiceProvider);
+
       return service.watch(id);
     });
 
 final watchPiecesByChantierProvider = StreamProvider.autoDispose
     .family<List<Piece>, String>((ref, chantierId) {
       final service = ref.watch(pieceServiceProvider);
+
       return service.watchByProjects(chantierId);
     });
 

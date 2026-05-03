@@ -75,6 +75,7 @@ class JsonFormController<T extends UnifiedModel>
 
   String? getError(String field) {
     if (!state.touched.contains(field)) return null;
+
     return state.errors[field];
   }
 
@@ -92,6 +93,7 @@ class JsonFormController<T extends UnifiedModel>
         return false;
       }
     }
+
     return true;
   }
 
@@ -104,6 +106,7 @@ class JsonFormController<T extends UnifiedModel>
     }
     // Fusionne les valeurs actuelles avec les valeurs par défaut du modèle
     final merged = {...adapter.initialData, ...state.values};
+
     return adapter.fromJson(merged);
   }
 

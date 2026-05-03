@@ -8,11 +8,13 @@ import '../local/models/mixin/hive_convertible.dart';
 mixin DisplayMixin on UnifiedModel {
   String get displayTitle {
     final json = toJson();
+
     return json['nom'] ?? json['titre'] ?? json['id'] ?? 'Sans nom';
   }
 
   String get displaySubtitle {
     final json = toJson();
+
     return json['email'] ?? json['description'] ?? json['adresse'] ?? '';
   }
 

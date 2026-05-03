@@ -6,12 +6,12 @@ import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../data/remote/providers/chantier_provider.dart';
 import '../../../../models/views/widgets/entity_etape_form.dart';
 
-class ChantiersEtapeListPreview extends ConsumerWidget {
+class ChantierEtapeListPreview extends ConsumerWidget {
   final List<ChantierEtape>? etapes;
   final void Function(int index) onTap;
   final void Function(int index)? onDelete;
 
-  const ChantiersEtapeListPreview({
+  const ChantierEtapeListPreview({
     required this.etapes,
     required this.onTap,
     this.onDelete,
@@ -44,8 +44,9 @@ class ChantiersEtapeListPreview extends ConsumerWidget {
                 return Card(
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor:
-                          etape.terminee == true ? Colors.green : Colors.grey,
+                      backgroundColor: etape.terminee == true
+                          ? Colors.green
+                          : Colors.grey,
                       child: Text('${index + 1}'),
                     ),
                     title: Text(
@@ -114,10 +115,9 @@ Widget? chantierFieldBuilder(
 ) {
   if (key != 'etapes') return null;
 
-  final etapes =
-      (value as List)
-          .map((e) => e is ChantierEtape ? e : ChantierEtape.fromJson(e))
-          .toList();
+  final etapes = (value as List)
+      .map((e) => e is ChantierEtape ? e : ChantierEtape.fromJson(e))
+      .toList();
 
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,21 +133,20 @@ Widget? chantierFieldBuilder(
         onPressed: () {
           showDialog(
             context: context,
-            builder:
-                (_) => EntityEtapeForm(
-                  initialValue: null,
-                  onSubmit: (etape) {
-                    final updated = [...etapes, etape];
-                    onChanged(updated.map((e) => e?.toJson()).toList());
-                  },
-                  fromJson: ChantierEtape.fromJson,
-                  createEmpty: ChantierEtape.mock,
-                ),
+            builder: (_) => EntityEtapeForm(
+              initialValue: null,
+              onSubmit: (etape) {
+                final updated = [...etapes, etape];
+                onChanged(updated.map((e) => e?.toJson()).toList());
+              },
+              fromJson: ChantierEtape.fromJson,
+              createEmpty: ChantierEtape.mock,
+            ),
           );
         },
       ),
       const SizedBox(height: 8),
-      ChantiersEtapeListPreview(
+      ChantierEtapeListPreview(
         etapes: etapes,
         onTap: (i) {
           final chantier = value;

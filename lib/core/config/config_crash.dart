@@ -26,6 +26,7 @@ Future<T?> catchAsync<T>(
     if (reportToSentry) {
       await Sentry.captureException(e, stackTrace: st);
     }
+
     return null; // ou rethrow si tu veux propager
   }
 }

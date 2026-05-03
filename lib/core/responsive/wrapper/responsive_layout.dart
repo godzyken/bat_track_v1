@@ -125,6 +125,7 @@ extension ResponsiveContext on BuildContext {
   ResponsiveInfo responsiveInfo(WidgetRef ref) {
     final screenSize = ref.watch(screenSizeProvider);
     final orientation = ref.watch(screenOrientationProvider);
+
     return ResponsiveInfo(screenSize, orientation);
   }
 }
@@ -134,6 +135,7 @@ extension ResponsiveContextStatic on BuildContext {
     final container = ProviderScope.containerOf(this);
     final screenSize = container.read(screenSizeProvider);
     final orientation = container.read(screenOrientationProvider);
+
     return ResponsiveInfo(screenSize, orientation);
   }
 }

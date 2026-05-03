@@ -29,6 +29,7 @@ class UnifiedEntityServiceImpl<M extends UnifiedModel, E extends HiveModel<M>>
       for (final model in remoteModels) {
         await saveLocal(model);
       }
+
       return remoteModels;
     } catch (e) {
       return await getAllLocal();

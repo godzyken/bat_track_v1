@@ -103,11 +103,13 @@ abstract class UnifiedEntityService<
   Future<M?> getLocal(String id) async {
     await _ensureInitialized();
     final json = _localBox.get(id);
+
     return json != null ? factory.fromEntity(json) : null;
   }
 
   Future<List<M>> getAllLocal() async {
     await _ensureInitialized();
+
     return factory.fromEntities(_localBox.values.toList());
   }
 
@@ -134,11 +136,13 @@ abstract class UnifiedEntityService<
 
   Future<M?> getRemote(String id) async {
     final json = await remoteStorage.getRaw(collectionName, id);
+
     return json.isEmpty ? null : factory.fromRemote(json);
   }
 
   Future<List<M>> getAllRemote() async {
     final raws = await remoteStorage.getAllRaw(collectionName);
+
     return raws.map((json) => factory.fromRemote(json)).toList();
   }
 
@@ -205,6 +209,7 @@ abstract class UnifiedEntityService<
         await saveLocal(entity);
       }
     }
+
     return entity;
   }
 
@@ -258,6 +263,7 @@ abstract class UnifiedEntityService<
   /// Vérifie l'existence (local d'abord)
   Future<bool> exists(String id) async {
     final local = await getLocal(id);
+
     return local != null;
   }
 
@@ -420,6 +426,7 @@ abstract class UnifiedEntityService<
 
   M markDeleted(M entity) {
     final now = DateTime.now();
+
     return entity.markDeleted(now) as M;
   }
 }

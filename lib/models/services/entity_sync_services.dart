@@ -33,7 +33,7 @@ abstract class EntityRemoteService<T> {
   Future<List<T>> getAll();
   Future<void> delete(String id);
   Stream<List<T>> watchAll();
-  Future fileExists(String path);
+  Future<File> fileExists(String path);
   Future<void> deleteFile(String path);
   Future<String> uploadFile(String path, File file);
   Future<Uint8List?> downloadFile(String path);
@@ -90,6 +90,7 @@ class EntitySyncService<T extends UnifiedModel> {
     final lastFetch = _cacheTimestamps[T.toString()];
     if (lastFetch != null && now.difference(lastFetch) < ttl) {
       developer.log('⛔ [EntitySync:$T] getAll ignoré (TTL actif)');
+
       return local.getAll();
     }
 
@@ -110,8 +111,8 @@ class EntitySyncService<T extends UnifiedModel> {
         final fileName = fileItem.getFile().path.split('/').last;
         final path = '$model/${model.id}/$fileName';
 
-        final exists = await remote.fileExists(path);
-        if (exists) {
+        final file = await remote.fileExists(path);
+        if (await file.exists()) {
           developer.log(
             '📦 Fichier $fileName déjà dans Firebase, download si nécessaire…',
           );
@@ -124,6 +125,7 @@ class EntitySyncService<T extends UnifiedModel> {
     developer.log(
       '✅ [EntitySync:$T] getAll terminé en ${sw.elapsedMilliseconds}ms',
     );
+
     return modelsFromCloud;
   }
 
@@ -137,6 +139,7 @@ class EntitySyncService<T extends UnifiedModel> {
     if (remoteItem != null) {
       await local.put(id, remoteItem);
     }
+
     return remoteItem;
   }
 
@@ -175,7 +178,9 @@ class EntitySyncService<T extends UnifiedModel> {
   /// 🔁 Vérifie si un document existe en distant
   Future<bool> existsInFirestore(String id) async {
     final doc = await remote.getById(id);
-    return doc!.isUpdated;
+    if (doc == null) return false;
+
+    return doc.isUpdated;
   }
 
   /// 📦 Précache toutes les pièces jointes
@@ -279,6 +284,7 @@ entitySyncServiceProvider<T extends UnifiedModel>(
       fromJson: fromJson,
       storage: ref.read(multiBackendRemoteProvider),
     );
+
     return EntitySyncService<T>(local, remote);
   });
 }

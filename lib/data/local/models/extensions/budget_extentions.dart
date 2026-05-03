@@ -52,6 +52,7 @@ extension BudgetCalculations on Piece {
             (t) => t.id == mo.idTechnicien,
             orElse: () => Technicien.mock(),
           );
+
           return sum! +
               _calculerCoutHeures(mo.heuresEstimees, tech.tauxHoraire);
         }) ??
@@ -84,6 +85,7 @@ extension ChantierEtapeBudgetCalculations on ChantierEtape {
 
     final budgetMainOeuvre = techniciens.fold(0.0, (sum, tech) {
       if (tech.id.isEmpty) return sum;
+
       return sum +
           _calculerSalaire(mainOeuvre.heuresEstimees, tech.tauxHoraire);
     });

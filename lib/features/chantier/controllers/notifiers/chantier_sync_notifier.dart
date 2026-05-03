@@ -38,7 +38,7 @@ class ChantierSyncNotifier extends AsyncNotifier<SyncedState<Chantier>> {
           PieceJointe.mock(
             id: DateTime.now().toString(),
             nom: 'Document sync',
-            url: downloadUrl,
+            url: downloadUrl.toString(),
           ),
         ],
       );

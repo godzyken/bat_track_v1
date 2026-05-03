@@ -61,7 +61,7 @@ mixin LoggedAction {
 
   void logEvent({
     required String name,
-    dynamic data,
+    required Map<String, dynamic> data,
     String? target,
     bool captureToSentry = true,
   }) {
@@ -88,7 +88,7 @@ mixin LoggedAction {
 
   void logError({
     required String name,
-    dynamic data,
+    required Map<String, dynamic> data,
     String? target,
     bool captureToSentry = true,
   }) {

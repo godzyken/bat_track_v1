@@ -22,6 +22,7 @@ final loggerProvider = Provider<Logger>((ref) {
 
 final errorLoggerProvider = Provider<ErrorLogger>((ref) {
   final logger = ref.read(loggerProvider);
+
   return ErrorLogger(logger);
 });
 
@@ -37,22 +38,22 @@ class ErrorLogger {
 
   void logWarning(dynamic warning, {String? context}) {
     logger.w('Warning in $context:$warning');
-    Sentry.captureMessage(warning);
+    Sentry.captureMessage('$warning');
   }
 
   void logInfo(dynamic info, {String? context}) {
     logger.i('Info in $context:$info');
-    Sentry.captureMessage(info);
+    Sentry.captureMessage('$info');
   }
 
   void logDebug(dynamic debug, {String? context}) {
     logger.d('Debug in $context:$debug');
-    Sentry.captureMessage(debug);
+    Sentry.captureMessage('$debug');
   }
 
   void logVerbose(dynamic verbose, {String? context}) {
     logger.t('Verbose in $context:$verbose');
-    Sentry.captureMessage(verbose);
+    Sentry.captureMessage('$verbose');
   }
 
   void catcherFlutterError(Ref ref) {
@@ -81,6 +82,7 @@ class ErrorLogger {
       } catch (e, s) {
         developer.log('Erreur lors de la capture Sentry: $e', stackTrace: s);
       }
+
       return true;
     };
   }

@@ -9,14 +9,17 @@ import '../../../../data/local/models/index_model_extention.dart';
 import '../../../../models/views/widgets/entity_form.dart';
 import '../../../../models/views/widgets/entity_list.dart';
 
-class EquipementScreen extends ConsumerWidget {
-  const EquipementScreen({super.key});
+class EquipementListScreen extends ConsumerWidget {
+  const EquipementListScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final info = context.responsiveInfo(ref);
     final equipementAsync = ref.watch(equipementListProvider);
-    final currentUser = ref.watch(currentUserStateProvider);
+    final user = ref.watch(currentUserStateProvider);
+    if (user == null) {
+      return const Center(child: Text('Utilisateur non connecté'));
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Équipements')),
@@ -32,7 +35,7 @@ class EquipementScreen extends ConsumerWidget {
               onSubmit: (updated) async {
                 await ref
                     .read(equipementListProvider.notifier)
-                    .updateEntity(updated);
+                    .updateItem(updated);
               },
               createEmpty: () => equipement,
             ),
@@ -46,7 +49,7 @@ class EquipementScreen extends ConsumerWidget {
               .delete();
         },
         infoOverride: info,
-        currentUser: currentUser!,
+        currentUser: user,
         onCreate: () {},
       ),
 
@@ -64,7 +67,7 @@ class EquipementScreen extends ConsumerWidget {
         initialValue: initial,
         fromJson: (json) => Equipement.fromJson(json),
         createEmpty: () => Equipement.mock(),
-        onSubmit: (e) => ref.read(equipementListProvider.notifier).add(e),
+        onSubmit: (e) => ref.read(equipementListProvider.notifier).addItem(e),
       ),
     );
   }

@@ -77,8 +77,8 @@ class DolibarrSyncService {
     for (final item in items) {
       box.isOpen;
 
-      await adapter.saveToFirebase(item as dynamic);
-      await adapter.saveToHive(item as dynamic);
+      await adapter.saveToFirebase(item);
+      await adapter.saveToHive(item);
     }
 
     if (context.mounted) {

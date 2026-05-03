@@ -50,9 +50,14 @@ class RemoteEntityServiceAdapter<T extends UnifiedModel>
   }
 
   @override
-  Future fileExists(String path) {
+  Future<File> fileExists(String path) {
     if (storage is FirebaseStorageService) {
-      return (storage as FirebaseStorageService).fileExists(path);
+      final service = storage as FirebaseStorageService;
+      if (service.fileExists(path) != true) {
+        throw Exception('File not found');
+      }
+
+      return service.fileExists(path);
     } else {
       throw Exception('Unsupported storage type');
     }

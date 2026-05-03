@@ -29,6 +29,7 @@ sealed class Materiau extends UnifiedModel with _$Materiau {
 
   double get prixTotal {
     final q = quantiteFixe ?? 0;
+
     return prixUnitaire * q;
   }
 

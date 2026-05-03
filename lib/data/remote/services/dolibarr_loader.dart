@@ -38,6 +38,7 @@ class DolibarrConfigLoader {
       'assets/config/dolibarr_config.json',
     );
     final Map<String, dynamic> json = jsonDecode(jsonStr);
+
     return DolibarrConfig.fromJson(json);
   }
 
@@ -46,6 +47,7 @@ class DolibarrConfigLoader {
       'assets/config/dolibarr_config.json',
     );
     final Map<String, dynamic> json = jsonDecode(jsonStr);
+
     return (json['instances'] as List)
         .map((e) => DolibarrInstance.fromJson(e))
         .toList();

@@ -21,7 +21,7 @@ import '../features/documents/views/screens/facture_detail_screen.dart';
 import '../features/documents/views/screens/factures_screen.dart';
 import '../features/intervention/views/screens/interventions_screen.dart';
 import '../features/projet/views/screens/projet_detail_screen.dart';
-import '../features/technicien/views/screens/technitiens_screen.dart';
+import '../features/technicien/views/screens/techniciens_screen.dart';
 import '../models/services/navigator_key_service.dart';
 import '../models/views/screens/exeception_screens.dart';
 import '../providers/auth_provider.dart';
@@ -114,6 +114,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: ':chantierId',
                 builder: (context, state) {
                   final chantier = state.extra as Chantier;
+
                   return ChantierDetailScreen(chantierId: chantier.id);
                 },
                 routes: [
@@ -123,6 +124,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     builder: (context, state) {
                       final chantierId =
                           state.pathParameters['chantierId'] ?? '';
+
                       return ChantierEtapesScreen(chantierId: chantierId);
                     },
                     routes: [
@@ -132,6 +134,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                           final chantierId =
                               state.pathParameters['chantierId'] ?? '';
                           final etapeId = state.pathParameters['etapeId'] ?? '';
+
                           return ChantierEtapeDetailScreen(
                             chantierId: chantierId,
                             etapeId: etapeId,
@@ -193,6 +196,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) {
                   final technicienId =
                       state.pathParameters['technicienId'] ?? '';
+
                   return TechnicienDetailScreen(technicienId: technicienId);
                 },
               ),
@@ -207,6 +211,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: ':clientId',
                 builder: (context, state) {
                   final clientId = state.pathParameters['clientId'] ?? '';
+
                   return ClientHomeScreen(clientId: clientId);
                 },
               ),
@@ -227,6 +232,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                   final documentId = currentUser.id;
 
                   final projetId = state.pathParameters['ProjetId'] as Projet;
+
                   return FactureDetailScreen(
                     userId: documentId,
                     projetId: projetId.id,
@@ -238,7 +244,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/equipements',
             name: 'Equipements',
-            builder: (context, state) => const EquipementScreen(),
+            builder: (context, state) => const EquipementListScreen(),
             routes: [
               GoRoute(
                 path: ':equipementId',
@@ -250,6 +256,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                   final documentId = currentUser.id;
 
                   final projetId = state.pathParameters['ProjetId'] as Projet;
+
                   return FactureDetailScreen(
                     userId: documentId,
                     projetId: projetId.id,
