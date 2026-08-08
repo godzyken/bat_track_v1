@@ -12,7 +12,7 @@ part 'pieces_jointes.freezed.dart';
 part 'pieces_jointes.g.dart';
 
 @freezed
-class PieceJointe extends UnifiedModel with _$PieceJointe implements HasFile {
+sealed class PieceJointe extends UnifiedModel with _$PieceJointe implements HasFile {
   const PieceJointe._();
 
   const factory PieceJointe({
@@ -66,6 +66,27 @@ class PieceJointe extends UnifiedModel with _$PieceJointe implements HasFile {
 
   @override
   File getFile() => File(url);
+
+  @override
+  String? get ownerId => null;
+
+  @override
+  List<String> get assignedUserIds => [];
+
+  @override
+  bool canRead(AppUser user) => true;
+
+  @override
+  bool canEdit(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canValidate(AppUser user) => AppUserAccessControl(user).isAdmin;
 
   @override
   bool get isUpdated => updatedAt != null;

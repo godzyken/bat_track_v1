@@ -10,6 +10,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/responsive/wrapper/responsive_layout.dart';
+import 'core/services/sync_worker.dart';
+import 'core/widgets/connectivity_banner.dart';
 import 'data/local/providers/hive_provider.dart';
 import 'data/local/providers/shared_preferences_provider.dart';
 import 'data/remote/providers/catch_error_provider.dart';
@@ -42,6 +44,9 @@ void main() {
       final container = ProviderContainer(
         overrides: [sharedPreferencesProvider.overrideWith((ref) => prefs)],
       );
+
+      // ✅ Démarrage du worker de synchronisation
+      container.read(syncWorkerProvider).start();
 
       // ✅ Initialise le gestionnaire d'erreurs global
       if (!kIsWeb) {
@@ -169,7 +174,12 @@ class MyApp extends ConsumerWidget {
       builder: (context, child) => ResponsiveObserver(
         child: Stack(
           children: [
-            child ?? const SizedBox.shrink(),
+            Column(
+              children: [
+                const ConnectivityBanner(),
+                Expanded(child: child ?? const SizedBox.shrink()),
+              ],
+            ),
             if (kDebugMode) const DebugFloatingOverlay(),
           ],
         ),

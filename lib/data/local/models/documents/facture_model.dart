@@ -84,6 +84,25 @@ sealed class FactureModel extends UnifiedModel with _$FactureModel {
   bool get isUpdated => updatedAt != null;
 
   @override
+  List<String> get assignedUserIds => [];
+
+  @override
+  bool canRead(AppUser user) => true;
+
+  @override
+  bool canEdit(AppUser user) =>
+      AppUserAccessControl(user).isAdmin || clientId == user.uid;
+
+  @override
+  bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canValidate(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
   UnifiedModel copyWithId(String newId) => copyWith(id: newId);
 
   @override

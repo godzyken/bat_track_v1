@@ -33,7 +33,9 @@ dependencies:
 
 
   shared_models:
-    path: ../shared_models/shared_models
+    git:
+      url: https://github.com/godzyken/shared_models.git
+      ref: master
 
   # Base UI
   cupertino_icons: ^1.0.8
@@ -72,6 +74,8 @@ dependencies:
   dio: ^5.8.0+1
   async: ^2.13.0
   logger: ^2.6.1
+  googleapis_auth: ^1.6.0
+  connectivity_plus: ^6.1.1
 
   # UI & charts
   go_router: ^17.0.0
@@ -106,6 +110,9 @@ dev_dependencies:
   path_provider_platform_interface: ^2.1.2
   hive_ce_generator: ^1.9.3
 
+dependency_overrides:
+  shared_models:
+    path: ../shared_models
 
 
 flutter:

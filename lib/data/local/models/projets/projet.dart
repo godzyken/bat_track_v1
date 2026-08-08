@@ -49,19 +49,39 @@ sealed class Projet extends UnifiedModel with _$Projet {
 
   factory Projet.fromJson(Map<String, dynamic> json) => _$ProjetFromJson(json);
 
-  /// 🔹 Correction 1 : Implémentation du getter requis par AccessControlMixin
   @override
   String get ownerId => createdBy;
 
-  /// 🔹 Correction 2 : Implémentation de la méthode requise par UnifiedModel
   @override
   Projet copyWithId(String newId) => copyWith(id: newId);
 
-  /// 🔹 Correction 3 : Implémentation de la méthode requise par UnifiedModel
   @override
   Projet markDeleted(DateTime date) {
     return copyWith(updatedAt: date, deletedAt: date);
   }
+
+  @override
+  bool get toutesPartiesOntValide =>
+      clientValide && chefDeProjetValide && techniciensValides;
+
+  @override
+  bool canRead(AppUser user) => true; // À affiner selon les besoins
+
+  @override
+  bool canEdit(AppUser user) {
+    if (AppUserAccessControl(user).isAdmin) return true;
+    if (AppUserAccessControl(user).isClient && ownerId == user.uid && !chefDeProjetValide) return true;
+    return false;
+  }
+
+  @override
+  bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canValidate(AppUser user) => AppUserAccessControl(user).isAdmin || (AppUserAccessControl(user).isClient && ownerId == user.uid);
 }
 
 /// 🔹 Extensions pour la logique métier
@@ -91,7 +111,6 @@ extension ProjetLogic on Projet {
 
 /// 🔹 Extensions pour les droits et workflow
 extension ProjetAccess on Projet {
-  String get ownerId => createdBy;
   bool canEditProject(AppUser user) {
     if (AppUserAccessControl(user).isAdmin || user.isClient) return true;
     if (AppUserAccessControl(user).isClient &&
@@ -136,7 +155,7 @@ extension ProjetAccess on Projet {
     return copyWith(members: updatedMembers);
   }
 
-  String get status {
+  String get currentStatus {
     if (!clientValide) return 'draft';
     if (clientValide && !chefDeProjetValide) return 'pendingValidation';
     if (clientValide && chefDeProjetValide && !techniciensValides) {
@@ -146,22 +165,6 @@ extension ProjetAccess on Projet {
       return 'fullyValidated';
     }
     return 'unknown';
-  }
-}
-
-/// 🔹 Extension pour modifier dynamiquement un champ
-extension ProjetCopy on Projet {
-  Projet copyWithField(String key, dynamic value) {
-    switch (key) {
-      case 'specialite':
-        return copyWith(description: value as String);
-      case 'localisation':
-        return copyWith(company: value as String);
-      case 'technicienIds':
-        return copyWith(assignedUserIds: List<String>.from(value as List));
-      default:
-        return this;
-    }
   }
 }
 

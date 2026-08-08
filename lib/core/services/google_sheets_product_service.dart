@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:googleapis/sheets/v4.dart' as sheets;
+import 'package:googleapis_auth/auth_io.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
 
 import '../../../data/local/models/index_model_extention.dart';
@@ -238,17 +239,7 @@ final googleAuthProvider = FutureProvider<AutoRefreshingAuthClient>((
   // 2. Créer les credentials à partir du JSON temporaire
   final credentials = ServiceAccountCredentials.fromJson(jsonCredentials);
 
-  /*  final credentials = ServiceAccountCredentials(
-    'email',
-    'projects/55611526582/locations/global/workloadIdentityPools/github-pool/providers/github-provider',
-    'github-sheets-sync_@egoteback.iam.gserviceaccount.com',
-    githubOidcToken,
-    [sheets.SheetsApi.spreadsheetsScope],
-  );
-
-  return await clientViaApiKey(credentials, githubOidcToken);*/
-
-  return await clientViaServiceAccount(credentials);
+  return await clientViaServiceAccount(credentials, [sheets.SheetsApi.spreadsheetsScope]);
 });
 
 /// Provider pour le service Google Sheets

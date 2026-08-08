@@ -9,7 +9,10 @@ class DolibarrConfig {
   DolibarrConfig({required this.baseUrl, required this.apiKey});
 
   factory DolibarrConfig.fromJson(Map<String, dynamic> json) {
-    return DolibarrConfig(baseUrl: json['baseUrl'], apiKey: json['apiKey']);
+    return DolibarrConfig(
+      baseUrl: (json['baseUrl'] as String?) ?? '',
+      apiKey: (json['apiKey'] as String?) ?? '',
+    );
   }
 }
 
@@ -26,9 +29,9 @@ class DolibarrInstance {
 
   factory DolibarrInstance.fromJson(Map<String, dynamic> json) =>
       DolibarrInstance(
-        name: json['name'],
-        baseUrl: json['baseUrl'],
-        apiKey: json['apiKey'],
+        name: (json['name'] as String?) ?? '',
+        baseUrl: (json['baseUrl'] as String?) ?? '',
+        apiKey: (json['apiKey'] as String?) ?? '',
       );
 }
 
@@ -37,7 +40,7 @@ class DolibarrConfigLoader {
     final jsonStr = await rootBundle.loadString(
       'assets/config/dolibarr_config.json',
     );
-    final Map<String, dynamic> json = jsonDecode(jsonStr);
+    final json = jsonDecode(jsonStr) as Map<String, dynamic>;
 
     return DolibarrConfig.fromJson(json);
   }
@@ -46,10 +49,10 @@ class DolibarrConfigLoader {
     final jsonStr = await rootBundle.loadString(
       'assets/config/dolibarr_config.json',
     );
-    final Map<String, dynamic> json = jsonDecode(jsonStr);
+    final json = jsonDecode(jsonStr) as Map<String, dynamic>;
 
     return (json['instances'] as List)
-        .map((e) => DolibarrInstance.fromJson(e))
+        .map((e) => DolibarrInstance.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 }

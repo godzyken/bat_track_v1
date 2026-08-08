@@ -56,6 +56,24 @@ sealed class Produit extends UnifiedModel with _$Produit {
   factory Produit.fromJson(Map<String, dynamic> json) =>
       _$ProduitFromJson(json);
 
+  @override
+  List<String> get assignedUserIds => [];
+
+  @override
+  bool canRead(AppUser user) => true;
+
+  @override
+  bool canEdit(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canValidate(AppUser user) => AppUserAccessControl(user).isAdmin;
+
   factory Produit.mock() => Produit(
     id: const Uuid().v4(),
     nom: 'Detecteur de fumee',

@@ -95,7 +95,7 @@ class CloudFlareService extends RemoteStorageService with NoSuchMethodLogger {
   }) {
     Query<Map<String, dynamic>> query = _db.collection(collectionPath);
     if (queryBuilder != null) {
-      query = queryBuilder(query);
+      query = queryBuilder(query) as Query<Map<String, dynamic>>;
     }
 
     return query.snapshots().map((snapshot) {

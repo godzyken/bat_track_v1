@@ -9,7 +9,7 @@ part 'facture.freezed.dart';
 part 'facture.g.dart';
 
 @freezed
-class Facture extends UnifiedModel with _$Facture {
+sealed class Facture extends UnifiedModel with _$Facture {
   const Facture._();
 
   const factory Facture({
@@ -65,6 +65,24 @@ class Facture extends UnifiedModel with _$Facture {
 
   @override
   bool get isUpdated => updatedAt != null;
+
+  @override
+  List<String> get assignedUserIds => [];
+
+  @override
+  bool canRead(AppUser user) => true;
+
+  @override
+  bool canEdit(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canValidate(AppUser user) => AppUserAccessControl(user).isAdmin;
 
   // ─── AccessControlMixin (seul getter abstrait) ────────────────
   @override

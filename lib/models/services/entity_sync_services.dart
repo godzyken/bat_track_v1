@@ -49,13 +49,24 @@ class EntitySyncService<T extends UnifiedModel> {
   EntitySyncService(this.local, this.remote);
 
   /// 🔁 Sauvegarde local + remote (+ fichier si HasFile)
+  /// Optimisé pour le mode Offline-First : l'écriture locale est prioritaire.
   Future<void> save(T item, {String? id}) async {
     final docId = id ?? item.id;
 
-    await Future.wait([local.put(docId, item), remote.save(item, docId)]);
+    // 1. Sauvegarde locale immédiate (bloquante pour garantir l'intégrité de l'UI)
+    await local.put(docId, item);
+    developer.log('📦 [Offline-First] Sauvegardé en local: $docId');
 
+    // 2. Sauvegarde remote en arrière-plan (non bloquante)
+    // Firestore gère sa propre file d'attente hors-ligne.
+    remote.save(item, docId).catchError((Object e) {
+      developer.log('📡 [Offline-First] Remote save en attente (Network/Error): $e');
+    });
+
+    // 3. Gestion des fichiers
     if (item is HasFile) {
-      await _handleFileUpload(item as HasFile, docId);
+      // On lance l'upload, s'il échoue, il sera re-tenté via retryPendingUploads
+      _handleFileUpload(item as HasFile, docId);
     }
 
     if (item is PieceJointe) {
@@ -200,18 +211,19 @@ class EntitySyncService<T extends UnifiedModel> {
   /// 📡 Watch combiné (local + remote)
   Stream<List<T>> watchAllCombined() async* {
     final hiveStream = local.watchAll();
+    // On n'écoute le remote que si on a du réseau (optionnel, Firestore gère ça)
     final remoteStream = remote.watchAll();
 
     await for (final event in StreamGroup.merge([hiveStream, remoteStream])) {
       final Map<String, T> mergedMap = {};
 
-      // Ajout des items locaux
+      // Ajout des items locaux (prioritaires pour l'UI offline)
       final localItems = await local.getAll();
       for (final item in localItems) {
         mergedMap[item.id] = item;
       }
 
-      // Ajout/MAJ avec les items du remote
+      // Mise à jour avec les items du remote si plus récents
       for (final item in event) {
         final existing = mergedMap[item.id];
         if (existing == null ||
@@ -223,6 +235,18 @@ class EntitySyncService<T extends UnifiedModel> {
       }
 
       yield mergedMap.values.toList();
+    }
+  }
+
+  /// 📤 Tentative de re-upload des fichiers en attente
+  Future<void> retryPendingUploads() async {
+    final items = await local.getAll();
+    for (final item in items) {
+      if (item is HasFile) {
+        // Logique de vérification si le fichier est déjà sur le cloud
+        // Pour simplifier, on tente l'upload (Firebase Storage écrasera ou ignorera)
+        await _handleFileUpload(item as HasFile, item.id);
+      }
     }
   }
 }

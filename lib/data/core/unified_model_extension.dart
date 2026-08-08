@@ -9,13 +9,13 @@ mixin DisplayMixin on UnifiedModel {
   String get displayTitle {
     final json = toJson();
 
-    return json['nom'] ?? json['titre'] ?? json['id'] ?? 'Sans nom';
+    return (json['nom'] ?? json['titre'] ?? json['id'] ?? 'Sans nom').toString();
   }
 
   String get displaySubtitle {
     final json = toJson();
 
-    return json['email'] ?? json['description'] ?? json['adresse'] ?? '';
+    return (json['email'] ?? json['description'] ?? json['adresse'] ?? '').toString();
   }
 
   IconData get displayIcon => Icons.info_outline;

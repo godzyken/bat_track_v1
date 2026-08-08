@@ -11,7 +11,7 @@ class FrameSyncQueue<M> {
   FrameSyncQueue({required this.onBatch});
 
   void add(M item) {
-    final id = (item as dynamic).id;
+    final String id = (item as dynamic).id.toString();
     _buffer[id] = item;
 
     if (_scheduled) return;
@@ -34,9 +34,9 @@ class FrameSyncQueue<M> {
     try {
       await onBatch(batch);
     } catch (e) {
-      _buffer.addAll(
-        Map.from({for (final item in batch) item: item}),
-      ); // retry plus tard
+      for (final item in batch) {
+        _buffer[(item as dynamic).id.toString()] = item;
+      }
     }
   }
 }

@@ -57,11 +57,29 @@ sealed class ChantierEtape extends UnifiedModel with _$ChantierEtape {
     chefDeProjetValide: true,
   );
 
-  // 🔹 Getters concrets pour les mixins
   @override
   String? get ownerId => chantierId; // ou autre propriétaire logique
+
   @override
   List<String> get assignedUserIds => techniciens ?? [];
+
+  @override
+  bool get techniciensValides => techValide;
+
+  @override
+  bool canRead(AppUser user) => true;
+
+  @override
+  bool canEdit(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canValidate(AppUser user) => AppUserAccessControl(user).isAdmin;
 
   @override
   bool get isUpdated => updatedAt != null;

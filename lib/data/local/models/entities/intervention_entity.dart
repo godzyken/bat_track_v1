@@ -80,7 +80,7 @@ class InterventionEntity extends HiveObject implements HiveModel<Intervention> {
     description: description,
     create: date,
     statut: statut,
-    document: document.map((e) => PieceJointe.fromJson(e as dynamic)).toList(),
+    document: document.map((e) => e.toModel()).toList(),
     titre: titre,
     commentaire: commentaire,
     facture: facture,

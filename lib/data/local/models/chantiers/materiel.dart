@@ -45,6 +45,24 @@ sealed class Materiel extends UnifiedModel with _$Materiel {
   bool get isUpdated => updatedAt != null;
 
   @override
+  List<String> get assignedUserIds => [];
+
+  @override
+  bool canRead(AppUser user) => true;
+
+  @override
+  bool canEdit(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canValidate(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
   String? get ownerId => id;
 
   @override

@@ -79,9 +79,8 @@ class AppUserEntity extends HiveObject implements HiveModel<AppUser> {
     motDePasse: motDePasse,
     createdAt: createdAt,
     appUpdatedAt: appUpdatedAt,
-    appIsUpdated: appIsUpdated,
+    appIsUpdated: appIsUpdated ?? false,
     instanceId: instanceId,
-    updatedAt: updatedAt,
     lastTimeConnect: lastTimeConnect,
   );
 }

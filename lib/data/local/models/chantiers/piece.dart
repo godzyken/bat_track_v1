@@ -99,6 +99,25 @@ sealed class Piece extends UnifiedModel with _$Piece {
   @override
   bool get isUpdated => updatedAt != null;
 
+  @override
+  List<String> get assignedUserIds => [];
+
+  @override
+  bool canRead(AppUser user) => true;
+
+  @override
+  bool canEdit(AppUser user) =>
+      AppUserAccessControl(user).isAdmin || addedBy == user.uid;
+
+  @override
+  bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canValidate(AppUser user) => AppUserAccessControl(user).isAdmin;
+
   /// 🔹 Correction 1 : Implémentation du getter requis par AccessControlMixin
   @override
   String get ownerId => addedBy;

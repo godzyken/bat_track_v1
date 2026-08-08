@@ -20,8 +20,10 @@ final firebaseInitializationProvider = FutureProvider<FirebaseApp>((ref) async {
       await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     }
 
+    // 🚀 Configuration Firestore pour le mode Offline-First
     FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED, // Cache illimité pour l'artisan
     );
 
     await SentryFlutter.init((options) {

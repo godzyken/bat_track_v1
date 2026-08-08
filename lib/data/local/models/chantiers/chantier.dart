@@ -45,6 +45,26 @@ sealed class Chantier extends UnifiedModel with _$Chantier {
   factory Chantier.fromJson(Map<String, dynamic> json) =>
       _$ChantierFromJson(json);
 
+  @override
+  List<String> get assignedUserIds => technicienIds;
+
+  @override
+  bool canRead(AppUser user) => true;
+
+  @override
+  bool canEdit(AppUser user) =>
+      AppUserAccessControl(user).isAdmin || chefDeProjetId == user.uid;
+
+  @override
+  bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canValidate(AppUser user) =>
+      AppUserAccessControl(user).isAdmin || chefDeProjetId == user.uid;
+
   /// Mock
   factory Chantier.mock() => Chantier(
     id: const Uuid().v4(),
@@ -69,10 +89,10 @@ sealed class Chantier extends UnifiedModel with _$Chantier {
   factory Chantier.fromJsonSafe(Map<String, dynamic> json, {ImportLog? log}) {
     try {
       return Chantier(
-        id: json['id'] ?? const Uuid().v4(),
-        nom: json['nom'] ?? 'Chantier sans nom',
-        adresse: json['adresse'] ?? '',
-        clientId: json['clientId'] ?? '',
+        id: (json['id'] as String?) ?? const Uuid().v4(),
+        nom: (json['nom'] as String?) ?? 'Chantier sans nom',
+        adresse: (json['adresse'] as String?) ?? '',
+        clientId: (json['clientId'] as String?) ?? '',
         dateDebut:
             tryParseDate(
               json['dateDebut'],
@@ -90,11 +110,11 @@ sealed class Chantier extends UnifiedModel with _$Chantier {
           fallback: DateTime.now(),
           context: 'Chantier.updatedAt',
         ),
-        etat: json['etat'],
-        technicienIds: List<String>.from(json['technicienIds'] ?? []),
+        etat: json['etat'] as String?,
+        technicienIds: List<String>.from((json['technicienIds'] as Iterable?) ?? []),
         documents: [], // parser si nécessaire
         etapes: [], // parser si nécessaire
-        commentaire: json['commentaire'],
+        commentaire: json['commentaire'] as String?,
         budgetPrevu: (json['budgetPrevu'] is num)
             ? (json['budgetPrevu'] as num).toDouble()
             : null,
@@ -102,12 +122,12 @@ sealed class Chantier extends UnifiedModel with _$Chantier {
             ? (json['budgetReel'] as num).toDouble()
             : null,
         interventions: [],
-        chefDeProjetId: json['chefDeProjetId'],
-        clientValide: json['clientValide'] ?? false,
-        chefDeProjetValide: json['chefDeProjetValide'] ?? false,
-        techniciensValides: json['techniciensValides'] ?? false,
-        superUtilisateurValide: json['superUtilisateurValide'] ?? false,
-        isCloudOnly: json['isCloudOnly'] ?? false,
+        chefDeProjetId: json['chefDeProjetId'] as String?,
+        clientValide: json['clientValide'] == true,
+        chefDeProjetValide: json['chefDeProjetValide'] == true,
+        techniciensValides: json['techniciensValides'] == true,
+        superUtilisateurValide: json['superUtilisateurValide'] == true,
+        isCloudOnly: json['isCloudOnly'] == true,
       );
     } catch (e) {
       log?.addError('Erreur de parsing Chantier: $e');

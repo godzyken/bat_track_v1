@@ -49,6 +49,35 @@ sealed class FactureDraft extends UnifiedModel with _$FactureDraft {
   String? get ownerId => clientId;
 
   @override
+  List<String> get assignedUserIds => [];
+
+  @override
+  bool canRead(AppUser user) => true;
+
+  @override
+  bool canEdit(AppUser user) => AppUserAccessControl(user).isAdmin || clientId == user.uid;
+
+  @override
+  bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canValidate(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool get clientValide => false;
+  @override
+  bool get chefDeProjetValide => false;
+  @override
+  bool get techniciensValides => false;
+  @override
+  bool get superUtilisateurValide => false;
+  @override
+  bool get toutesPartiesOntValide => false;
+
+  @override
   DateTime? get updatedAt => dateDerniereModification;
 
   factory FactureDraft.mock() => FactureDraft(
@@ -108,6 +137,24 @@ sealed class CustomLigneFacture extends UnifiedModel with _$CustomLigneFacture {
 
   @override
   String? get ownerId => ctlId;
+
+  @override
+  List<String> get assignedUserIds => [];
+
+  @override
+  bool canRead(AppUser user) => true;
+
+  @override
+  bool canEdit(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
+
+  @override
+  bool canValidate(AppUser user) => AppUserAccessControl(user).isAdmin;
 
   @override
   DateTime? get updatedAt => ctlUpdatedAt;
