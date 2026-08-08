@@ -3,7 +3,7 @@ import 'dart:developer' as developer;
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FirebaseService implements RemoteStorageService {
+class FirebaseService extends RemoteStorageService {
   FirebaseService._();
   static final FirebaseService instance = FirebaseService._();
 
@@ -105,7 +105,7 @@ class FirebaseService implements RemoteStorageService {
       collectionOrTable,
     );
     if (queryBuilder != null) {
-      query = queryBuilder(query);
+      query = queryBuilder(query) as Query<Map<String, dynamic>>;
     }
     return query.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {

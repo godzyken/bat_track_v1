@@ -8,6 +8,9 @@ class FirestoreService extends RemoteStorageService {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   @override
+  bool get isConnected => true; // À implémenter avec un vrai check si besoin
+
+  @override
   Future<Map<String, dynamic>> getRaw(String collectionPath, String id) async {
     final sw = Stopwatch()..start();
     log('📥 getRaw -> $collectionPath/$id');
@@ -78,7 +81,7 @@ class FirestoreService extends RemoteStorageService {
     Query<Map<String, dynamic>> query = _db.collection(collectionPath);
 
     if (queryBuilder != null) {
-      query = queryBuilder(query);
+      query = queryBuilder(query) as Query<Map<String, dynamic>>;
     }
 
     return query.snapshots().map((snapshot) {

@@ -321,6 +321,50 @@ abstract class UnifiedEntityService<
     );
   }
 
+  /// Observe tous les items liés à un technicien spécifique
+  Stream<List<M>> watchByTechnicien(String technicienId) async* {
+    await _ensureInitialized();
+    yield await getAllLocalByFilter((json) => json['technicienId'] == technicienId);
+    yield* _localBox.watch().asyncMap((_) async {
+      return await getAllLocalByFilter((json) => json['technicienId'] == technicienId);
+    });
+  }
+
+  /// Observe tous les items appartenant à un propriétaire spécifique
+  Stream<List<M>> watchByOwner(String ownerId) async* {
+    await _ensureInitialized();
+    yield await getAllLocalByFilter((json) => json['clientId'] == ownerId);
+    yield* _localBox.watch().asyncMap((_) async {
+      return await getAllLocalByFilter((json) => json['clientId'] == ownerId);
+    });
+  }
+
+  /// Observe tous les items liés à un projet spécifique
+  Stream<List<M>> watchByProjects(String projectId) async* {
+    await _ensureInitialized();
+    yield await getAllLocalByFilter((json) => json['id'] == projectId || json['projetId'] == projectId);
+    yield* _localBox.watch().asyncMap((_) async {
+      return await getAllLocalByFilter((json) => json['id'] == projectId || json['projetId'] == projectId);
+    });
+  }
+
+  /// Observe tous les items d'un propriétaire dans un projet spécifique
+  Stream<List<M>> watchByOwnerProjects(
+    String ownerId,
+    String projectId,
+  ) async* {
+    await _ensureInitialized();
+    yield await getAllLocalByFilter((json) => (json['clientId'] == ownerId || json['ownerId'] == ownerId) && (json['id'] == projectId || json['projetId'] == projectId));
+    yield* _localBox.watch().asyncMap((_) async {
+      return await getAllLocalByFilter((json) => (json['clientId'] == ownerId || json['ownerId'] == ownerId) && (json['id'] == projectId || json['projetId'] == projectId));
+    });
+  }
+
+  Future<List<M>> getAllLocalByFilter(bool Function(Map<String, dynamic> json) filter) async {
+    final all = await getAllLocal();
+    return all.where((item) => filter(item.toJson())).toList();
+  }
+
   Future<void> bidirectionalSync() async {
     final localData = await getAllLocal();
     final remoteData = await getAllRemote();

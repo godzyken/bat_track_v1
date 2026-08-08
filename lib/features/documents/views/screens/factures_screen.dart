@@ -67,7 +67,7 @@ class FacturesScreen extends ConsumerWidget {
               fromJson: (json) => Facture.fromJson(json),
               initialValue: facture,
               customFieldBuilder:
-                  (context, key, value, controller, onChanged, expertMode) {
+                  (BuildContext context, String key, dynamic value, TextEditingController? controller, void Function(dynamic) onChanged, bool expertMode) {
                     // Options a personnaliser ici
                     switch (key) {
                       case 'numero':
@@ -76,7 +76,7 @@ class FacturesScreen extends ConsumerWidget {
                           decoration: const InputDecoration(
                             labelText: 'Numéro de facture',
                           ),
-                          onChanged: onChanged,
+                          onChanged: (v) => onChanged(v),
                           validator: (value) => value == null || value.isEmpty
                               ? 'Champs requis'
                               : null,
@@ -87,7 +87,7 @@ class FacturesScreen extends ConsumerWidget {
                           decoration: const InputDecoration(
                             labelText: 'Total (€)',
                           ),
-                          onChanged: onChanged,
+                          onChanged: (v) => onChanged(double.tryParse(v) ?? 0.0),
                           keyboardType: TextInputType.number,
                         );
                       default:

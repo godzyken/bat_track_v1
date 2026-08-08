@@ -1,60 +1,39 @@
-# Plan : Stratégie "Offline-First" avec Firebase
+# Plan de réparation des tests
 
-Pour répondre à l'exigence "aucun manque de réseau ne doit affecter l'artisan", nous allons mettre en place une architecture **Local-First**. L'application doit fonctionner parfaitement en mode avion, et se synchroniser de manière transparente dès que le réseau revient.
+Le passage à Riverpod 3.0 et les changements dans `shared_models` (UnifiedModel) ont cassé la suite de tests. Ce plan vise à migrer les tests vers les outils natifs de Riverpod 3.0 et à mettre à jour les mocks.
 
-## Stratégie Technique
+## User Review Required
 
-### 1. Firestore avec Persistance Permanente
-Nous allons configurer Firestore pour utiliser un cache local persistant sur le disque.
-- **Mobile (Android/iOS)** : Activé par défaut, mais nous allons augmenter la taille du cache.
-- **Web** : Activation explicite de l'indexDB pour le cache.
-
-### 2. Architecture "Source de Vérité Locale" (Hive)
-Même avec le cache Firestore, l'utilisation de **Hive** (déjà présent dans le projet) est recommandée comme "Source de Vérité" immédiate pour l'interface utilisateur.
-- **Écriture** : L'UI écrit dans Hive immédiatement (retour instantané). Le service de sync tente d'écrire dans Firebase en arrière-plan.
-- **Lecture** : L'UI lit depuis Hive. Hive est mis à jour dès que Firebase reçoit de nouvelles données (Realtime).
-
-### 3. Gestion des Médias (Photos de chantier)
-C'est le point critique pour un artisan.
-- **Capture** : Les photos sont enregistrées localement dans le dossier `application_documents_directory`.
-- **Référence** : Un objet `PieceJointe` est créé localement avec le chemin du fichier local.
-- **Upload Différé** : Un worker (ou une boucle de sync) uploade les fichiers vers Firebase Storage uniquement quand le réseau est stable.
-
----
+> [!IMPORTANT]
+> Je vais supprimer toute dépendance à `riverpod_test` au profit des utilitaires natifs de Riverpod 3.0 (`ProviderContainer.test()`). Cela change légèrement la structure de certains tests mais les rend plus robustes et compatibles.
 
 ## Proposed Changes
 
-### [Core Configuration]
+### [Dependencies]
 
-#### [MODIFY] [firebase_providers.dart](file:///C:/Users/soufi/StudioProjects/bat_track_v1/lib/data/remote/providers/firebase_providers.dart)
-- Augmenter la taille du cache Firestore (`cacheSizeBytes`).
-- Configurer la persistance pour le Web.
+#### [MODIFY] [pubspec.yaml](file:///C:/Users/soufi/StudioProjects/bat_track_v1/pubspec.yaml)
+- S'assurer que `riverpod_test` est bien retiré (déjà fait, mais vérification).
 
-### [Sync Logic]
+### [Mocks & Helpers]
 
-#### [MODIFY] [entity_sync_services.dart](file:///C:/Users/soufi/StudioProjects/bat_track_v1/lib/models/services/entity_sync_services.dart)
-- Modifier `save` pour qu'il ne bloque pas l'utilisateur si le remote échoue.
-- Implémenter une file d'attente d'upload pour les images.
+#### [MODIFY] [mock_services.dart](file:///C:/Users/soufi/StudioProjects/bat_track_v1/test/mocks/mock_services.dart)
+- Mettre à jour les mocks pour utiliser `UnifiedEntityServiceImpl` au lieu de l'interface abstraite.
 
-### [UI Components]
+#### [MODIFY] [provider_test_helpers.dart](file:///C:/Users/soufi/StudioProjects/bat_track_v1/test/helpers/provider_test_helpers.dart)
+- Retirer l'import de `riverpod_test`.
+- Réimplémenter les helpers en utilisant `ProviderContainer`.
 
-#### [NEW] Indicator Widget
-- Créer un petit widget visuel indiquant si l'app est en mode "Sync en attente" ou "Connecté".
+### [Test Suites Migration]
 
----
+#### [MODIFY] [projet_list_provider_test.dart](file:///C:/Users/soufi/StudioProjects/bat_track_v1/test/features/projet/controllers/providers/projet_list_provider_test.dart)
+- Remplacer `testProvider` par des blocs `test()` standard avec `ProviderContainer`.
+
+#### [MODIFY] [synced_entity_service_test.dart](file:///C:/Users/soufi/StudioProjects/bat_track_v1/test/unit/services/synced_entity_service_test.dart)
+- Corriger l'instanciation de `UnifiedEntityService` (utiliser l'implémentation concrète).
+- Mettre à jour les appels de méthodes (ex: `save` au lieu de `create`).
 
 ## Verification Plan
 
-### Manual Verification
-1.  **Test Mode Avion** :
-    - Ouvrir l'application, passer en mode avion.
-    - Créer un nouveau Chantier.
-    - Ajouter une photo (simulation).
-    - Vérifier que tout s'affiche instantanément dans les listes.
-2.  **Test Reconnexion** :
-    - Désactiver le mode avion.
-    - Vérifier dans la Console Firebase que les données et la photo sont bien arrivées.
-
----
-> [!IMPORTANT]
-> Cette approche garantit que l'artisan n'a jamais de "chargement" ou de "roue qui tourne" pendant qu'il saisit ses données sur le terrain, même dans une zone blanche.
+### Automated Tests
+- Exécution de `flutter analyze` pour vérifier que le dossier `test/` est propre.
+- Exécution sélective de certains tests avec `flutter test test/path/to/test.dart`.

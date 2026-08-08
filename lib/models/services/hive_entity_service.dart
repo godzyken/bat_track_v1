@@ -150,6 +150,33 @@ class HiveEntityService<T extends UnifiedModel>
     await _box!.clear();
   }
 
+  Stream<T?> watchById(String id) {
+    return _box!.watch(key: id).map((event) {
+      final json = _box!.get(id);
+      return json != null ? fromJson(Map<String, dynamic>.from(json)) : null;
+    });
+  }
+
+  Future<List<T>> query({
+    bool Function(T item)? where,
+    int Function(T a, T b)? orderBy,
+  }) async {
+    await init();
+    var results = _box!.values
+        .map((json) => fromJson(Map<String, dynamic>.from(json)))
+        .toList();
+
+    if (where != null) {
+      results = results.where(where).toList();
+    }
+
+    if (orderBy != null) {
+      results.sort(orderBy);
+    }
+
+    return results;
+  }
+
   Map<String, dynamic> _handleEntityNotFound() {
     throw Exception('Entity not found');
   }

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
 import '../../core/services/unified_entity_service.dart';
+import '../../data/local/services/service_type.dart';
 import '../data/hive_model.dart';
 import '../data/maperror/logged_action.dart';
 
@@ -65,23 +66,38 @@ class SafeAndLoggedEntityService<M extends UnifiedModel, E extends HiveModel<M>>
     );
   }
 
-  // 3. DÉLÉGATION DES OPÉRATIONS DE SYNC MANUEL (si besoin)
+  // 3. DÉLÉGATION DES OPÉRATIONS DE SYNC MANUEL
 
-  // Ces méthodes doivent être présentes dans l'interface UnifiedEntityService
-  Future<void> syncFromRemote({BuildContext? context}) async {
+  @override
+  Future<void> syncAllFromRemote() async {
     await safeVoid(
       () => _delegate.syncAllFromRemote(),
-      context: 'syncFromRemote<$M>',
+      context: 'syncAllFromRemote<$M>',
     );
-    logAction(action: 'syncFromRemote', target: '$M');
+    logAction(action: 'syncAllFromRemote', target: '$M');
   }
 
-  Future<void> syncToRemote() async {
+  @override
+  Future<void> syncAllToRemote() async {
     await safeVoid(
-      () => _delegate.syncAllFromRemote(),
-      context: 'syncToRemote<$M>',
+      () => _delegate.syncAllToRemote(),
+      context: 'syncAllToRemote<$M>',
     );
-    logAction(action: 'syncToRemote', target: '$M');
+    logAction(action: 'syncAllToRemote', target: '$M');
+  }
+
+  // Ces méthodes sont conservées pour la compatibilité si elles sont appelées ailleurs
+  Future<void> syncFromRemote({BuildContext? context}) async => syncAllFromRemote();
+  Future<void> syncToRemote() async => syncAllToRemote();
+
+  @override
+  Stream<List<M>> watchAll() {
+    return _delegate.watchAll();
+  }
+
+  @override
+  Stream<M?> watch(String id) {
+    return _delegate.watch(id);
   }
 
   @override
@@ -102,6 +118,26 @@ class SafeAndLoggedEntityService<M extends UnifiedModel, E extends HiveModel<M>>
     return _delegate.watchRemoteFiltered(queryBuilder: queryBuilder);
   }
 
+  @override
+  Stream<List<M>> watchByTechnicien(String technicienId) {
+    return _delegate.watchByTechnicien(technicienId);
+  }
+
+  @override
+  Stream<List<M>> watchByOwner(String ownerId) {
+    return _delegate.watchByOwner(ownerId);
+  }
+
+  @override
+  Stream<List<M>> watchByProjects(String projectId) {
+    return _delegate.watchByProjects(projectId);
+  }
+
+  @override
+  Stream<List<M>> watchByOwnerProjects(String ownerId, String projectId) {
+    return _delegate.watchByOwnerProjects(ownerId, projectId);
+  }
+
   // 4. DÉLÉGATION AUTOMATIQUE VIA noSuchMethod POUR TOUT LE RESTE
 
   void _log(String method, List<dynamic> args) {
@@ -109,15 +145,14 @@ class SafeAndLoggedEntityService<M extends UnifiedModel, E extends HiveModel<M>>
   }
 
   @override
-  noSuchMethod(Invocation invocation) {
+  dynamic noSuchMethod(Invocation invocation) {
     // Log du nom et des arguments
     _log(invocation.memberName.toString(), invocation.positionalArguments);
 
     try {
-      // Délégation automatique à _delegate pour toutes les autres méthodes (watchAll, getLocalRaw, etc.)
-      return Function.apply((_delegate as dynamic).noSuchMethod, [invocation]);
+      // Délégation automatique à _delegate pour toutes les autres méthodes
+      return ( _delegate as dynamic).noSuchMethod(invocation);
     } catch (e) {
-      // En cas d'erreur lors de la délégation, si la méthode n'est pas implémentée
       if (e is NoSuchMethodError) {
         throw UnimplementedError(
           'Method ${invocation.memberName} not implemented in delegate or decorator.',

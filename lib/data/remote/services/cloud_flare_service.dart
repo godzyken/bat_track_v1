@@ -12,6 +12,9 @@ class CloudFlareService extends RemoteStorageService with NoSuchMethodLogger {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   @override
+  bool get isConnected => true;
+
+  @override
   dynamic get proxyTarget => _db;
 
   /// 🔍 Récupère un enregistrement brut

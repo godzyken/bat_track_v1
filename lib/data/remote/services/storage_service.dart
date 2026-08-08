@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 
 class StorageService
     with NoSuchMethodLogger
-    implements RemoteStorageService, BaseStorageService {
+    implements BaseStorageService {
   final FirebaseStorage _storage;
 
   StorageService(this._storage);

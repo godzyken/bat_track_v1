@@ -73,7 +73,7 @@ class EntityCard<T extends UnifiedModel> extends ConsumerWidget {
                   AspectRatio(
                     aspectRatio: 16 / 9,
                     child: Image.network(
-                      entity.toJson()['imageUrl'],
+                      (entity.toJson()['imageUrl'] ?? '').toString(),
                       fit: BoxFit.cover,
                       errorBuilder: (_, _, _) => Container(
                         color: Colors.grey.shade300,
@@ -91,7 +91,7 @@ class EntityCard<T extends UnifiedModel> extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    entity.toJson()['nom'] ?? 'Sans titre',
+                    (entity.toJson()['nom'] ?? 'Sans titre').toString(),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -101,7 +101,7 @@ class EntityCard<T extends UnifiedModel> extends ConsumerWidget {
                   const SizedBox(height: 4),
                   if (entity.toJson()['description'] != null)
                     Text(
-                      entity.toJson()['description'],
+                      entity.toJson()['description'].toString(),
                       style: Theme.of(context).textTheme.bodyMedium,
                       maxLines: isWide ? 4 : 2,
                       overflow: TextOverflow.ellipsis,

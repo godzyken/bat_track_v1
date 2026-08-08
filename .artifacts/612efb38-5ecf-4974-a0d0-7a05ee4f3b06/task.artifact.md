@@ -9,7 +9,9 @@
 - [x] Désactivation temporaire de Firebase dans `main.dart`
 - [x] Vérification finale avec `flutter analyze`
 - [x] Implémentation Offline-First
-    - [x] Configuration de la persistance Firestore dans `firebase_providers.dart`
-    - [x] Optimisation de `EntitySyncService` pour la sauvegarde locale immédiate
-    - [x] Gestion de la file d'attente d'upload des fichiers (Retry logic)
-    - [x] Widget indicateur de statut de synchronisation
+- [/] Réparation des tests (Migration Riverpod 3.0 & UnifiedModel)
+    - [ ] Mise à jour des Mocks dans `test/mocks/mock_services.dart`
+    - [ ] Migration des helpers dans `test/helpers/provider_test_helpers.dart`
+    - [ ] Migration de `test/features/projet/controllers/providers/projet_list_provider_test.dart`
+    - [ ] Migration de `test/unit/services/synced_entity_service_test.dart`
+    - [ ] Nettoyage des autres fichiers de tests impactés

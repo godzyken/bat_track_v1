@@ -96,6 +96,10 @@ final clientServiceProvider =
       factory: ClientEntityFactory(),
     );
 
+final clientListProvider = StreamProvider<List<Client>>((ref) {
+  return ref.watch(clientServiceProvider).watchAll();
+});
+
 // ChantierEtape
 final chantierEtapeServiceProvider =
     unifiedEntityServiceProvider<ChantierEtape, ChantierEtapesEntity>(

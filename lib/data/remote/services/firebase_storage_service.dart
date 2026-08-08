@@ -12,7 +12,7 @@ import 'base_storage_service.dart';
 
 class FirebaseStorageService
     with NoSuchMethodLogger
-    implements RemoteStorageService, BaseStorageService {
+    implements BaseStorageService {
   final FirebaseStorage _storage;
   final Dio _dio;
   final Logger _logger;

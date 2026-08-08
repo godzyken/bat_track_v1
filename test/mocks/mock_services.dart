@@ -1,6 +1,8 @@
+import 'package:bat_track_v1/core/services/unified_entity_service.dart';
 import 'package:bat_track_v1/core/services/unified_entity_service_impl.dart';
 import 'package:bat_track_v1/models/data/hive_model.dart';
 import 'package:bat_track_v1/models/services/hive_entity_service.dart';
+import 'package:bat_track_v1/models/services/logged_entity_service.dart';
 import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapter.dart';
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 import 'package:mocktail/mocktail.dart';
@@ -18,6 +20,13 @@ class MockSyncedEntityService<M extends UnifiedModel, E extends HiveModel<M>>
 class MockRemoteEntityServiceAdapter<T extends UnifiedModel> extends Mock
     implements RemoteEntityServiceAdapter<T> {}
 
+class MockLoggedEntitySyncService<M extends UnifiedModel, E extends HiveModel<M>>
+    extends Mock
+    implements SafeAndLoggedEntityService<M, E> {}
+
+class MockLoggedEntityService<T extends UnifiedModel> extends Mock
+    implements BaseEntityService<T> {}
+
 // Helper pour créer des mocks pré-configurés
 class MockServiceBuilder {
   static MockHiveEntityService<T>
@@ -33,10 +42,6 @@ class MockServiceBuilder {
 
   static MockRemoteStorageService createMockRemoteService() {
     final mock = MockRemoteStorageService();
-
-    // Configurations par défaut pour éviter les erreurs
-    when(() => mock.isConnected).thenReturn(true);
-
     return mock;
   }
 }

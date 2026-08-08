@@ -26,7 +26,13 @@ class JsonFormField extends ConsumerStatefulWidget {
 class _JsonFormFieldState extends ConsumerState<JsonFormField> {
   List<String>? _asyncOptions;
   bool _uploading = false;
-  double _progress = 0.0;
+  final double _progress = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAsyncOptionsIfNeeded();
+  }
 
   Future<void> _loadAsyncOptionsIfNeeded() async {
     if (widget.field.asyncOptions != null) {
@@ -105,11 +111,11 @@ class _JsonFormFieldState extends ConsumerState<JsonFormField> {
         labelText: widget.field.label,
         border: const OutlineInputBorder(),
       ),
-      initialValue: widget.value,
+      value: widget.value as String?,
       items: (widget.field.options ?? [])
           .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
           .toList(),
-      onChanged: widget.onChanged,
+      onChanged: (val) => widget.onChanged?.call(val),
       validator: widget.field.required
           ? (v) => v == null ? 'Requis' : null
           : null,
@@ -117,7 +123,7 @@ class _JsonFormFieldState extends ConsumerState<JsonFormField> {
   }
 
   Widget _buildDatePicker(BuildContext context) {
-    final date = widget.value is DateTime ? widget.value : null;
+    final DateTime? date = widget.value is DateTime ? widget.value as DateTime : null;
     return InkWell(
       onTap: () async {
         final picked = await showDatePicker(
@@ -145,7 +151,7 @@ class _JsonFormFieldState extends ConsumerState<JsonFormField> {
   Widget _buildCheckbox() {
     return CheckboxListTile(
       title: Text(widget.field.label),
-      value: (widget.value ?? false) as bool,
+      value: (widget.value ?? false) is bool ? (widget.value ?? false) as bool : false,
       onChanged: widget.field.readOnly ? null : widget.onChanged,
       controlAffinity: ListTileControlAffinity.leading,
     );
@@ -154,7 +160,7 @@ class _JsonFormFieldState extends ConsumerState<JsonFormField> {
   Widget _buildSwitch() {
     return SwitchListTile(
       title: Text(widget.field.label),
-      value: widget.value ?? false,
+      value: (widget.value ?? false) is bool ? (widget.value ?? false) as bool : false,
       onChanged: widget.onChanged != null ? (v) => widget.onChanged!(v) : null,
     );
   }

@@ -49,7 +49,7 @@ class EntityManagerScreen<T extends UnifiedModel> extends ConsumerWidget {
             icon: const Icon(Icons.picture_as_pdf),
             onPressed: () async {
               final service = ref.read(serviceProvider);
-              final items = await service.getAll();
+              final items = (await service.getAll()) as List<T>;
               final bytes = await generatePdf(items);
               await Printing.layoutPdf(onLayout: (_) => bytes);
             },

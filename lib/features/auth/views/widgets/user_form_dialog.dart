@@ -38,10 +38,10 @@ class UserFormDialog extends ConsumerWidget {
         }
       },
       customFieldBuilder:
-          (context, key, value, controller, onChanged, expertMode) {
+          (BuildContext context, String key, dynamic value, TextEditingController? controller, void Function(dynamic) onChanged, bool expertMode) {
             if (key == 'role') {
               return DropdownButtonFormField<String>(
-                initialValue: value ?? 'client',
+                value: (value as String?) ?? 'client',
                 decoration: const InputDecoration(labelText: 'Rôle'),
                 items: const [
                   DropdownMenuItem(value: 'admin', child: Text('Admin')),

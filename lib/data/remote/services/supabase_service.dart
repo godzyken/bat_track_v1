@@ -5,29 +5,29 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../models/services/remote/remote_storage_service.dart';
 
-class SupabaseService implements RemoteStorageService {
-  SupabaseService._();
+class SupabaseService extends RemoteStorageService {
+  SupabaseService._() : super();
   static final SupabaseService instance = SupabaseService._();
 
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// Récupère un enregistrement brut (Map) depuis une table Supabase.
-  /// Retourne {} si absent.
+  @override
+  bool get isConnected => true; 
+
   @override
   Future<Map<String, dynamic>> getRaw(String table, String id) async {
     try {
-      final res =
+      final dynamic res =
           await _supabase.from(table).select().eq('id', id).maybeSingle();
 
       if (res == null) return {};
-      return Map<String, dynamic>.from(res);
+      return Map<String, dynamic>.from(res as Map);
     } catch (e, st) {
       developer.log('SupabaseService.getRaw error: $e\n$st');
       rethrow;
     }
   }
 
-  /// Écrit/merge les données dans Supabase (upsert).
   @override
   Future<void> saveRaw(
     String table,
@@ -36,28 +36,24 @@ class SupabaseService implements RemoteStorageService {
   ) async {
     try {
       final toInsert = {...data, 'id': id};
-      final res = await _supabase.from(table).upsert(toInsert);
-      if (res.error != null) throw res.error!;
+      final dynamic fromTable = _supabase.from(table);
+      await fromTable.upsert(toInsert);
     } catch (e, st) {
       developer.log('SupabaseService.saveRaw error: $e\n$st');
       rethrow;
     }
   }
 
-  /// Supprime un enregistrement dans Supabase.
   @override
   Future<void> deleteRaw(String table, String id) async {
     try {
-      final res = await _supabase.from(table).delete().eq('id', id);
-      if (res.error != null) throw res.error!;
+      await (_supabase.from(table) as dynamic).delete().eq('id', id);
     } catch (e, st) {
       developer.log('SupabaseService.deleteRaw error: $e\n$st');
       rethrow;
     }
   }
 
-  /// Récupère tous les enregistrements (raw),
-  /// optionnellement filtrés par updatedAfter et limit.
   @override
   Future<List<Map<String, dynamic>>> getAllRaw(
     String table, {
@@ -65,25 +61,27 @@ class SupabaseService implements RemoteStorageService {
     int? limit,
   }) async {
     try {
-      final query = _supabase.from(table).select();
+      dynamic query = _supabase.from(table).select();
 
       if (updatedAfter != null) {
-        query.gte('updatedAt', updatedAfter.toIso8601String());
+        query = query.gte('updatedAt', updatedAfter.toIso8601String());
       }
       if (limit != null) {
-        query.limit(limit);
+        query = query.limit(limit);
       }
 
-      final List<dynamic> res = await query;
+      final dynamic res = await query;
 
-      return res.map((r) => Map<String, dynamic>.from(r as Map)).toList();
+      if (res is List) {
+        return res.map((r) => Map<String, dynamic>.from(r as dynamic)).toList();
+      }
+      return [];
     } catch (e, st) {
       developer.log('SupabaseService.getAllRaw error: $e\n$st');
       rethrow;
     }
   }
 
-  /// Utilité : obtenir des modèles typés directement.
   Future<List<T>> getAll<T>(
     String table,
     T Function(Map<String, dynamic>) fromJson, {
@@ -101,20 +99,26 @@ class SupabaseService implements RemoteStorageService {
   @override
   Stream<List<Map<String, dynamic>>> watchCollectionRaw(
     String collectionOrTable, {
-    Function(dynamic query)? queryBuilder,
+    dynamic Function(dynamic query)? queryBuilder,
   }) {
-    SupabaseQueryBuilder query = _supabase.from(collectionOrTable);
+    // Utilisation de dynamic pour contourner les types changeants de Supabase
+    dynamic query = _supabase.from(collectionOrTable).stream(primaryKey: ['id']);
+    
     if (queryBuilder != null) {
       query = queryBuilder(query);
     }
 
-    return query
-        .stream(primaryKey: ['id'])
-        .map((rows) => rows.map((e) => e).toList());
+    final Stream stream = query as dynamic;
+
+    return stream.map((rows) {
+      if (rows is List) {
+        return rows.map((e) => Map<String, dynamic>.from(e as dynamic)).toList();
+      }
+      return <Map<String, dynamic>>[];
+    });
   }
 }
 
-/// Provider global de SupabaseService
 final supabaseServiceProvider = Provider<SupabaseService>((ref) {
   return SupabaseService.instance;
 });

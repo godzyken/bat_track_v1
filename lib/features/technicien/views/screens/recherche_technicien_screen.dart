@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
+import '../../controllers/providers/technicien_providers.dart';
+
 class RechercheTechnicienScreen extends ConsumerStatefulWidget {
   const RechercheTechnicienScreen({super.key});
 
@@ -66,7 +68,7 @@ class _RechercheTechnicienScreenState
       child: Column(
         children: [
           DropdownButtonFormField<String>(
-            initialValue: _specialiteSelectionnee,
+            value: _specialiteSelectionnee,
             decoration: const InputDecoration(labelText: 'Spécialité'),
             items: [
               'Plomberie',
@@ -80,7 +82,7 @@ class _RechercheTechnicienScreenState
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            initialValue: _regionSelectionnee,
+            value: _regionSelectionnee,
             decoration: const InputDecoration(labelText: 'Région'),
             items: [
               'Béziers',

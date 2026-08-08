@@ -116,7 +116,7 @@ Widget? chantierFieldBuilder(
   if (key != 'etapes') return null;
 
   final etapes = (value as List)
-      .map((e) => e is ChantierEtape ? e : ChantierEtape.fromJson(e))
+      .map((e) => e is ChantierEtape ? e : ChantierEtape.fromJson(e as Map<String, dynamic>))
       .toList();
 
   return Column(

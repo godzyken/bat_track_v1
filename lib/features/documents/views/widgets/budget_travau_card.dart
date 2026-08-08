@@ -35,7 +35,7 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
   }
 
   void _editBudget(List<Technicien> techniciens) async {
-    final controllerMap = {
+    final Map<String, TextEditingController> controllerMap = {
       for (final mo in piece.mainOeuvre ?? [])
         mo.idTechnicien: TextEditingController(
           text: mo.heuresEstimees.toString(),
@@ -94,7 +94,7 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
 
     if (newValues != null) {
       final updatedMainOeuvre = piece.mainOeuvre!.map((mo) {
-        final heures = newValues[mo.idTechnicien];
+        final heures = newValues[mo.idTechnicien.toString()];
 
         return heures != null ? mo.copyWith(heuresEstimees: heures) : mo;
       }).toList();
@@ -287,7 +287,7 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
           const SizedBox(width: 8),
           Expanded(child: Text(label)),
           Text(
-            "${formatter.format(amount.toStringAsFixed(2))} €",
+            formatter.format(amount),
             style: const TextStyle(fontWeight: FontWeight.w500),
           ),
         ],

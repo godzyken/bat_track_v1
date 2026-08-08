@@ -1,6 +1,8 @@
 abstract class RemoteStorageService {
   const RemoteStorageService();
 
+  bool get isConnected => true; // Par défaut connecté
+
   /// 🔍 Récupère un enregistrement brut
   Future<Map<String, dynamic>> getRaw(String collectionOrTable, String id);
 
