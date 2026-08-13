@@ -14,7 +14,6 @@ class CloudFlareService extends RemoteStorageService with NoSuchMethodLogger {
   @override
   bool get isConnected => true;
 
-  @override
   dynamic get proxyTarget => _db;
 
   /// 🔍 Récupère un enregistrement brut

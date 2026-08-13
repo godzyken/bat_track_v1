@@ -17,7 +17,7 @@ class LogEntryHive extends HiveObject {
   String? userId;
 
   @HiveField(4)
-  Map? data;
+  Map<dynamic, dynamic>? data;
 
   @HiveField(5)
   DateTime timestamp;

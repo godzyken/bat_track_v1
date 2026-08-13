@@ -37,7 +37,7 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
   void _editBudget(List<Technicien> techniciens) async {
     final Map<String, TextEditingController> controllerMap = {
       for (final mo in piece.mainOeuvre ?? [])
-        mo.idTechnicien: TextEditingController(
+        mo.idTechnicien.toString(): TextEditingController(
           text: mo.heuresEstimees.toString(),
         ),
     };

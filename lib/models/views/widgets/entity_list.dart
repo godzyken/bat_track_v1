@@ -132,7 +132,14 @@ Future<void> showEntityFormDialog<T extends UnifiedModel>({
       createEmpty: createEmpty,
       fromJson: fromJson,
       onSubmit: onSubmit,
-      customFieldBuilder: (ctx, key, value, controller, onChanged, expert) {
+      customFieldBuilder: ({
+        required BuildContext context,
+        required String key,
+        required dynamic value,
+        required TextEditingController? controller,
+        required void Function(dynamic) onChanged,
+        required bool expertMode,
+      }) {
         if (role == 'tech') {
           final isDimension = editableKeysForTech.contains(key);
           if (!isDimension) {

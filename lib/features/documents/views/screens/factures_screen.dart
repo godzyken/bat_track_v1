@@ -66,34 +66,40 @@ class FacturesScreen extends ConsumerWidget {
             builder: (_) => EntityForm<Facture>(
               fromJson: (json) => Facture.fromJson(json),
               initialValue: facture,
-              customFieldBuilder:
-                  (BuildContext context, String key, dynamic value, TextEditingController? controller, void Function(dynamic) onChanged, bool expertMode) {
-                    // Options a personnaliser ici
-                    switch (key) {
-                      case 'numero':
-                        return TextFormField(
-                          controller: controller,
-                          decoration: const InputDecoration(
-                            labelText: 'Numéro de facture',
-                          ),
-                          onChanged: (v) => onChanged(v),
-                          validator: (value) => value == null || value.isEmpty
-                              ? 'Champs requis'
-                              : null,
-                        );
-                      case 'total':
-                        return TextFormField(
-                          controller: controller,
-                          decoration: const InputDecoration(
-                            labelText: 'Total (€)',
-                          ),
-                          onChanged: (v) => onChanged(double.tryParse(v) ?? 0.0),
-                          keyboardType: TextInputType.number,
-                        );
-                      default:
-                        return null;
-                    }
-                  },
+              customFieldBuilder: ({
+                required BuildContext context,
+                required String key,
+                required dynamic value,
+                required TextEditingController? controller,
+                required void Function(dynamic) onChanged,
+                required bool expertMode,
+              }) {
+                // Options a personnaliser ici
+                switch (key) {
+                  case 'numero':
+                    return TextFormField(
+                      controller: controller,
+                      decoration: const InputDecoration(
+                        labelText: 'Numéro de facture',
+                      ),
+                      onChanged: (v) => onChanged(v),
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Champs requis'
+                          : null,
+                    );
+                  case 'total':
+                    return TextFormField(
+                      controller: controller,
+                      decoration: const InputDecoration(
+                        labelText: 'Total (€)',
+                      ),
+                      onChanged: (v) => onChanged(double.tryParse(v) ?? 0.0),
+                      keyboardType: TextInputType.number,
+                    );
+                  default:
+                    return null;
+                }
+              },
               onSubmit: (updated) async {
                 await ref.read(factureSyncServiceProvider).syncOne(updated);
               },

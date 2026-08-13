@@ -98,13 +98,6 @@ class GoogleSheetsProductService {
       return double.tryParse(str.replaceAll(',', '.'));
     }
 
-    int? getInt(int index) {
-      final str = getString(index);
-      if (str == null) return null;
-
-      return int.tryParse(str);
-    }
-
     List<String>? getList(int index, {String separator = ';'}) {
       final str = getString(index);
       if (str == null) return null;
@@ -229,7 +222,7 @@ final googleAuthProvider = FutureProvider<AutoRefreshingAuthClient>((
 
   if (envPath == null || envPath.isEmpty) {
     throw Exception(
-      "Configuration incomplète : GOOGLE_APPLICATION_CREDENTIALS manquant.",
+      'Configuration incomplète : GOOGLE_APPLICATION_CREDENTIALS manquant.',
     );
   }
 

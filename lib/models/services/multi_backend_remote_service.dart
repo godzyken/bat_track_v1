@@ -51,7 +51,7 @@ class MultiBackendRemoteService extends RemoteStorageService {
   @override
   Stream<List<Map<String, dynamic>>> watchCollectionRaw(
     String coll, {
-    Function(dynamic query)? queryBuilder,
+    dynamic Function(dynamic query)? queryBuilder,
   }) {
     // On écoute le stream du backend principal
     return backends[enabledBackends.first]?.watchCollectionRaw(

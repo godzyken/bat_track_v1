@@ -105,14 +105,14 @@ class _EntityFormState<T extends UnifiedModel>
     return null;
   }
 
-  Widget? _defaultFieldBuilder(
-    BuildContext context,
-    String key,
-    dynamic value,
-    TextEditingController? controller,
-    void Function(dynamic) onChanged,
-    bool expertMode,
-  ) {
+  Widget? _defaultFieldBuilder({
+    required BuildContext context,
+    required String key,
+    required dynamic value,
+    required TextEditingController? controller,
+    required void Function(dynamic) onChanged,
+    required bool expertMode,
+  }) {
     final autofill = _getAutofillHints(key);
     // 👤 Champs utilisateurs spécifiques par rôle
     if (key == 'clientId' && T.toString() != 'AppUser') {
@@ -296,15 +296,15 @@ class _EntityFormState<T extends UnifiedModel>
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: builder(
-          context,
-          key,
-          val,
-          ctl,
-          (dynamic v) {
+          context: context,
+          key: key,
+          value: val,
+          controller: ctl,
+          onChanged: (dynamic v) {
             _json[key] = v;
             _rawOverrides[key]?.text = json.encode(v);
           },
-          _expertMode,
+          expertMode: _expertMode,
         ) ?? const SizedBox.shrink(),
       );
     }).toList();

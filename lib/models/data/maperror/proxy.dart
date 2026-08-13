@@ -57,7 +57,7 @@ class DebugProxy<T> {
         arguments,
         invocation.namedArguments,
         () => Function.apply(
-          _getMethod(_inner as dynamic, invocation.memberName),
+          _getMethod(_inner as dynamic, invocation.memberName) as Function,
           arguments,
           invocation.namedArguments,
         ),
@@ -65,16 +65,15 @@ class DebugProxy<T> {
     }
 
     return Function.apply(
-      _getMethod(_inner as dynamic, invocation.memberName),
+      _getMethod(_inner as dynamic, invocation.memberName) as Function,
       arguments,
       invocation.namedArguments,
     );
   }
 
-  dynamic _getMethod(Object obj, Symbol memberName) {
+  dynamic _getMethod(dynamic obj, Symbol memberName) {
     try {
-      final dyn = obj as dynamic;
-      return dyn;
+      return obj;
     } catch (_) {
       return null;
     }

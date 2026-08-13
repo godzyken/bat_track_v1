@@ -74,8 +74,8 @@ dependencies:
   dio: ^5.8.0+1
   async: ^2.13.0
   logger: ^2.6.1
-  googleapis_auth: ^1.6.0
-  connectivity_plus: ^6.1.1
+  googleapis_auth: ^2.3.3
+  connectivity_plus: ^7.3.1
 
   # UI & charts
   go_router: ^17.0.0

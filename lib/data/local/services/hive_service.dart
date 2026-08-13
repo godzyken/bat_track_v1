@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import '../models/index_model_extention.dart';
 
 class HiveService {
-  static final Map<String, Box> _boxes = {};
+  static final Map<String, Box<dynamic>> _boxes = {};
 
   /// Initialise Hive et enregistre les adaptateurs
   static Future<void> init() async {
@@ -102,7 +102,7 @@ class HiveService {
   }
 
   static Future<void> deleteBox(String boxName) async {
-    final box = await _openBox(boxName);
+    final box = await _openBox<dynamic>(boxName);
     await box.deleteFromDisk();
   }
 

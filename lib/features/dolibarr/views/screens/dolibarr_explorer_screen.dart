@@ -25,7 +25,7 @@ class _DolibarrExplorerScreenState
     text: '/thirdparties',
   );
   final TextEditingController _searchController = TextEditingController();
-  AsyncValue<Response>? _response;
+  AsyncValue<Response<dynamic>>? _response;
 
   String _filter = '';
 
@@ -35,7 +35,7 @@ class _DolibarrExplorerScreenState
     final endpoint = _endpointController.text.trim();
 
     try {
-      final res = await dio.get(endpoint);
+      final res = await dio.get<dynamic>(endpoint);
       setState(() => _response = AsyncValue.data(res));
     } catch (e, st) {
       setState(() => _response = AsyncValue.error(e, st));

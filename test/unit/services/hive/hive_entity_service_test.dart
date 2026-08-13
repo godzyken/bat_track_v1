@@ -155,7 +155,7 @@ void main() {
               MockDataFactories.createProjet(id: 'u2_$i', createdBy: 'user2'),
         );
 
-        for (final projet in [...user1Projets, ...user2Projets]) {
+        for (final projet in <Projet>[...user1Projets, ...user2Projets]) {
           await service.create(projet);
         }
 

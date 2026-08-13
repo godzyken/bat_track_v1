@@ -76,74 +76,80 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
           context.pop();
         }
       },
-      customFieldBuilder:
-          (context, key, value, controller, onChanged, expertMode) {
-            // 🔹 Choix du client (toujours accessible au admin)
-            if (key == 'clientId' &&
-                (AppUserAccess(user).isAdmin || !isEditing)) {
-              return UserDropdownField(
-                role: 'client',
-                label: 'Client assigné',
-                selectedUserId: selectedClientId ?? '',
-                onChanged: (newId) => setState(() => selectedClientId = newId),
-              );
-            }
+      customFieldBuilder: ({
+        required BuildContext context,
+        required String key,
+        required dynamic value,
+        required TextEditingController? controller,
+        required void Function(dynamic) onChanged,
+        required bool expertMode,
+      }) {
+        // 🔹 Choix du client (toujours accessible au admin)
+        if (key == 'clientId' &&
+            (AppUserAccess(user).isAdmin || !isEditing)) {
+          return UserDropdownField(
+            role: 'client',
+            label: 'Client assigné',
+            selectedUserId: selectedClientId ?? '',
+            onChanged: (newId) => setState(() => selectedClientId = newId),
+          );
+        }
 
-            // 🔹 Multi-sélection technicien pour admin / chef de projet
-            if (key == 'technicienIds' &&
-                value is List &&
-                (AppUserAccess(user).isAdmin || user.isClient)) {
-              return Wrap(
-                spacing: 8,
-                children: techs.map((t) {
-                  final isSelected = selectedTechniciens.contains(t.id);
-                  return FilterChip(
-                    label: Text('${t.nom} (${t.specialite})'),
-                    selected: isSelected,
-                    onSelected: (sel) {
-                      setState(() {
-                        if (sel) {
-                          selectedTechniciens.add(t.id);
-                        } else {
-                          selectedTechniciens.remove(t.id);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
+        // 🔹 Multi-sélection technicien pour admin / chef de projet
+        if (key == 'technicienIds' &&
+            value is List &&
+            (AppUserAccess(user).isAdmin || user.isClient)) {
+          return Wrap(
+            spacing: 8,
+            children: techs.map((t) {
+              final isSelected = selectedTechniciens.contains(t.id);
+              return FilterChip(
+                label: Text('${t.nom} (${t.specialite})'),
+                selected: isSelected,
+                onSelected: (sel) {
+                  setState(() {
+                    if (sel) {
+                      selectedTechniciens.add(t.id);
+                    } else {
+                      selectedTechniciens.remove(t.id);
+                    }
+                  });
+                },
               );
-            }
+            }).toList(),
+          );
+        }
 
-            // 🔹 Validation par rôle
-            if (key == 'clientValide' && AppUserAccess(user).isClient) {
-              return CheckboxListTile(
-                title: const Text('Je valide le projet'),
-                value: clientValide,
-                onChanged: (v) => setState(() => clientValide = v ?? false),
-              );
-            }
+        // 🔹 Validation par rôle
+        if (key == 'clientValide' && AppUserAccess(user).isClient) {
+          return CheckboxListTile(
+            title: const Text('Je valide le projet'),
+            value: clientValide,
+            onChanged: (v) => setState(() => clientValide = v ?? false),
+          );
+        }
 
-            if (key == 'chefDeProjetValide' && user.isClient) {
-              return CheckboxListTile(
-                title: const Text('Validation Chef de projet'),
-                value: chefDeProjetValide,
-                onChanged: (v) =>
-                    setState(() => chefDeProjetValide = v ?? false),
-              );
-            }
+        if (key == 'chefDeProjetValide' && user.isClient) {
+          return CheckboxListTile(
+            title: const Text('Validation Chef de projet'),
+            value: chefDeProjetValide,
+            onChanged: (v) =>
+                setState(() => chefDeProjetValide = v ?? false),
+          );
+        }
 
-            if (key == 'superUtilisateurValide' &&
-                AppUserAccess(user).isAdmin) {
-              return CheckboxListTile(
-                title: const Text('Validation Super Utilisateur'),
-                value: superUtilisateurValide,
-                onChanged: (v) =>
-                    setState(() => superUtilisateurValide = v ?? false),
-              );
-            }
+        if (key == 'superUtilisateurValide' &&
+            AppUserAccess(user).isAdmin) {
+          return CheckboxListTile(
+            title: const Text('Validation Super Utilisateur'),
+            value: superUtilisateurValide,
+            onChanged: (v) =>
+                setState(() => superUtilisateurValide = v ?? false),
+          );
+        }
 
-            return null;
-          },
+        return null;
+      },
     );
   }
 }

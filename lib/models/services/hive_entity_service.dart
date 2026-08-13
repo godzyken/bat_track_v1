@@ -6,15 +6,15 @@ class HiveEntityService<T extends UnifiedModel>
     implements EntityLocalService<T> {
   final String boxName;
   final T Function(Map<String, dynamic>) fromJson;
-  Box<Map>? _box;
+  Box<Map<dynamic, dynamic>>? _box;
 
   HiveEntityService({required this.boxName, required this.fromJson});
 
   Future<void> init() async {
     if (!Hive.isBoxOpen(boxName)) {
-      _box = await Hive.openBox<Map>(boxName);
+      _box = await Hive.openBox<Map<dynamic, dynamic>>(boxName);
     } else {
-      _box = Hive.box<Map>(boxName);
+      _box = Hive.box<Map<dynamic, dynamic>>(boxName);
     }
   }
 

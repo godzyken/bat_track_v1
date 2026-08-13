@@ -32,7 +32,7 @@ abstract class UnifiedEntityService<
   late final Box<E> _localBox;
   bool _isInitialized = false;
 
-  StreamSubscription? _remoteSub;
+  StreamSubscription<List<M>>? _remoteSub;
 
   late final FrameSyncQueue<M> _syncQueue;
 
@@ -370,22 +370,8 @@ abstract class UnifiedEntityService<
     final remoteData = await getAllRemote();
     final mergedData = <M>[];
     final conflictMap = <String, M>{};
-    final conflictIds = <String>{};
     final conflictIdsLocal = <String>{};
     final conflictIdsRemote = <String>{};
-    final conflictIdsBoth = <String>{};
-    final conflictIdsLocalOnly = <String>{};
-    final conflictIdsRemoteOnly = <String>{};
-    final conflictIdsBothOnly = <String>{};
-    final conflictIdsLocalUpdated = <String>{};
-    final conflictIdsRemoteUpdated = <String>{};
-    final conflictIdsBothUpdated = <String>{};
-    final conflictIdsLocalOnlyUpdated = <String>{};
-    final conflictIdsRemoteOnlyUpdated = <String>{};
-    final conflictIdsBothOnlyUpdated = <String>{};
-    final conflictIdsLocalOnlyDeleted = <String>{};
-    final conflictIdsRemoteOnlyDeleted = <String>{};
-    final conflictIdsBothOnlyDeleted = <String>{};
 
     for (final localItem in localData) {
       final remoteItem = remoteData.firstWhereOrNull(
@@ -394,29 +380,15 @@ abstract class UnifiedEntityService<
 
       if (remoteItem == null) {
         conflictIdsLocal.add(localItem.id);
-        conflictIdsLocalOnly.add(localItem.id);
-        conflictIdsLocalOnlyDeleted.add(localItem.id);
       } else if (localItem.updatedAt!.isAfter(remoteItem.updatedAt!)) {
         conflictIdsLocal.add(localItem.id);
-        conflictIdsLocalUpdated.add(localItem.id);
-        conflictIdsLocalOnlyUpdated.add(localItem.id);
-        conflictIdsBoth.add(localItem.id);
-        conflictIdsBothUpdated.add(localItem.id);
         mergedData.add(localItem);
         conflictMap[localItem.id] = localItem;
       } else {
         conflictIdsRemote.add(remoteItem.id);
-        conflictIdsRemoteUpdated.add(remoteItem.id);
-        conflictIdsRemoteOnlyUpdated.add(remoteItem.id);
-        conflictIdsBoth.add(remoteItem.id);
-        conflictIdsBothUpdated.add(remoteItem.id);
         mergedData.add(remoteItem);
         conflictMap[remoteItem.id] = remoteItem;
       }
-
-      conflictIdsBothOnly.add(localItem.id);
-      conflictIdsBothOnlyUpdated.add(localItem.id);
-      conflictIdsBothOnlyDeleted.add(localItem.id);
     }
 
     for (final remoteItem in remoteData) {
@@ -426,14 +398,8 @@ abstract class UnifiedEntityService<
 
       if (localItem == null) {
         conflictIdsRemote.add(remoteItem.id);
-        conflictIdsRemoteOnly.add(remoteItem.id);
-        conflictIdsRemoteOnlyDeleted.add(remoteItem.id);
       } else if (remoteItem.updatedAt!.isAfter(localItem.updatedAt!)) {
         conflictIdsRemote.add(remoteItem.id);
-        conflictIdsRemoteUpdated.add(remoteItem.id);
-        conflictIdsRemoteOnlyUpdated.add(remoteItem.id);
-        conflictIdsBoth.add(remoteItem.id);
-        conflictIdsBothUpdated.add(remoteItem.id);
 
         mergedData.add(remoteItem);
         conflictMap[remoteItem.id] = remoteItem;

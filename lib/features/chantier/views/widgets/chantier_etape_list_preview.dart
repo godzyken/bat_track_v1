@@ -105,14 +105,14 @@ class ChantierEtapeListPreview extends ConsumerWidget {
 }
 
 /// Champ personnalisé pour `Chantier.etapes`
-Widget? chantierFieldBuilder(
-  BuildContext context,
-  String key,
-  dynamic value,
-  TextEditingController? controller,
-  void Function(dynamic) onChanged,
-  bool expertMode,
-) {
+Widget? chantierFieldBuilder({
+  required BuildContext context,
+  required String key,
+  required dynamic value,
+  required TextEditingController? controller,
+  required void Function(dynamic) onChanged,
+  required bool expertMode,
+}) {
   if (key != 'etapes') return null;
 
   final etapes = (value as List)
@@ -149,7 +149,7 @@ Widget? chantierFieldBuilder(
       ChantierEtapeListPreview(
         etapes: etapes,
         onTap: (i) {
-          final chantier = value;
+          final dynamic chantier = value;
 
           context.goNamed(
             'chantier-etape-detail',

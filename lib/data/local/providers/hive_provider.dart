@@ -319,24 +319,3 @@ final equipementServiceProvider =
       collectionName: 'equipements',
       factory: EquipementEntityFactory(),
     );
-
-final _serviceRegistry = <Type, Provider>{
-  Chantier: chantierServiceProvider,
-  Client: clientServiceProvider,
-  Technicien: technicienServiceProvider,
-  Intervention: interventionServiceProvider,
-  ChantierEtape: chantierEtapeServiceProvider,
-  PieceJointe: pieceJointeServiceProvider,
-  Piece: pieceServiceProvider,
-  Materiel: materielServiceProvider,
-  Materiau: materiauServiceProvider,
-  MainOeuvre: mainOeuvreServiceProvider,
-  FactureDraft: factureDraftServiceProvider,
-  FactureModel: factureModelServiceProvider,
-  Facture: factureServiceProvider,
-  Projet: projetServiceProvider,
-  UserModel: userServiceProvider,
-  Equipement: equipementServiceProvider,
-  AppUser: appUserEntityServiceProvider,
-  // AppUser: filteredAppUserServiceProvider,
-};

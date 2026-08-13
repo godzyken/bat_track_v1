@@ -27,7 +27,7 @@ class _DolibarrRequestEditorState extends ConsumerState<DolibarrRequestEditor> {
     final bodyRaw = _bodyController.text.trim();
 
     try {
-      late Response res;
+      late Response<dynamic> res;
 
       switch (method) {
         case 'GET':

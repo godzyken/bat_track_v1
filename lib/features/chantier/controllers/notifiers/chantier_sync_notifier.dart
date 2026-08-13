@@ -9,15 +9,7 @@ import '../../../../models/notifiers/logged_notifier.dart';
 import '../../../../providers/hive_firebase_provider.dart';
 
 class ChantierSyncNotifier extends AsyncNotifier<SyncedState<Chantier>> {
-  late Chantier _initial;
-
-  @override
-  Future<SyncedState<Chantier>> build() async {
-    throw UnimplementedError("Use provider with initial data");
-  }
-
   Future<SyncedState<Chantier>> buildWithInitial(Chantier initial) async {
-    _initial = initial;
     return SyncedState.initial(initial);
   }
 

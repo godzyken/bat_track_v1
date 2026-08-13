@@ -32,10 +32,7 @@ class SyncWorker {
   }
 
   void stop() {
-    final sub = _subscription;
-    if (sub != null) {
-      (sub as dynamic).close();
-    }
+    _subscription?.close();
   }
 }
 

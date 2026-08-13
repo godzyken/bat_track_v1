@@ -16,15 +16,16 @@ typedef EntityDetailBuilder<M, E> =
       SyncEntityNotifier notifier,
       SyncedState<M> state,
     );
+
 typedef FieldBuilder =
-    Widget? Function(
-      BuildContext context,
-      String key,
-      dynamic value,
-      TextEditingController? controller,
-      void Function(dynamic) onChanged,
-      bool expertMode,
-    );
+    Widget? Function({
+      required BuildContext context,
+      required String key,
+      required dynamic value,
+      required TextEditingController? controller,
+      required void Function(dynamic) onChanged,
+      required bool expertMode,
+    });
 
 typedef AsyncCallback<T> = Future<T> Function();
 typedef OnEtapeSubmit = void Function(ChantierEtape etape);

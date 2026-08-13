@@ -19,7 +19,6 @@ class FirebaseStorageService
 
   FirebaseStorageService(this._storage, this._dio, this._logger);
 
-  @override
   dynamic get proxyTarget => _storage;
 
   @override

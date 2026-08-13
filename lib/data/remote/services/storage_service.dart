@@ -14,7 +14,6 @@ class StorageService
 
   StorageService(this._storage);
 
-  @override
   dynamic get proxyTarget => _storage;
 
   @override

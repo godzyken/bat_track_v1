@@ -17,14 +17,7 @@ class ErrorLogger {
     await Sentry.captureException(
       error,
       stackTrace: stackTrace,
-      hint: context != null
-          ? Hint.withScreenshot(
-              SentryAttachment.fromLoader(
-                loader: error,
-                filename: TypeCheckHint.currentStackTrace,
-              ),
-            )
-          : null,
+      hint: context != null ? Hint.withMap({'context': context}) : null,
     );
   }
 

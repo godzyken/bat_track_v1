@@ -11,7 +11,7 @@ class DolibarrSyncService {
   DolibarrSyncService(this.ref);
 
   Future<void> syncAllFromDolibarr(BuildContext context) async {
-    final syncs = <Future Function()>[
+    final syncs = <Future<void> Function()>[
       () => _syncModel<Client>(
         context: context,
         fromJson: Client.fromJson,

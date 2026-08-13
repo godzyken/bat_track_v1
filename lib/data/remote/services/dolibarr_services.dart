@@ -18,7 +18,7 @@ class DolibarrApiService {
       );
 
   Future<List<Map<String, dynamic>>> fetch(String endpoint) async {
-    final response = await dio.get(endpoint);
+    final response = await dio.get<dynamic>(endpoint);
     if (response.statusCode == 200) {
       return List<Map<String, dynamic>>.from(response.data as Iterable);
     } else {

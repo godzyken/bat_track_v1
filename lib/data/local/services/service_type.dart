@@ -11,7 +11,6 @@ import '../../remote/services/storage_service.dart';
 import '../models/adapters/hive_entity_factory.dart';
 import '../models/entities/index_entity_extention.dart';
 import '../models/index_model_extention.dart';
-import 'hive_service.dart';
 
 enum StorageMode { hive, firebase, firestore, cloudflare }
 

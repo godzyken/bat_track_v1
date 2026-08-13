@@ -22,7 +22,6 @@ class ClientHomeScreen extends ConsumerWidget {
       return const Center(child: Text("Veuillez vous connecter."));
     }
 
-    final isAdmin = currentUser.role == 'admin';
     final isOwner = currentUser.role == 'client';
 
     bool canEdit<T extends UnifiedModel>({

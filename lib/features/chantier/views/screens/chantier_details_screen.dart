@@ -51,7 +51,7 @@ class ChantierDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final info = context.responsiveInfo(ref);
+    context.responsiveInfo(ref);
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     // ✅ NOUVEAU : Lecture du Notifier familial

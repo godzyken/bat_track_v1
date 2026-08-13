@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 
 class StreamChangeNotifier extends ChangeNotifier {
-  final StreamSubscription _subscription;
+  final StreamSubscription<dynamic> _subscription;
 
   StreamChangeNotifier(Stream<dynamic> stream)
     : _subscription = stream.listen((_) => _safeNotify());
@@ -17,7 +17,7 @@ class StreamChangeNotifier extends ChangeNotifier {
 
   static StreamChangeNotifier? _notifier;
 
-  static StreamChangeNotifier init(Stream stream) {
+  static StreamChangeNotifier init(Stream<dynamic> stream) {
     _notifier = StreamChangeNotifier(stream);
     return _notifier!;
   }

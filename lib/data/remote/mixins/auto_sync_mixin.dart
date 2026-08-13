@@ -27,7 +27,7 @@ mixin AutoSync<T extends UnifiedModel, Serializable>
     final currentId = ++_debounceId;
 
     // ⏳ pseudo-debounce sans Timer
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
 
     // ❌ si un nouvel update est passé → on annule
     if (currentId != _debounceId) return;

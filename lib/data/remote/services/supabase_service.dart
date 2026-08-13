@@ -17,11 +17,11 @@ class SupabaseService extends RemoteStorageService {
   @override
   Future<Map<String, dynamic>> getRaw(String table, String id) async {
     try {
-      final dynamic res =
+      final res =
           await _supabase.from(table).select().eq('id', id).maybeSingle();
 
       if (res == null) return {};
-      return Map<String, dynamic>.from(res as Map);
+      return Map<String, dynamic>.from(res as Map<dynamic, dynamic>);
     } catch (e, st) {
       developer.log('SupabaseService.getRaw error: $e\n$st');
       rethrow;
@@ -36,7 +36,7 @@ class SupabaseService extends RemoteStorageService {
   ) async {
     try {
       final toInsert = {...data, 'id': id};
-      final dynamic fromTable = _supabase.from(table);
+      final fromTable = _supabase.from(table);
       await fromTable.upsert(toInsert);
     } catch (e, st) {
       developer.log('SupabaseService.saveRaw error: $e\n$st');
@@ -47,7 +47,7 @@ class SupabaseService extends RemoteStorageService {
   @override
   Future<void> deleteRaw(String table, String id) async {
     try {
-      await (_supabase.from(table) as dynamic).delete().eq('id', id);
+      await _supabase.from(table).delete().eq('id', id);
     } catch (e, st) {
       developer.log('SupabaseService.deleteRaw error: $e\n$st');
       rethrow;
@@ -70,10 +70,10 @@ class SupabaseService extends RemoteStorageService {
         query = query.limit(limit);
       }
 
-      final dynamic res = await query;
+      final res = await query;
 
       if (res is List) {
-        return res.map((r) => Map<String, dynamic>.from(r as dynamic)).toList();
+        return res.map((dynamic r) => Map<String, dynamic>.from(r as Map<dynamic, dynamic>)).toList();
       }
       return [];
     } catch (e, st) {
@@ -108,11 +108,11 @@ class SupabaseService extends RemoteStorageService {
       query = queryBuilder(query);
     }
 
-    final Stream stream = query as dynamic;
+    final stream = query as Stream;
 
-    return stream.map((rows) {
+    return stream.map((dynamic rows) {
       if (rows is List) {
-        return rows.map((e) => Map<String, dynamic>.from(e as dynamic)).toList();
+        return rows.map((dynamic e) => Map<String, dynamic>.from(e as Map<dynamic, dynamic>)).toList();
       }
       return <Map<String, dynamic>>[];
     });

@@ -13,14 +13,14 @@ extension FactureDraftBuilder on FactureDraft {
 
     for (final etape in chantier.etapes) {
       final montant = etape.pieces
-          .where((p) => p.mainOeuvre != [])
+          .where((p) => p.mainOeuvre != <MainOeuvre>[])
           .fold<double>(
             0.0,
             (sum, p) => sum + (p.getBudgetTotalSansMainOeuvre()),
           );
 
       final coutMainOeuvre = etape.pieces
-          .where((p) => p.mainOeuvre != [])
+          .where((p) => p.mainOeuvre != <MainOeuvre>[])
           .fold<double>(0.0, (sum, p) => sum + (p.getBudgetTotal(techList)));
 
       lignes.add(
@@ -76,7 +76,7 @@ extension ChantierBudgetExt on Chantier {
     for (final t in techs) {
       return allManoeuvres.where((m) => t.id == m.idTechnicien).toList();
     }
-    return [];
+    return <MainOeuvre>[];
   }
 
   double getTotalBudgetWithTech(List<Piece> pieces, List<Technicien> allTechs) {

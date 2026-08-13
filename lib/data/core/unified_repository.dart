@@ -35,7 +35,7 @@ class UnifiedRepository<T extends UnifiedModel>
   final RepositoryConfig<T> config;
   final Ref ref;
 
-  Box<Map>? _hiveBox;
+  Box<Map<dynamic, dynamic>>? _hiveBox;
   CollectionReference<Map<String, dynamic>>? _firebaseCollection;
 
   UnifiedRepository(this.config, this.ref) {
@@ -45,8 +45,8 @@ class UnifiedRepository<T extends UnifiedModel>
 
   // ==================== HIVE ====================
 
-  Future<Box<Map>> _getHiveBox() async {
-    _hiveBox ??= await Hive.openBox<Map>(config.collectionPath);
+  Future<Box<Map<dynamic, dynamic>>> _getHiveBox() async {
+    _hiveBox ??= await Hive.openBox<Map<dynamic, dynamic>>(config.collectionPath);
 
     return _hiveBox!;
   }

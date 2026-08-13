@@ -1,4 +1,3 @@
-import 'package:bat_track_v1/data/local/services/service_type.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 

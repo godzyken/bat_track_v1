@@ -67,7 +67,7 @@ class CloudflareEntityService<M extends UnifiedModel>
   }
 
   Future<List<M>> sortedBy(
-    Comparable Function(M) selector, {
+    Comparable<dynamic> Function(M) selector, {
     bool descending = false,
   }) async {
     final list = await getAll();

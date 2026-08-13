@@ -8,24 +8,24 @@ class LoggingNavigatorObserver extends NavigatorObserver {
   LoggingNavigatorObserver({required this.logger});
 
   @override
-  void didPush(Route route, Route? previousRoute) {
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
     _logNavigation('PUSH', route, previousRoute);
   }
 
   @override
-  void didPop(Route route, Route? previousRoute) {
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
     _logNavigation('POP', route, previousRoute);
   }
 
   @override
-  void didReplace({Route? newRoute, Route? oldRoute}) {
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
     _logNavigation('REPLACE', newRoute, oldRoute);
   }
 
-  void _logNavigation(String action, Route? route, Route? previousRoute) {
+  void _logNavigation(String action, Route<dynamic>? route, Route<dynamic>? previousRoute) {
     final newRouteName = route?.settings.name ?? route?.settings.toString();
     final oldRouteName =
         previousRoute?.settings.name ?? previousRoute?.settings.toString();
