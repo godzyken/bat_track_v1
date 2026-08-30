@@ -17,18 +17,18 @@ final dioProvider = Provider<Dio>((ref) {
     InterceptorsWrapper(
       onRequest: (options, handler) {
         options.headers['DOLAPIKEY'] = instance?.apiKey ?? '';
-        logger.i("Request[${options.method}] => PATH: ${options.path}");
+        logger.i('Request[${options.method}] => PATH: ${options.path}');
         handler.next(options);
       },
       onResponse: (response, handler) {
         logger.i(
-          "Response[${response.statusCode}] => PATH: ${response.requestOptions.path}",
+          'Response[${response.statusCode}] => PATH: ${response.requestOptions.path}',
         );
         handler.next(response);
       },
       onError: (DioException err, handler) async {
         logger.e(
-          "Error[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}",
+          'Error[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}',
         );
         await Sentry.captureException(err, stackTrace: handler);
 

@@ -46,10 +46,10 @@ class DolibarrSection extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text('URL : ${instance.value!.baseUrl}'),
                 const SizedBox(height: 8),
-                ExpansionTile(
-                  title: const Text("Explorateur avancé Dolibarr"),
+                const ExpansionTile(
+                  title: Text('Explorateur avancé Dolibarr'),
                   initiallyExpanded: true,
-                  children: const [
+                  children: [
                     Padding(
                       padding: EdgeInsets.all(16),
                       child: DolibarrRequestEditor(),

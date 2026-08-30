@@ -178,7 +178,7 @@ class _EntityFormState<T extends UnifiedModel>
       return TextFormField(
         key: ValueKey(key),
         controller: controller,
-        decoration: InputDecoration(labelText: "$key (séparés par virgule)"),
+        decoration: InputDecoration(labelText: '$key (séparés par virgule)'),
         keyboardType: TextInputType.multiline,
         autofillHints: autofill,
       );
@@ -187,7 +187,7 @@ class _EntityFormState<T extends UnifiedModel>
       return TextFormField(
         key: ValueKey(key),
         controller: controller,
-        decoration: InputDecoration(labelText: "$key (JSON)"),
+        decoration: InputDecoration(labelText: '$key (JSON)'),
         style: const TextStyle(fontFamily: 'NotoSans'),
         maxLines: 4,
         keyboardType: TextInputType.multiline,
@@ -236,7 +236,7 @@ class _EntityFormState<T extends UnifiedModel>
         final password = result['motDePasse'] as String?;
         if (email == null || password == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Email et mot de passe requis")),
+            const SnackBar(content: Text('Email et mot de passe requis')),
           );
 
           return;
@@ -274,7 +274,7 @@ class _EntityFormState<T extends UnifiedModel>
         if (mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text("Erreur : ${e.toString()}")));
+          ).showSnackBar(SnackBar(content: Text('Erreur : ${e.toString()}')));
         }
 
         return;
@@ -322,7 +322,7 @@ class _EntityFormState<T extends UnifiedModel>
           return TextFormField(
             key: ValueKey('expert_$key'),
             controller: ctl,
-            decoration: InputDecoration(labelText: "$key (JSON brut)"),
+            decoration: InputDecoration(labelText: '$key (JSON brut)'),
             maxLines: 6,
             style: const TextStyle(fontFamily: 'NotoSans'),
             validator: (v) {
@@ -364,7 +364,7 @@ class _EntityFormState<T extends UnifiedModel>
                     value: _expertMode,
                     onChanged: (v) => setState(() => _expertMode = v ?? false),
                   ),
-                  const Text("Mode expert"),
+                  const Text('Mode expert'),
                 ],
               ),
             ],
@@ -374,9 +374,9 @@ class _EntityFormState<T extends UnifiedModel>
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text("Annuler"),
+          child: const Text('Annuler'),
         ),
-        ElevatedButton(onPressed: _submit, child: const Text("Valider")),
+        ElevatedButton(onPressed: _submit, child: const Text('Valider')),
       ],
     );
   }

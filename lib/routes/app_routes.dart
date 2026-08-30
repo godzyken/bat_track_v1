@@ -172,10 +172,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     ],
                   ),
                   GoRoute(
-                    path: "interventions/:statut",
+                    path: 'interventions/:statut',
                     builder: (context, state) {
-                      final chantierId = state.pathParameters["chantierId"]!;
-                      final statut = state.pathParameters["statut"]!;
+                      final chantierId = state.pathParameters['chantierId']!;
+                      final statut = state.pathParameters['statut']!;
                       return InterventionsScreen(
                         chantierId: chantierId,
                         statut: statut,
@@ -289,7 +289,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     currentUser: currentUser,
                   );
                 },
-                routes: [],
+                routes: const [],
               ),
             ],
           ),

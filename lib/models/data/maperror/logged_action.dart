@@ -14,7 +14,7 @@ mixin LoggedAction {
   void initLogger(Ref ref) {
     _ref = ref;
 
-    developer.log("🛠 Logger Initialisé pour $runtimeType");
+    developer.log('🛠 Logger Initialisé pour $runtimeType');
   }
 
   void logAction({
@@ -24,7 +24,7 @@ mixin LoggedAction {
     bool captureToSentry = true,
   }) {
     final timestamp = DateTime.now();
-    developer.log(">>>> [CONSOLE CHECK] $timestamp | $action | $target");
+    developer.log('>>>> [CONSOLE CHECK] $timestamp | $action | $target');
     final logger = _ref.read(loggerNotifierProvider.notifier);
 
     final message = LogEntry(
@@ -72,7 +72,7 @@ mixin LoggedAction {
       target: target!,
     );
 
-    debugPrint("LOGGED EVENT: ${jsonEncode(message)}");
+    debugPrint('LOGGED EVENT: ${jsonEncode(message)}');
 
     if (captureToSentry) {
       Sentry.captureEvent(
@@ -98,7 +98,7 @@ mixin LoggedAction {
       action: name,
       target: target!,
     );
-    debugPrint("LOGGED ERROR: ${jsonEncode(message)}");
+    debugPrint('LOGGED ERROR: ${jsonEncode(message)}');
 
     if (captureToSentry) {
       Sentry.captureException(

@@ -6,7 +6,7 @@ class UnauthorizedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Center(child: Text("Accès refusé", style: TextStyle(fontSize: 24))),
+      body: Center(child: Text('Accès refusé', style: TextStyle(fontSize: 24))),
     );
   }
 }

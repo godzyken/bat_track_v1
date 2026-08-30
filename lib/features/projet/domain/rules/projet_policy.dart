@@ -13,8 +13,9 @@ class ProjetPolicy {
         projet.status == ProjetStatus.draft) {
       return true;
     }
-    if (AppUserAccess(user).isTechnicien && projet.members.contains(user.uid))
+    if (AppUserAccess(user).isTechnicien && projet.members.contains(user.uid)) {
       return true;
+    }
     return false;
   }
 
@@ -35,10 +36,12 @@ class ProjetPolicy {
 
   bool canRead(AppUser user, Projet projet) {
     if (AppUserAccess(user).isAdmin) return true;
-    if (AppUserAccess(user).isClient && projet.createdBy == user.uid)
+    if (AppUserAccess(user).isClient && projet.createdBy == user.uid) {
       return true;
-    if (AppUserAccess(user).isTechnicien && projet.members.contains(user.uid))
+    }
+    if (AppUserAccess(user).isTechnicien && projet.members.contains(user.uid)) {
       return true;
+    }
     return false;
   }
 }

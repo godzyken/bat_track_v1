@@ -124,11 +124,11 @@ class _DolibarrExplorerScreenState
   @override
   Widget build(BuildContext context) {
     final instance = ref.watch(selectedInstanceProvider);
-    if (instance.value == null) return ErrorApp(message: 'Pas d\'instance');
+    if (instance.value == null) return const ErrorApp(message: 'Pas d\'instance');
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Explorateur Dolibarr"),
+        title: const Text('Explorateur Dolibarr'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -142,7 +142,7 @@ class _DolibarrExplorerScreenState
         child: Column(
           children: [
             Text(
-              "Instance : ${instance.value?.name} (${instance.value!.baseUrl})",
+              'Instance : ${instance.value?.name} (${instance.value!.baseUrl})',
             ),
             const SizedBox(height: 12),
             Row(
@@ -161,14 +161,14 @@ class _DolibarrExplorerScreenState
                 ElevatedButton.icon(
                   onPressed: _fetchData,
                   icon: const Icon(Icons.cloud_download),
-                  label: const Text("Charger"),
+                  label: const Text('Charger'),
                 ),
               ],
             ),
             const SizedBox(height: 16),
             Expanded(
               child: _response == null
-                  ? const Center(child: Text("Aucune requête effectuée."))
+                  ? const Center(child: Text('Aucune requête effectuée.'))
                   : _response!.when(
                       data: (res) => _buildFormattedJson(res.data),
                       loading: () => const Center(

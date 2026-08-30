@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
@@ -17,6 +18,7 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
   final bool showActions;
   final bool readOnly;
   final ResponsiveInfo? infoOverride;
+  final Widget Function(T item)? cardTrailingBuilder;
 
   const EntityList({
     super.key,
@@ -29,6 +31,7 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
     this.showActions = true,
     this.readOnly = false,
     this.infoOverride,
+    this.cardTrailingBuilder,
   });
 
   @override
@@ -70,16 +73,16 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
                   : null,
               showActions: showActions,
               readOnly: readOnly || !item.canEdit(currentUser),
+              trailingActions: cardTrailingBuilder != null ? [cardTrailingBuilder!(item)] : null,
             );
           }
 
           // Mobile → Liste
           if (info.isMobile) {
             return ListView.builder(
-              padding: const EdgeInsets.all(12),
+              scrollCacheExtent: const ScrollCacheExtent.pixels(500), padding: const EdgeInsets.all(12),
               itemCount: filteredItems.length,
               itemBuilder: (context, index) => buildCard(filteredItems[index]),
-              cacheExtent: 500,
             );
           }
 

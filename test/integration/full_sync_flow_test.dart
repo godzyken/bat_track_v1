@@ -102,7 +102,7 @@ void main() {
       final remoteProjet = MockDataFactories.createProjet(
         id: 'conflict_1',
         nom: 'Version Remote',
-      ).copyWith(updatedAt: now.add(Duration(minutes: 10))); // Plus récent
+      ).copyWith(updatedAt: now.add(const Duration(minutes: 10))); // Plus récent
 
       // Setup mocks
       when(

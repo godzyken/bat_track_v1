@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,11 @@ import '../../../../models/notifiers/logged_notifier.dart';
 import '../../../../providers/hive_firebase_provider.dart';
 
 class ChantierSyncNotifier extends AsyncNotifier<SyncedState<Chantier>> {
+  @override
+  FutureOr<SyncedState<Chantier>> build() {
+    return SyncedState.initial(Chantier.mock());
+  }
+
   Future<SyncedState<Chantier>> buildWithInitial(Chantier initial) async {
     return SyncedState.initial(initial);
   }

@@ -50,7 +50,7 @@ class SelectedInstanceNotifier extends AsyncNotifier<DolibarrInstance?> {
   // ------------------------------------------------------------------
 
   Future<void> clear() async {
-    state = AsyncData(null);
+    state = const AsyncData(null);
 
     final prefs = await ref.read(sharedPreferencesProvider.future);
 

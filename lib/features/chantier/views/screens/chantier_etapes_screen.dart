@@ -72,13 +72,13 @@ class ChantierEtapesScreen extends ConsumerWidget {
     final pieces = chantier.value?.etapes.expand((e) => e.pieces).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Étapes & Pièces")),
+      appBar: AppBar(title: const Text('Étapes & Pièces')),
       body: ResponsiveCardLayout(
         children: [
           const Padding(
             padding: EdgeInsets.all(12),
             child: Text(
-              "📋 Étapes",
+              '📋 Étapes',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
@@ -122,12 +122,12 @@ class ChantierEtapesScreen extends ConsumerWidget {
           const Padding(
             padding: EdgeInsets.all(12),
             child: Text(
-              "🧱 Pièces",
+              '🧱 Pièces',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           if (pieces!.isEmpty)
-            const Center(child: Text("Aucune pièce définie"))
+            const Center(child: Text('Aucune pièce définie'))
           else
             GridView.count(
               crossAxisCount: info.isTablet ? 2 : 1,
@@ -181,17 +181,17 @@ class ChantierEtapesScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton.extended(
-            heroTag: "addEtape",
+            heroTag: 'addEtape',
             onPressed: () => _openEtapeForm(context, ref),
             icon: const Icon(Icons.playlist_add),
-            label: const Text("Ajouter une étape"),
+            label: const Text('Ajouter une étape'),
           ),
           const SizedBox(height: 10),
           FloatingActionButton.extended(
-            heroTag: "addPiece",
+            heroTag: 'addPiece',
             onPressed: () => _openPieceForm(context, ref),
             icon: const Icon(Icons.add_home_work),
-            label: const Text("Ajouter une pièce"),
+            label: const Text('Ajouter une pièce'),
           ),
         ],
       ),

@@ -142,7 +142,7 @@ class ChantierDetailScreen extends ConsumerWidget {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16.0),
                           child: Text(
-                            "⚠️ Une erreur est survenue lors de la dernière synchronisation.",
+                            '⚠️ Une erreur est survenue lors de la dernière synchronisation.',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.error,
                             ),
@@ -151,7 +151,7 @@ class ChantierDetailScreen extends ConsumerWidget {
 
                       // Infos Dolibarrr
                       buildSection(
-                        "Connexion Dolibarr",
+                        'Connexion Dolibarr',
                         DolibarrSection(
                           onSync: () => notifier.updateChantier(chantier),
                         ),
@@ -160,7 +160,7 @@ class ChantierDetailScreen extends ConsumerWidget {
 
                       // Infos générales
                       buildSection(
-                        "Informations générales",
+                        'Informations générales',
                         ChantierCardInfo(
                           chantier: chantier,
                           dateFormat: dateFormat,
@@ -171,7 +171,7 @@ class ChantierDetailScreen extends ConsumerWidget {
 
                       // Description
                       buildSection(
-                        "Description",
+                        'Description',
                         ChantierDescription(
                           chantier: chantier,
                           maxLines: 2,
@@ -182,21 +182,21 @@ class ChantierDetailScreen extends ConsumerWidget {
 
                       // Documents
                       buildSection(
-                        "Documents",
+                        'Documents',
                         ChantierListDocuments(chantier: chantier),
                       ),
                       const SizedBox(height: 16),
 
                       // Budget
                       buildSection(
-                        "Budget",
+                        'Budget',
                         BudgetDetailSansTech(details: totalBudget),
                       ),
                       const SizedBox(height: 16),
 
                       // Étapes avec timeline interactive
                       buildSection(
-                        "Étapes du chantier",
+                        'Étapes du chantier',
                         chantierEstTermine(chantier)
                             ? ChantiersEtapeKanbanReadOnly(
                               etapes: chantier.etapes,
@@ -227,7 +227,7 @@ class ChantierDetailScreen extends ConsumerWidget {
             FloatingActionButton.extended(
               heroTag: 'syncNow',
               onPressed: () => notifier.updateChantier(chantier),
-              label: const Text("Forcer la synchro"),
+              label: const Text('Forcer la synchro'),
               icon: const Icon(Icons.sync),
             ),
             const SizedBox(height: 12),
@@ -239,7 +239,7 @@ class ChantierDetailScreen extends ConsumerWidget {
                   pathParameters: {'id': chantier.id},
                 );
               },
-              label: const Text("Ajouter une étape"),
+              label: const Text('Ajouter une étape'),
               icon: const Icon(Icons.add),
             ),
           ],

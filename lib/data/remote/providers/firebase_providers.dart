@@ -34,11 +34,12 @@ final firebaseInitializationProvider = FutureProvider<FirebaseApp>((ref) async {
       options.tracesSampleRate = 1.0;
       // The sampling rate for profiling is relative to tracesSampleRate
       // Setting to 1.0 will profile 100% of sampled transactions:
-      options.profilesSampleRate = 1.0;
+      options.sampleRate = 1.0;
     }, appRunner: () {});
 
     return app;
   } catch (e, st) {
+    // ignore: prefer_single_quotes
     logger.e("Erreur critique", error: e, stackTrace: st);
     await Sentry.captureException(e, stackTrace: st);
     rethrow;

@@ -25,7 +25,7 @@ class ChantierDetailLoader extends ConsumerWidget {
     return chantierAsync.when(
       loading: () => const LoadingApp(),
       error: (e, _) => ErrorApp(
-        message: "Erreur lors du chargement des détails du chantier : $e",
+        message: 'Erreur lors du chargement des détails du chantier : $e',
       ),
       data: (chantier) {
         if (chantier.id.isEmpty) {

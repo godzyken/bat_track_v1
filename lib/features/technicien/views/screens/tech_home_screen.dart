@@ -18,7 +18,7 @@ class TechHomeScreen extends ConsumerWidget {
     final currentUser = ref.watch(currentUserProvider).value;
 
     if (currentUser == null || currentUser.role != 'technicien') {
-      return const Center(child: Text("Accès réservé aux techniciens."));
+      return const Center(child: Text('Accès réservé aux techniciens.'));
     }
 
     final userId = currentUser.id;
@@ -58,7 +58,7 @@ class TechHomeScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Projets assignés",
+              'Projets assignés',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
@@ -101,7 +101,7 @@ class TechHomeScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             Text(
-              "Chantiers assignés",
+              'Chantiers assignés',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
@@ -144,7 +144,7 @@ class TechHomeScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             Text(
-              "Interventions à venir",
+              'Interventions à venir',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
@@ -190,7 +190,7 @@ class TechHomeScreen extends ConsumerWidget {
               child: ElevatedButton.icon(
                 onPressed: () => Navigator.pushNamed(context, '/profil'),
                 icon: const Icon(Icons.person),
-                label: const Text("Voir mon profil"),
+                label: const Text('Voir mon profil'),
               ),
             ),
           ],

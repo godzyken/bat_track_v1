@@ -130,8 +130,8 @@ class _AnimatedInterventionChartState extends State<AnimatedInterventionChart>
       return BarChart(
         BarChartData(
           maxY: maxY + interval,
-          barTouchData: BarTouchData(enabled: false),
-          gridData: FlGridData(show: true),
+          barTouchData: const BarTouchData(enabled: false),
+          gridData: const FlGridData(show: true),
           borderData: FlBorderData(show: false),
           alignment: BarChartAlignment.spaceAround,
           barGroups: barGroups,
@@ -158,8 +158,8 @@ class _AnimatedInterventionChartState extends State<AnimatedInterventionChart>
                 },
               ),
             ),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
         ),
       );

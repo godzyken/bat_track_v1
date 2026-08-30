@@ -14,12 +14,12 @@ class AdminHomeScreen extends ConsumerWidget {
     final usersAsync = ref.watch(allUsersProfileProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Admin - Utilisateurs")),
+      appBar: AppBar(title: const Text('Admin - Utilisateurs')),
       body: usersAsync.when(
         loading: () => const LoadingApp(),
         error: (e, _) => ErrorApp(
           message:
-              "Erreur lors de la connection au profile administrateur : $e",
+              'Erreur lors de la connection au profile administrateur : $e',
         ),
         data: (users) => ListView.builder(
           itemCount: users.length,
@@ -27,7 +27,7 @@ class AdminHomeScreen extends ConsumerWidget {
             final user = users[index];
             return ListTile(
               title: Text(user.name),
-              subtitle: Text("${user.email} – ${user.role.name}"),
+              subtitle: Text('${user.email} – ${user.role.name}'),
               trailing: DropdownButton<String>(
                 value: user.role.name,
                 onChanged: (newRole) async {

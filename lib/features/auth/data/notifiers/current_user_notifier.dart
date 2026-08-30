@@ -25,7 +25,7 @@ class CurrentUserNotifier extends Notifier<AsyncValue<AppUser?>> {
     state = const AsyncLoading();
 
     _sub = firestore
-        .collection("users")
+        .collection('users')
         .doc(authState.uid)
         .snapshots()
         .listen(

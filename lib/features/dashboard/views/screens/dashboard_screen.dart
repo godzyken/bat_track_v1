@@ -7,6 +7,9 @@ import '../../../../models/views/screens/exeception_screens.dart';
 import '../../../dolibarr/views/widgets/dolibarr_section.dart';
 import '../../../intervention/controllers/providers/intervention_stats_provider.dart';
 import '../../../intervention/views/widgets/intervention_chart.dart';
+import '../../../../core/widgets/fiscal_integrity_indicator.dart';
+import '../../controllers/providers/projection_provider.dart';
+import '../../../../core/financial_engine/projection_engine.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -29,6 +32,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       appBar: AppBar(
         title: const Text('Dashboard intelligent'),
         actions: [
+          const Center(child: FiscalIntegrityIndicator()),
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
@@ -39,7 +44,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       body: statsAsync.when(
         loading: () => const LoadingApp(),
-        error: (e, _) => ErrorApp(message: "Erreur dashboard : $e"),
+        error: (e, _) => ErrorApp(message: 'Erreur dashboard : $e'),
         data: (stats) {
           final projets = stats.keys.toList();
 
@@ -88,11 +93,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     color: Colors.red.withValues(alpha: 0.1),
                     child: ListTile(
                       leading: const Icon(Icons.warning, color: Colors.red),
-                      title: const Text("Anomalie détectée"),
+                      title: const Text('Anomalie détectée'),
                       subtitle: Text(
                         tooManyDeletes
-                            ? "Trop de suppressions détectées"
-                            : "Activité très élevée",
+                            ? 'Trop de suppressions détectées'
+                            : 'Activité très élevée',
                       ),
                     ),
                   ),
@@ -187,9 +192,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
                 const SizedBox(height: 24),
 
+                /// 🏦 PROJECTIONS FINANCIÈRES (Convergence BTP 4.0)
+                ref.watch(cashflowProjectionProvider).when(
+                  data: (proj) => _buildProjectionSection(proj),
+                  loading: () => const LinearProgressIndicator(),
+                  error: (e, _) => Text('Erreur projection : $e'),
+                ),
+
+                const SizedBox(height: 24),
+
                 /// 📡 ANALYTICS LOGS
                 const Text(
-                  "Activité système",
+                  'Activité système',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
 
@@ -203,9 +217,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 Wrap(
                   spacing: 12,
                   children: [
-                    _statCard("Logs", loggerState.totalLogs),
-                    _statCard("Actions", logStats.length),
-                    _statCard("Modules", logTargets.length),
+                    _statCard('Logs', loggerState.totalLogs),
+                    _statCard('Actions', logStats.length),
+                    _statCard('Modules', logTargets.length),
                   ],
                 ),
               ],
@@ -229,6 +243,62 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildProjectionSection(CashflowProjection projection) {
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.trending_up, color: Colors.blue),
+                SizedBox(width: 8),
+                Text(
+                  'Projections de Trésorerie',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _projectionLine('Revenu encaissé (Scellé)', projection.currentRevenue, Colors.green),
+            _projectionLine('Factures en attente', projection.pendingInvoices, Colors.orange),
+            const Divider(),
+            _projectionLine('Potentiel Total', projection.potentialRevenue, Colors.blue),
+            const SizedBox(height: 16),
+            Text(
+              'Avancement global chantiers : ${(projection.completionRate * 100).toStringAsFixed(1)}%',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            LinearProgressIndicator(
+              value: projection.completionRate,
+              backgroundColor: Colors.grey.shade200,
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _projectionLine(String label, double amount, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label),
+          Text(
+            '${amount.toStringAsFixed(2)} €',
+            style: TextStyle(color: color, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }

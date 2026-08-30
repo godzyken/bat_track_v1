@@ -108,7 +108,7 @@ class SupabaseService extends RemoteStorageService {
       query = queryBuilder(query);
     }
 
-    final stream = query as Stream;
+    final stream = query as Stream<dynamic>;
 
     return stream.map((dynamic rows) {
       if (rows is List) {

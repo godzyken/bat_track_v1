@@ -35,8 +35,8 @@ final interventionsByStatutProvider =
     ) async {
       final interventionService = ref.read(interventionServiceProvider);
 
-      final chantierId = params["chantierId"]!;
-      final statut = params["statut"]!;
+      final chantierId = params['chantierId']!;
+      final statut = params['statut']!;
 
       final interventions = await interventionService.getAll();
       return interventions

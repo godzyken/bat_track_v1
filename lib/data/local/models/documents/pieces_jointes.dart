@@ -57,9 +57,9 @@ sealed class PieceJointe extends UnifiedModel with _$PieceJointe implements HasF
       type: type ?? 'facture',
       taille: taille ?? 1024,
       createdAt: createAt ?? DateTime.now(),
-      parentType: parentType ?? "Chantier",
-      parentId: parentId ?? "ch_01",
-      typeMime: typeMime ?? "application/pdf",
+      parentType: parentType ?? 'Chantier',
+      parentId: parentId ?? 'ch_01',
+      typeMime: typeMime ?? 'application/pdf',
       updatedAt: updatedAt ?? DateTime.now(),
     );
   }

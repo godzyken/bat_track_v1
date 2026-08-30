@@ -43,9 +43,9 @@ class SyncStatusBar extends StatelessWidget {
           Expanded(
             child: Text(
               isSyncing
-                  ? "Synchronisation en cours..."
+                  ? 'Synchronisation en cours...'
                   : hasError
-                  ? "Échec de la synchronisation"
+                  ? 'Échec de la synchronisation'
                   : "Dernière synchro : ${lastSynced != null ? timeAgo(lastSynced!) : "jamais"}",
             ),
           ),

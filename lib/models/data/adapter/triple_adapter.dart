@@ -44,7 +44,7 @@ class TripleAdapter<T extends UnifiedModel> {
         .collection(collectionPath)
         .get();
     return snapshot.docs
-        .map((doc) => fromJson({...doc.data(), "id": doc.id}))
+        .map((doc) => fromJson({...doc.data(), 'id': doc.id}))
         .toList();
   }
 
@@ -52,7 +52,7 @@ class TripleAdapter<T extends UnifiedModel> {
   Future<List<T>> fetchFromDolibarr() async {
     final instance = ref.read(selectedInstanceProvider).value;
     if (instance == null) {
-      throw Exception("Aucune instance Dolibarr sélectionnée");
+      throw Exception('Aucune instance Dolibarr sélectionnée');
     }
 
     final url = '${instance.baseUrl}/$dolibarrEndpoint';
@@ -72,7 +72,7 @@ class TripleAdapter<T extends UnifiedModel> {
   Future<void> pushToDolibarr(T model) async {
     final instance = ref.read(selectedInstanceProvider).value;
     if (instance == null) {
-      throw Exception("Aucune instance Dolibarr sélectionnée");
+      throw Exception('Aucune instance Dolibarr sélectionnée');
     }
 
     final url = '${instance.baseUrl}/$dolibarrEndpoint';

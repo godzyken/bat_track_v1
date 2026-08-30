@@ -22,7 +22,7 @@ class KanbanPlanningScreen extends ConsumerWidget {
 
     if (chantierAsync.value == null) {
       return const Scaffold(
-        body: Center(child: Text("Chargement du chantier...")),
+        body: Center(child: Text('Chargement du chantier...')),
       );
     }
 

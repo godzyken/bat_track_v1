@@ -11,7 +11,7 @@ class JsonFormController<T extends UnifiedModel>
 
   @override
   FormStateModel build() {
-    return FormStateModel(values: {}, errors: {}, touched: {});
+    return const FormStateModel(values: {}, errors: {}, touched: {});
   }
 
   void init(JsonAdapter<T> adapter, T model) {

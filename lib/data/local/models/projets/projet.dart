@@ -138,18 +138,18 @@ extension ProjetAccess on Projet {
   }
 
   Projet validateByClient(String clientId) {
-    if (ownerId != clientId) throw Exception("Seul le créateur peut valider.");
+    if (ownerId != clientId) throw Exception('Seul le créateur peut valider.');
     return copyWith(clientValide: true);
   }
 
   Projet validateByAdminOrChef(AppUser user) {
-    if (!canValidateProject(user)) throw Exception("Utilisateur non autorisé.");
+    if (!canValidateProject(user)) throw Exception('Utilisateur non autorisé.');
     return copyWith(chefDeProjetValide: true);
   }
 
   Projet assignTechnician(AppUser tech) {
     if (!canBeAssigned(tech)) {
-      throw Exception("Technicien non valide ou déjà assigné.");
+      throw Exception('Technicien non valide ou déjà assigné.');
     }
     final updatedMembers = List<String>.from(members)..add(tech.uid);
     return copyWith(members: updatedMembers);

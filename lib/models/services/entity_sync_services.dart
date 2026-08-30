@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
+import '../../core/compliance/iscal_audit_service.dart';
 import '../../data/local/models/index_model_extention.dart';
 import '../../data/local/services/service_type.dart';
 import '../../data/remote/providers/multi_backend_remote_provider.dart';
@@ -45,13 +46,30 @@ class EntitySyncService<T extends UnifiedModel> {
 
   final EntityLocalService<T> local;
   final EntityRemoteService<T> remote;
+  final Ref? ref;
 
-  EntitySyncService(this.local, this.remote);
+  EntitySyncService(this.local, this.remote, {this.ref});
 
   /// 🔁 Sauvegarde local + remote (+ fichier si HasFile)
   /// Optimisé pour le mode Offline-First : l'écriture locale est prioritaire.
   Future<void> save(T item, {String? id}) async {
     final docId = id ?? item.id;
+
+    // ⚖️ [CONFORMITÉ ISCA] Vérification du verrouillage fiscal
+    if (item is Facture && ref != null) {
+      final IscalAuditService auditService = ref!.read(iscalAuditServiceProvider);
+      // Supposons que l'entreprise est identifiée par le 'company' de l'user courant
+      // On fera une verif simplifiée ici
+      final isClosed = await auditService.isPeriodClosed('DEFAULT_COMPANY', item.date);
+      if (isClosed) {
+        throw Exception('Modification impossible : Période fiscale clôturée.');
+      }
+
+      // Si la facture est validée/payée, on la scelle
+      if (item.toutesPartiesOntValide) {
+        await auditService.sealFacture(item);
+      }
+    }
 
     // 1. Sauvegarde locale immédiate (bloquante pour garantir l'intégrité de l'UI)
     await local.put(docId, item);
@@ -309,6 +327,6 @@ entitySyncServiceProvider<T extends UnifiedModel>(
       storage: ref.read(multiBackendRemoteProvider),
     );
 
-    return EntitySyncService<T>(local, remote);
+    return EntitySyncService<T>(local, remote, ref: ref);
   });
 }

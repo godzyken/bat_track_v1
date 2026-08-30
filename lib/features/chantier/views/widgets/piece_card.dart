@@ -91,7 +91,7 @@ class PieceCard extends ConsumerWidget {
                 _buildSectionTitle(context, 'Matériaux'),
                 ...piece.materiaux!.map(
                   (m) => _buildBullet(
-                    Icon(Icons.paid_outlined, semanticLabel: ''),
+                    const Icon(Icons.paid_outlined, semanticLabel: ''),
                     '${m.nom} - ${m.prixUnitaire} €/ ${m.unite}'
                     '${m.coefficientSurface != null ? ', coef: ${m.coefficientSurface}' : ''}'
                     '${m.quantiteFixe != null ? ', fixe: ${m.quantiteFixe}' : ''}',
@@ -103,7 +103,7 @@ class PieceCard extends ConsumerWidget {
                 _buildSectionTitle(context, 'Matériels'),
                 ...piece.materiels!.map(
                   (m) => _buildBullet(
-                    Icon(Icons.paid_sharp),
+                    const Icon(Icons.paid_sharp),
                     '${m.nom} - ${m.prixUnitaire} € x ${m.quantiteFixe}'
                     '${m.joursLocation != null ? ', ${m.joursLocation}j loc. à ${m.prixLocation} €' : ''}',
                   ),
@@ -122,7 +122,7 @@ class PieceCard extends ConsumerWidget {
                         orElse: () => Technicien.mock(),
                       );
                       return _buildBullet(
-                        Icon(Icons.engineering),
+                        const Icon(Icons.engineering),
                         '${tech.nom} - ${e.heuresEstimees} h',
                       );
                     }).toList();
@@ -131,7 +131,7 @@ class PieceCard extends ConsumerWidget {
                   },
                   orElse: () => Semantics(
                     label: 'Chargement des techniciens...',
-                    child: Text('Chargement...'),
+                    child: const Text('Chargement...'),
                   ),
                 ),
               ],

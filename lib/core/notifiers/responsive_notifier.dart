@@ -23,7 +23,7 @@ class ScreenOrientationNotifier extends Notifier<ScreenOrientation> {
 class ResponsiveNotifier extends Notifier<ResponsiveInfo> {
   @override
   ResponsiveInfo build() =>
-      ResponsiveInfo(ScreenSize.mobile, ScreenOrientation.portrait);
+      const ResponsiveInfo(ScreenSize.mobile, ScreenOrientation.portrait);
 
   void update(ScreenSize size, ScreenOrientation orientation) {
     if (state.screenSize != size || state.orientation != orientation) {

@@ -21,7 +21,7 @@ class ChantierEtapeListPreview extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (etapes == null || etapes!.isEmpty) {
-      return const Text("Aucune étape enregistrée.");
+      return const Text('Aucune étape enregistrée.');
     }
 
     return Column(
@@ -123,13 +123,13 @@ Widget? chantierFieldBuilder({
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       const Text(
-        "Étapes du chantier",
+        'Étapes du chantier',
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 8),
       ElevatedButton.icon(
         icon: const Icon(Icons.add),
-        label: const Text("Ajouter une étape"),
+        label: const Text('Ajouter une étape'),
         onPressed: () {
           showDialog(
             context: context,

@@ -47,13 +47,13 @@ class DolibarrSyncService {
         await sync();
       } catch (e) {
         if (context.mounted) {
-          _showSnack(context, "Erreur pendant la synchro : $e");
+          _showSnack(context, 'Erreur pendant la synchro : $e');
         }
       }
     }
 
     if (context.mounted) {
-      _showSnack(context, "Synchronisation complète !");
+      _showSnack(context, 'Synchronisation complète !');
     }
   }
 
@@ -84,7 +84,7 @@ class DolibarrSyncService {
     if (context.mounted) {
       _showSnack(
         context,
-        "$collection : ${items.length} éléments synchronisés",
+        '$collection : ${items.length} éléments synchronisés',
       );
     }
   }

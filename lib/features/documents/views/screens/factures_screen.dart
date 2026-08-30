@@ -118,6 +118,15 @@ class FacturesScreen extends ConsumerWidget {
             : null,
         infoOverride: info,
         currentUser: user,
+        cardTrailingBuilder: (facture) {
+          if (facture.toutesPartiesOntValide) {
+            return const Tooltip(
+              message: 'Facture scellée (ISCA)',
+              child: Icon(Icons.lock_outline, color: Colors.green, size: 20),
+            );
+          }
+          return const SizedBox.shrink();
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

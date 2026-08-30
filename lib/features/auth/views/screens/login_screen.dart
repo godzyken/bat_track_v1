@@ -36,7 +36,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final role = ref.read(selectedRoleNotifierProvider);
     if (role == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Veuillez sélectionner un rôle")),
+        const SnackBar(content: Text('Veuillez sélectionner un rôle')),
       );
       return;
     }
@@ -53,7 +53,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text("Erreur : $e")));
+        ).showSnackBar(SnackBar(content: Text('Erreur : $e')));
       }
     } finally {
       ref.read(loginLoadingNotifierProvider.notifier).setLoading(false);
@@ -67,7 +67,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final isWide = info.isTablet || info.isDesktop;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Connexion")),
+      appBar: AppBar(title: const Text('Connexion')),
       body: SafeArea(
         child: Column(
           children: [
@@ -85,24 +85,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           TextFormField(
                             controller: emailCtrl,
                             decoration: const InputDecoration(
-                              labelText: "Email",
+                              labelText: 'Email',
                             ),
                             validator: (v) =>
-                                v!.isEmpty ? "Champ requis" : null,
+                                v!.isEmpty ? 'Champ requis' : null,
                           ),
                           const SizedBox(height: 16),
                           TextFormField(
                             controller: passCtrl,
                             decoration: const InputDecoration(
-                              labelText: "Mot de passe",
+                              labelText: 'Mot de passe',
                             ),
                             obscureText: true,
                             validator: (v) =>
-                                v!.isEmpty ? "Champ requis" : null,
+                                v!.isEmpty ? 'Champ requis' : null,
                           ),
                           const SizedBox(height: 24),
                           const Text(
-                            "Choisissez un rôle",
+                            'Choisissez un rôle',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -116,7 +116,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               onPressed: loading ? null : () => login(context),
                               child: loading
                                   ? const CircularProgressIndicator()
-                                  : const Text("Se connecter"),
+                                  : const Text('Se connecter'),
                             ),
                           ],
                         ],
@@ -138,7 +138,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   child: loading
                       ? const CircularProgressIndicator()
-                      : const Text("Se connecter"),
+                      : const Text('Se connecter'),
                 ),
               ),
           ],

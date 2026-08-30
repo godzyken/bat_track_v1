@@ -66,7 +66,7 @@ Widget defaultFieldBuilder({
   if (value is List || key.toLowerCase().contains('liste')) {
     return TextFormField(
       controller: controller,
-      decoration: InputDecoration(labelText: "$key (séparés par virgule)"),
+      decoration: InputDecoration(labelText: '$key (séparés par virgule)'),
       keyboardType: TextInputType.multiline,
     );
   }
@@ -74,7 +74,7 @@ Widget defaultFieldBuilder({
   if (value is Map || value is UnifiedModel) {
     return TextFormField(
       controller: controller,
-      decoration: InputDecoration(labelText: "$key (JSON)"),
+      decoration: InputDecoration(labelText: '$key (JSON)'),
       style: const TextStyle(fontFamily: 'NotoSans'),
       maxLines: 4,
       keyboardType: TextInputType.multiline,

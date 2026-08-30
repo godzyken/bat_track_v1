@@ -70,7 +70,7 @@ class ModelRegistry {
     register<Chantier>(
       fromJson: Chantier.fromJson,
       mock: Chantier.mock,
-      repoConfig: RepositoryConfig(
+      repoConfig: const RepositoryConfig(
         collectionPath: 'chantiers',
         dolibarrEndpoint: 'projects',
         fromJson: Chantier.fromJson,
@@ -81,7 +81,7 @@ class ModelRegistry {
     register<Client>(
       fromJson: Client.fromJson,
       mock: Client.mock,
-      repoConfig: RepositoryConfig(
+      repoConfig: const RepositoryConfig(
         collectionPath: 'clients',
         dolibarrEndpoint: 'thirdparties',
         fromJson: Client.fromJson,
@@ -92,7 +92,7 @@ class ModelRegistry {
     register<Technicien>(
       fromJson: Technicien.fromJson,
       mock: Technicien.mock,
-      repoConfig: RepositoryConfig(
+      repoConfig: const RepositoryConfig(
         collectionPath: 'techniciens',
         dolibarrEndpoint: 'users',
         fromJson: Technicien.fromJson,
@@ -103,7 +103,7 @@ class ModelRegistry {
     register<Projet>(
       fromJson: Projet.fromJson,
       mock: () => ProjetMock.mock(),
-      repoConfig: RepositoryConfig(
+      repoConfig: const RepositoryConfig(
         collectionPath: 'projets',
         dolibarrEndpoint: 'projects',
         fromJson: Projet.fromJson,
@@ -115,7 +115,7 @@ class ModelRegistry {
     register<Intervention>(
       fromJson: Intervention.fromJson,
       mock: Intervention.mock,
-      repoConfig: RepositoryConfig(
+      repoConfig: const RepositoryConfig(
         collectionPath: 'interventions',
         dolibarrEndpoint: 'tasks',
         fromJson: Intervention.fromJson,
@@ -126,7 +126,7 @@ class ModelRegistry {
     register<Materiau>(
       fromJson: Materiau.fromJson,
       mock: Materiau.mock,
-      repoConfig: RepositoryConfig(
+      repoConfig: const RepositoryConfig(
         collectionPath: 'materiaux',
         dolibarrEndpoint: 'products',
         fromJson: Materiau.fromJson,
@@ -138,7 +138,7 @@ class ModelRegistry {
     register<Materiel>(
       fromJson: Materiel.fromJson,
       mock: Materiel.mock,
-      repoConfig: RepositoryConfig(
+      repoConfig: const RepositoryConfig(
         collectionPath: 'materiels',
         dolibarrEndpoint: 'products',
         fromJson: Materiel.fromJson,
@@ -149,7 +149,7 @@ class ModelRegistry {
     register<MainOeuvre>(
       fromJson: MainOeuvre.fromJson,
       mock: MainOeuvre.mock,
-      repoConfig: RepositoryConfig(
+      repoConfig: const RepositoryConfig(
         collectionPath: 'main_oeuvre',
         dolibarrEndpoint: 'tasks',
         fromJson: MainOeuvre.fromJson,
@@ -160,7 +160,7 @@ class ModelRegistry {
     register<Facture>(
       fromJson: Facture.fromJson,
       mock: Facture.mock,
-      repoConfig: RepositoryConfig(
+      repoConfig: const RepositoryConfig(
         collectionPath: 'factures',
         dolibarrEndpoint: 'invoices',
         fromJson: Facture.fromJson,
@@ -172,7 +172,7 @@ class ModelRegistry {
     register<PieceJointe>(
       fromJson: PieceJointe.fromJson,
       mock: PieceJointe.mock,
-      repoConfig: RepositoryConfig(
+      repoConfig: const RepositoryConfig(
         collectionPath: 'pieces_jointes',
         dolibarrEndpoint: 'documents',
         fromJson: PieceJointe.fromJson,
@@ -183,7 +183,7 @@ class ModelRegistry {
     register<ChantierEtape>(
       fromJson: ChantierEtape.fromJson,
       mock: ChantierEtape.mock,
-      repoConfig: RepositoryConfig(
+      repoConfig: const RepositoryConfig(
         collectionPath: 'chantier_etapes',
         dolibarrEndpoint: 'etapes',
         fromJson: ChantierEtape.fromJson,

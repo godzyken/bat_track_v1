@@ -43,7 +43,7 @@ class _DolibarrRequestEditorState extends ConsumerState<DolibarrRequestEditor> {
           res = await dio.delete(endpoint);
           break;
         default:
-          throw Exception("Méthode non supportée");
+          throw Exception('Méthode non supportée');
       }
 
       setState(() {
@@ -51,7 +51,7 @@ class _DolibarrRequestEditorState extends ConsumerState<DolibarrRequestEditor> {
       });
     } catch (e) {
       setState(() {
-        _responseText = "Erreur : $e";
+        _responseText = 'Erreur : $e';
       });
     }
   }
@@ -78,7 +78,7 @@ class _DolibarrRequestEditorState extends ConsumerState<DolibarrRequestEditor> {
               child: TextField(
                 controller: _endpointController,
                 decoration: const InputDecoration(
-                  labelText: "Endpoint (ex: thirdparties)",
+                  labelText: 'Endpoint (ex: thirdparties)',
                 ),
               ),
             ),
@@ -90,14 +90,14 @@ class _DolibarrRequestEditorState extends ConsumerState<DolibarrRequestEditor> {
             controller: _bodyController,
             maxLines: 10,
             decoration: const InputDecoration(
-              labelText: "Corps JSON (POST/PUT)",
+              labelText: 'Corps JSON (POST/PUT)',
               border: OutlineInputBorder(),
             ),
           ),
         const SizedBox(height: 16),
         ElevatedButton.icon(
           icon: const Icon(Icons.send),
-          label: const Text("Exécuter"),
+          label: const Text('Exécuter'),
           onPressed: _executeRequest,
         ),
         const SizedBox(height: 16),

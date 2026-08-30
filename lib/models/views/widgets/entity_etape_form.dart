@@ -55,7 +55,7 @@ class _EntityEtapeFormState<T> extends ConsumerState<EntityEtapeForm<T>> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Nouvelle étape"),
+      title: const Text('Nouvelle étape'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -116,11 +116,11 @@ class _EntityEtapeFormState<T> extends ConsumerState<EntityEtapeForm<T>> {
       actions: [
         TextButton(
           onPressed: () => setState(() => _showAdvanced = !_showAdvanced),
-          child: Text(_showAdvanced ? "Cacher expert" : "Mode expert"),
+          child: Text(_showAdvanced ? 'Cacher expert' : 'Mode expert'),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text("Annuler"),
+          child: const Text('Annuler'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -136,7 +136,7 @@ class _EntityEtapeFormState<T> extends ConsumerState<EntityEtapeForm<T>> {
             widget.onSubmit(parsed);
             Navigator.of(context).pop();
           },
-          child: const Text("Valider"),
+          child: const Text('Valider'),
         ),
       ],
     );

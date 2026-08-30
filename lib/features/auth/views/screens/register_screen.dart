@@ -21,10 +21,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final passwordCtrl = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Créer un compte")),
+      appBar: AppBar(title: const Text('Créer un compte')),
       body: Center(
         child: ElevatedButton(
-          child: const Text("Nouveau compte"),
+          child: const Text('Nouveau compte'),
           onPressed: () {
             showDialog(
               context: context,

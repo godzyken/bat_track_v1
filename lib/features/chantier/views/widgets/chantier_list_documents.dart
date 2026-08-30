@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
@@ -12,9 +13,8 @@ class ChantierListDocuments extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListView.builder(
-      scrollDirection: Axis.horizontal,
+      scrollCacheExtent: const ScrollCacheExtent.pixels(500), scrollDirection: Axis.horizontal,
       itemCount: chantier.documents.length,
-      cacheExtent: 500,
       itemBuilder:
           (context, index) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),

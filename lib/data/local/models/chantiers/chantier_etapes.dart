@@ -48,7 +48,7 @@ sealed class ChantierEtape extends UnifiedModel with _$ChantierEtape {
     titre: 'Parvis',
     description: 'Aggrandissement de la piece principale',
     dateDebut: DateTime.now(),
-    dateFin: DateTime.now().add(Duration(days: 19)),
+    dateFin: DateTime.now().add(const Duration(days: 19)),
     terminee: false,
     pieces: [Piece.mock(), Piece.mock()],
     ordre: 2,

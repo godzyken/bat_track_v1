@@ -27,7 +27,7 @@ class DashboardPreviewCard extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error:
                   (e, _) => ErrorWidget(
-                    "Erreur lors de la connection au profile administrateur : $e",
+                    'Erreur lors de la connection au profile administrateur : $e',
                   ),
               data: (stats) {
                 return Column(

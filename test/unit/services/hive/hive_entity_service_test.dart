@@ -175,11 +175,11 @@ void main() {
         final projets = [
           MockDataFactories.createProjet(
             id: '1',
-          ).copyWith(dateDebut: now.add(Duration(days: 2))),
+          ).copyWith(dateDebut: now.add(const Duration(days: 2))),
           MockDataFactories.createProjet(id: '2').copyWith(dateDebut: now),
           MockDataFactories.createProjet(
             id: '3',
-          ).copyWith(dateDebut: now.add(Duration(days: 1))),
+          ).copyWith(dateDebut: now.add(const Duration(days: 1))),
         ];
 
         for (final projet in projets) {

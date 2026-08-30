@@ -19,7 +19,7 @@ class ClientHomeScreen extends ConsumerWidget {
     final currentUser = ref.watch(currentUserProvider).value;
 
     if (currentUser == null) {
-      return const Center(child: Text("Veuillez vous connecter."));
+      return const Center(child: Text('Veuillez vous connecter.'));
     }
 
     final isOwner = currentUser.role == 'client';
@@ -113,7 +113,7 @@ class ClientHomeScreen extends ConsumerWidget {
         child: Column(
           children: [
             buildEntitySection<Projet>(
-              title: "Mes projets",
+              title: 'Mes projets',
               items: projects,
               boxName: 'project',
               createEmpty: () => ProjetMock.mock(),
@@ -126,7 +126,7 @@ class ClientHomeScreen extends ConsumerWidget {
                   .toList(),
             ),
             buildEntitySection<Chantier>(
-              title: "Chantiers associés",
+              title: 'Chantiers associés',
               items: chantiers,
               boxName: 'chantierBox',
               createEmpty: Chantier.mock,
@@ -147,7 +147,7 @@ class ClientHomeScreen extends ConsumerWidget {
                   .toList(),
             ),
             buildEntitySection<Intervention>(
-              title: "Interventions prévues",
+              title: 'Interventions prévues',
               items: interventions,
               boxName: 'interventionBox',
               createEmpty: Intervention.mock,
@@ -175,7 +175,7 @@ class ClientHomeScreen extends ConsumerWidget {
               child: ElevatedButton.icon(
                 onPressed: () => Navigator.pushNamed(context, '/profil'),
                 icon: const Icon(Icons.person),
-                label: const Text("Voir mon profil"),
+                label: const Text('Voir mon profil'),
               ),
             ),
           ],

@@ -26,7 +26,7 @@ class ChantierPiecesScreen extends ConsumerWidget {
     final piecesAsync = ref.watch(watchPiecesByChantierProvider(chantierId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Pièces du chantier")),
+      appBar: AppBar(title: const Text('Pièces du chantier')),
       floatingActionButton: isClient
           ? FloatingActionButton(
               onPressed: () {

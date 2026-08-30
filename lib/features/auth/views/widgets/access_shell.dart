@@ -25,19 +25,19 @@ class AccessShell extends ConsumerWidget {
       UserStatus.loaded => currentUser.when(
         data: (user) {
           if (user == null) {
-            return Stack(
+            return const Stack(
               children: [
-                const Center(child: Text('Pas encore connecté')),
-                const LoginScreen(),
+                Center(child: Text('Pas encore connecté')),
+                LoginScreen(),
               ],
             );
           }
           debugPrint(
-            "✅ accessShell = data : ${user.email} / role: ${user.role}",
+            '✅ accessShell = data : ${user.email} / role: ${user.role}',
           );
 
           final location = state.uri.toString();
-          debugPrint("🔍 Navigation vers $location avec rôle ${user.role}");
+          debugPrint('🔍 Navigation vers $location avec rôle ${user.role}');
 
           // Vérification simple du rôle pour toutes les pages protégées
           final allowedRoles = [

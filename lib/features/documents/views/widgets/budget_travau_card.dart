@@ -46,7 +46,7 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Modifier les heures estimées"),
+          title: const Text('Modifier les heures estimées'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -192,18 +192,18 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Surface : ${piece.surface} m²",
+                  'Surface : ${piece.surface} m²',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const Divider(height: 24),
                 _budgetLine(
-                  "Matériaux",
+                  'Matériaux',
                   totalMateriaux,
                   Icons.construction,
                   formatCurrency,
                 ),
                 _budgetLine(
-                  "Matériel",
+                  'Matériel',
                   totalMateriels,
                   Icons.build,
                   formatCurrency,
@@ -219,14 +219,14 @@ class _BudgetTravauCardState extends ConsumerState<BudgetTravauCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      "Budget total :",
+                      'Budget total :',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      "${total.toStringAsFixed(2)} €",
+                      '${total.toStringAsFixed(2)} €',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

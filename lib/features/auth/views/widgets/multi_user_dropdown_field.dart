@@ -61,7 +61,7 @@ class MultiUserDropdownField extends ConsumerWidget {
       loading: () => const LoadingApp(),
       error:
           (e, _) => ErrorApp(
-            message: "Erreur lors de la selection des utilisateurs : $e",
+            message: 'Erreur lors de la selection des utilisateurs : $e',
           ),
     );
   }

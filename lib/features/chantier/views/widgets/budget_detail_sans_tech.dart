@@ -29,7 +29,7 @@ class BudgetDetailSansTech extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          "Total : ${total.toStringAsFixed(2)} €",
+          'Total : ${total.toStringAsFixed(2)} €',
           style: Theme.of(context).textTheme.titleSmall,
         ),
       ],
@@ -47,7 +47,7 @@ class BudgetDetailSansTech extends ConsumerWidget {
               final percentage = total > 0 ? (value / total * 100) : 0;
               return PieChartSectionData(
                 value: value,
-                title: "${percentage.toStringAsFixed(1)}%",
+                title: '${percentage.toStringAsFixed(1)}%',
                 color: colors[i % colors.length],
                 radius: 50,
                 titleStyle: const TextStyle(color: Colors.white, fontSize: 12),
@@ -78,7 +78,7 @@ class BudgetDetailSansTech extends ConsumerWidget {
                     color: colors[i % colors.length],
                   ),
                   const SizedBox(width: 8),
-                  Text("${e.key}: ${e.value.toStringAsFixed(2)} €"),
+                  Text('${e.key}: ${e.value.toStringAsFixed(2)} €'),
                 ],
               ),
             );

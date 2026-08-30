@@ -38,7 +38,7 @@ class _RechercheTechnicienScreenState
           // Liste des résultats
           Expanded(
             child: techniciensAsync.when(
-              data: (techniciens) {
+              data: (List<Technicien> techniciens) {
                 if (techniciens.isEmpty) {
                   return const Center(
                     child: Text('Aucun technicien disponible'),
@@ -68,7 +68,7 @@ class _RechercheTechnicienScreenState
       child: Column(
         children: [
           DropdownButtonFormField<String>(
-            value: _specialiteSelectionnee,
+            initialValue: _specialiteSelectionnee,
             decoration: const InputDecoration(labelText: 'Spécialité'),
             items: [
               'Plomberie',
@@ -82,7 +82,7 @@ class _RechercheTechnicienScreenState
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            value: _regionSelectionnee,
+            initialValue: _regionSelectionnee,
             decoration: const InputDecoration(labelText: 'Région'),
             items: [
               'Béziers',

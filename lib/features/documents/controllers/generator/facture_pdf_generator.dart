@@ -28,7 +28,7 @@ class FacturePdfGenerator {
             level: 0,
             child: pw.Text(
               'FACTURE',
-              style: pw.TextStyle(fontSize: 28, fontWeight: pw.FontWeight.bold),
+              style: const pw.TextStyle(fontSize: 28, fontWeight: pw.FontWeight.bold),
             ),
           ),
           _buildClientSection(client),
@@ -64,18 +64,18 @@ class FacturePdfGenerator {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text("Facture pour l'intervention : ${intervention.titre}"),
-            pw.Text("Technicien : ${intervention.technicienId}"),
-            pw.Text("Date : ${intervention.create.toIso8601String()}"),
+            pw.Text('Technicien : ${intervention.technicienId}'),
+            pw.Text('Date : ${intervention.create.toIso8601String()}'),
             if (intervention.facture != null) ...[
-              pw.Text("Montant HT : ${intervention.facture!.totalHT}"),
-              pw.Text("Montant TTC : ${intervention.facture!.totalTTC}"),
+              pw.Text('Montant HT : ${intervention.facture!.totalHT}'),
+              pw.Text('Montant TTC : ${intervention.facture!.totalTTC}'),
               if (intervention.facture!.isFinalized)
-                pw.Text("Facture FINALISÉE"),
+                pw.Text('Facture FINALISÉE'),
             ],
             if ((intervention.document).isNotEmpty) ...[
               pw.SizedBox(height: 16),
-              pw.Text("Documents joints :"),
-              ...(intervention.document).map((p) => pw.Text("- ${p.nom}")),
+              pw.Text('Documents joints :'),
+              ...(intervention.document).map((p) => pw.Text('- ${p.nom}')),
             ],
           ],
         ),
@@ -92,7 +92,7 @@ class FacturePdfGenerator {
       children: [
         pw.Text(
           'Client :',
-          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
         ),
         pw.Text(client.nom),
         if (client.adresse.isNotEmpty) pw.Text(client.adresse),
@@ -109,7 +109,7 @@ class FacturePdfGenerator {
       children: [
         pw.Text(
           'Chantier :',
-          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
         ),
         pw.Text(chantier.nom),
         if (chantier.adresse.isNotEmpty) pw.Text(chantier.adresse),
@@ -126,7 +126,7 @@ class FacturePdfGenerator {
           .map((ligne) => [ligne.description, ligne.montant.toStringAsFixed(2)])
           .toList(),
       border: pw.TableBorder.all(),
-      headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+      headerStyle: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
     );
   }
 
@@ -148,7 +148,7 @@ class FacturePdfGenerator {
             ),
           pw.Text(
             'Total TTC : ${totalTTC.toStringAsFixed(2)} €',
-            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+            style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
           ),
         ],
       ),
@@ -163,7 +163,7 @@ class FacturePdfGenerator {
         pw.SizedBox(height: 30),
         pw.Text(
           'Signature du client :',
-          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
         ),
         pw.SizedBox(height: 10),
         pw.Image(image, height: 80),
@@ -177,7 +177,7 @@ class FacturePdfGenerator {
       children: [
         pw.Text(
           'Pièces jointes associées :',
-          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
         ),
         pw.Bullet(
           text: pieces.map((p) => '${p.nom} (${p.typeMime})').join('\n'),

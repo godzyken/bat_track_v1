@@ -18,19 +18,19 @@ class InterventionsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncIntervs = ref.watch(
       interventionsByStatutProvider({
-        "chantierId": chantierId,
-        "statut": statut,
+        'chantierId': chantierId,
+        'statut': statut,
       }),
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text("Interventions - $statut")),
+      appBar: AppBar(title: Text('Interventions - $statut')),
       body: asyncIntervs.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text("Erreur: $e")),
+        error: (e, _) => Center(child: Text('Erreur: $e')),
         data: (list) {
           if (list.isEmpty) {
-            return const Center(child: Text("Aucune intervention trouvée."));
+            return const Center(child: Text('Aucune intervention trouvée.'));
           }
           return ListView.separated(
             itemCount: list.length,
@@ -40,10 +40,10 @@ class InterventionsScreen extends ConsumerWidget {
               return ListTile(
                 leading: const Icon(Icons.build),
                 title: Text(interv.titre!),
-                subtitle: Text("Technicien: ${interv.technicienId}"),
+                subtitle: Text('Technicien: ${interv.technicienId}'),
                 trailing: Text(interv.create.toString()),
                 onTap: () {
-                  context.push("/intervention/${interv.id}");
+                  context.push('/intervention/${interv.id}');
                 },
               );
             },

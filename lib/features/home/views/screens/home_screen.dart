@@ -40,17 +40,17 @@ class HomeScreen extends ConsumerWidget {
     Widget layout;
     switch (info.screenSize) {
       case ScreenSize.desktop:
-        layout = Row(
+        layout = const Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Expanded(flex: 1, child: SideMenu()),
             Expanded(flex: 3, child: HomeContent()),
           ],
         );
         break;
       case ScreenSize.tablet:
-        layout = Column(
-          children: const [SideMenu(), Expanded(child: HomeContent())],
+        layout = const Column(
+          children: [SideMenu(), Expanded(child: HomeContent())],
         );
         break;
       case ScreenSize.mobile:

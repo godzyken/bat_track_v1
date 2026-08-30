@@ -16,3 +16,7 @@ final allInterventionsFutureProvider = FutureProvider<List<Intervention>>((
 ) async {
   return await ref.read(allInterventionsStreamProvider.future);
 });
+
+final allFacturesFutureProvider = FutureProvider<List<Facture>>((ref) async {
+  return await ref.read(allFacturesStreamProvider.future);
+});

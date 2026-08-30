@@ -111,7 +111,7 @@ class _JsonFormFieldState extends ConsumerState<JsonFormField> {
         labelText: widget.field.label,
         border: const OutlineInputBorder(),
       ),
-      value: widget.value as String?,
+      initialValue: widget.value as String?,
       items: (widget.field.options ?? [])
           .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
           .toList(),
@@ -270,11 +270,11 @@ class _JsonFormFieldState extends ConsumerState<JsonFormField> {
             onPressed: _uploading
                 ? null
                 : () async {
-                    final result = await FilePicker.pickFiles(
-                      type: FileType.any,
+                    final List<PlatformFile> result = await FilePicker.pickFiles(
+                      type: FileType.any
                     );
-                    if (result != null && result.files.single.path != null) {
-                      widget.onChanged?.call(result.files.single.path);
+                    if (result.isNotEmpty && result.first.path != null) {
+                      widget.onChanged?.call(result.first.path);
                     }
                   },
           ),

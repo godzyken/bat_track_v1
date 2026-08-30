@@ -32,7 +32,7 @@ class ProjectListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Liste des projets"),
+        title: const Text('Liste des projets'),
         actions: [
           if (policy.canCreate(currentUser))
             IconButton(
@@ -45,7 +45,7 @@ class ProjectListScreen extends ConsumerWidget {
       body: asyncProjects.when(
         data: (projects) {
           if (projects.isEmpty) {
-            return const Center(child: Text("Aucun Projet disponible"));
+            return const Center(child: Text('Aucun Projet disponible'));
           }
           if (info.isMobile) {
             return ListView.builder(
@@ -74,7 +74,7 @@ class ProjectListScreen extends ConsumerWidget {
                     if (policy.canValidate(currentUser, project))
                       IconButton(
                         icon: const Icon(Icons.check_circle),
-                        tooltip: "Valider",
+                        tooltip: 'Valider',
                         onPressed: () async {
                           await _validateProject(ref, project);
                         },
@@ -82,7 +82,7 @@ class ProjectListScreen extends ConsumerWidget {
                     if (policy.canAssignTech(currentUser, project))
                       IconButton(
                         icon: const Icon(Icons.person_add),
-                        tooltip: "Assigner technicien",
+                        tooltip: 'Assigner technicien',
                         onPressed: () =>
                             _assignTechnicien(context, ref, project),
                       ),

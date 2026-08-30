@@ -20,9 +20,9 @@ class ChantiersScreen extends ConsumerWidget {
     if (userAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (userAsync.hasError) return Center(child: Text('Erreur utilisateur'));
+    if (userAsync.hasError) return const Center(child: Text('Erreur utilisateur'));
     final user = userAsync.value;
-    if (user == null) return Center(child: Text('Utilisateur non connecté'));
+    if (user == null) return const Center(child: Text('Utilisateur non connecté'));
     final isAdmin = user.role == 'admin';
     final isClient = user.role == 'client';
     final isTechnicien = user.role == 'technicien';
@@ -78,24 +78,22 @@ class ChantiersScreen extends ConsumerWidget {
           ? null
           : Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                child: FloatingActionButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => EntityForm<Chantier>(
-                        fromJson: (json) => Chantier.fromJson(json),
-                        onSubmit: (chantier) async {
-                          await ref
-                              .read(chantierListProvider.notifier)
-                              .addItem(chantier);
-                        },
-                        createEmpty: () => Chantier.mock(),
-                      ),
-                    );
-                  },
-                  child: const Icon(Icons.add),
-                ),
+              child: FloatingActionButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => EntityForm<Chantier>(
+                      fromJson: (json) => Chantier.fromJson(json),
+                      onSubmit: (chantier) async {
+                        await ref
+                            .read(chantierListProvider.notifier)
+                            .addItem(chantier);
+                      },
+                      createEmpty: () => Chantier.mock(),
+                    ),
+                  );
+                },
+                child: const Icon(Icons.add),
               ),
             ),
     );

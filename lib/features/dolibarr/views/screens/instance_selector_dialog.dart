@@ -45,7 +45,7 @@ class InstanceSelectorDialog extends ConsumerWidget {
         error:
             (err, _) => ErrorApp(
               message:
-                  "Erreur lors de la connection au profile administrateur : $err",
+                  'Erreur lors de la connection au profile administrateur : $err',
             ),
       ),
       actions: [

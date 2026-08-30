@@ -32,24 +32,24 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
     ChantierEtape etape,
   ) async {
     try {
-      final result = await FilePicker.pickFiles(
-        allowMultiple: false,
+      final List<PlatformFile> result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
       );
 
-      if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
-        final type = (file.extension?.toLowerCase() ?? '') == 'pdf'
+      if (result.isNotEmpty) {
+        final PlatformFile file = result.first;
+        final String type = (file.extension?.toLowerCase() ?? '') == 'pdf'
             ? 'pdf'
             : 'image';
 
+        final int size = await file.length();
         final piece = PieceJointe(
           id: etape.id,
           url: file.path!,
           nom: file.name,
           type: type,
-          taille: file.size.toDouble(),
+          taille: size.toDouble(),
           createdAt: DateTime.now(),
           typeMime: '',
           parentType: '',

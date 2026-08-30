@@ -60,44 +60,44 @@ class ProjetAdapter implements JsonAdapter<Projet> {
 
   @override
   List<JsonField> get fields => [
-    JsonField(
+    const JsonField(
       name: 'nom',
       label: 'Nom du projet',
       type: FieldType.text,
       required: true,
       icon: Icons.wb_shade_outlined,
     ),
-    JsonField(
+    const JsonField(
       name: 'description',
       label: 'Description',
       type: FieldType.text,
       icon: Icons.description,
     ),
-    JsonField(
+    const JsonField(
       name: 'dateDebut',
       label: 'Date de début',
       type: FieldType.date,
       icon: Icons.calendar_today,
     ),
-    JsonField(
+    const JsonField(
       name: 'dateFin',
       label: 'Date de fin',
       type: FieldType.date,
       icon: Icons.event,
     ),
-    JsonField(
+    const JsonField(
       name: 'specialite',
       label: 'Spécialité',
       type: FieldType.text,
       icon: Icons.workspace_premium_outlined,
     ),
-    JsonField(
+    const JsonField(
       name: 'localisation',
       label: 'Localisation',
       type: FieldType.text,
       icon: Icons.share_location_outlined,
     ),
-    JsonField(
+    const JsonField(
       name: 'budgetEstime',
       label: 'Budget estimé',
       type: FieldType.number,
