@@ -86,7 +86,7 @@ class IscalAuditService {
 
     final closures = await _remoteStorage.watchCollectionRaw(
       _closureCollection,
-      queryBuilder: (dynamic q) => q
+      queryBuilder: (dynamic q) => (q as dynamic)
           .where('companyId', isEqualTo: companyId)
           .where('periodType', isEqualTo: 'DAILY')
           .where('periodDate', isEqualTo: dayKey),

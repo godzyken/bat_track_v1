@@ -9,6 +9,7 @@
 - `[x]` **Phase 3 : UI & Conformité**
     - `[x]` Ajouter l\u0027indicateur de scellé dans `factures_screen.dart`
     - `[x]` Mise à jour du `dashboard_screen.dart` avec les projections de trésorerie
-- `[/]` **Phase 4 : Validation**
+- `[x]` **Phase 4 : Validation**
     - `[x]` Créer les tests unitaires d\u0027intégrité de la chaîne
-    - `[ ]` Vérification `flutter analyze` globale finale
+    - `[x]` Créer les tests d\u0027intégration (BTP 4.0 flow)
+    - `[x]` Vérification `flutter analyze` globale finale

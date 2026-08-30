@@ -1,5 +1,7 @@
 import 'package:bat_track_v1/data/local/models/extensions/budget_extentions.dart';
-import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
+import '../documents/pieces_jointes.dart';
+import 'chantier_etapes.dart';
+import 'intervention.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shared_models/shared_models.dart';
 import 'package:uuid/uuid.dart';

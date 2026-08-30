@@ -1,51 +1,22 @@
-import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'iscal_audit_service.dart';
 
-class FiscalClosureState {
-  final bool isClosedToday;
-  final bool isChecking;
+/// Provider simple pour vérifier si le jour est clôturé fiscalement.
+final fiscalClosureProvider = FutureProvider.family<bool, String>((ref, companyId) async {
+  final auditService = ref.watch(iscalAuditServiceProvider);
+  return await auditService.isPeriodClosed(companyId, DateTime.now());
+});
 
-  FiscalClosureState({this.isClosedToday = false, this.isChecking = false});
+/// Service pour déclencher la clôture (Action).
+final fiscalClosureActionProvider = Provider((ref) => FiscalClosureAction(ref));
 
-  FiscalClosureState copyWith({bool? isClosedToday, bool? isChecking}) {
-    return FiscalClosureState(
-      isClosedToday: isClosedToday ?? this.isClosedToday,
-      isChecking: isChecking ?? this.isChecking,
-    );
-  }
-}
-
-class FiscalClosureNotifier extends Notifier<FiscalClosureState> {
-  @override
-  FiscalClosureState build() {
-    return FiscalClosureState();
-  }
-
-  IscalAuditService get _auditService => ref.read(iscalAuditServiceProvider);
-
-  Future<void> checkStatus(String companyId) async {
-    state = state.copyWith(isChecking: true);
-    try {
-      final isClosed = await _auditService.isPeriodClosed(companyId, DateTime.now());
-      state = state.copyWith(isClosedToday: isClosed, isChecking: false);
-    } catch (_) {
-      state = state.copyWith(isChecking: false);
-    }
-  }
+class FiscalClosureAction {
+  final Ref _ref;
+  FiscalClosureAction(this._ref);
 
   Future<void> closeDay(String companyId) async {
-    state = state.copyWith(isChecking: true);
-    try {
-      await _auditService.generateClosure(companyId, ClosurePeriod.daily, DateTime.now());
-      state = state.copyWith(isClosedToday: true, isChecking: false);
-    } catch (e) {
-      state = state.copyWith(isChecking: false);
-      rethrow;
-    }
+    final auditService = _ref.read(iscalAuditServiceProvider);
+    await auditService.generateClosure(companyId, ClosurePeriod.daily, DateTime.now());
+    _ref.invalidate(fiscalClosureProvider(companyId));
   }
 }
-
-final fiscalClosureProvider = NotifierProvider<FiscalClosureNotifier, FiscalClosureState>(() {
-  return FiscalClosureNotifier();
-});
