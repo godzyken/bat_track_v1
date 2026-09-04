@@ -7,7 +7,7 @@ part 'materiau.freezed.dart';
 part 'materiau.g.dart';
 
 @freezed
-class Materiau extends UnifiedModel with _$Materiau {
+abstract class Materiau extends UnifiedModel with _$Materiau {
   factory Materiau({
     required String id,
     required String nom,

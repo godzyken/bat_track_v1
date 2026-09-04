@@ -12,7 +12,7 @@ part 'chantier.freezed.dart';
 part 'chantier.g.dart';
 
 @freezed
-class Chantier extends UnifiedModel with _$Chantier {
+abstract class Chantier extends UnifiedModel with _$Chantier {
   Chantier._();
 
   factory Chantier({

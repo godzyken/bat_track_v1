@@ -10,7 +10,7 @@ part 'facture_draft.freezed.dart';
 part 'facture_draft.g.dart';
 
 @freezed
-class FactureDraft extends UnifiedModel with _$FactureDraft {
+abstract class FactureDraft extends UnifiedModel with _$FactureDraft {
   factory FactureDraft({
     required String chantierId,
     required String clientId,
@@ -107,7 +107,7 @@ class FactureDraft extends UnifiedModel with _$FactureDraft {
 }
 
 @freezed
-class CustomLigneFacture extends UnifiedModel with _$CustomLigneFacture {
+abstract class CustomLigneFacture extends UnifiedModel with _$CustomLigneFacture {
   factory CustomLigneFacture({
     required String ctlId,
     required String description,

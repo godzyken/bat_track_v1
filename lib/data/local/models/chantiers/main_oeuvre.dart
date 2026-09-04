@@ -7,7 +7,7 @@ part 'main_oeuvre.freezed.dart';
 part 'main_oeuvre.g.dart';
 
 @freezed
-class MainOeuvre extends UnifiedModel with _$MainOeuvre {
+abstract class MainOeuvre extends UnifiedModel with _$MainOeuvre {
   MainOeuvre._();
 
   factory MainOeuvre({

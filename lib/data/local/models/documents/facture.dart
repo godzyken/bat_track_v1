@@ -9,7 +9,7 @@ part 'facture.freezed.dart';
 part 'facture.g.dart';
 
 @freezed
-class Facture extends UnifiedModel with _$Facture {
+abstract class Facture extends UnifiedModel with _$Facture {
   const Facture._();
 
   const factory Facture({
