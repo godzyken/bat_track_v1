@@ -1,0 +1,31 @@
+name: btp_4_0_ecosystem
+
+packages:
+  - .
+  - ../shared_models
+  - ../compta4me
+  - ../egote_services_v2
+
+command:
+  bootstrap:
+    # On force l'utilisation des liens symboliques pour le développement local
+    usePubspecOverrides: true
+
+scripts:
+  analyze:
+    run: melos exec -- "flutter analyze"
+    description: Analyse statique de tous les projets de l'écosystème.
+
+  test:
+    run: melos exec -- "flutter test"
+    description: Exécution des tests unitaires sur tous les packages.
+
+  build_runner:
+    run: melos exec -- "dart run build_runner build --delete-conflicting-outputs"
+    description: Régénération de code Freezed/Generated pour tous les packages.
+    select-package:
+      depends-on: "build_runner"
+
+  format:
+    run: melos exec -- "dart format ."
+    description: Formatage du code sur l'ensemble de l'écosystème.
