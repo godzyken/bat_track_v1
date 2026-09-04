@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/financial_engine/projection_engine.dart';
-import '../../../../data/local/models/chantiers/chantier.dart';
-import '../../../../data/local/models/documents/facture.dart';
+import '../../../../data/local/models/index_model_extention.dart';
+import 'package:shared_models/shared_models.dart';
 import '../../../../models/providers/asynchrones/entity_list_future_provider.dart';
 
 final cashflowProjectionProvider = FutureProvider<CashflowProjection>((

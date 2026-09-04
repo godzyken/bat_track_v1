@@ -1,5 +1,5 @@
+import 'package:shared_models/shared_models.dart';
 import '../../data/local/models/chantiers/chantier.dart';
-import '../../data/local/models/documents/facture.dart';
 
 class CashflowProjection {
   final double currentRevenue;

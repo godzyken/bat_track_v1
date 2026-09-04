@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 import 'package:uuid/uuid.dart';
 import '../../data/local/models/index_model_extention.dart';
 import '../../data/remote/providers/multi_backend_remote_provider.dart';
@@ -26,9 +26,8 @@ class IscalAuditService {
     final logs = await _remoteStorage.getAllRaw(_logCollection, limit: 1);
 
     final String previousHash = logs.isNotEmpty
-        ? (logs.first['currentHash'] as String? ??
-              '0000000000000000000000000000000000000000000000000000000000000000')
-        : '0000000000000000000000000000000000000000000000000000000000000000';
+        ? (logs.first['currentHash'] as String? ?? IscaEngine.initialHash)
+        : IscaEngine.initialHash;
 
     // 2. Données critiques pour le hachage ISCA
     final Map<String, dynamic> payload = {
@@ -40,11 +39,12 @@ class IscalAuditService {
 
     final String payloadString = jsonEncode(payload);
 
-    // 3. Calcul du Hash SHA-256 chaîné
-    final String dataToHash = '$action|$payloadString|$previousHash';
-    final String currentHash = sha256
-        .convert(utf8.encode(dataToHash))
-        .toString();
+    // 3. Calcul du Hash SHA-256 chaîné via le moteur partagé
+    final String currentHash = IscaEngine.calculateHash(
+      action: action,
+      payload: payloadString,
+      previousHash: previousHash,
+    );
 
     // 4. Enregistrement du scellé
     await _remoteStorage.saveRaw(
@@ -68,8 +68,7 @@ class IscalAuditService {
       (a, b) => (a['createdAt'] as String).compareTo(b['createdAt'] as String),
     );
 
-    String expectedPrevHash =
-        '0000000000000000000000000000000000000000000000000000000000000000';
+    String expectedPrevHash = IscaEngine.initialHash;
 
     for (final log in logs) {
       final String actualPrevHash = log['previousHash'] as String;
@@ -79,12 +78,14 @@ class IscalAuditService {
       final String payload = log['payload'] as String;
       final String currentHash = log['currentHash'] as String;
 
-      final String dataToHash = '$action|$payload|$actualPrevHash';
-      final String recalculatedHash = sha256
-          .convert(utf8.encode(dataToHash))
-          .toString();
+      final bool isValid = IscaEngine.verifyHash(
+        action: action,
+        payload: payload,
+        previousHash: actualPrevHash,
+        currentHash: currentHash,
+      );
 
-      if (recalculatedHash != currentHash) return false;
+      if (!isValid) return false;
 
       expectedPrevHash = currentHash;
     }

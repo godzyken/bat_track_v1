@@ -28,3 +28,6 @@
     - `[x]` Lancement de la Release v1.0.3
     - `[x]` Correctif CI Firebase (génération dummy firebase_options)
     - `[x]` Lancement de la Release v1.0.4
+    - `[x]` Migration vers Melos (Monorepo structure)
+    - `[x]` Configuration CI/CD Melos (Multi-repo checkout)
+    - `[x]` Lancement de la Release v1.0.5
