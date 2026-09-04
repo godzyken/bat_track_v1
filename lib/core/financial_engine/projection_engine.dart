@@ -1,4 +1,5 @@
-import '../../data/local/models/index_model_extention.dart';
+import '../../data/local/models/chantiers/chantier.dart';
+import '../../data/local/models/documents/facture.dart';
 
 class CashflowProjection {
   final double currentRevenue;

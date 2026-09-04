@@ -16,29 +16,33 @@ class FiscalClosureState {
   }
 }
 
-class FiscalClosureNotifier extends AsyncNotifier<FiscalClosureState> {
-  // To simulate family without generator, we often use a constructor or late init.
-  // But NotifierProvider.family is designed for this.
-  
+class FiscalClosureNotifier extends Notifier<FiscalClosureState> {
   @override
-  FutureOr<FiscalClosureState> build() {
+  FiscalClosureState build() {
     return FiscalClosureState();
   }
 
+  IscalAuditService get _auditService => ref.read(iscalAuditServiceProvider);
+
   Future<void> checkStatus(String companyId) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final isClosed = await ref.read(iscalAuditServiceProvider).isPeriodClosed(companyId, DateTime.now());
-      return FiscalClosureState(isClosedToday: isClosed, isChecking: false);
-    });
+    state = state.copyWith(isChecking: true);
+    try {
+      final isClosed = await _auditService.isPeriodClosed(companyId, DateTime.now());
+      state = FiscalClosureState(isClosedToday: isClosed, isChecking: false);
+    } catch (_) {
+      state = state.copyWith(isChecking: false);
+    }
   }
 
   Future<void> closeDay(String companyId) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await ref.read(iscalAuditServiceProvider).generateClosure(companyId, ClosurePeriod.daily, DateTime.now());
-      return FiscalClosureState(isClosedToday: true, isChecking: false);
-    });
+    state = state.copyWith(isChecking: true);
+    try {
+      await _auditService.generateClosure(companyId, ClosurePeriod.daily, DateTime.now());
+      state = FiscalClosureState(isClosedToday: true, isChecking: false);
+    } catch (e) {
+      state = state.copyWith(isChecking: false);
+      rethrow;
+    }
   }
 }
 

@@ -50,6 +50,23 @@ lib/
 - **Dolibarr Bridge :** Permet l'importation bidirectionnelle des tiers (clients) et projets depuis l'ERP.
 - **ISCA Compliance :** Journal d'audit scellé garantissant l'inaltérabilité fiscale.
 
+## Focus Technique: Sync Engine (Offline-First)
+
+L'Engine de Synchronisation est le cœur réactif de BatTrack. Il repose sur une architecture hybride permettant une fluidité totale sans connexion.
+
+### 1. Stratégie d'Écriture (Optimistic UI)
+Lorsqu'un utilisateur modifie une donnée (ex: validation d'une étape de chantier) :
+1. **Écriture Locale Immédiate :** Le `UnifiedEntityService` persiste l'objet dans **Hive**. L'UI se met à jour instantanément via les streams de Riverpod.
+2. **File d'Attente de Mutation :** La modification est placée dans une `FrameSyncQueue`.
+3. **Synchronisation Asynchrone :** Si le réseau est disponible, le service tente une écriture sur le backend configuré (Firestore/Supabase). En cas d'échec (offline), l'opération est marquée comme `pending` et sera re-tentée automatiquement dès le retour du signal.
+
+### 2. Résolution de Conflits
+Le système utilise une stratégie **"Last Update Wins"** renforcée par des horodatages synchronisés sur un serveur de temps (NTP) pour éviter les dérives locales :
+- Chaque entité possède un champ `updatedAt`.
+- Le `RemoteEntityServiceAdapter` compare le timestamp distant avec le local avant d'écraser, garantissant que la version la plus récente gagne, même si elle arrive avec du retard depuis une file d'attente offline.
+
+---
+
 ## Conventions de code
 
 - **Imports :** Préférence pour les imports relatifs pour les briques internes.
