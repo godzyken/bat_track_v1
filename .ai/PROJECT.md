@@ -4,7 +4,10 @@
 BatTrack (bat_track_v1)
 
 ## Purpose
-Plateforme intelligente de suivi de chantier pour le BTP 4.0. Elle permet la gestion des interventions, la synchronisation multi-cloud, le devisage hiérarchique et garantit la conformité fiscale et écologique.
+Digitaliser le cycle de vie complet du chantier (du devis à la facture scellée) avec une intelligence écologique et une rigueur fiscale native. BatTrack sert de point de capture terrain pour l\u0027écosystème EGOTe Services.
+
+## Vision
+Devenir le "Standard de Confiance" pour les PME du BTP en combinant agilité mobile (offline-first) et conformité légale (Loi Anti-Fraude TVA).
 
 ## Target
 - Artisans et PME du BTP.
