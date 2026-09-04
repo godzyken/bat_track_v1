@@ -1583,9 +1583,11 @@ packages:
   shared_models:
     dependency: "direct main"
     description:
-      path: "../shared_models"
-      relative: true
-    source: path
+      path: "."
+      ref: master
+      resolved-ref: ebe4a0239b5fafabc877743cd31d382111a485e8
+      url: "https://github.com/godzyken/shared_models.git"
+    source: git
     version: "1.0.0+1"
   shared_preferences:
     dependency: "direct main"
