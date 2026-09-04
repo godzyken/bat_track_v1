@@ -53,6 +53,16 @@ abstract class Produit extends UnifiedModel with _$Produit {
     int? googleSheetsRow,
   }) = _Produit;
 
+  @override String get id;
+  String get nom;
+  String get categorie;
+  String? get reference;
+  double get prixUnitaire;
+  double? get tauxTVA;
+  List<String>? get certifications;
+  double? get impactCarbone;
+  int? get googleSheetsRow;
+
   factory Produit.fromJson(Map<String, dynamic> json) =>
       _$ProduitFromJson(json);
 

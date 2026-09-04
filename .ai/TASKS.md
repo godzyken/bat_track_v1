@@ -9,9 +9,9 @@
     - [x] AGENTS.md Protocol
     - [x] ARCHITECTURE.md Documentation
     - [x] CI/CD Alignment (GitHub Actions)
-- [x] **Release v1.0.0**
+- [x] **Release v1.0.4**
     - [x] Git tagging and push
-    - [x] Build workflow launched
+    - [x] Firebase dummy options generation in CI
 
 ## Pending
 - [x] fix(ci): Disable local dependency_overrides for shared_models.

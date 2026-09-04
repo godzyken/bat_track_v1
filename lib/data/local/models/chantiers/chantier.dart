@@ -43,6 +43,12 @@ abstract class Chantier extends UnifiedModel with _$Chantier {
     @Default(20.0) double tauxTVAParDefaut, // Ajout (ex: 20%)
   }) = _Chantier;
 
+  @override String get id;
+  String get nom;
+  String get clientId;
+  List<ChantierEtape> get etapes;
+  DateTime get dateDebut;
+
   /// Génération JSON
   factory Chantier.fromJson(Map<String, dynamic> json) =>
       _$ChantierFromJson(json);

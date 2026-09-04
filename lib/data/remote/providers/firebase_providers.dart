@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-import '../../../firebase_options.dart';
+import 'package:bat_track_v1/firebase_options.dart';
 
 final firebaseInitializationProvider = FutureProvider<FirebaseApp>((ref) async {
   final logger = ref.watch(loggerProvider);

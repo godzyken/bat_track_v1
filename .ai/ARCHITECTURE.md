@@ -65,6 +65,21 @@ Le système utilise une stratégie **"Last Update Wins"** renforcée par des hor
 - Chaque entité possède un champ `updatedAt`.
 - Le `RemoteEntityServiceAdapter` compare le timestamp distant avec le local avant d'écraser, garantissant que la version la plus récente gagne, même si elle arrive avec du retard depuis une file d'attente offline.
 
+## Vision IA: BTP 4.0 & Gemini
+
+BatTrack intègre l'IA non pas comme un gadget, mais comme un accélérateur de productivité pour l'artisan.
+
+### 1. Analyse Multimodale de Devis (Gemini 1.5 Pro)
+Le workflow "Capture-to-Budget" permet d'extraire des données structurées depuis le terrain :
+- **Entrée :** Photo d'un devis papier ou PDF d'un fournisseur de matériaux.
+- **Traitement :** Gemini analyse l'image, identifie les noms des produits, les quantités, les prix unitaires et la TVA.
+- **Sortie :** Mapping automatique vers le modèle `Produit` et injection dans les lignes de frais du chantier.
+
+### 2. Assistant Prédictif (RAG & Analyse)
+L'IA a accès au contexte complet du projet (via les documents scannés et les logs fiscaux) :
+- **Prévision de Stock :** Alerte l'artisan si la consommation réelle de matériaux sur les étapes terminées suggère une rupture pour les étapes à venir.
+- **Support Réglementaire :** Interrogation en langage naturel sur les normes ADEME ou les règles de TVA applicables à un matériau spécifique.
+
 ---
 
 ## Conventions de code

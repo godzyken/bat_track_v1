@@ -147,7 +147,7 @@ class StorageService
   }
 
   @override
-  noSuchMethod(Invocation invocation) {
+  dynamic noSuchMethod(Invocation invocation) {
     // Log du nom et des arguments
     _log(invocation.memberName.toString(), invocation.positionalArguments);
 
