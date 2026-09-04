@@ -10,7 +10,7 @@ part 'piece.freezed.dart';
 part 'piece.g.dart';
 
 @freezed
-sealed class Piece extends UnifiedModel with _$Piece {
+class Piece extends UnifiedModel with _$Piece {
   Piece._();
 
   factory Piece({

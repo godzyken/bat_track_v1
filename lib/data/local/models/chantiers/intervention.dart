@@ -9,7 +9,7 @@ part 'intervention.freezed.dart';
 part 'intervention.g.dart';
 
 @freezed
-sealed class Intervention extends UnifiedModel with _$Intervention {
+class Intervention extends UnifiedModel with _$Intervention {
   Intervention._();
 
   factory Intervention({

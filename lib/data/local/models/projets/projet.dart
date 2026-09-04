@@ -17,7 +17,7 @@ enum ProjetStatus {
 }
 
 @freezed
-sealed class Projet extends UnifiedModel with _$Projet {
+class Projet extends UnifiedModel with _$Projet {
   Projet._();
 
   factory Projet({
