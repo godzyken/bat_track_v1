@@ -84,7 +84,7 @@ class IscalAuditService {
   Future<bool> isPeriodClosed(String companyId, DateTime date) async {
     final String dayKey = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 
-    final closures = await _remoteStorage.watchCollectionRaw(
+    final List<Map<String, dynamic>> closures = await _remoteStorage.watchCollectionRaw(
       _closureCollection,
       queryBuilder: (dynamic q) => (q as dynamic)
           .where('companyId', isEqualTo: companyId)

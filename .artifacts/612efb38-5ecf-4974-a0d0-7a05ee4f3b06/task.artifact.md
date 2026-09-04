@@ -1,4 +1,10 @@
-# Tâches : Convergence BTP 4.0
+# Tâches : Convergence BTP 4.0 \u0026 Équipement AI Template
+
+- `[x]` **Phase 0 : Équipement AI Template**
+    - `[x]` Remplir `.ai/PROJECT.md` avec l\u0027identité BatTrack
+    - `[x]` Remplir `.ai/ARCHITECTURE.md` (Feature-First)
+    - `[x]` Déplacer les briques AI (AGENTS.md, .ai, .mcp, .agents) à la racine
+    - `[x]` Fusionner les workflows GitHub (ci.yml, release.yml)
 
 - `[x]` **Phase 1 : Core Financial Engine (ISCA/ADEME)**
     - `[x]` Créer `iscal_audit_service.dart` (Portage Compta4me)

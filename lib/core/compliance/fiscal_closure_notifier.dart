@@ -1,22 +1,47 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'iscal_audit_service.dart';
 
-/// Provider simple pour vérifier si le jour est clôturé fiscalement.
-final fiscalClosureProvider = FutureProvider.family<bool, String>((ref, companyId) async {
-  final auditService = ref.watch(iscalAuditServiceProvider);
-  return await auditService.isPeriodClosed(companyId, DateTime.now());
-});
+class FiscalClosureState {
+  final bool isClosedToday;
+  final bool isChecking;
 
-/// Service pour déclencher la clôture (Action).
-final fiscalClosureActionProvider = Provider((ref) => FiscalClosureAction(ref));
+  FiscalClosureState({this.isClosedToday = false, this.isChecking = false});
 
-class FiscalClosureAction {
-  final Ref _ref;
-  FiscalClosureAction(this._ref);
-
-  Future<void> closeDay(String companyId) async {
-    final auditService = _ref.read(iscalAuditServiceProvider);
-    await auditService.generateClosure(companyId, ClosurePeriod.daily, DateTime.now());
-    _ref.invalidate(fiscalClosureProvider(companyId));
+  FiscalClosureState copyWith({bool? isClosedToday, bool? isChecking}) {
+    return FiscalClosureState(
+      isClosedToday: isClosedToday ?? this.isClosedToday,
+      isChecking: isChecking ?? this.isChecking,
+    );
   }
 }
+
+class FiscalClosureNotifier extends AsyncNotifier<FiscalClosureState> {
+  // To simulate family without generator, we often use a constructor or late init.
+  // But NotifierProvider.family is designed for this.
+  
+  @override
+  FutureOr<FiscalClosureState> build() {
+    return FiscalClosureState();
+  }
+
+  Future<void> checkStatus(String companyId) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final isClosed = await ref.read(iscalAuditServiceProvider).isPeriodClosed(companyId, DateTime.now());
+      return FiscalClosureState(isClosedToday: isClosed, isChecking: false);
+    });
+  }
+
+  Future<void> closeDay(String companyId) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(iscalAuditServiceProvider).generateClosure(companyId, ClosurePeriod.daily, DateTime.now());
+      return FiscalClosureState(isClosedToday: true, isChecking: false);
+    });
+  }
+}
+
+final fiscalClosureProvider = NotifierProvider<FiscalClosureNotifier, FiscalClosureState>(
+  FiscalClosureNotifier.new,
+);
