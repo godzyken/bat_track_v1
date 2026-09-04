@@ -12,18 +12,20 @@ void main() {
   group('DashboardService', () {
     late DashboardService dashboardService;
     late MockLoggedEntitySyncService<Projet, ProjetEntity> mockProjetService;
-    late MockLoggedEntitySyncService<Chantier, ChantierEntity> mockChantierService;
-    late MockLoggedEntitySyncService<Intervention, InterventionEntity> mockInterventionService;
+    late MockLoggedEntitySyncService<Chantier, ChantierEntity>
+    mockChantierService;
+    late MockLoggedEntitySyncService<Intervention, InterventionEntity>
+    mockInterventionService;
     late AppUser testUser;
 
     setUp(() {
       mockProjetService = MockLoggedEntitySyncService<Projet, ProjetEntity>();
-      mockChantierService = MockLoggedEntitySyncService<Chantier, ChantierEntity>();
-      mockInterventionService = MockLoggedEntitySyncService<Intervention, InterventionEntity>();
+      mockChantierService =
+          MockLoggedEntitySyncService<Chantier, ChantierEntity>();
+      mockInterventionService =
+          MockLoggedEntitySyncService<Intervention, InterventionEntity>();
 
-      testUser = MockDataFactories.createUser(
-        uid: 'user_1',
-      );
+      testUser = MockDataFactories.createUser(uid: 'user_1');
 
       dashboardService = DashboardService(
         user: testUser,
@@ -34,10 +36,12 @@ void main() {
     });
 
     test('watchProjects should return a stream from service', () {
-      when(() => mockProjetService.watchByOwner(any())).thenAnswer((_) => Stream.value([]));
-      
+      when(
+        () => mockProjetService.watchByOwner(any()),
+      ).thenAnswer((_) => Stream.value([]));
+
       final stream = dashboardService.watchProjects();
-      
+
       expect(stream, isA<Stream<List<Projet>>>());
     });
   });

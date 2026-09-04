@@ -13,19 +13,27 @@ class SyncWorker {
 
   void start() {
     developer.log('🔄 [SyncWorker] Démarrage du worker de synchronisation');
-    
-    _subscription = ref.listen<AsyncValue<ConnectivityStatus>>(connectivityStatusProvider, (previous, next) {
-      if (next.value == ConnectivityStatus.isConnected) {
-        developer.log('📡 [SyncWorker] Réseau détecté, lancement de la synchronisation globale');
-        _performFullSync();
-      }
-    }, fireImmediately: true);
+
+    _subscription = ref.listen<AsyncValue<ConnectivityStatus>>(
+      connectivityStatusProvider,
+      (previous, next) {
+        if (next.value == ConnectivityStatus.isConnected) {
+          developer.log(
+            '📡 [SyncWorker] Réseau détecté, lancement de la synchronisation globale',
+          );
+          _performFullSync();
+        }
+      },
+      fireImmediately: true,
+    );
   }
 
   Future<void> _performFullSync() async {
     try {
       await syncAllEntitiesFromFirestore(ref);
-      developer.log('✅ [SyncWorker] Synchronisation globale terminée avec succès');
+      developer.log(
+        '✅ [SyncWorker] Synchronisation globale terminée avec succès',
+      );
     } catch (e) {
       developer.log('❌ [SyncWorker] Échec de la synchronisation globale: $e');
     }

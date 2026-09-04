@@ -87,7 +87,8 @@ class SafeAndLoggedEntityService<M extends UnifiedModel, E extends HiveModel<M>>
   }
 
   // Ces méthodes sont conservées pour la compatibilité si elles sont appelées ailleurs
-  Future<void> syncFromRemote({BuildContext? context}) async => syncAllFromRemote();
+  Future<void> syncFromRemote({BuildContext? context}) async =>
+      syncAllFromRemote();
   Future<void> syncToRemote() async => syncAllToRemote();
 
   @override
@@ -151,7 +152,7 @@ class SafeAndLoggedEntityService<M extends UnifiedModel, E extends HiveModel<M>>
 
     try {
       // Délégation automatique à _delegate pour toutes les autres méthodes
-      return ( _delegate as dynamic).noSuchMethod(invocation);
+      return (_delegate as dynamic).noSuchMethod(invocation);
     } catch (e) {
       if (e is NoSuchMethodError) {
         throw UnimplementedError(

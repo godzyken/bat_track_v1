@@ -193,11 +193,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 const SizedBox(height: 24),
 
                 /// 🏦 PROJECTIONS FINANCIÈRES (Convergence BTP 4.0)
-                ref.watch(cashflowProjectionProvider).when(
-                  data: (proj) => _buildProjectionSection(proj),
-                  loading: () => const LinearProgressIndicator(),
-                  error: (e, _) => Text('Erreur projection : $e'),
-                ),
+                ref
+                    .watch(cashflowProjectionProvider)
+                    .when(
+                      data: (proj) => _buildProjectionSection(proj),
+                      loading: () => const LinearProgressIndicator(),
+                      error: (e, _) => Text('Erreur projection : $e'),
+                    ),
 
                 const SizedBox(height: 24),
 
@@ -266,10 +268,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            _projectionLine('Revenu encaissé (Scellé)', projection.currentRevenue, Colors.green),
-            _projectionLine('Factures en attente', projection.pendingInvoices, Colors.orange),
+            _projectionLine(
+              'Revenu encaissé (Scellé)',
+              projection.currentRevenue,
+              Colors.green,
+            ),
+            _projectionLine(
+              'Factures en attente',
+              projection.pendingInvoices,
+              Colors.orange,
+            ),
             const Divider(),
-            _projectionLine('Potentiel Total', projection.potentialRevenue, Colors.blue),
+            _projectionLine(
+              'Potentiel Total',
+              projection.potentialRevenue,
+              Colors.blue,
+            ),
             const SizedBox(height: 16),
             Text(
               'Avancement global chantiers : ${(projection.completionRate * 100).toStringAsFixed(1)}%',

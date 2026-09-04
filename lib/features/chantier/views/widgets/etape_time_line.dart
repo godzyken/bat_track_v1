@@ -38,10 +38,9 @@ class EtapeTimeline extends ConsumerWidget {
             subtitle: Text(
               'Début : ${current.dateDebut.toLocal().toString().split(' ').first}',
             ),
-            tileColor:
-                current.id == etape.id
-                    ? Colors.blue.withAlpha(25)
-                    : Colors.transparent,
+            tileColor: current.id == etape.id
+                ? Colors.blue.withAlpha(25)
+                : Colors.transparent,
             trailing: Icon(
               current.terminee ? Icons.check_circle : Icons.timelapse,
               color: current.terminee ? Colors.green : Colors.orange,
@@ -53,14 +52,9 @@ class EtapeTimeline extends ConsumerWidget {
           final e = etapes[index];
           return DotIndicator(
             color: e.terminee ? Colors.green : Colors.grey,
-            child:
-                e.id == etape.id
-                    ? const Icon(
-                      Icons.arrow_forward,
-                      size: 12,
-                      color: Colors.white,
-                    )
-                    : null,
+            child: e.id == etape.id
+                ? const Icon(Icons.arrow_forward, size: 12, color: Colors.white)
+                : null,
           );
         },
         connectorBuilder: (_, _, _) => const SolidLineConnector(),

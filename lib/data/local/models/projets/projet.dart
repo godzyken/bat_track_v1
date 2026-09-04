@@ -70,7 +70,10 @@ abstract class Projet extends UnifiedModel with _$Projet {
   @override
   bool canEdit(AppUser user) {
     if (AppUserAccessControl(user).isAdmin) return true;
-    if (AppUserAccessControl(user).isClient && ownerId == user.uid && !chefDeProjetValide) return true;
+    if (AppUserAccessControl(user).isClient &&
+        ownerId == user.uid &&
+        !chefDeProjetValide)
+      return true;
     return false;
   }
 
@@ -81,7 +84,9 @@ abstract class Projet extends UnifiedModel with _$Projet {
   bool canMerge(AppUser user) => AppUserAccessControl(user).isAdmin;
 
   @override
-  bool canValidate(AppUser user) => AppUserAccessControl(user).isAdmin || (AppUserAccessControl(user).isClient && ownerId == user.uid);
+  bool canValidate(AppUser user) =>
+      AppUserAccessControl(user).isAdmin ||
+      (AppUserAccessControl(user).isClient && ownerId == user.uid);
 }
 
 /// 🔹 Extensions pour la logique métier

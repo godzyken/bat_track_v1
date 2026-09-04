@@ -71,20 +71,19 @@ class _LogConsoleState extends ConsumerState<LogConsole> {
           ),
           const Divider(height: 0),
           Expanded(
-            child:
-                logs.isEmpty
-                    ? const Center(child: Text('Aucun log pour l’instant.'))
-                    : ListView.builder(
-                      itemCount: logs.length,
-                      itemBuilder: (_, i) {
-                        final log = logs[i];
-                        return ListTile(
-                          title: Text('${log.action} → ${log.target}'),
-                          subtitle: Text(log.data?.toString() ?? ''),
-                          dense: true,
-                        );
-                      },
-                    ),
+            child: logs.isEmpty
+                ? const Center(child: Text('Aucun log pour l’instant.'))
+                : ListView.builder(
+                    itemCount: logs.length,
+                    itemBuilder: (_, i) {
+                      final log = logs[i];
+                      return ListTile(
+                        title: Text('${log.action} → ${log.target}'),
+                        subtitle: Text(log.data?.toString() ?? ''),
+                        dense: true,
+                      );
+                    },
+                  ),
           ),
         ],
       ),

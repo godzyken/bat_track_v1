@@ -7,9 +7,7 @@ import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart'
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 
-class StorageService
-    with NoSuchMethodLogger
-    implements BaseStorageService {
+class StorageService with NoSuchMethodLogger implements BaseStorageService {
   final FirebaseStorage _storage;
 
   StorageService(this._storage);

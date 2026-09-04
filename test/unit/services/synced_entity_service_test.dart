@@ -10,6 +10,7 @@ import '../../mocks/mock_data_factories.dart';
 import '../../mocks/mock_services.dart';
 
 class MockProjetEntityFactory extends Mock implements ProjetEntityFactory {}
+
 class MockBox<T> extends Mock implements Box<T> {}
 
 void main() {
@@ -26,7 +27,7 @@ void main() {
     setUp(() {
       mockRemoteStorage = MockRemoteStorageService();
       mockFactory = MockProjetEntityFactory();
-      
+
       service = UnifiedEntityServiceImpl<Projet, ProjetEntity>(
         collectionName: 'projets',
         factory: mockFactory,
@@ -40,18 +41,22 @@ void main() {
       // Arrange
       final projet = testProjets[0];
       final entity = ProjetEntity.fromModel(projet);
-      
+
       when(() => mockFactory.toEntity(any())).thenReturn(entity);
-      when(() => mockRemoteStorage.saveRaw(any(), any(), any())).thenAnswer((_) async {});
-      
+      when(
+        () => mockRemoteStorage.saveRaw(any(), any(), any()),
+      ).thenAnswer((_) async {});
+
       // Note: testing actual Hive interaction in unit tests is hard without full setup
       // We are mostly testing the logic of the service wrapper here.
     });
 
     test('getAll should try remote then local on failure', () async {
       // Arrange
-      when(() => mockRemoteStorage.getAllRaw(any())).thenThrow(Exception('Network error'));
-      
+      when(
+        () => mockRemoteStorage.getAllRaw(any()),
+      ).thenThrow(Exception('Network error'));
+
       // Act & Assert
       // expectation is that it catches and returns local (which is empty in mock setup)
       final result = await service.getAll();

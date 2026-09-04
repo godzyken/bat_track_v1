@@ -7,14 +7,16 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Convergence BTP 4.0 Integration Test', () {
-    testWidgets('Full flow: Payment -> Sealing -> Projection Update', (tester) async {
+    testWidgets('Full flow: Payment -> Sealing -> Projection Update', (
+      tester,
+    ) async {
       app.main();
       await tester.pumpAndSettle();
 
       // 1. Navigate to Factures
       // Assuming there is a drawer or bottom nav
       // For this test, we'll assume we can find a way to the Factures screen
-      
+
       // 2. Check ISCA Indicator
       expect(find.byIcon(Icons.verified_user), findsOneWidget);
 

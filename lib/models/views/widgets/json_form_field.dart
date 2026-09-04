@@ -123,7 +123,9 @@ class _JsonFormFieldState extends ConsumerState<JsonFormField> {
   }
 
   Widget _buildDatePicker(BuildContext context) {
-    final DateTime? date = widget.value is DateTime ? widget.value as DateTime : null;
+    final DateTime? date = widget.value is DateTime
+        ? widget.value as DateTime
+        : null;
     return InkWell(
       onTap: () async {
         final picked = await showDatePicker(
@@ -151,7 +153,9 @@ class _JsonFormFieldState extends ConsumerState<JsonFormField> {
   Widget _buildCheckbox() {
     return CheckboxListTile(
       title: Text(widget.field.label),
-      value: (widget.value ?? false) is bool ? (widget.value ?? false) as bool : false,
+      value: (widget.value ?? false) is bool
+          ? (widget.value ?? false) as bool
+          : false,
       onChanged: widget.field.readOnly ? null : widget.onChanged,
       controlAffinity: ListTileControlAffinity.leading,
     );
@@ -160,7 +164,9 @@ class _JsonFormFieldState extends ConsumerState<JsonFormField> {
   Widget _buildSwitch() {
     return SwitchListTile(
       title: Text(widget.field.label),
-      value: (widget.value ?? false) is bool ? (widget.value ?? false) as bool : false,
+      value: (widget.value ?? false) is bool
+          ? (widget.value ?? false) as bool
+          : false,
       onChanged: widget.onChanged != null ? (v) => widget.onChanged!(v) : null,
     );
   }
@@ -270,9 +276,8 @@ class _JsonFormFieldState extends ConsumerState<JsonFormField> {
             onPressed: _uploading
                 ? null
                 : () async {
-                    final List<PlatformFile> result = await FilePicker.pickFiles(
-                      type: FileType.any
-                    );
+                    final List<PlatformFile> result =
+                        await FilePicker.pickFiles(type: FileType.any);
                     if (result.isNotEmpty && result.first.path != null) {
                       widget.onChanged?.call(result.first.path);
                     }

@@ -20,28 +20,21 @@ class ScreenWrapper extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final responsiveInfo = context.responsiveInfo(ref);
 
-    final padding =
-        responsiveInfo.isMobile
-            ? const EdgeInsets.symmetric(horizontal: 12, vertical: 8)
-            : const EdgeInsets.symmetric(horizontal: 24, vertical: 16);
+    final padding = responsiveInfo.isMobile
+        ? const EdgeInsets.symmetric(horizontal: 12, vertical: 8)
+        : const EdgeInsets.symmetric(horizontal: 24, vertical: 16);
 
-    final bodyContent =
-        scrollable
-            ? SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Padding(padding: padding, child: child),
-            )
-            : Padding(padding: padding, child: child);
+    final bodyContent = scrollable
+        ? SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(padding: padding, child: child),
+          )
+        : Padding(padding: padding, child: child);
 
     return Scaffold(
-      appBar:
-          showAppBar
-              ? AppBar(
-                title: Text(title ?? ''),
-                centerTitle: true,
-                elevation: 2,
-              )
-              : null,
+      appBar: showAppBar
+          ? AppBar(title: Text(title ?? ''), centerTitle: true, elevation: 2)
+          : null,
       body: SafeArea(child: bodyContent),
     );
   }

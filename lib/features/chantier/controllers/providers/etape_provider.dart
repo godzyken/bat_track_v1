@@ -23,38 +23,41 @@ EtapeStatut getEtapeStatut(ChantierEtape e) {
   return EtapeStatut.aFaire;
 }
 
-final etapesParStatutProvider = Provider.family<
-  AsyncValue<Map<EtapeStatut, List<ChantierEtape>>>,
-  String
->((ref, chantierId) {
-  final chantierAsync = ref.watch(chantierAdvancedNotifierProvider(chantierId));
+final etapesParStatutProvider =
+    Provider.family<AsyncValue<Map<EtapeStatut, List<ChantierEtape>>>, String>((
+      ref,
+      chantierId,
+    ) {
+      final chantierAsync = ref.watch(
+        chantierAdvancedNotifierProvider(chantierId),
+      );
 
-  return chantierAsync.when(
-    loading: () => const AsyncValue.loading(),
-    error: (err, stack) => AsyncValue.error(err, stack),
-    data: (chantier) {
-      if (chantier == null) {
-        return const AsyncValue.data({
-          EtapeStatut.aFaire: [],
-          EtapeStatut.enCours: [],
-          EtapeStatut.terminee: [],
-        });
-      }
+      return chantierAsync.when(
+        loading: () => const AsyncValue.loading(),
+        error: (err, stack) => AsyncValue.error(err, stack),
+        data: (chantier) {
+          if (chantier == null) {
+            return const AsyncValue.data({
+              EtapeStatut.aFaire: [],
+              EtapeStatut.enCours: [],
+              EtapeStatut.terminee: [],
+            });
+          }
 
-      // On utilise les étapes chargées dans le Chantier
-      final etapes = chantier.etapes;
+          // On utilise les étapes chargées dans le Chantier
+          final etapes = chantier.etapes;
 
-      final grouped = <EtapeStatut, List<ChantierEtape>>{
-        EtapeStatut.aFaire: [],
-        EtapeStatut.enCours: [],
-        EtapeStatut.terminee: [],
-      };
+          final grouped = <EtapeStatut, List<ChantierEtape>>{
+            EtapeStatut.aFaire: [],
+            EtapeStatut.enCours: [],
+            EtapeStatut.terminee: [],
+          };
 
-      for (final e in etapes) {
-        grouped[getEtapeStatut(e)]!.add(e);
-      }
+          for (final e in etapes) {
+            grouped[getEtapeStatut(e)]!.add(e);
+          }
 
-      return AsyncValue.data(grouped);
-    },
-  );
-});
+          return AsyncValue.data(grouped);
+        },
+      );
+    });

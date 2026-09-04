@@ -55,7 +55,8 @@ abstract class FactureDraft extends UnifiedModel with _$FactureDraft {
   bool canRead(AppUser user) => true;
 
   @override
-  bool canEdit(AppUser user) => AppUserAccessControl(user).isAdmin || clientId == user.uid;
+  bool canEdit(AppUser user) =>
+      AppUserAccessControl(user).isAdmin || clientId == user.uid;
 
   @override
   bool canDelete(AppUser user) => AppUserAccessControl(user).isAdmin;
@@ -107,7 +108,8 @@ abstract class FactureDraft extends UnifiedModel with _$FactureDraft {
 }
 
 @freezed
-abstract class CustomLigneFacture extends UnifiedModel with _$CustomLigneFacture {
+abstract class CustomLigneFacture extends UnifiedModel
+    with _$CustomLigneFacture {
   factory CustomLigneFacture({
     required String ctlId,
     required String description,

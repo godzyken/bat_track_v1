@@ -46,7 +46,9 @@ class UnifiedRepository<T extends UnifiedModel>
   // ==================== HIVE ====================
 
   Future<Box<Map<dynamic, dynamic>>> _getHiveBox() async {
-    _hiveBox ??= await Hive.openBox<Map<dynamic, dynamic>>(config.collectionPath);
+    _hiveBox ??= await Hive.openBox<Map<dynamic, dynamic>>(
+      config.collectionPath,
+    );
 
     return _hiveBox!;
   }

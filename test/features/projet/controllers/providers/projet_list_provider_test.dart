@@ -155,20 +155,25 @@ void main() {
       expect(states[1].error.toString(), contains('Firestore error'));
     });
 
-    test('projectListProvider emits 1 projet complet avec chantiers et étapes', () async {
-      final container = ProviderContainer(
-        overrides: [
-          projectListProvider.overrideWith((ref) => Stream.value([projetPenelope])),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'projectListProvider emits 1 projet complet avec chantiers et étapes',
+      () async {
+        final container = ProviderContainer(
+          overrides: [
+            projectListProvider.overrideWith(
+              (ref) => Stream.value([projetPenelope]),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      await Future.delayed(const Duration(milliseconds: 10));
-      final state = container.read(projectListProvider);
+        await Future.delayed(const Duration(milliseconds: 10));
+        final state = container.read(projectListProvider);
 
-      expect(state.hasValue, true);
-      expect(state.value!.length, 1);
-      expect(state.value!.first.chantiers!.isNotEmpty, true);
-    });
+        expect(state.hasValue, true);
+        expect(state.value!.length, 1);
+        expect(state.value!.first.chantiers!.isNotEmpty, true);
+      },
+    );
   });
 }

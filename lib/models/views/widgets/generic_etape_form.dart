@@ -61,48 +61,44 @@ class _GenericEtapeFormState<T> extends State<GenericEtapeForm<T>> {
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
-            children:
-                _formValues.entries.map((entry) {
-                  final key = entry.key;
-                  final value = entry.value;
+            children: _formValues.entries.map((entry) {
+              final key = entry.key;
+              final value = entry.value;
 
-                  if (!_showExpert && !_isSimple(value) && !_isDateField(key)) {
-                    return const SizedBox.shrink();
-                  }
+              if (!_showExpert && !_isSimple(value) && !_isDateField(key)) {
+                return const SizedBox.shrink();
+              }
 
-                  if (_controllers.containsKey(key)) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: TextFormField(
-                        controller: _controllers[key],
-                        decoration: InputDecoration(
-                          labelText: _formatLabel(key),
-                        ),
-                        validator:
-                            (v) =>
-                                v == null || v.isEmpty ? 'Champ requis' : null,
-                      ),
-                    );
-                  }
+              if (_controllers.containsKey(key)) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: TextFormField(
+                    controller: _controllers[key],
+                    decoration: InputDecoration(labelText: _formatLabel(key)),
+                    validator: (v) =>
+                        v == null || v.isEmpty ? 'Champ requis' : null,
+                  ),
+                );
+              }
 
-                  if (_isDateField(key)) {
-                    final initialDate = _parseDate(value?.toString());
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: InputDatePickerFormField(
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2100),
-                        initialDate: initialDate ?? DateTime.now(),
-                        fieldLabelText: _formatLabel(key),
-                        onDateSubmitted: (date) {
-                          _formValues[key] = date.toIso8601String();
-                        },
-                      ),
-                    );
-                  }
+              if (_isDateField(key)) {
+                final initialDate = _parseDate(value?.toString());
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: InputDatePickerFormField(
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                    initialDate: initialDate ?? DateTime.now(),
+                    fieldLabelText: _formatLabel(key),
+                    onDateSubmitted: (date) {
+                      _formValues[key] = date.toIso8601String();
+                    },
+                  ),
+                );
+              }
 
-                  return const SizedBox.shrink();
-                }).toList(),
+              return const SizedBox.shrink();
+            }).toList(),
           ),
         ),
       ),

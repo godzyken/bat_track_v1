@@ -27,9 +27,7 @@ void main() {
 
     test('projectListProvider should emit list of projets', () async {
       final container = ProviderContainer(
-        overrides: [
-          projetServiceProvider.overrideWith((ref) => mockService),
-        ],
+        overrides: [projetServiceProvider.overrideWith((ref) => mockService)],
       );
       addTearDown(container.dispose);
 

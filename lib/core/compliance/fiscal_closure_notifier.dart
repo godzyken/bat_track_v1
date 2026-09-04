@@ -27,7 +27,10 @@ class FiscalClosureNotifier extends Notifier<FiscalClosureState> {
   Future<void> checkStatus(String companyId) async {
     state = state.copyWith(isChecking: true);
     try {
-      final isClosed = await _auditService.isPeriodClosed(companyId, DateTime.now());
+      final isClosed = await _auditService.isPeriodClosed(
+        companyId,
+        DateTime.now(),
+      );
       state = FiscalClosureState(isClosedToday: isClosed, isChecking: false);
     } catch (_) {
       state = state.copyWith(isChecking: false);
@@ -37,7 +40,11 @@ class FiscalClosureNotifier extends Notifier<FiscalClosureState> {
   Future<void> closeDay(String companyId) async {
     state = state.copyWith(isChecking: true);
     try {
-      await _auditService.generateClosure(companyId, ClosurePeriod.daily, DateTime.now());
+      await _auditService.generateClosure(
+        companyId,
+        ClosurePeriod.daily,
+        DateTime.now(),
+      );
       state = FiscalClosureState(isClosedToday: true, isChecking: false);
     } catch (e) {
       state = state.copyWith(isChecking: false);
@@ -46,6 +53,7 @@ class FiscalClosureNotifier extends Notifier<FiscalClosureState> {
   }
 }
 
-final fiscalClosureProvider = NotifierProvider<FiscalClosureNotifier, FiscalClosureState>(
-  FiscalClosureNotifier.new,
-);
+final fiscalClosureProvider =
+    NotifierProvider<FiscalClosureNotifier, FiscalClosureState>(
+      FiscalClosureNotifier.new,
+    );

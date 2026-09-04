@@ -73,14 +73,17 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
                   : null,
               showActions: showActions,
               readOnly: readOnly || !item.canEdit(currentUser),
-              trailingActions: cardTrailingBuilder != null ? [cardTrailingBuilder!(item)] : null,
+              trailingActions: cardTrailingBuilder != null
+                  ? [cardTrailingBuilder!(item)]
+                  : null,
             );
           }
 
           // Mobile → Liste
           if (info.isMobile) {
             return ListView.builder(
-              scrollCacheExtent: const ScrollCacheExtent.pixels(500), padding: const EdgeInsets.all(12),
+              scrollCacheExtent: const ScrollCacheExtent.pixels(500),
+              padding: const EdgeInsets.all(12),
               itemCount: filteredItems.length,
               itemBuilder: (context, index) => buildCard(filteredItems[index]),
             );
@@ -135,29 +138,30 @@ Future<void> showEntityFormDialog<T extends UnifiedModel>({
       createEmpty: createEmpty,
       fromJson: fromJson,
       onSubmit: onSubmit,
-      customFieldBuilder: ({
-        required BuildContext context,
-        required String key,
-        required dynamic value,
-        required TextEditingController? controller,
-        required void Function(dynamic) onChanged,
-        required bool expertMode,
-      }) {
-        if (role == 'tech') {
-          final isDimension = editableKeysForTech.contains(key);
-          if (!isDimension) {
-            return TextFormField(
-              controller: controller,
-              enabled: false,
-              decoration: InputDecoration(
-                labelText: key,
-                disabledBorder: const OutlineInputBorder(),
-              ),
-            );
-          }
-        }
-        return null;
-      },
+      customFieldBuilder:
+          ({
+            required BuildContext context,
+            required String key,
+            required dynamic value,
+            required TextEditingController? controller,
+            required void Function(dynamic) onChanged,
+            required bool expertMode,
+          }) {
+            if (role == 'tech') {
+              final isDimension = editableKeysForTech.contains(key);
+              if (!isDimension) {
+                return TextFormField(
+                  controller: controller,
+                  enabled: false,
+                  decoration: InputDecoration(
+                    labelText: key,
+                    disabledBorder: const OutlineInputBorder(),
+                  ),
+                );
+              }
+            }
+            return null;
+          },
       fieldVisibility: (key, _) {
         if (role == 'tech' && hiddenKeysForTech.contains(key)) {
           return false;

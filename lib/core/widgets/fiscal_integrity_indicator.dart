@@ -23,8 +23,8 @@ class FiscalIntegrityIndicator extends ConsumerWidget {
         final bool isIntegrityOk = snapshot.data ?? false;
 
         return Tooltip(
-          message: isIntegrityOk 
-              ? 'Chaîne fiscale intègre (ISCA)' 
+          message: isIntegrityOk
+              ? 'Chaîne fiscale intègre (ISCA)'
               : 'Attention : Anomalie détectée dans la chaîne fiscale !',
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -39,7 +39,11 @@ class FiscalIntegrityIndicator extends ConsumerWidget {
                   padding: EdgeInsets.only(left: 4),
                   child: Text(
                     'ISCA Error',
-                    style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
             ],

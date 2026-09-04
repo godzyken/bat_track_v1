@@ -57,10 +57,15 @@ class EntitySyncService<T extends UnifiedModel> {
 
     // ⚖️ [CONFORMITÉ ISCA] Vérification du verrouillage fiscal
     if (item is Facture && ref != null) {
-      final IscalAuditService auditService = ref!.read(iscalAuditServiceProvider);
+      final IscalAuditService auditService = ref!.read(
+        iscalAuditServiceProvider,
+      );
       // Supposons que l'entreprise est identifiée par le 'company' de l'user courant
       // On fera une verif simplifiée ici
-      final isClosed = await auditService.isPeriodClosed('DEFAULT_COMPANY', item.date);
+      final isClosed = await auditService.isPeriodClosed(
+        'DEFAULT_COMPANY',
+        item.date,
+      );
       if (isClosed) {
         throw Exception('Modification impossible : Période fiscale clôturée.');
       }
@@ -78,7 +83,9 @@ class EntitySyncService<T extends UnifiedModel> {
     // 2. Sauvegarde remote en arrière-plan (non bloquante)
     // Firestore gère sa propre file d'attente hors-ligne.
     remote.save(item, docId).catchError((Object e) {
-      developer.log('📡 [Offline-First] Remote save en attente (Network/Error): $e');
+      developer.log(
+        '📡 [Offline-First] Remote save en attente (Network/Error): $e',
+      );
     });
 
     // 3. Gestion des fichiers

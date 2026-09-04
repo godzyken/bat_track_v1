@@ -21,3 +21,10 @@
     - `[x]` Lancement de la Release v1.0.0
     - `[x]` Correctif CI (dépendance git shared_models)
     - `[x]` Stabilisation finale des types (PlatformFile, Notifiers)
+    - `[x]` Lancement de la Release v1.0.1 (Correctif authentification Git)
+    - `[x]` Correctif CI global (build_runner + retrait sealed models)
+    - `[x]` Lancement de la Release v1.0.2
+    - `[x]` Correctif visibilité Freezed (abstract class)
+    - `[x]` Lancement de la Release v1.0.3
+    - `[x]` Correctif CI Firebase (génération dummy firebase_options)
+    - `[x]` Lancement de la Release v1.0.4

@@ -53,7 +53,8 @@ abstract class Produit extends UnifiedModel with _$Produit {
     int? googleSheetsRow,
   }) = _Produit;
 
-  @override String get id;
+  @override
+  String get id;
   String get nom;
   String get categorie;
   String? get reference;

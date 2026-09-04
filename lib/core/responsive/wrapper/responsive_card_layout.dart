@@ -26,16 +26,15 @@ class ResponsiveCardLayout extends ConsumerWidget {
               child: Wrap(
                 spacing: spacing,
                 runSpacing: spacing,
-                children:
-                    children.map((child) {
-                      return ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minWidth: 300,
-                          maxWidth: 480,
-                        ),
-                        child: child,
-                      );
-                    }).toList(),
+                children: children.map((child) {
+                  return ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: 300,
+                      maxWidth: 480,
+                    ),
+                    child: child,
+                  );
+                }).toList(),
               ),
             ),
           );

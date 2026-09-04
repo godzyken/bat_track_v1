@@ -112,14 +112,20 @@ class TechnicienSearchParams {
   });
 }
 
-final techniciensSearchProvider = FutureProvider.family<List<Technicien>, TechnicienSearchParams>((ref, params) async {
-  final allTechs = await ref.watch(techniciensFutureProvider.future);
-  
-  return allTechs.where((t) {
-    if (params.specialite != null && t.specialite != params.specialite) return false;
-    if (params.region != null && t.localisation != params.region) return false;
-    if (params.disponibleUniquement && !t.disponible) return false;
-    if (t.rating != null && t.rating! < params.minRating) return false;
-    return true;
-  }).toList();
-});
+final techniciensSearchProvider =
+    FutureProvider.family<List<Technicien>, TechnicienSearchParams>((
+      ref,
+      params,
+    ) async {
+      final allTechs = await ref.watch(techniciensFutureProvider.future);
+
+      return allTechs.where((t) {
+        if (params.specialite != null && t.specialite != params.specialite)
+          return false;
+        if (params.region != null && t.localisation != params.region)
+          return false;
+        if (params.disponibleUniquement && !t.disponible) return false;
+        if (t.rating != null && t.rating! < params.minRating) return false;
+        return true;
+      }).toList();
+    });

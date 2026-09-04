@@ -324,9 +324,13 @@ abstract class UnifiedEntityService<
   /// Observe tous les items liés à un technicien spécifique
   Stream<List<M>> watchByTechnicien(String technicienId) async* {
     await _ensureInitialized();
-    yield await getAllLocalByFilter((json) => json['technicienId'] == technicienId);
+    yield await getAllLocalByFilter(
+      (json) => json['technicienId'] == technicienId,
+    );
     yield* _localBox.watch().asyncMap((_) async {
-      return await getAllLocalByFilter((json) => json['technicienId'] == technicienId);
+      return await getAllLocalByFilter(
+        (json) => json['technicienId'] == technicienId,
+      );
     });
   }
 
@@ -342,9 +346,13 @@ abstract class UnifiedEntityService<
   /// Observe tous les items liés à un projet spécifique
   Stream<List<M>> watchByProjects(String projectId) async* {
     await _ensureInitialized();
-    yield await getAllLocalByFilter((json) => json['id'] == projectId || json['projetId'] == projectId);
+    yield await getAllLocalByFilter(
+      (json) => json['id'] == projectId || json['projetId'] == projectId,
+    );
     yield* _localBox.watch().asyncMap((_) async {
-      return await getAllLocalByFilter((json) => json['id'] == projectId || json['projetId'] == projectId);
+      return await getAllLocalByFilter(
+        (json) => json['id'] == projectId || json['projetId'] == projectId,
+      );
     });
   }
 
@@ -354,13 +362,23 @@ abstract class UnifiedEntityService<
     String projectId,
   ) async* {
     await _ensureInitialized();
-    yield await getAllLocalByFilter((json) => (json['clientId'] == ownerId || json['ownerId'] == ownerId) && (json['id'] == projectId || json['projetId'] == projectId));
+    yield await getAllLocalByFilter(
+      (json) =>
+          (json['clientId'] == ownerId || json['ownerId'] == ownerId) &&
+          (json['id'] == projectId || json['projetId'] == projectId),
+    );
     yield* _localBox.watch().asyncMap((_) async {
-      return await getAllLocalByFilter((json) => (json['clientId'] == ownerId || json['ownerId'] == ownerId) && (json['id'] == projectId || json['projetId'] == projectId));
+      return await getAllLocalByFilter(
+        (json) =>
+            (json['clientId'] == ownerId || json['ownerId'] == ownerId) &&
+            (json['id'] == projectId || json['projetId'] == projectId),
+      );
     });
   }
 
-  Future<List<M>> getAllLocalByFilter(bool Function(Map<String, dynamic> json) filter) async {
+  Future<List<M>> getAllLocalByFilter(
+    bool Function(Map<String, dynamic> json) filter,
+  ) async {
     final all = await getAllLocal();
     return all.where((item) => filter(item.toJson())).toList();
   }

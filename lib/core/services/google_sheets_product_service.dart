@@ -232,7 +232,9 @@ final googleAuthProvider = FutureProvider<AutoRefreshingAuthClient>((
   // 2. Créer les credentials à partir du JSON temporaire
   final credentials = ServiceAccountCredentials.fromJson(jsonCredentials);
 
-  return await clientViaServiceAccount(credentials, [sheets.SheetsApi.spreadsheetsScope]);
+  return await clientViaServiceAccount(credentials, [
+    sheets.SheetsApi.spreadsheetsScope,
+  ]);
 });
 
 /// Provider pour le service Google Sheets

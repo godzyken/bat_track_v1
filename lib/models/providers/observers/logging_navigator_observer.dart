@@ -25,7 +25,11 @@ class LoggingNavigatorObserver extends NavigatorObserver {
     _logNavigation('REPLACE', newRoute, oldRoute);
   }
 
-  void _logNavigation(String action, Route<dynamic>? route, Route<dynamic>? previousRoute) {
+  void _logNavigation(
+    String action,
+    Route<dynamic>? route,
+    Route<dynamic>? previousRoute,
+  ) {
     final newRouteName = route?.settings.name ?? route?.settings.toString();
     final oldRouteName =
         previousRoute?.settings.name ?? previousRoute?.settings.toString();

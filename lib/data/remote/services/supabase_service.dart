@@ -12,13 +12,16 @@ class SupabaseService extends RemoteStorageService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
   @override
-  bool get isConnected => true; 
+  bool get isConnected => true;
 
   @override
   Future<Map<String, dynamic>> getRaw(String table, String id) async {
     try {
-      final res =
-          await _supabase.from(table).select().eq('id', id).maybeSingle();
+      final res = await _supabase
+          .from(table)
+          .select()
+          .eq('id', id)
+          .maybeSingle();
 
       if (res == null) return {};
       return Map<String, dynamic>.from(res as Map<dynamic, dynamic>);
@@ -73,7 +76,12 @@ class SupabaseService extends RemoteStorageService {
       final res = await query;
 
       if (res is List) {
-        return res.map((dynamic r) => Map<String, dynamic>.from(r as Map<dynamic, dynamic>)).toList();
+        return res
+            .map(
+              (dynamic r) =>
+                  Map<String, dynamic>.from(r as Map<dynamic, dynamic>),
+            )
+            .toList();
       }
       return [];
     } catch (e, st) {
@@ -102,8 +110,10 @@ class SupabaseService extends RemoteStorageService {
     dynamic Function(dynamic query)? queryBuilder,
   }) {
     // Utilisation de dynamic pour contourner les types changeants de Supabase
-    dynamic query = _supabase.from(collectionOrTable).stream(primaryKey: ['id']);
-    
+    dynamic query = _supabase
+        .from(collectionOrTable)
+        .stream(primaryKey: ['id']);
+
     if (queryBuilder != null) {
       query = queryBuilder(query);
     }
@@ -112,7 +122,12 @@ class SupabaseService extends RemoteStorageService {
 
     return stream.map((dynamic rows) {
       if (rows is List) {
-        return rows.map((dynamic e) => Map<String, dynamic>.from(e as Map<dynamic, dynamic>)).toList();
+        return rows
+            .map(
+              (dynamic e) =>
+                  Map<String, dynamic>.from(e as Map<dynamic, dynamic>),
+            )
+            .toList();
       }
       return <Map<String, dynamic>>[];
     });

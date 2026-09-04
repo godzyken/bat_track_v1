@@ -47,169 +47,133 @@ class ChantiersEtapeKanbanInteractive extends ConsumerWidget {
           Expanded(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children:
-                  grouped.entries.map((entry) {
-                    final color = switch (entry.key) {
-                      'À faire' => Colors.grey[100],
-                      'En cours' => Colors.yellow[100],
-                      'Terminée' => Colors.green[100],
-                      _ => Colors.white,
-                    };
+              children: grouped.entries.map((entry) {
+                final color = switch (entry.key) {
+                  'À faire' => Colors.grey[100],
+                  'En cours' => Colors.yellow[100],
+                  'Terminée' => Colors.green[100],
+                  _ => Colors.white,
+                };
 
-                    return Expanded(
-                      child: DragTarget<ChantierEtape>(
-                        onAcceptWithDetails: (details) {
-                          final updated = details.data.copyWith(
-                            statut: entry.key,
-                          );
-                          onUpdate?.call(updated);
-                        },
-                        builder:
-                            (context, _, _) => Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              padding: const EdgeInsets.all(8),
-                              color: color,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    entry.key,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Expanded(
-                                    child: ImplicitlyAnimatedReorderableList<
-                                      ChantierEtape
-                                    >(
-                                      items: entry.value,
-                                      areItemsTheSame: (a, b) => a.id == b.id,
-                                      onReorderFinished: (
-                                        item,
-                                        from,
-                                        to,
-                                        newItems,
-                                      ) {
-                                        onReorder(newItems);
-                                      },
-                                      itemBuilder: (
-                                        context,
-                                        itemAnimation,
-                                        item,
-                                        index,
-                                      ) {
-                                        final canEdit =
-                                            canEditEtape?.call(item) ?? true;
-
-                                        return Reorderable(
-                                          key: ValueKey(item.id),
-                                          builder:
-                                              (
-                                                context,
-                                                dragAnim,
-                                                inDrag,
-                                              ) => LongPressDraggable<
-                                                ChantierEtape
-                                              >(
-                                                data: item,
-                                                feedback: Material(
-                                                  elevation: 4,
-                                                  child: Card(
-                                                    color: Colors.white,
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                            8.0,
-                                                          ),
-                                                      child: Text(item.titre),
-                                                    ),
-                                                  ),
-                                                ),
-                                                child: SizeFadeTransition(
-                                                  animation: itemAnimation,
-                                                  child: Card(
-                                                    margin:
-                                                        const EdgeInsets.only(
-                                                          bottom: 12,
-                                                        ),
-                                                    child: ListTile(
-                                                      contentPadding:
-                                                          const EdgeInsets.all(
-                                                            12,
-                                                          ),
-                                                      leading: const Icon(
-                                                        Icons.drag_handle,
-                                                      ),
-                                                      title: Text(item.titre),
-                                                      subtitle: Text(
-                                                        item.description,
-                                                      ),
-                                                      trailing: Wrap(
-                                                        spacing: 4,
-                                                        children: [
-                                                          if (canEdit)
-                                                            IconButton(
-                                                              icon: const Icon(
-                                                                Icons.edit,
-                                                              ),
-                                                              onPressed: () {
-                                                                final chantier =
-                                                                    ref.read(
-                                                                      chantierAdvancedNotifierProvider(
-                                                                        item.chantierId,
-                                                                      ),
-                                                                    );
-                                                                context.goNamed(
-                                                                  'chantier-etape-detail',
-                                                                  pathParameters: {
-                                                                    'id':
-                                                                        item.chantierId,
-                                                                    'etapeId':
-                                                                        item.id,
-                                                                  },
-                                                                  extra: {
-                                                                    'chantier':
-                                                                        chantier,
-                                                                    'etape':
-                                                                        item,
-                                                                  },
-                                                                );
-                                                              },
-                                                              tooltip: 'Éditer',
-                                                            ),
-                                                          if (canEdit)
-                                                            IconButton(
-                                                              icon: const Icon(
-                                                                Icons.delete,
-                                                                color:
-                                                                    Colors.red,
-                                                              ),
-                                                              onPressed:
-                                                                  () =>
-                                                                      onDelete(
-                                                                        item.id,
-                                                                      ),
-                                                              tooltip:
-                                                                  'Supprimer',
-                                                            ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
+                return Expanded(
+                  child: DragTarget<ChantierEtape>(
+                    onAcceptWithDetails: (details) {
+                      final updated = details.data.copyWith(statut: entry.key);
+                      onUpdate?.call(updated);
+                    },
+                    builder: (context, _, _) => Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.all(8),
+                      color: color,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            entry.key,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
+                          ),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: ImplicitlyAnimatedReorderableList<ChantierEtape>(
+                              items: entry.value,
+                              areItemsTheSame: (a, b) => a.id == b.id,
+                              onReorderFinished: (item, from, to, newItems) {
+                                onReorder(newItems);
+                              },
+                              itemBuilder: (context, itemAnimation, item, index) {
+                                final canEdit =
+                                    canEditEtape?.call(item) ?? true;
+
+                                return Reorderable(
+                                  key: ValueKey(item.id),
+                                  builder: (context, dragAnim, inDrag) =>
+                                      LongPressDraggable<ChantierEtape>(
+                                        data: item,
+                                        feedback: Material(
+                                          elevation: 4,
+                                          child: Card(
+                                            color: Colors.white,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(
+                                                8.0,
+                                              ),
+                                              child: Text(item.titre),
+                                            ),
+                                          ),
+                                        ),
+                                        child: SizeFadeTransition(
+                                          animation: itemAnimation,
+                                          child: Card(
+                                            margin: const EdgeInsets.only(
+                                              bottom: 12,
+                                            ),
+                                            child: ListTile(
+                                              contentPadding:
+                                                  const EdgeInsets.all(12),
+                                              leading: const Icon(
+                                                Icons.drag_handle,
+                                              ),
+                                              title: Text(item.titre),
+                                              subtitle: Text(item.description),
+                                              trailing: Wrap(
+                                                spacing: 4,
+                                                children: [
+                                                  if (canEdit)
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                        Icons.edit,
+                                                      ),
+                                                      onPressed: () {
+                                                        final chantier = ref.read(
+                                                          chantierAdvancedNotifierProvider(
+                                                            item.chantierId,
+                                                          ),
+                                                        );
+                                                        context.goNamed(
+                                                          'chantier-etape-detail',
+                                                          pathParameters: {
+                                                            'id':
+                                                                item.chantierId,
+                                                            'etapeId': item.id,
+                                                          },
+                                                          extra: {
+                                                            'chantier':
+                                                                chantier,
+                                                            'etape': item,
+                                                          },
+                                                        );
+                                                      },
+                                                      tooltip: 'Éditer',
+                                                    ),
+                                                  if (canEdit)
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                        Icons.delete,
+                                                        color: Colors.red,
+                                                      ),
+                                                      onPressed: () =>
+                                                          onDelete(item.id),
+                                                      tooltip: 'Supprimer',
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  }).toList(),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ),
         ],
@@ -247,52 +211,51 @@ class ChantiersEtapeKanbanReadOnly extends ConsumerWidget {
           height: 400, // hauteur fixe ou adaptative
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children:
-                grouped.entries.map((entry) {
-                  final color = switch (entry.key) {
-                    'À faire' => Colors.grey[100],
-                    'En cours' => Colors.yellow[100],
-                    'Terminée' => Colors.green[100],
-                    _ => Colors.white,
-                  };
+            children: grouped.entries.map((entry) {
+              final color = switch (entry.key) {
+                'À faire' => Colors.grey[100],
+                'En cours' => Colors.yellow[100],
+                'Terminée' => Colors.green[100],
+                _ => Colors.white,
+              };
 
-                  return Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      padding: const EdgeInsets.all(8),
-                      color: color,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            entry.key,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: entry.value.length,
-                              itemBuilder: (context, index) {
-                                final item = entry.value[index];
-                                return Card(
-                                  margin: const EdgeInsets.only(bottom: 12),
-                                  child: ListTile(
-                                    contentPadding: const EdgeInsets.all(12),
-                                    title: Text(item.titre),
-                                    subtitle: Text(item.description),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
+              return Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.all(8),
+                  color: color,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        entry.key,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: entry.value.length,
+                          itemBuilder: (context, index) {
+                            final item = entry.value[index];
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(12),
+                                title: Text(item.titre),
+                                subtitle: Text(item.description),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ),
       ],

@@ -16,12 +16,16 @@ class CashflowProjection {
     required this.totalStages,
   });
 
-  double get completionRate => totalStages > 0 ? completedStages / totalStages : 0.0;
+  double get completionRate =>
+      totalStages > 0 ? completedStages / totalStages : 0.0;
 }
 
 class ProjectionEngine {
   /// Calcule les projections financières basées sur les chantiers et factures.
-  static CashflowProjection calculate(List<Chantier> chantiers, List<Facture> factures) {
+  static CashflowProjection calculate(
+    List<Chantier> chantiers,
+    List<Facture> factures,
+  ) {
     double currentRevenue = 0.0;
     double pendingInvoices = 0.0;
     int completedStages = 0;

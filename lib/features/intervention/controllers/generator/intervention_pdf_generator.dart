@@ -17,8 +17,9 @@ class InterventionPdfGenerator implements PdfGenerator<Intervention> {
       RegExp(r'[^\w\s-]'),
       '_',
     );
-    final suffix =
-        intervention.facture?.isFinalized == true ? 'final' : 'brouillon';
+    final suffix = intervention.facture?.isFinalized == true
+        ? 'final'
+        : 'brouillon';
     return 'facture_intervention_${sanitized}_$suffix.pdf';
   }
 

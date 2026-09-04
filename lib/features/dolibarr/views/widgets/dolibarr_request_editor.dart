@@ -67,10 +67,12 @@ class _DolibarrRequestEditorState extends ConsumerState<DolibarrRequestEditor> {
           children: [
             DropdownButton<String>(
               value: _method,
-              items:
-                  ['GET', 'POST', 'PUT', 'DELETE']
-                      .map((m) => DropdownMenuItem(value: m, child: Text(m)))
-                      .toList(),
+              items: [
+                'GET',
+                'POST',
+                'PUT',
+                'DELETE',
+              ].map((m) => DropdownMenuItem(value: m, child: Text(m))).toList(),
               onChanged: (val) => setState(() => _method = val!),
             ),
             SizedBox(

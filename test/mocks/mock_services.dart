@@ -20,7 +20,10 @@ class MockSyncedEntityService<M extends UnifiedModel, E extends HiveModel<M>>
 class MockRemoteEntityServiceAdapter<T extends UnifiedModel> extends Mock
     implements RemoteEntityServiceAdapter<T> {}
 
-class MockLoggedEntitySyncService<M extends UnifiedModel, E extends HiveModel<M>>
+class MockLoggedEntitySyncService<
+  M extends UnifiedModel,
+  E extends HiveModel<M>
+>
     extends Mock
     implements SafeAndLoggedEntityService<M, E> {}
 

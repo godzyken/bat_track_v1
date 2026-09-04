@@ -25,9 +25,7 @@ void main() {
 
     test('should handle create operation', () async {
       final container = ProviderContainer(
-        overrides: [
-          projetServiceProvider.overrideWith((ref) => mockService),
-        ],
+        overrides: [projetServiceProvider.overrideWith((ref) => mockService)],
       );
       addTearDown(container.dispose);
 
@@ -36,7 +34,10 @@ void main() {
 
       // In real scenario, we would trigger notifier action
       // but here we just verify the setup
-      expect(container.read(projetListProvider), isA<AsyncLoading<List<Projet>>>());
+      expect(
+        container.read(projetListProvider),
+        isA<AsyncLoading<List<Projet>>>(),
+      );
     });
   });
 }

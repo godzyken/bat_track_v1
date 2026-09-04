@@ -26,10 +26,9 @@ class MultiUserDropdownField extends ConsumerWidget {
 
     return usersAsync.when(
       data: (users) {
-        final filtered =
-            companyId != null
-                ? users.where((u) => u.company == companyId).toList()
-                : users;
+        final filtered = companyId != null
+            ? users.where((u) => u.company == companyId).toList()
+            : users;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,32 +36,30 @@ class MultiUserDropdownField extends ConsumerWidget {
             Text(label, style: Theme.of(context).textTheme.labelLarge),
             Wrap(
               spacing: 8,
-              children:
-                  filtered.map((user) {
-                    final isSelected = selectedUserIds.contains(user.id);
-                    return FilterChip(
-                      label: Text(user.company ?? user.name),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        final updated = List<String>.from(selectedUserIds);
-                        if (selected) {
-                          updated.add(user.id);
-                        } else {
-                          updated.remove(user.id);
-                        }
-                        onChanged(updated);
-                      },
-                    );
-                  }).toList(),
+              children: filtered.map((user) {
+                final isSelected = selectedUserIds.contains(user.id);
+                return FilterChip(
+                  label: Text(user.company ?? user.name),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    final updated = List<String>.from(selectedUserIds);
+                    if (selected) {
+                      updated.add(user.id);
+                    } else {
+                      updated.remove(user.id);
+                    }
+                    onChanged(updated);
+                  },
+                );
+              }).toList(),
             ),
           ],
         );
       },
       loading: () => const LoadingApp(),
-      error:
-          (e, _) => ErrorApp(
-            message: 'Erreur lors de la selection des utilisateurs : $e',
-          ),
+      error: (e, _) => ErrorApp(
+        message: 'Erreur lors de la selection des utilisateurs : $e',
+      ),
     );
   }
 }

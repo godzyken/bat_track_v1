@@ -28,7 +28,10 @@ class FacturePdfGenerator {
             level: 0,
             child: pw.Text(
               'FACTURE',
-              style: const pw.TextStyle(fontSize: 28, fontWeight: pw.FontWeight.bold),
+              style: const pw.TextStyle(
+                fontSize: 28,
+                fontWeight: pw.FontWeight.bold,
+              ),
             ),
           ),
           _buildClientSection(client),

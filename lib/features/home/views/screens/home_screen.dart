@@ -50,7 +50,10 @@ class HomeScreen extends ConsumerWidget {
         break;
       case ScreenSize.tablet:
         layout = const Column(
-          children: [SideMenu(), Expanded(child: HomeContent())],
+          children: [
+            SideMenu(),
+            Expanded(child: HomeContent()),
+          ],
         );
         break;
       case ScreenSize.mobile:

@@ -124,7 +124,8 @@ class _DolibarrExplorerScreenState
   @override
   Widget build(BuildContext context) {
     final instance = ref.watch(selectedInstanceProvider);
-    if (instance.value == null) return const ErrorApp(message: 'Pas d\'instance');
+    if (instance.value == null)
+      return const ErrorApp(message: 'Pas d\'instance');
 
     return Scaffold(
       appBar: AppBar(

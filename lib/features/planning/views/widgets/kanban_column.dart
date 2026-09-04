@@ -25,35 +25,34 @@ class KanbanColumn extends ConsumerWidget {
           ref.read(chantierEtapeServiceProvider).save(updated);
           onDrop(updated); // Optionnel : notifie le parent
         },
-        builder:
-            (context, _, _) => Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  color: Colors.grey[200],
-                  child: Text(
-                    statut,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ...etapes.map(
-                  (e) => LongPressDraggable<ChantierEtape>(
-                    data: e,
-                    feedback: Material(
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(e.titre),
-                        ),
-                      ),
-                    ),
-                    child: Card(child: ListTile(title: Text(e.titre))),
-                  ),
-                ),
-              ],
+        builder: (context, _, _) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              color: Colors.grey[200],
+              child: Text(
+                statut,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
+            const SizedBox(height: 8),
+            ...etapes.map(
+              (e) => LongPressDraggable<ChantierEtape>(
+                data: e,
+                feedback: Material(
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(e.titre),
+                    ),
+                  ),
+                ),
+                child: Card(child: ListTile(title: Text(e.titre))),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

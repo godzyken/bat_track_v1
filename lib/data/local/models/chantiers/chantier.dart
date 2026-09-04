@@ -43,7 +43,8 @@ abstract class Chantier extends UnifiedModel with _$Chantier {
     @Default(20.0) double tauxTVAParDefaut, // Ajout (ex: 20%)
   }) = _Chantier;
 
-  @override String get id;
+  @override
+  String get id;
   String get nom;
   String get clientId;
   List<ChantierEtape> get etapes;
@@ -119,7 +120,9 @@ abstract class Chantier extends UnifiedModel with _$Chantier {
           context: 'Chantier.updatedAt',
         ),
         etat: json['etat'] as String?,
-        technicienIds: List<String>.from((json['technicienIds'] as Iterable?) ?? []),
+        technicienIds: List<String>.from(
+          (json['technicienIds'] as Iterable?) ?? [],
+        ),
         documents: [], // parser si nécessaire
         etapes: [], // parser si nécessaire
         commentaire: json['commentaire'] as String?,

@@ -295,17 +295,19 @@ class _EntityFormState<T extends UnifiedModel>
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
-        child: builder(
-          context: context,
-          key: key,
-          value: val,
-          controller: ctl,
-          onChanged: (dynamic v) {
-            _json[key] = v;
-            _rawOverrides[key]?.text = json.encode(v);
-          },
-          expertMode: _expertMode,
-        ) ?? const SizedBox.shrink(),
+        child:
+            builder(
+              context: context,
+              key: key,
+              value: val,
+              controller: ctl,
+              onChanged: (dynamic v) {
+                _json[key] = v;
+                _rawOverrides[key]?.text = json.encode(v);
+              },
+              expertMode: _expertMode,
+            ) ??
+            const SizedBox.shrink(),
       );
     }).toList();
   }

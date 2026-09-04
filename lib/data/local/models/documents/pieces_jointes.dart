@@ -12,7 +12,9 @@ part 'pieces_jointes.freezed.dart';
 part 'pieces_jointes.g.dart';
 
 @freezed
-abstract class PieceJointe extends UnifiedModel with _$PieceJointe implements HasFile {
+abstract class PieceJointe extends UnifiedModel
+    with _$PieceJointe
+    implements HasFile {
   const PieceJointe._();
 
   const factory PieceJointe({

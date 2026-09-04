@@ -25,10 +25,9 @@ class DashboardPreviewCard extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             child: statsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error:
-                  (e, _) => ErrorWidget(
-                    'Erreur lors de la connection au profile administrateur : $e',
-                  ),
+              error: (e, _) => ErrorWidget(
+                'Erreur lors de la connection au profile administrateur : $e',
+              ),
               data: (stats) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

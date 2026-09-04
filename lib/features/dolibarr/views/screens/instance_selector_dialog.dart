@@ -21,32 +21,30 @@ class InstanceSelectorDialog extends ConsumerWidget {
 
           return Column(
             mainAxisSize: MainAxisSize.min,
-            children:
-                instances
-                    .map(
-                      (instance) => ListTile(
-                        title: Text(instance.name),
-                        subtitle: Text(instance.baseUrl),
-                        onTap: () async {
-                          await ref
-                              .read(selectedInstanceProvider.notifier)
-                              .selectInstance(instance);
-                          if (context.mounted) {
-                            Navigator.pushReplacementNamed(context, '/home');
-                            Navigator.of(context).pop();
-                          }
-                        },
-                      ),
-                    )
-                    .toList(),
+            children: instances
+                .map(
+                  (instance) => ListTile(
+                    title: Text(instance.name),
+                    subtitle: Text(instance.baseUrl),
+                    onTap: () async {
+                      await ref
+                          .read(selectedInstanceProvider.notifier)
+                          .selectInstance(instance);
+                      if (context.mounted) {
+                        Navigator.pushReplacementNamed(context, '/home');
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                )
+                .toList(),
           );
         },
         loading: () => const LoadingApp(),
-        error:
-            (err, _) => ErrorApp(
-              message:
-                  'Erreur lors de la connection au profile administrateur : $err',
-            ),
+        error: (err, _) => ErrorApp(
+          message:
+              'Erreur lors de la connection au profile administrateur : $err',
+        ),
       ),
       actions: [
         TextButton(

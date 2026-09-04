@@ -99,10 +99,13 @@ void main() {
         nom: 'Version Locale',
       ).copyWith(updatedAt: now);
 
-      final remoteProjet = MockDataFactories.createProjet(
-        id: 'conflict_1',
-        nom: 'Version Remote',
-      ).copyWith(updatedAt: now.add(const Duration(minutes: 10))); // Plus récent
+      final remoteProjet =
+          MockDataFactories.createProjet(
+            id: 'conflict_1',
+            nom: 'Version Remote',
+          ).copyWith(
+            updatedAt: now.add(const Duration(minutes: 10)),
+          ); // Plus récent
 
       // Setup mocks
       when(

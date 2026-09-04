@@ -27,7 +27,8 @@ abstract class Facture extends UnifiedModel with _$Facture {
     @Default(false) bool isCloudOnly,
   }) = _Facture;
 
-  @override String get id;
+  @override
+  String get id;
   String get reference;
   double get montant;
   String get clientId;

@@ -41,18 +41,17 @@ class BudgetDetailSansTech extends ConsumerWidget {
 
     return PieChart(
       PieChartData(
-        sections:
-            data.entries.mapIndexed((i, e) {
-              final value = e.value;
-              final percentage = total > 0 ? (value / total * 100) : 0;
-              return PieChartSectionData(
-                value: value,
-                title: '${percentage.toStringAsFixed(1)}%',
-                color: colors[i % colors.length],
-                radius: 50,
-                titleStyle: const TextStyle(color: Colors.white, fontSize: 12),
-              );
-            }).toList(),
+        sections: data.entries.mapIndexed((i, e) {
+          final value = e.value;
+          final percentage = total > 0 ? (value / total * 100) : 0;
+          return PieChartSectionData(
+            value: value,
+            title: '${percentage.toStringAsFixed(1)}%',
+            color: colors[i % colors.length],
+            radius: 50,
+            titleStyle: const TextStyle(color: Colors.white, fontSize: 12),
+          );
+        }).toList(),
         sectionsSpace: 4,
         centerSpaceRadius: 30,
       ),
@@ -66,23 +65,22 @@ class BudgetDetailSansTech extends ConsumerWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          data.entries.mapIndexed((i, e) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    color: colors[i % colors.length],
-                  ),
-                  const SizedBox(width: 8),
-                  Text('${e.key}: ${e.value.toStringAsFixed(2)} €'),
-                ],
+      children: data.entries.mapIndexed((i, e) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                color: colors[i % colors.length],
               ),
-            );
-          }).toList(),
+              const SizedBox(width: 8),
+              Text('${e.key}: ${e.value.toStringAsFixed(2)} €'),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 }

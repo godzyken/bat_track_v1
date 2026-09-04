@@ -27,8 +27,9 @@ class KanbanPlanningScreen extends ConsumerWidget {
     }
 
     // Étapes liées uniquement à ce chantier
-    final etapesDuChantier =
-        allEtapes.value!.where((e) => e.chantierId == chantierId).toList();
+    final etapesDuChantier = allEtapes.value!
+        .where((e) => e.chantierId == chantierId)
+        .toList();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Planning Chantier')),
@@ -38,23 +39,21 @@ class KanbanPlanningScreen extends ConsumerWidget {
           Expanded(
             flex: 2,
             child: Row(
-              children:
-                  statuts
-                      .map(
-                        (s) => KanbanColumn(
-                          statut: s,
-                          etapes:
-                              etapesDuChantier
-                                  .where((e) => e.statut == s)
-                                  .toList(),
-                          onDrop: (updatedEtape) {
-                            ref
-                                .read(chantierEtapeServiceProvider)
-                                .save(updatedEtape);
-                          },
-                        ),
-                      )
-                      .toList(),
+              children: statuts
+                  .map(
+                    (s) => KanbanColumn(
+                      statut: s,
+                      etapes: etapesDuChantier
+                          .where((e) => e.statut == s)
+                          .toList(),
+                      onDrop: (updatedEtape) {
+                        ref
+                            .read(chantierEtapeServiceProvider)
+                            .save(updatedEtape);
+                      },
+                    ),
+                  )
+                  .toList(),
             ),
           ),
 

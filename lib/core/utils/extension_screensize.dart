@@ -1,4 +1,3 @@
-
 import '../responsive/wrapper/responsive_layout.dart';
 
 extension ScreenSizeX on ScreenSize {

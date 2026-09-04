@@ -13,40 +13,36 @@ class ChantierListDocuments extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListView.builder(
-      scrollCacheExtent: const ScrollCacheExtent.pixels(500), scrollDirection: Axis.horizontal,
+      scrollCacheExtent: const ScrollCacheExtent.pixels(500),
+      scrollDirection: Axis.horizontal,
       itemCount: chantier.documents.length,
-      itemBuilder:
-          (context, index) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: CachedNetworkImage(
-                imageUrl: chantier.documents[index].url,
-                width: 120,
-                height: 120,
-                fit: BoxFit.cover,
-                placeholder:
-                    (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
-                errorWidget:
-                    (context, _, stackTrace) => Container(
-                      width: 120,
-                      height: 120,
-                      color: Colors.grey[300],
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.broken_image),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Erreur de chargement... ${index + 1} / $stackTrace',
-                          ),
-                        ],
-                      ),
-                    ),
+      itemBuilder: (context, index) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: CachedNetworkImage(
+            imageUrl: chantier.documents[index].url,
+            width: 120,
+            height: 120,
+            fit: BoxFit.cover,
+            placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
+            errorWidget: (context, _, stackTrace) => Container(
+              width: 120,
+              height: 120,
+              color: Colors.grey[300],
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.broken_image),
+                  const SizedBox(height: 8),
+                  Text('Erreur de chargement... ${index + 1} / $stackTrace'),
+                ],
               ),
             ),
           ),
+        ),
+      ),
     );
   }
 }

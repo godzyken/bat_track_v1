@@ -35,33 +35,32 @@ class HomeContent extends ConsumerWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
-        child:
-            isWide
-                ? IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Partie texte
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: welcomeSection,
-                        ),
-                      ),
-                      const SizedBox(width: 40),
-                      // Partie carte
-                      const Expanded(child: DashboardPreviewCard()),
-                    ],
-                  ),
-                )
-                : Column(
-                  mainAxisSize: MainAxisSize.min,
+        child: isWide
+            ? IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    welcomeSection,
-                    const SizedBox(height: 20),
-                    const DashboardPreviewCard(),
+                    // Partie texte
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: welcomeSection,
+                      ),
+                    ),
+                    const SizedBox(width: 40),
+                    // Partie carte
+                    const Expanded(child: DashboardPreviewCard()),
                   ],
                 ),
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  welcomeSection,
+                  const SizedBox(height: 20),
+                  const DashboardPreviewCard(),
+                ],
+              ),
       ),
     );
   }

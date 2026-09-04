@@ -24,8 +24,9 @@ class AppLogger {
     if (level == LogLevel.error || level == LogLevel.warning) {
       Sentry.captureMessage(
         '$prefix $message',
-        level:
-            level == LogLevel.error ? SentryLevel.error : SentryLevel.warning,
+        level: level == LogLevel.error
+            ? SentryLevel.error
+            : SentryLevel.warning,
       );
       if (error != null) {
         Sentry.captureException(error, stackTrace: stackTrace);

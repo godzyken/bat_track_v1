@@ -7,17 +7,22 @@ extension JsonModelDisplay on UnifiedModel {
   /// Renvoie le champ principal pour le titre (ex: nom, titre…)
   String get displayTitle {
     final json = toJson();
-    return (json['nom'] ?? json['titre'] ?? json['id']?.toString() ?? toString()).toString();
+    return (json['nom'] ??
+            json['titre'] ??
+            json['id']?.toString() ??
+            toString())
+        .toString();
   }
 
   /// Renvoie un champ secondaire utile (email, description, adresse…)
   String get displaySubtitle {
     final json = toJson();
     return (json['email'] ??
-        json['specialite'] ??
-        json['description'] ??
-        json['adresse'] ??
-        '').toString();
+            json['specialite'] ??
+            json['description'] ??
+            json['adresse'] ??
+            '')
+        .toString();
   }
 
   /// Détails générés dynamiquement à partir de tous les champs pertinents

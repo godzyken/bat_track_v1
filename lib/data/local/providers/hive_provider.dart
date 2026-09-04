@@ -115,12 +115,13 @@ final allFacturesModelStreamProvider =
       return service.watchAll();
     });
 
-final allFacturesStreamProvider =
-    StreamProvider.autoDispose<List<Facture>>((ref) {
-      final service = ref.watch(factureServiceProvider);
+final allFacturesStreamProvider = StreamProvider.autoDispose<List<Facture>>((
+  ref,
+) {
+  final service = ref.watch(factureServiceProvider);
 
-      return service.watchAll();
-    });
+  return service.watchAll();
+});
 
 final allFacturesByChantierStreamProvider = StreamProvider.autoDispose
     .family<List<Facture>, String>((ref, chantierId) {

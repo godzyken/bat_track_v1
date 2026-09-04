@@ -37,37 +37,38 @@ class UserFormDialog extends ConsumerWidget {
           Navigator.of(context).pop();
         }
       },
-      customFieldBuilder: ({
-        required BuildContext context,
-        required String key,
-        required dynamic value,
-        required TextEditingController? controller,
-        required void Function(dynamic) onChanged,
-        required bool expertMode,
-      }) {
-        if (key == 'role') {
-          return DropdownButtonFormField<String>(
-            initialValue: (value as String?) ?? 'client',
-            decoration: const InputDecoration(labelText: 'Rôle'),
-            items: const [
-              DropdownMenuItem(value: 'admin', child: Text('Admin')),
-              DropdownMenuItem(
-                value: 'technicien',
-                child: Text('Technicien'),
-              ),
-              DropdownMenuItem(value: 'client', child: Text('Client')),
-            ],
-            onChanged: (val) {
-              if (val != null) {
-                controller?.text = val;
-                onChanged(val);
-              }
-            },
-          );
-        }
+      customFieldBuilder:
+          ({
+            required BuildContext context,
+            required String key,
+            required dynamic value,
+            required TextEditingController? controller,
+            required void Function(dynamic) onChanged,
+            required bool expertMode,
+          }) {
+            if (key == 'role') {
+              return DropdownButtonFormField<String>(
+                initialValue: (value as String?) ?? 'client',
+                decoration: const InputDecoration(labelText: 'Rôle'),
+                items: const [
+                  DropdownMenuItem(value: 'admin', child: Text('Admin')),
+                  DropdownMenuItem(
+                    value: 'technicien',
+                    child: Text('Technicien'),
+                  ),
+                  DropdownMenuItem(value: 'client', child: Text('Client')),
+                ],
+                onChanged: (val) {
+                  if (val != null) {
+                    controller?.text = val;
+                    onChanged(val);
+                  }
+                },
+              );
+            }
 
-        return null;
-      },
+            return null;
+          },
     );
   }
 }

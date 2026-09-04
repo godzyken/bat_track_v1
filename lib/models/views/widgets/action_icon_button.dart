@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/responsive/wrapper/responsive_layout.dart';
 
-
 class ActionIconButton extends ConsumerWidget {
   final IconData icon;
   final Color color;

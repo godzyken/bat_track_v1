@@ -60,56 +60,52 @@ class _EntityEtapeFormState<T> extends ConsumerState<EntityEtapeForm<T>> {
         child: Form(
           key: _formKey,
           child: Column(
-            children:
-                _formValues.entries.map((entry) {
-                  final key = entry.key;
-                  final value = entry.value;
+            children: _formValues.entries.map((entry) {
+              final key = entry.key;
+              final value = entry.value;
 
-                  if (!_showAdvanced &&
-                      !_isSimpleField(value) &&
-                      key != 'dateDebut' &&
-                      key != 'dateFin') {
-                    return const SizedBox.shrink();
-                  }
+              if (!_showAdvanced &&
+                  !_isSimpleField(value) &&
+                  key != 'dateDebut' &&
+                  key != 'dateFin') {
+                return const SizedBox.shrink();
+              }
 
-                  if (_controllers.containsKey(key)) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6.0),
-                      child: TextFormField(
-                        controller: _controllers[key],
-                        decoration: InputDecoration(labelText: key),
-                        keyboardType: TextInputType.name,
-                        autofillHints: const [AutofillHints.name],
-                        validator:
-                            (val) =>
-                                val == null || val.isEmpty
-                                    ? 'Champ requis'
-                                    : null,
-                      ),
-                    );
-                  }
+              if (_controllers.containsKey(key)) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6.0),
+                  child: TextFormField(
+                    controller: _controllers[key],
+                    decoration: InputDecoration(labelText: key),
+                    keyboardType: TextInputType.name,
+                    autofillHints: const [AutofillHints.name],
+                    validator: (val) =>
+                        val == null || val.isEmpty ? 'Champ requis' : null,
+                  ),
+                );
+              }
 
-                  if (value is String && key.toLowerCase().contains('date')) {
-                    DateTime? parsedDate;
-                    try {
-                      parsedDate = DateTime.tryParse(value);
-                    } catch (_) {}
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6.0),
-                      child: InputDatePickerFormField(
-                        initialDate: parsedDate ?? DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2100),
-                        fieldLabelText: key,
-                        onDateSubmitted: (date) {
-                          _formValues[key] = date.toIso8601String();
-                        },
-                      ),
-                    );
-                  }
+              if (value is String && key.toLowerCase().contains('date')) {
+                DateTime? parsedDate;
+                try {
+                  parsedDate = DateTime.tryParse(value);
+                } catch (_) {}
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6.0),
+                  child: InputDatePickerFormField(
+                    initialDate: parsedDate ?? DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                    fieldLabelText: key,
+                    onDateSubmitted: (date) {
+                      _formValues[key] = date.toIso8601String();
+                    },
+                  ),
+                );
+              }
 
-                  return const SizedBox.shrink();
-                }).toList(),
+              return const SizedBox.shrink();
+            }).toList(),
           ),
         ),
       ),

@@ -23,12 +23,14 @@ void main() {
           'createdAt': '2026-08-13T10:00:00.000',
           'action': 'PAYMENT_SEAL',
           'payload': '{"factureId":"1"}',
-          'previousHash': '0000000000000000000000000000000000000000000000000000000000000000',
-          'currentHash': 'f63e620573e8e19e798e9b6a9829b3a41906b4a8a25ccd5190ea58996931d2b9', // Dummy hash for example
-        }
+          'previousHash':
+              '0000000000000000000000000000000000000000000000000000000000000000',
+          'currentHash':
+              'f63e620573e8e19e798e9b6a9829b3a41906b4a8a25ccd5190ea58996931d2b9', // Dummy hash for example
+        },
       ];
       // Note: In real test, recalculate correct hash to match SHA-256 logic of service
-      
+
       // We skip actual hash computation here to simplify, but in a real ISCA test we'd match the algo.
       // Let's use a simpler mock behavior where we control the chain.
     });
@@ -39,10 +41,16 @@ void main() {
       final companyId = 'TEST_CO';
       final dayKey = '2026-08-13';
 
-      when(() => mockStorage.watchCollectionRaw(
-            any(),
-            queryBuilder: any(named: 'queryBuilder'),
-          )).thenAnswer((_) => Stream.value([{'id': 'closure_1'}]));
+      when(
+        () => mockStorage.watchCollectionRaw(
+          any(),
+          queryBuilder: any(named: 'queryBuilder'),
+        ),
+      ).thenAnswer(
+        (_) => Stream.value([
+          {'id': 'closure_1'},
+        ]),
+      );
 
       // Act
       final result = await auditService.isPeriodClosed(companyId, date);

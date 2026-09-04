@@ -199,20 +199,20 @@ class ChantierDetailScreen extends ConsumerWidget {
                         'Étapes du chantier',
                         chantierEstTermine(chantier)
                             ? ChantiersEtapeKanbanReadOnly(
-                              etapes: chantier.etapes,
-                            )
+                                etapes: chantier.etapes,
+                              )
                             : ChantiersEtapeKanbanInteractive(
-                              etapes: chantier.etapes,
-                              canEditEtape:
-                                  (etape) => canModifyEtape(etape, chantier),
-                              onReorder: (reordered) {
-                                notifier.updateChantier(
-                                  chantier.copyWith(etapes: reordered),
-                                );
-                              },
-                              onDelete: notifier.deleteEtape,
-                              onUpdate: notifier.updateEtape,
-                            ),
+                                etapes: chantier.etapes,
+                                canEditEtape: (etape) =>
+                                    canModifyEtape(etape, chantier),
+                                onReorder: (reordered) {
+                                  notifier.updateChantier(
+                                    chantier.copyWith(etapes: reordered),
+                                  );
+                                },
+                                onDelete: notifier.deleteEtape,
+                                onUpdate: notifier.updateEtape,
+                              ),
                       ),
                     ],
                   ),

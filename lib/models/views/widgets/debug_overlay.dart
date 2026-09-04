@@ -74,28 +74,24 @@ class _DebugFloatingOverlayState extends State<DebugFloatingOverlay> {
                             return ListTile(
                               title: Text(log.title),
                               subtitle: Text(log.timestamp.toIso8601String()),
-                              onTap:
-                                  log.json != null
-                                      ? () => showDialog(
-                                        context: context,
-                                        builder:
-                                            (_) => AlertDialog(
-                                              title: const Text('JSON complet'),
-                                              content: SingleChildScrollView(
-                                                child: Text(log.json!),
-                                              ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed:
-                                                      () => Navigator.pop(
-                                                        context,
-                                                      ),
-                                                  child: const Text('Fermer'),
-                                                ),
-                                              ],
-                                            ),
-                                      )
-                                      : null,
+                              onTap: log.json != null
+                                  ? () => showDialog(
+                                      context: context,
+                                      builder: (_) => AlertDialog(
+                                        title: const Text('JSON complet'),
+                                        content: SingleChildScrollView(
+                                          child: Text(log.json!),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text('Fermer'),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : null,
                             );
                           },
                         ),

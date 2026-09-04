@@ -13,7 +13,7 @@ void main() {
 
       // We might need to handle login here if the app starts on LoginScreen
       // For this integration test, we check if we can see the Dashboard or elements of it.
-      
+
       // Navigate to Dashboard if not already there
       final dashboardIcon = find.byIcon(Icons.dashboard);
       if (dashboardIcon.evaluate().isNotEmpty) {
@@ -28,7 +28,10 @@ void main() {
       // Check for ISCA Integrity Indicator
       final verifiedIcon = find.byIcon(Icons.verified_user);
       final maybeIcon = find.byIcon(Icons.gpp_maybe);
-      expect(verifiedIcon.evaluate().isNotEmpty || maybeIcon.evaluate().isNotEmpty, isTrue);
+      expect(
+        verifiedIcon.evaluate().isNotEmpty || maybeIcon.evaluate().isNotEmpty,
+        isTrue,
+      );
     });
   });
 }
