@@ -61,7 +61,7 @@ class ClientsScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (_) => EntityForm<Client>(
               fromJson: (json) => Client.fromJson(json),

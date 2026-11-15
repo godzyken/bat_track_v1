@@ -50,7 +50,7 @@ class ChantiersScreen extends ConsumerWidget {
 
           if (!isEditable) return;
 
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (_) => EntityForm<Chantier>(
               fromJson: (json) => Chantier.fromJson(json),
@@ -82,7 +82,7 @@ class ChantiersScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(8.0),
               child: FloatingActionButton(
                 onPressed: () {
-                  showDialog(
+                  showDialog<void>(
                     context: context,
                     builder: (_) => EntityForm<Chantier>(
                       fromJson: (json) => Chantier.fromJson(json),

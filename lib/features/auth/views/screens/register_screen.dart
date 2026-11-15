@@ -26,7 +26,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         child: ElevatedButton(
           child: const Text('Nouveau compte'),
           onPressed: () {
-            showDialog(
+            showDialog<void>(
               context: context,
               builder: (_) {
                 return AlertDialog(

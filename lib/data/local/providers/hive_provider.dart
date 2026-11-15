@@ -1,7 +1,6 @@
 import 'package:bat_track_v1/core/services/unified_entity_service_impl.dart';
 import 'package:bat_track_v1/data/local/models/adapters/hive_entity_factory.dart';
 import 'package:bat_track_v1/data/local/models/entities/index_entity_extention.dart';
-import 'package:bat_track_v1/data/local/services/service_type.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/models/services/hive_entity_service.dart';
 import 'package:bat_track_v1/models/services/remote/remote_entity_service_adapter.dart';

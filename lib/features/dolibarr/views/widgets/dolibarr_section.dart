@@ -34,7 +34,7 @@ class DolibarrSection extends ConsumerWidget {
                     tooltip: 'Changer d\'instance',
                     icon: const Icon(Icons.edit),
                     onPressed: () {
-                      showDialog(
+                      showDialog<void>(
                         context: context,
                         builder: (_) => const InstanceSelectorDialog(),
                       );

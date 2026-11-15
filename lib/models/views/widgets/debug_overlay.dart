@@ -75,7 +75,7 @@ class _DebugFloatingOverlayState extends State<DebugFloatingOverlay> {
                               title: Text(log.title),
                               subtitle: Text(log.timestamp.toIso8601String()),
                               onTap: log.json != null
-                                  ? () => showDialog(
+                                  ? () => showDialog<void>(
                                       context: context,
                                       builder: (_) => AlertDialog(
                                         title: const Text('JSON complet'),

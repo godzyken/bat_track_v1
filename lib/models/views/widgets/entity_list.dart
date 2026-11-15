@@ -66,7 +66,9 @@ class EntityList<T extends UnifiedModel> extends ConsumerWidget {
             return EntityCard<T>(
               entity: item,
               onDelete: (item.canDelete(currentUser))
-                  ? () => onDelete?.call(id) ?? HiveService.delete(boxName, id)
+                  ? () =>
+                        onDelete?.call(id) ??
+                        HiveService.delete<void>(boxName, id)
                   : null,
               onEdit: (item.canEdit(currentUser))
                   ? () => onEdit?.call(item)

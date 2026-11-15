@@ -17,7 +17,7 @@ Stream<List<T>> Function(Ref) mockStreamProvider<T>({
     List<T>? lastValidSnapshot;
 
     for (var i = 0; i < snapshots.length; i++) {
-      await Future.delayed(delay);
+      await Future<void>.delayed(delay);
 
       if (errors != null && errors.containsKey(i)) {
         final err = errors[i]!;

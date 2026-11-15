@@ -50,7 +50,7 @@ class AdminHomeScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (_) => EntityForm<UserModel>(
               onSubmit: (newUser) async {

@@ -27,7 +27,7 @@ class EquipementListScreen extends ConsumerWidget {
         items: equipementAsync,
         boxName: 'equipements',
         onEdit: (equipement) {
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (_) => EntityForm<Equipement>(
               fromJson: (json) => Equipement.fromJson(json),
@@ -61,7 +61,7 @@ class EquipementListScreen extends ConsumerWidget {
   }
 
   void _showForm(BuildContext context, WidgetRef ref, {Equipement? initial}) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => EntityForm<Equipement>(
         initialValue: initial,

@@ -61,7 +61,7 @@ class FacturesScreen extends ConsumerWidget {
         items: factureAsync,
         boxName: 'factures',
         onEdit: (facture) {
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (_) => EntityForm<Facture>(
               fromJson: (json) => Facture.fromJson(json),
@@ -132,7 +132,7 @@ class FacturesScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (_) => EntityForm<Facture>(
               fromJson: (json) => Facture.fromJson(json),

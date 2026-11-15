@@ -135,7 +135,7 @@ Widget? chantierFieldBuilder({
         icon: const Icon(Icons.add),
         label: const Text('Ajouter une étape'),
         onPressed: () {
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (_) => EntityEtapeForm(
               initialValue: null,

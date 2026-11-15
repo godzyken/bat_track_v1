@@ -18,7 +18,7 @@ class ChantierEtapesScreen extends ConsumerWidget {
     WidgetRef ref, {
     ChantierEtape? etape,
   }) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => EntityForm(
         chantierId: chantierId,
@@ -38,7 +38,7 @@ class ChantierEtapesScreen extends ConsumerWidget {
   }
 
   void _openPieceForm(BuildContext context, WidgetRef ref, {Piece? piece}) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => EntityForm<Piece>(
         chantierId: chantierId,

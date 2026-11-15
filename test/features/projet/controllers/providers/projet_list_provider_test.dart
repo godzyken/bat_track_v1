@@ -42,7 +42,7 @@ void main() {
         fireImmediately: true,
       );
 
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
 
       expect(states, [
         const AsyncLoading<List<Projet>>(),
@@ -127,7 +127,7 @@ void main() {
         fireImmediately: true,
       );
 
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
 
       expect(states.length, 3);
       expect(states[0], const AsyncLoading<List<Projet>>());
@@ -152,7 +152,7 @@ void main() {
         fireImmediately: true,
       );
 
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
 
       expect(states[0], const AsyncLoading<List<Projet>>());
       expect(states[1].hasError, true);
@@ -171,7 +171,7 @@ void main() {
         );
         addTearDown(container.dispose);
 
-        await Future.delayed(const Duration(milliseconds: 10));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
         final state = container.read(projectListProvider);
 
         expect(state.hasValue, true);
