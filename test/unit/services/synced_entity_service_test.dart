@@ -1,10 +1,12 @@
-import 'package:shared_models/shared_models.dart';
 import 'package:bat_track_v1/core/services/unified_entity_service_impl.dart';
 import 'package:bat_track_v1/data/local/models/adapters/hive_entity_factory.dart';
 import 'package:bat_track_v1/data/local/models/entities/projet_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_models/shared_models.dart';
+
+import '../../helpers/hive_test_setup.dart';
 import '../../mocks/mock_data_factories.dart';
 import '../../mocks/mock_services.dart';
 
@@ -19,13 +21,24 @@ void main() {
     late List<Projet> testProjets;
     late MockProjetEntityFactory mockFactory;
 
-    setUpAll(() {
+    setUpAll(() async {
+      await HiveTestSetup.setupHive();
       registerFallbackValue(MockDataFactories.createProjet());
+    });
+
+    tearDownAll(() async {
+      await HiveTestSetup.tearDownHive();
     });
 
     setUp(() {
       mockRemoteStorage = MockRemoteStorageService();
       mockFactory = MockProjetEntityFactory();
+
+      when(() => mockFactory.fromEntities(any())).thenReturn([]);
+      when(() => mockFactory.toEntities(any())).thenReturn([]);
+      when(
+        () => mockRemoteStorage.watchCollectionRaw(any()),
+      ).thenAnswer((_) => Stream.value(<Map<String, dynamic>>[]));
 
       service = UnifiedEntityServiceImpl<Projet, ProjetEntity>(
         collectionName: 'projets',

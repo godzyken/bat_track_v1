@@ -6,33 +6,49 @@ class HiveEntityService<T extends UnifiedModel>
     implements EntityLocalService<T> {
   final String boxName;
   final T Function(Map<String, dynamic>) fromJson;
-  Box<Map<dynamic, dynamic>>? _box;
+  Box<dynamic>? _box;
 
   HiveEntityService({required this.boxName, required this.fromJson});
 
   Future<void> init() async {
     if (!Hive.isBoxOpen(boxName)) {
-      _box = await Hive.openBox<Map<dynamic, dynamic>>(boxName);
+      _box = await Hive.openBox(boxName);
     } else {
-      _box = Hive.box<Map<dynamic, dynamic>>(boxName);
+      _box = Hive.box(boxName);
     }
+  }
+
+  Map<String, dynamic> _deepConvertMap(Map<dynamic, dynamic> map) {
+    return map.map((key, value) {
+      final stringKey = key.toString();
+      if (value is Map) {
+        return MapEntry(stringKey, _deepConvertMap(value));
+      } else if (value is List) {
+        return MapEntry(
+          stringKey,
+          value.map((e) => e is Map ? _deepConvertMap(e) : e).toList(),
+        );
+      }
+      return MapEntry(stringKey, value);
+    });
+  }
+
+  T _parseItem(dynamic item) {
+    if (item is T) return item;
+    if (item is Map) return fromJson(_deepConvertMap(item));
+    throw Exception('Invalid item format in Hive box: $item');
   }
 
   @override
   Future<List<T>> getAll() async {
     await init();
-    return _box!.values
-        .map((json) => fromJson(Map<String, dynamic>.from(json)))
-        .toList();
+    return _box!.values.map(_parseItem).toList();
   }
 
   @override
-  Stream<List<T>> watchAll() {
-    return _box!.watch().map(
-      (_) => _box!.values
-          .map((json) => fromJson(Map<String, dynamic>.from(json)))
-          .toList(),
-    );
+  Stream<List<T>> watchAll() async* {
+    await init();
+    yield* _box!.watch().map((_) => _box!.values.map(_parseItem).toList());
   }
 
   @override
@@ -43,8 +59,9 @@ class HiveEntityService<T extends UnifiedModel>
 
   @override
   Future<T?> get(String id) async {
-    final json = _box!.get(id);
-    return json != null ? fromJson(Map<String, dynamic>.from(json)) : null;
+    await init();
+    final item = _box!.get(id);
+    return item != null ? _parseItem(item) : null;
   }
 
   @override
@@ -56,7 +73,7 @@ class HiveEntityService<T extends UnifiedModel>
   Future<List<T>> getByQuery(Map<String, dynamic> query) async {
     await init();
     return _box!.values
-        .map((json) => fromJson(Map<String, dynamic>.from(json)))
+        .map(_parseItem)
         .where(
           (item) => query.entries.every((e) => item.toJson()[e.key] == e.value),
         )
@@ -66,7 +83,7 @@ class HiveEntityService<T extends UnifiedModel>
   Stream<List<T>> watchByQuery(Map<String, dynamic> query) {
     return _box!.watch().map(
       (_) => _box!.values
-          .map((json) => fromJson(Map<String, dynamic>.from(json)))
+          .map(_parseItem)
           .where(
             (item) =>
                 query.entries.every((e) => item.toJson()[e.key] == e.value),
@@ -77,18 +94,19 @@ class HiveEntityService<T extends UnifiedModel>
 
   Future<T?> getByQueryFirst(Map<String, dynamic> query) async {
     await init();
-    final json = _box!.values.firstWhere(
-      (json) => query.entries.every((e) => json[e.key] == e.value),
-      orElse: () => _handleEntityNotFound(),
-    );
-    return fromJson(Map<String, dynamic>.from(json));
+    final item = _box!.values.firstWhere((item) {
+      final parsed = _parseItem(item);
+      return query.entries.every((e) => parsed.toJson()[e.key] == e.value);
+    }, orElse: () => _handleEntityNotFound());
+    return _parseItem(item);
   }
 
   Future<void> deleteByQuery(Map<String, dynamic> query) async {
+    await init();
     final idsToDelete = _box!.keys.where((key) {
-      final json = _box!.get(key);
-      if (json == null) return false;
-      final entity = fromJson(Map<String, dynamic>.from(json));
+      final item = _box!.get(key);
+      if (item == null) return false;
+      final entity = _parseItem(item);
       return query.entries.every((e) => entity.toJson()[e.key] == e.value);
     }).toList();
     for (final id in idsToDelete) {
@@ -135,9 +153,9 @@ class HiveEntityService<T extends UnifiedModel>
   Future<void> deleteByQueryBatch(Map<String, dynamic> query) async {
     await init();
     final idsToDelete = _box!.keys.where((key) {
-      final json = _box!.get(key);
-      if (json == null) return false;
-      final entity = fromJson(Map<String, dynamic>.from(json));
+      final item = _box!.get(key);
+      if (item == null) return false;
+      final entity = _parseItem(item);
       return query.entries.every((e) => entity.toJson()[e.key] == e.value);
     }).toList();
     for (final id in idsToDelete) {
@@ -150,10 +168,11 @@ class HiveEntityService<T extends UnifiedModel>
     await _box!.clear();
   }
 
-  Stream<T?> watchById(String id) {
-    return _box!.watch(key: id).map((event) {
-      final json = _box!.get(id);
-      return json != null ? fromJson(Map<String, dynamic>.from(json)) : null;
+  Stream<T?> watchById(String id) async* {
+    await init();
+    yield* _box!.watch(key: id).map((event) {
+      final item = _box!.get(id);
+      return item != null ? _parseItem(item) : null;
     });
   }
 
@@ -162,9 +181,7 @@ class HiveEntityService<T extends UnifiedModel>
     int Function(T a, T b)? orderBy,
   }) async {
     await init();
-    var results = _box!.values
-        .map((json) => fromJson(Map<String, dynamic>.from(json)))
-        .toList();
+    var results = _box!.values.map(_parseItem).toList();
 
     if (where != null) {
       results = results.where(where).toList();
