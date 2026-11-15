@@ -62,7 +62,7 @@ class EntityManagerScreen<T extends UnifiedModel> extends ConsumerWidget {
         items: asyncList,
         boxName: '${asyncList.requireValue}',
         onEdit: (item) {
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (_) => EntityForm<T>(
               fromJson: fromJson,
@@ -89,7 +89,7 @@ class EntityManagerScreen<T extends UnifiedModel> extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (_) => EntityForm<T>(
               fromJson: fromJson,
