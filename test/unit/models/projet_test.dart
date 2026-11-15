@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
+import 'package:bat_track_v1/features/projet/domain/rules/projet_policy.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_models/shared_models.dart';
 
@@ -88,12 +89,12 @@ void main() {
           role: UserRole.technicien,
         );
         final projetWithTech = testProjet.copyWith(
-          assignedUserIds: ['tech_1'],
+          members: ['tech_1'],
           status: ProjetStatus.validated,
         );
 
         expect(projetWithTech.canRead(techUser), isTrue);
-        expect(projetWithTech.canEdit(techUser), isTrue);
+        expect(ProjetPolicy().canEdit(techUser, projetWithTech), isTrue);
         expect(projetWithTech.canValidate(techUser), isFalse);
       });
 
@@ -103,8 +104,8 @@ void main() {
           role: UserRole.client,
         );
 
-        expect(testProjet.canRead(randomUser), isFalse);
-        expect(testProjet.canEdit(randomUser), isFalse);
+        expect(ProjetPolicy().canRead(randomUser, testProjet), isFalse);
+        expect(ProjetPolicy().canEdit(randomUser, testProjet), isFalse);
       });
     });
 
@@ -153,18 +154,21 @@ void main() {
       });
 
       test('should calculate correct status', () {
-        expect(testProjet.status, equals('draft'));
+        expect(testProjet.currentStatus, equals('draft'));
 
         final clientValidated = testProjet.copyWith(clientValide: true);
-        expect(clientValidated.status, equals('pendingValidation'));
+        expect(clientValidated.currentStatus, equals('pendingValidation'));
 
         final chefValidated = clientValidated.copyWith(
           chefDeProjetValide: true,
         );
-        expect(chefValidated.status, equals('validatedWithoutTechnicians'));
+        expect(
+          chefValidated.currentStatus,
+          equals('validatedWithoutTechnicians'),
+        );
 
         final fullyValidated = chefValidated.copyWith(techniciensValides: true);
-        expect(fullyValidated.status, equals('fullyValidated'));
+        expect(fullyValidated.currentStatus, equals('fullyValidated'));
       });
     });
 

@@ -1,7 +1,7 @@
-import 'package:shared_models/shared_models.dart';
 import 'package:bat_track_v1/models/services/hive_entity_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../helpers/hive_test_setup.dart';
 import '../../../mocks/mock_data_factories.dart';
@@ -24,7 +24,9 @@ void main() {
     });
 
     tearDown(() async {
-      await testBox.clear();
+      if (Hive.isBoxOpen('test_projets')) {
+        await Hive.box<Projet>('test_projets').close();
+      }
     });
 
     tearDownAll(() async {

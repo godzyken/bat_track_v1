@@ -1,4 +1,5 @@
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
+import 'package:bat_track_v1/features/projet/domain/rules/projet_policy.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_models/shared_models.dart';
 
@@ -38,7 +39,7 @@ void main() {
         final validated = draftProjet.validateByClient(clientUser.uid);
 
         expect(validated.clientValide, isTrue);
-        expect(validated.status, equals('pendingValidation'));
+        expect(validated.currentStatus, equals('pendingValidation'));
       });
 
       test('admin validation should complete validation process', () {
@@ -46,17 +47,20 @@ void main() {
         final adminValidated = clientValidated.validateByAdminOrChef(adminUser);
 
         expect(adminValidated.chefDeProjetValide, isTrue);
-        expect(adminValidated.status, equals('validatedWithoutTechnicians'));
+        expect(
+          adminValidated.currentStatus,
+          equals('validatedWithoutTechnicians'),
+        );
       });
 
       test('full validation workflow should work end-to-end', () {
         // Step 1: Client validation
         var projet = draftProjet.validateByClient(clientUser.uid);
-        expect(projet.status, equals('pendingValidation'));
+        expect(projet.currentStatus, equals('pendingValidation'));
 
         // Step 2: Admin validation
         projet = projet.validateByAdminOrChef(adminUser);
-        expect(projet.status, equals('validatedWithoutTechnicians'));
+        expect(projet.currentStatus, equals('validatedWithoutTechnicians'));
 
         // Step 3: Assign technician
         projet = projet.assignTechnician(techUser);
@@ -64,7 +68,7 @@ void main() {
 
         // Step 4: Technician validation (simulated)
         projet = projet.copyWith(techniciensValides: true);
-        expect(projet.status, equals('fullyValidated'));
+        expect(projet.currentStatus, equals('fullyValidated'));
       });
 
       test('should enforce validation order', () {
@@ -85,18 +89,18 @@ void main() {
     group('Permission System', () {
       test('should respect edit permissions by project status', () {
         // Draft: client can edit
-        expect(draftProjet.canEdit(clientUser), isTrue);
-        expect(draftProjet.canEdit(techUser), isFalse);
+        expect(ProjetPolicy().canEdit(clientUser, draftProjet), isTrue);
+        expect(ProjetPolicy().canEdit(techUser, draftProjet), isFalse);
 
         // Validated: client cannot edit, assigned tech can
         final validatedProjet = draftProjet.copyWith(
           status: ProjetStatus.validated,
           chefDeProjetValide: true,
-          assignedUserIds: [techUser.uid],
+          members: [techUser.uid],
         );
 
-        expect(validatedProjet.canEdit(clientUser), isFalse);
-        expect(validatedProjet.canEdit(techUser), isTrue);
+        expect(ProjetPolicy().canEdit(clientUser, validatedProjet), isFalse);
+        expect(ProjetPolicy().canEdit(techUser, validatedProjet), isTrue);
       });
 
       test('should handle technician assignment permissions', () {
@@ -114,16 +118,16 @@ void main() {
     group('Status Calculations', () {
       test('should calculate correct composite status', () {
         var projet = draftProjet;
-        expect(projet.status, equals('draft'));
+        expect(projet.currentStatus, equals('draft'));
 
         projet = projet.copyWith(clientValide: true);
-        expect(projet.status, equals('pendingValidation'));
+        expect(projet.currentStatus, equals('pendingValidation'));
 
         projet = projet.copyWith(chefDeProjetValide: true);
-        expect(projet.status, equals('validatedWithoutTechnicians'));
+        expect(projet.currentStatus, equals('validatedWithoutTechnicians'));
 
         projet = projet.copyWith(techniciensValides: true);
-        expect(projet.status, equals('fullyValidated'));
+        expect(projet.currentStatus, equals('fullyValidated'));
       });
 
       test('should handle edge cases in status calculation', () {
@@ -134,7 +138,7 @@ void main() {
           chefDeProjetValide: false,
         );
 
-        expect(invalidState.status, equals('pendingValidation'));
+        expect(invalidState.currentStatus, equals('pendingValidation'));
       });
     });
   });

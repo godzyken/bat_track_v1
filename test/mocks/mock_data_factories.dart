@@ -52,15 +52,32 @@ class MockDataFactories {
     );
   }
 
-  static AppUser createUser({
-    String? uid,
-    UserRole? role,
-    bool isAdmin = false,
-  }) {
+  static AppUser createUser({String? uid, dynamic role, bool isAdmin = false}) {
+    String roleStr = 'technicien';
+    if (isAdmin) {
+      roleStr = 'admin';
+    } else if (role is UserRole) {
+      switch (role) {
+        case UserRole.client:
+          roleStr = 'client';
+          break;
+        case UserRole.chefDeProjet:
+          roleStr = 'chef_de_projet';
+          break;
+        case UserRole.technicien:
+          roleStr = 'technicien';
+          break;
+        case UserRole.superUtilisateur:
+          roleStr = 'super_utilisateur';
+          break;
+      }
+    } else if (role is String) {
+      roleStr = role;
+    }
     return AppUser(
       uid: uid ?? _uuid.v4(),
       email: 'test@example.com',
-      role: isAdmin ? 'admin' : 'technicien',
+      role: roleStr,
       createdAt: DateTime.now(),
       name: 'anthony',
     );
