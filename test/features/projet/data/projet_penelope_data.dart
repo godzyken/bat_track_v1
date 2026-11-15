@@ -116,6 +116,7 @@ final chantierPenelope = Chantier(
 /// --- Projet ---
 final projetPenelope = Projet(
   id: 'prj_001',
+  clientId: 'cli_001',
   nom: 'Rénovation villa Penelope',
   description:
       'Projet de rénovation complète avec mise aux normes électriques et finitions modernes.',

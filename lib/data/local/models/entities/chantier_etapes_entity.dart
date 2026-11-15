@@ -21,9 +21,9 @@ class ChantierEtapesEntity extends HiveObject
   @HiveField(5)
   final String description;
   @HiveField(6)
-  final DateTime dateDebut;
+  final DateTime? dateDebut;
   @HiveField(7)
-  final DateTime dateFin;
+  final DateTime? dateFin;
   @HiveField(8)
   final bool terminee;
   @HiveField(9)
@@ -48,10 +48,10 @@ class ChantierEtapesEntity extends HiveObject
     required this.statut,
     required this.pieces,
     required this.piecesJointes,
-    required this.dateDebut,
-    required this.dateFin,
+    this.dateDebut,
+    this.dateFin,
     required this.ordre,
-    required this.budget,
+    this.budget,
     required this.terminee,
     required this.ceUpdatedAt,
     this.techniciens,
@@ -96,7 +96,7 @@ class ChantierEtapesEntity extends HiveObject
     statut: statut,
     updatedAt: updatedAt,
     timeline: timeline,
-    budget: budget,
+    budget: budget ?? 0.0,
     techniciens: techniciens,
   );
 

@@ -19,6 +19,13 @@ class EtapeCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final color = etape.terminee ? Colors.green[100] : Colors.orange[100];
 
+    final debutStr = etape.dateDebut != null
+        ? etape.dateDebut!.toLocal().toString().split(' ')[0]
+        : '—';
+    final finStr = etape.dateFin != null
+        ? etape.dateFin!.toLocal().toString().split(' ')[0]
+        : '—';
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       color: color,
@@ -40,13 +47,9 @@ class EtapeCard extends ConsumerWidget {
           children: [
             Text(etape.description),
             const SizedBox(height: 4),
-            Text(
-              '📅 Début : ${etape.dateDebut.toLocal().toString().split(' ')[0]}',
-            ),
+            Text('📅 Début : $debutStr'),
             const SizedBox(height: 2),
-            Text(
-              '🏁 Fin : ${etape.dateFin.toLocal().toString().split(' ')[0]}',
-            ),
+            Text('🏁 Fin : $finStr'),
             const SizedBox(height: 2),
             Text(etape.terminee ? '✅ Terminée' : '⏳ En cours'),
           ],

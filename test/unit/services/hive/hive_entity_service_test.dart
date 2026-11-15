@@ -1,4 +1,4 @@
-import 'package:bat_track_v1/data/local/models/projets/projet.dart';
+import 'package:shared_models/shared_models.dart';
 import 'package:bat_track_v1/models/services/hive_entity_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive.dart';

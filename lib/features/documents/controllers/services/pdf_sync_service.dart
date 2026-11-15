@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../data/local/models/documents/pieces_jointes.dart';
+import 'package:shared_models/shared_models.dart';
 import '../generator/pdf_generator_interface.dart';
 
 class PdfSyncService<T> {

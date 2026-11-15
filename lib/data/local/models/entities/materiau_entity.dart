@@ -37,9 +37,9 @@ class MateriauEntity extends HiveObject implements HiveModel<Materiau> {
       maId: model.id,
       nom: model.nom,
       prixUnitaire: model.prixUnitaire,
-      unite: model.unite,
+      unite: model.unite ?? '',
       coefficientSurface: model.coefficientSurface,
-      quantiteFixe: model.quantiteFixe!,
+      quantiteFixe: model.quantiteFixe ? 1.0 : 0.0,
       maUpdatedAt: model.updatedAt,
     );
   }
@@ -53,7 +53,8 @@ class MateriauEntity extends HiveObject implements HiveModel<Materiau> {
     nom: nom,
     prixUnitaire: prixUnitaire,
     unite: unite,
-    coefficientSurface: coefficientSurface,
+    coefficientSurface: coefficientSurface ?? 1.0,
+    quantiteFixe: quantiteFixe > 0,
     updatedAt: updatedAt,
   );
 

@@ -134,19 +134,3 @@ extension ChantierBudgetCalculations on Chantier {
         calculerBudgetInterventions();
   }
 }
-
-/// Extension utilitaire pour le mixin ValidationMixin
-extension ValidationHelper on ValidationMixin {
-  /// Méthode statique réutilisable pour vérifier les statuts
-  static bool computeValidationStatus({
-    required bool clientValide,
-    required bool chefDeProjetValide,
-    required bool techniciensValides,
-    required bool superUtilisateurValide,
-  }) {
-    return clientValide &&
-        chefDeProjetValide &&
-        techniciensValides &&
-        superUtilisateurValide;
-  }
-}

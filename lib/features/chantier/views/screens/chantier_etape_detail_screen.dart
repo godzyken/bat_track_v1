@@ -43,7 +43,7 @@ class ChantierEtapeDetailScreen extends ConsumerWidget {
             ? 'pdf'
             : 'image';
 
-        final int size = await file.length();
+        final int size = (await file.length()) ?? 0;
         final piece = PieceJointe(
           id: etape.id,
           url: file.path!,

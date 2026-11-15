@@ -17,7 +17,7 @@ enum EtapeStatut { aFaire, enCours, terminee }
 
 EtapeStatut getEtapeStatut(ChantierEtape e) {
   if (e.terminee == true) return EtapeStatut.terminee;
-  if (e.dateDebut.isBefore(DateTime.now())) {
+  if (e.dateDebut != null && e.dateDebut!.isBefore(DateTime.now())) {
     return EtapeStatut.enCours;
   }
   return EtapeStatut.aFaire;

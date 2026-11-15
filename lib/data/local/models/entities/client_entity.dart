@@ -47,7 +47,6 @@ class ClientEntity extends HiveObject implements HiveModel<Client> {
     this.clUpdatedAt,
   });
 
-  @override
   factory ClientEntity.fromModel(Client model) {
     return ClientEntity(
       clId: model.id,

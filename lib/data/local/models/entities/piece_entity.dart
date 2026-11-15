@@ -47,8 +47,8 @@ class PieceEntity extends HiveObject implements HiveModel<Piece> {
       materiels: model.materiels,
       mainOeuvre: model.mainOeuvre,
       pcUpdatedAt: model.updatedAt,
-      addBy: model.addedBy,
-      validatedBy: model.validatedByTech,
+      addBy: model.addedBy ?? '',
+      validatedBy: model.techniciensValides,
     );
   }
 
@@ -65,7 +65,7 @@ class PieceEntity extends HiveObject implements HiveModel<Piece> {
     mainOeuvre: mainOeuvre,
     updatedAt: updatedAt,
     addedBy: addBy,
-    validatedByTech: validatedBy,
+    techniciensValides: validatedBy ?? false,
   );
 
   @override

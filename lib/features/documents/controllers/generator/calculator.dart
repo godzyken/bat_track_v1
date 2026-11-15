@@ -36,7 +36,7 @@ class BudgetGen {
     return {
       'Matériaux': totalMateriaux,
       'Matériel': totalMateriels,
-      'Main-d’œuvre': totalMainOeuvre,
+      "Main-d'œuvre": totalMainOeuvre,
     };
   }
 
@@ -67,24 +67,31 @@ class BudgetGen {
     required double surface,
   }) {
     return materiaux.fold(0.0, (sum, m) {
-      final quantite = m.quantiteFixe ?? (m.coefficientSurface ?? 0) * surface;
+      // quantiteFixe est bool dans shared_models v2 :
+      // true = quantité fixe unitaire (1.0), false = basée sur surface * coefficient
+      final quantite = m.quantiteFixe
+          ? 1.0
+          : (m.coefficientSurface ?? 0.0) * surface;
       return sum + (quantite * m.prixUnitaire);
     });
   }
 
   static double calculerCoutMateriels(List<Materiel> materiels) {
     return materiels.fold(0.0, (sum, m) {
-      if (m.joursLocation == 0) {
-        return sum + (m.prixUnitaire * m.quantiteFixe);
+      final joursLoc = m.joursLocation ?? 0;
+      if (joursLoc == 0) {
+        // quantiteFixe bool → si true, 1 unité, sinon 0
+        final qty = m.quantiteFixe ? 1.0 : 0.0;
+        return sum + (m.prixUnitaire * qty);
       }
-      return calculerCoutLocationMateriels(materiels);
+      return sum + calculerCoutLocationMateriels([m]);
     });
   }
 
   static double calculerCoutLocationMateriels(List<Materiel> materiels) {
     return materiels.fold(
       0.0,
-      (sum, m) => sum + (m.prixLocation! * m.joursLocation!),
+      (sum, m) => sum + ((m.prixLocation ?? 0.0) * (m.joursLocation ?? 0)),
     );
   }
 

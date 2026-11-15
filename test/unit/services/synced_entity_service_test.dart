@@ -1,11 +1,10 @@
+import 'package:shared_models/shared_models.dart';
 import 'package:bat_track_v1/core/services/unified_entity_service_impl.dart';
 import 'package:bat_track_v1/data/local/models/adapters/hive_entity_factory.dart';
 import 'package:bat_track_v1/data/local/models/entities/projet_entity.dart';
-import 'package:bat_track_v1/data/local/models/projets/projet.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:hive_ce/hive.dart';
-
+import 'package:mocktail/mocktail.dart';
 import '../../mocks/mock_data_factories.dart';
 import '../../mocks/mock_services.dart';
 

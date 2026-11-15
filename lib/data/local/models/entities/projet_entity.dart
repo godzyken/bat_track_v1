@@ -99,6 +99,7 @@ class ProjetEntity extends HiveObject implements HiveModel<Projet> {
   Projet toModel() => Projet(
     id: id,
     nom: nom,
+    clientId: '',
     company: company,
     description: description,
     dateDebut: dateDebut,

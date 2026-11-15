@@ -38,16 +38,17 @@ class TechHomeScreen extends ConsumerWidget {
       (list) => list.where((c) => c.technicienIds.contains(userId)).toList(),
     );
 
+    // Intervention.date remplace create, technicienIds remplace technicienId
     final upcomingInterventions = interventions.whenData(
       (list) =>
           list
               .where(
                 (i) =>
-                    i.technicienId == userId &&
-                    i.create.isAfter(DateTime.now()),
+                    i.technicienIds.contains(userId) &&
+                    i.date.isAfter(DateTime.now()),
               )
               .toList()
-            ..sort((a, b) => a.create.compareTo(b.create)),
+            ..sort((a, b) => a.date.compareTo(b.date)),
     );
 
     return ScreenWrapper(

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_models/shared_models.dart';
-
-import '../projets/projet.dart';
 import 'json_adapter.dart';
 
 class ProjetAdapter implements JsonAdapter<Projet> {
@@ -10,6 +8,7 @@ class ProjetAdapter implements JsonAdapter<Projet> {
     'id': model.id,
     'nom': model.nom,
     'description': model.description,
+    'clientId': model.clientId,
     'dateDebut': model.dateDebut.toIso8601String(),
     'dateFin': model.dateFin.toIso8601String(),
     'deadLine': model.deadLine?.toIso8601String(),
@@ -33,6 +32,7 @@ class ProjetAdapter implements JsonAdapter<Projet> {
     id: json['id'] as String,
     nom: json['nom'] as String,
     description: json['description'] as String,
+    clientId: (json['clientId'] as String?) ?? '',
     dateDebut: DateTime.parse(json['dateDebut'] as String),
     dateFin: DateTime.parse(json['dateFin'] as String),
     deadLine: tryParseDate(json['deadLine']),
@@ -66,6 +66,13 @@ class ProjetAdapter implements JsonAdapter<Projet> {
       type: FieldType.text,
       required: true,
       icon: Icons.wb_shade_outlined,
+    ),
+    const JsonField(
+      name: 'clientId',
+      label: 'Identifiant Client',
+      type: FieldType.text,
+      required: true,
+      icon: Icons.person_outline,
     ),
     const JsonField(
       name: 'description',
@@ -106,6 +113,5 @@ class ProjetAdapter implements JsonAdapter<Projet> {
   ];
 
   @override
-  // TODO: implement initialData
-  Map<String, dynamic> get initialData => throw UnimplementedError();
+  Map<String, dynamic> get initialData => {};
 }

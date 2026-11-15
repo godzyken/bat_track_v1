@@ -16,10 +16,12 @@ class InterventionNotifier extends AsyncNotifier<InterventionState> {
 
     final interventions = await interventionService.getAllRemote();
 
-    final Map<String, int> stats = {'Terminée': 0, 'En cours': 0, 'Annulée': 0};
+    // Intervention n'a plus de champ 'statut' — on se base sur 'terminee'
+    final Map<String, int> stats = {'Terminée': 0, 'En cours': 0};
 
     for (final i in interventions) {
-      stats[i.statut] = (stats[i.statut] ?? 0) + 1;
+      final key = i.terminee ? 'Terminée' : 'En cours';
+      stats[key] = (stats[key] ?? 0) + 1;
     }
 
     return InterventionState(stats: stats);
@@ -31,10 +33,11 @@ class InterventionNotifier extends AsyncNotifier<InterventionState> {
     state = await AsyncValue.guard(() async {
       final interventions = await interventionService.getAllRemote();
 
-      final stats = <String, int>{};
+      final stats = <String, int>{'Terminée': 0, 'En cours': 0};
 
       for (final i in interventions) {
-        stats[i.statut] = (stats[i.statut] ?? 0) + 1;
+        final key = i.terminee ? 'Terminée' : 'En cours';
+        stats[key] = (stats[key] ?? 0) + 1;
       }
 
       return InterventionState(stats: stats);

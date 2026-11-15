@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../data/local/models/chantiers/chantier.dart';
+import 'package:shared_models/shared_models.dart';
 import 'chantier_repository_provider.dart';
 
 final chantiersProvider =

@@ -13,17 +13,17 @@ class EquipementEntity extends HiveObject implements HiveModel<Equipement> {
   @HiveField(1)
   final String nom;
   @HiveField(2)
-  final String type; // extincteur, détecteur, etc.
+  final String type; // extincteur, détecteur, etc. / marque
   @HiveField(3)
-  final String? localisation;
+  final String? localisation; // modèle
   @HiveField(4)
   final DateTime dateInstallation;
   @HiveField(5)
-  final DateTime? dateProchaineVerification;
+  final DateTime? dateProchaineVerification; // dateDerniereMaintenance
   @HiveField(6)
   final bool enService; // actif, hors service, à vérifier
   @HiveField(7)
-  final String? homologation;
+  final String? homologation; // numeroSerie
   @HiveField(8)
   final String? commentaire;
   @override
@@ -71,62 +71,57 @@ class EquipementEntity extends HiveObject implements HiveModel<Equipement> {
   HiveModel<Equipement> fromModel(Equipement model) => EquipementEntity(
     id: model.id,
     nom: model.nom,
-    type: model.type,
-    dateInstallation: model.dateInstallation,
+    type: model.marque ?? '',
+    dateInstallation: model.dateInstallation ?? DateTime.now(),
     chantierId: model.chantierId,
-    createdBy: model.createdBy,
-    technicienIds: model.technicienIds,
+    createdBy: '',
+    technicienIds: const [],
     clientValide: model.clientValide,
     chefDeProjetValide: model.chefDeProjetValide,
     techniciensValides: model.techniciensValides,
     superUtilisateurValide: model.superUtilisateurValide,
     isCloudOnly: model.isCloudOnly,
     updatedAt: model.updatedAt,
-    dateProchaineVerification: model.dateProchaineVerification,
-    enService: model.enService,
-    commentaire: model.commentaire,
-    homologation: model.homologation,
-    localisation: model.localisation,
+    dateProchaineVerification: model.dateDerniereMaintenance,
+    enService: true,
+    commentaire: null,
+    homologation: model.numeroSerie,
+    localisation: model.modele,
   );
 
   @override
   Equipement toModel() => Equipement(
     id: id,
     nom: nom,
-    type: type,
+    marque: type,
+    modele: localisation,
+    numeroSerie: homologation,
     dateInstallation: dateInstallation,
+    dateDerniereMaintenance: dateProchaineVerification,
     chantierId: chantierId,
-    createdBy: createdBy,
-    technicienIds: technicienIds,
     clientValide: clientValide,
     chefDeProjetValide: chefDeProjetValide,
     techniciensValides: techniciensValides,
     superUtilisateurValide: superUtilisateurValide,
     isCloudOnly: isCloudOnly,
     updatedAt: updatedAt,
-    dateProchaineVerification: dateProchaineVerification,
-    enService: enService,
-    commentaire: commentaire,
-    homologation: homologation,
-    localisation: localisation,
-    count: null,
   );
 
   factory EquipementEntity.fromModel(Equipement model) {
     return EquipementEntity(
       id: model.id,
       nom: model.nom,
-      type: model.type,
-      localisation: model.localisation,
-      dateInstallation: model.dateInstallation,
-      dateProchaineVerification: model.dateProchaineVerification,
-      enService: model.enService,
-      homologation: model.homologation,
-      commentaire: model.commentaire,
+      type: model.marque ?? '',
+      localisation: model.modele,
+      dateInstallation: model.dateInstallation ?? DateTime.now(),
+      dateProchaineVerification: model.dateDerniereMaintenance,
+      enService: true,
+      homologation: model.numeroSerie,
+      commentaire: null,
       updatedAt: model.updatedAt,
       chantierId: model.chantierId,
-      createdBy: model.createdBy,
-      technicienIds: model.technicienIds,
+      createdBy: '',
+      technicienIds: const [],
       clientValide: model.clientValide,
       chefDeProjetValide: model.chefDeProjetValide,
       techniciensValides: model.techniciensValides,

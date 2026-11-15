@@ -1,6 +1,4 @@
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
-import 'package:shared_models/models/private/app_user.dart';
-import 'package:shared_models/models/user_enums.dart';
 import 'package:uuid/uuid.dart';
 
 class MockDataFactories {
@@ -16,6 +14,7 @@ class MockDataFactories {
   }) {
     return Projet(
       id: id ?? _uuid.v4(),
+      clientId: 'client_1',
       nom: nom ?? 'Projet Test ${DateTime.now().millisecondsSinceEpoch}',
       description: 'Description test',
       dateDebut: DateTime.now(),

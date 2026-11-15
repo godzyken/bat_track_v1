@@ -52,17 +52,17 @@ class InterventionEntity extends HiveObject implements HiveModel<Intervention> {
     return InterventionEntity(
       sId: model.id,
       chantierId: model.chantierId,
-      technicienId: model.technicienId,
-      company: model.company,
-      description: model.description,
-      date: model.create,
-      statut: model.statut,
-      document: model.document
-          .map((e) => PieceJointeEntity.fromModel(e))
-          .toList(),
+      technicienId: model.technicienIds.isNotEmpty
+          ? model.technicienIds.first
+          : '',
+      company: '',
+      description: model.description ?? '',
+      date: model.date,
+      statut: model.terminee ? 'Terminé' : 'En cours',
+      document: const [],
       titre: model.titre,
-      commentaire: model.commentaire,
-      facture: model.facture,
+      commentaire: null,
+      facture: null,
       sUpdatedAt: model.updatedAt,
     );
   }
@@ -75,15 +75,11 @@ class InterventionEntity extends HiveObject implements HiveModel<Intervention> {
   Intervention toModel() => Intervention(
     id: id,
     chantierId: chantierId,
-    technicienId: technicienId,
-    company: company,
+    titre: titre ?? '',
     description: description,
-    create: date,
-    statut: statut,
-    document: document.map((e) => e.toModel()).toList(),
-    titre: titre,
-    commentaire: commentaire,
-    facture: facture,
+    date: date,
+    technicienIds: technicienId.isNotEmpty ? [technicienId] : [],
+    terminee: statut == 'Terminé',
     updatedAt: updatedAt,
   );
 

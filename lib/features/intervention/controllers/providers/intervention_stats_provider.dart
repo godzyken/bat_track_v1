@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../../../../data/local/models/chantiers/intervention.dart';
 import '../../../../data/local/providers/hive_provider.dart';
 
 final interventionStatsProvider =
@@ -9,15 +9,19 @@ final interventionStatsProvider =
       final interventionService = ref.read(interventionServiceProvider);
       final interventions = await interventionService.getAll();
 
-      // Groupement par projet
-      final byProjet = groupBy(interventions, (i) => i.id);
+      // Groupement par chantier (on utilise chantierId comme clé de projet)
+      final byProjet = groupBy(interventions, (i) => i.chantierId);
 
       return byProjet.map((projetId, chantierList) {
         final byChantier = groupBy(chantierList, (i) => i.chantierId);
 
         final chantierStats = byChantier.map((chantierId, interventions) {
-          final byStatut = groupBy(interventions, (i) => i.statut);
-          final statutCounts = byStatut.map(
+          // 'statut' n'existe plus — on dérive de 'terminee'
+          final byStatut = groupBy(
+            interventions,
+            (i) => i.terminee ? 'Terminée' : 'En cours',
+          );
+          final statutCounts = byStatut.map<String, int>(
             (statut, list) => MapEntry(statut, list.length),
           );
 
@@ -39,7 +43,12 @@ final interventionsByStatutProvider =
       final statut = params['statut']!;
 
       final interventions = await interventionService.getAll();
+      // Filtre par chantierId + statut dérivé de 'terminee'
       return interventions
-          .where((i) => i.chantierId == chantierId && i.statut == statut)
+          .where(
+            (i) =>
+                i.chantierId == chantierId &&
+                (i.terminee ? 'Terminée' : 'En cours') == statut,
+          )
           .toList();
     });

@@ -1,4 +1,4 @@
-import 'package:bat_track_v1/data/local/models/chantiers/equipement.dart';
+import 'package:shared_models/shared_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/riverpod/base_list_notifier.dart';

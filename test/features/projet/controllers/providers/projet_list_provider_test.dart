@@ -1,7 +1,7 @@
-import 'package:bat_track_v1/data/local/models/projets/projet.dart';
 import 'package:bat_track_v1/features/projet/controllers/providers/projet_list_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../data/projet_penelope_data.dart';
 
@@ -14,6 +14,7 @@ void main() {
             (ref) => Stream.value([
               Projet(
                 id: '1',
+                clientId: 'client_1',
                 nom: 'Projet Test',
                 description: '',
                 dateDebut: DateTime.now(),
@@ -61,6 +62,7 @@ void main() {
               [
                 Projet(
                   id: '1',
+                  clientId: 'client_1',
                   nom: 'Projet Initial',
                   description: '',
                   dateDebut: DateTime.now(),
@@ -79,6 +81,7 @@ void main() {
               [
                 Projet(
                   id: '1',
+                  clientId: 'client_1',
                   nom: 'Projet Initial',
                   description: '',
                   dateDebut: DateTime.now(),
@@ -95,6 +98,7 @@ void main() {
                 ),
                 Projet(
                   id: '2',
+                  clientId: 'client_1',
                   nom: 'Projet Nouveau',
                   description: '',
                   dateDebut: DateTime.now(),

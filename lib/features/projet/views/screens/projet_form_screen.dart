@@ -1,4 +1,4 @@
-import 'package:bat_track_v1/data/local/models/projets/projet.dart';
+import 'package:shared_models/shared_models.dart';
 import 'package:bat_track_v1/features/auth/data/providers/current_user_provider.dart';
 import 'package:bat_track_v1/models/views/widgets/entity_form.dart';
 import 'package:flutter/material.dart';

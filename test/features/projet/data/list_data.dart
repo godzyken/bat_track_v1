@@ -4,6 +4,7 @@ import 'package:shared_models/shared_models.dart';
 /// Projets :
 final projetA = Projet(
   id: '1',
+  clientId: 'client_1',
   nom: 'Projet A',
   description: '',
   dateDebut: DateTime.now(),
@@ -21,6 +22,7 @@ final projetA = Projet(
 
 final projetB = Projet(
   id: '2',
+  clientId: 'client_1',
   nom: 'Projet B',
   description: '',
   dateDebut: DateTime.now(),
@@ -38,6 +40,7 @@ final projetB = Projet(
 
 final projetC = Projet(
   id: '3',
+  clientId: 'client_1',
   nom: 'Projet C',
   description: '',
   dateDebut: DateTime.now(),
@@ -55,6 +58,7 @@ final projetC = Projet(
 
 final projetD = Projet(
   id: '4',
+  clientId: 'client_1',
   nom: 'Projet D',
   description: '',
   dateDebut: DateTime.now(),
@@ -72,6 +76,7 @@ final projetD = Projet(
 
 final projetE = Projet(
   id: '5',
+  clientId: 'client_1',
   nom: 'Projet E',
   description: '',
   dateDebut: DateTime.now(),
@@ -397,56 +402,19 @@ final tech2 = Technicien(
 final intervention1 = Intervention(
   id: 'i1',
   chantierId: '01',
-  technicienId: 't1',
-  company: 'BatServices',
+  titre: 'Installation du tableau électrique principal',
   description: 'Installation du tableau électrique principal',
-  create: DateTime(2025, 3, 1),
-  statut: 'en_cours',
-  document: [
-    PieceJointe(
-      id: 'pj1',
-      nom: 'Plan Tableau Électrique',
-      url: 'https://example.com/docs/tab_elec_plan.pdf',
-      typeMime: 'application/pdf',
-      createdAt: DateTime(2025, 3, 1),
-      type: 'plan',
-      parentType: 'intervention',
-      parentId: 'i1',
-      taille: 250000, // ~250 Ko
-    ),
-    PieceJointe(
-      id: 'pj2',
-      nom: 'Photo Installation',
-      url: 'https://example.com/images/installec.jpg',
-      typeMime: 'image/jpeg',
-      createdAt: DateTime(2025, 3, 2),
-      type: 'photo',
-      parentType: 'intervention',
-      parentId: 'i1',
-      taille: 480000, // ~480 Ko
-    ),
-  ],
+  date: DateTime(2025, 3, 1),
+  technicienIds: ['t1'],
+  terminee: false,
 );
 
 final intervention2 = Intervention(
   id: 'i2',
   chantierId: '02',
-  technicienId: 't2',
-  company: 'BatServices',
+  titre: 'Peinture des plafonds',
   description: 'Peinture des plafonds',
-  create: DateTime(2025, 3, 10),
-  statut: 'prévu',
-  document: [
-    PieceJointe(
-      id: 'pj3',
-      nom: 'Devis Peinture',
-      url: 'https://example.com/docs/devis_peinture.pdf',
-      typeMime: 'application/pdf',
-      createdAt: DateTime(2025, 3, 10),
-      type: 'devis',
-      parentType: 'intervention',
-      parentId: 'i2',
-      taille: 120000,
-    ),
-  ],
+  date: DateTime(2025, 3, 10),
+  technicienIds: ['t2'],
+  terminee: false,
 );

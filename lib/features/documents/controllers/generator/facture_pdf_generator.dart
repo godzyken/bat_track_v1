@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:shared_models/shared_models.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
 
@@ -67,19 +66,19 @@ class FacturePdfGenerator {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text("Facture pour l'intervention : ${intervention.titre}"),
-            pw.Text('Technicien : ${intervention.technicienId}'),
-            pw.Text('Date : ${intervention.create.toIso8601String()}'),
+            // technicienIds remplace technicienId (singulier)
+            pw.Text(
+              'Technicien(s) : ${intervention.technicienIds.isNotEmpty ? intervention.technicienIds.first : "—"}',
+            ),
+            // date remplace create
+            pw.Text('Date : ${intervention.date.toIso8601String()}'),
             if (intervention.facture != null) ...[
               pw.Text('Montant HT : ${intervention.facture!.totalHT}'),
               pw.Text('Montant TTC : ${intervention.facture!.totalTTC}'),
               if (intervention.facture!.isFinalized)
                 pw.Text('Facture FINALISÉE'),
             ],
-            if ((intervention.document).isNotEmpty) ...[
-              pw.SizedBox(height: 16),
-              pw.Text('Documents joints :'),
-              ...(intervention.document).map((p) => pw.Text('- ${p.nom}')),
-            ],
+            // document n'existe plus — on utilise piecesJointes via le chantier
           ],
         ),
       ),

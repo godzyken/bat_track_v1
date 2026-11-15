@@ -2,9 +2,9 @@ import 'package:bat_track_v1/data/local/models/entities/chantier_etapes_entity.d
 import 'package:bat_track_v1/data/local/models/entities/intervention_entity.dart';
 import 'package:bat_track_v1/data/local/models/entities/pieces_jointes_entity.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../models/data/hive_model.dart';
-import '../chantiers/chantier.dart';
 
 part 'chantier_entity.g.dart';
 

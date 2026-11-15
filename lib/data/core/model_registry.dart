@@ -102,7 +102,7 @@ class ModelRegistry {
     // Projets
     register<Projet>(
       fromJson: Projet.fromJson,
-      mock: () => ProjetMock.mock(),
+      mock: ProjetMock.mock,
       repoConfig: const RepositoryConfig(
         collectionPath: 'projets',
         dolibarrEndpoint: 'projects',
@@ -210,34 +210,4 @@ extension ModelRegistryExtension on Type {
   bool get isRegistered => ModelRegistry.isRegistered();
 }
 
-// ==================== UTILISATION ====================
-
-/*
-// Dans main.dart :
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialiser le registry
-  ModelRegistry.initializeAll();
-
-  runApp(MyApp());
-}
-
-// Dans un provider :
-final chantierRepoProvider = Provider<UnifiedRepository<Chantier>>((ref) {
-  final config = ModelRegistry.getRepoConfig<Chantier>()!;
-  return UnifiedRepository<Chantier>(config, ref);
-});
-
-// Utilisation :
-final repo = ref.read(chantierRepoProvider);
-final chantier = await repo.get('chantier_id');
-await repo.save(chantier.copyWith(nom: 'Nouveau nom'));
-await repo.syncFromDolibarr(); // Import Dolibarr
-
-// Créer un mock pour les tests :
-final mockChantier = ModelRegistry.createMock<Chantier>()!;
-
-// Parser JSON dynamique :
-final parsed = ModelRegistry.fromJson<Chantier>(jsonData);
-*/
+// ==================== UTILISATION ====================\n

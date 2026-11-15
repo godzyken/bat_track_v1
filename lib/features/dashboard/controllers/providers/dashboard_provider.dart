@@ -46,7 +46,7 @@ final dashboardProvider = FutureProvider<DashboardData>((ref) async {
             .toList();
 
         interventionsFiltered = allInterventions
-            .where((i) => i.technicienId.contains(user.id))
+            .where((i) => i.technicienIds.contains(user.id))
             .toList();
 
         // Projets liés aux chantiers du technicien
@@ -75,7 +75,7 @@ final dashboardProvider = FutureProvider<DashboardData>((ref) async {
             .toList();
         break;
       case UserRole.chefDeProjet:
-        // Le client voit ses projets et chantiers associés
+        // Le chef de projet voit ses projets et chantiers associés
         projetsFiltered = allProjets
             .where((p) => p.ownerId.contains(user.id))
             .toList();

@@ -33,11 +33,12 @@ class EtapeTimeline extends ConsumerWidget {
         connectionDirection: ConnectionDirection.before,
         contentsBuilder: (_, index) {
           final current = etapes[index];
+          final debutStr = current.dateDebut != null
+              ? current.dateDebut!.toLocal().toString().split(' ').first
+              : '—';
           return ListTile(
             title: Text(current.titre),
-            subtitle: Text(
-              'Début : ${current.dateDebut.toLocal().toString().split(' ').first}',
-            ),
+            subtitle: Text('Début : $debutStr'),
             tileColor: current.id == etape.id
                 ? Colors.blue.withAlpha(25)
                 : Colors.transparent,

@@ -37,7 +37,7 @@ class MaterielEntity extends HiveObject implements HiveModel<Materiel> {
       matId: model.id,
       nom: model.nom,
       prixUnitaire: model.prixUnitaire,
-      quantiteFixe: model.quantiteFixe,
+      quantiteFixe: model.quantiteFixe ? 1.0 : 0.0,
       prixLocation: model.prixLocation,
       joursLocation: model.joursLocation,
       matUpdatedAt: model.updatedAt,
@@ -52,9 +52,9 @@ class MaterielEntity extends HiveObject implements HiveModel<Materiel> {
     id: id,
     nom: nom,
     prixUnitaire: prixUnitaire,
-    quantiteFixe: quantiteFixe,
-    prixLocation: prixLocation,
-    joursLocation: joursLocation,
+    quantiteFixe: quantiteFixe > 0,
+    prixLocation: prixLocation ?? 0.0,
+    joursLocation: joursLocation ?? 0.0,
     updatedAt: updatedAt,
   );
 

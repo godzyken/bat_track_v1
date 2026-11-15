@@ -59,8 +59,8 @@ class ChantierEtapeListPreview extends ConsumerWidget {
                       children: [
                         Text(etape.description),
                         Text(
-                          'Du ${etape.dateDebut.toLocal().toString().split(' ').first} '
-                          'au ${etape.dateFin.toLocal().toString().split(' ').first}',
+                          'Du ${etape.dateDebut?.toLocal().toString().split(' ').first ?? 'N/A'} '
+                          'au ${etape.dateFin?.toLocal().toString().split(' ').first ?? 'N/A'}',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey[600],

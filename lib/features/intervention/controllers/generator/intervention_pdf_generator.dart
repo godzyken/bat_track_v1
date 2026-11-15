@@ -1,4 +1,4 @@
-import '../../../../data/local/models/chantiers/intervention.dart';
+import 'package:shared_models/shared_models.dart';
 import '../../../documents/controllers/generator/facture_pdf_generator.dart';
 import '../../../documents/controllers/generator/pdf_generator_interface.dart';
 

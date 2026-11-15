@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_models/core/models/unified_model.dart';
 
 import '../../data/local/models/index_model_extention.dart';
 
@@ -109,7 +108,9 @@ extension JsonModelDisplay on UnifiedModel {
     } else if (value is ChantierEtape) {
       return value.description;
     } else if (value is PieceJointe) {
-      return '${value.type.toUpperCase()}: ${value.url}';
+      // type est nullable (String?) dans shared_models v2
+      final typeStr = (value.type ?? '').toUpperCase();
+      return '$typeStr: ${value.url}';
     } else if (value is Map<String, dynamic>) {
       // Si c'est un document sous forme brute JSON
       if (value['type'] != null && value['filename'] != null) {

@@ -27,7 +27,8 @@ class ChantierDetailScreen extends ConsumerWidget {
 
   bool chantierModifiable(Chantier chantier) {
     final now = DateTime.now();
-    return chantier.dateFin!.isAfter(now) &&
+    return chantier.dateFin != null &&
+        chantier.dateFin!.isAfter(now) &&
         ['à faire', 'en cours'].contains(chantier.etat?.toLowerCase());
   }
 
@@ -35,8 +36,8 @@ class ChantierDetailScreen extends ConsumerWidget {
     final now = DateTime.now();
     if (isClient) return chantierModifiable(chantier);
     if (isTechnicien) {
-      return etape.techniciens!.contains(userId) &&
-          (etape.dateFin.isAfter(now));
+      return (etape.techniciens?.contains(userId) ?? false) &&
+          (etape.dateFin?.isAfter(now) ?? false);
     }
     return true; // admin ou autre
   }

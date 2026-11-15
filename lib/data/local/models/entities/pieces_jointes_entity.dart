@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:bat_track_v1/data/local/models/documents/pieces_jointes.dart';
 import 'package:bat_track_v1/models/data/hive_model.dart';
 import 'package:hive_ce/hive.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../base/has_files.dart';
 
@@ -52,10 +52,10 @@ class PieceJointeEntity extends HiveObject
       url: model.url,
       typeMime: model.typeMime,
       createdAt: model.createdAt,
-      type: model.type,
+      type: model.type ?? 'autre',
       parentType: model.parentType,
       parentId: model.parentId,
-      taille: model.taille,
+      taille: model.taille ?? 0.0,
       pjUpdatedAt: model.updatedAt,
     );
   }
@@ -71,7 +71,7 @@ class PieceJointeEntity extends HiveObject
     url: url!,
     typeMime: typeMime!,
     createdAt: createdAt,
-    type: type!,
+    type: type,
     parentType: parentType!,
     parentId: parentId!,
     taille: taille,

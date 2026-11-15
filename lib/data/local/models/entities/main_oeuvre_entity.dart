@@ -1,7 +1,7 @@
 import 'package:hive_ce/hive.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../../../models/data/hive_model.dart';
-import '../chantiers/main_oeuvre.dart';
 
 part 'main_oeuvre_entity.g.dart';
 
@@ -45,8 +45,8 @@ class MainOeuvreEntity extends HiveObject implements HiveModel<MainOeuvre> {
       idTechnicien: model.idTechnicien,
       heuresEstimees: model.heuresEstimees,
       moUpdatedAt: model.updatedAt,
-      dateCreate: model.dateDebut,
-      isActive: model.isActive,
+      dateCreate: DateTime.now(),
+      isActive: true,
     );
   }
 
@@ -60,10 +60,7 @@ class MainOeuvreEntity extends HiveObject implements HiveModel<MainOeuvre> {
     chantierId: chantierId,
     idTechnicien: idTechnicien,
     heuresEstimees: heuresEstimees,
-    dateDebut: dateCreate,
-    passedTime: moUpdatedAt,
     updatedAt: updatedAt,
-    isActive: true,
   );
 
   @override

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../data/local/models/chantiers/chantier.dart';
+import 'package:shared_models/shared_models.dart';
 import '../notifiers/chantier_notifier.dart';
 
 final chantierNotifierProvider =

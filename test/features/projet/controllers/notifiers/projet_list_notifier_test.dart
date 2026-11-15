@@ -1,7 +1,7 @@
-import 'package:bat_track_v1/data/local/models/projets/projet.dart';
 import 'package:bat_track_v1/features/projet/controllers/notifiers/projet_list_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_models/shared_models.dart';
 
 void main() {
   test('adding a project updates state', () async {
@@ -16,6 +16,7 @@ void main() {
 
     final projet = Projet(
       id: '1',
+      clientId: 'client_1',
       nom: 'Projet Test',
       currentUserId: 'Peopole',
       localDraft: const {},
