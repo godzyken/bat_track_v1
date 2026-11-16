@@ -54,3 +54,5 @@ app.*.map.json
 # FVM Version Cache
 .fvm/
 sentry.properties
+/shared_models_ci
+/shared_models_ci.pub

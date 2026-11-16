@@ -82,8 +82,14 @@ jobs:
       - name: Format shared_models
         run: dart format packages/shared_models
 
+      - name: Install shared_models dependencies
+        run: |
+          cd packages/shared_models
+          flutter pub get
+          cd ../..
+
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get -v
 
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib/ test/
