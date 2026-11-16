@@ -54,15 +54,19 @@ abstract class UnifiedEntityService<
   // INITIALISATION
   // ═══════════════════════════════════════════════════════════════
 
-  Future<void> _ensureInitialized() async {
-    if (_isInitialized) return;
+  Future<void>? _initFuture;
 
+  Future<void> _ensureInitialized() {
+    return _initFuture ??= _doInit();
+  }
+
+  Future<void> _doInit() async {
+    if (_isInitialized) return;
     if (!Hive.isBoxOpen(collectionName)) {
       _localBox = await Hive.openBox<E>(collectionName);
     } else {
       _localBox = Hive.box<E>(collectionName);
     }
-
     _isInitialized = true;
   }
 

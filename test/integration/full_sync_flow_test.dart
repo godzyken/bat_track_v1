@@ -1,8 +1,10 @@
-import 'package:bat_track_v1/data/local/providers/hive_provider.dart';
+import 'package:bat_track_v1/core/providers/entity_providers.dart';
+import 'package:bat_track_v1/data/local/models/adapters/hive_entity_factory.dart';
+import 'package:bat_track_v1/data/local/models/entities/projet_entity.dart';
 import 'package:bat_track_v1/data/remote/providers/multi_backend_remote_provider.dart';
-import 'package:bat_track_v1/features/projet/controllers/providers/projet_list_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../helpers/hive_test_setup.dart';
@@ -16,10 +18,27 @@ void main() {
 
     setUpAll(() async {
       await HiveTestSetup.setupHive();
+      if (!Hive.isAdapterRegistered(1)) {
+        Hive.registerAdapter(ProjetEntityAdapter());
+      }
+      EntityFactoryRegistry.init();
     });
 
-    setUp(() {
+    setUp(() async {
+      await HiveTestSetup.setupHive();
+      EntityFactoryRegistry.init();
+
       mockRemoteStorage = MockServiceBuilder.createMockRemoteService();
+      when(() => mockRemoteStorage.isConnected).thenReturn(true);
+      when(
+        () => mockRemoteStorage.watchCollectionRaw(any()),
+      ).thenAnswer((_) => Stream.value([]));
+      when(
+        () => mockRemoteStorage.saveRaw(any(), any(), any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockRemoteStorage.getAllRaw(any()),
+      ).thenAnswer((_) async => []);
 
       container = ProviderContainer(
         overrides: [
@@ -28,8 +47,13 @@ void main() {
       );
     });
 
-    tearDown(() {
+    tearDown(() async {
       container.dispose();
+      try {
+        if (Hive.isBoxOpen('projets')) {
+          await Hive.box<ProjetEntity>('projets').clear();
+        }
+      } catch (_) {}
     });
 
     tearDownAll(() async {
@@ -45,21 +69,17 @@ void main() {
           (_) async => remoteProjets.map((p) => p.toJson()).toList(),
         );
 
+        container.listen(projetListProvider, (_, __) {});
+
         // Act - Déclencher la synchronisation via le service
         final projetService = container.read(projetServiceProvider);
-        await projetService.syncFromRemote();
+        await projetService.syncAllFromRemote();
+
+        await Future<void>.delayed(const Duration(milliseconds: 50));
 
         // Assert - Vérifier que les données sont disponibles via le provider
-        final projectListAsync = container.read(projectListProvider);
-
-        await expectLater(
-          projectListAsync.when(
-            data: (data) => data.length,
-            loading: () => 0,
-            error: (_, _) => -1,
-          ),
-          equals(5),
-        );
+        final projectListAsync = container.read(projetListProvider);
+        expect(projectListAsync.value?.length, equals(5));
       },
     );
 
@@ -70,25 +90,21 @@ void main() {
         () => mockRemoteStorage.getAllRaw(any()),
       ).thenThrow(Exception('No internet connection'));
 
+      container.listen(projetListProvider, (_, __) {});
+
       // Créer des données locales
       final localProjets = MockDataFactories.createProjetList(2);
       final projetService = container.read(projetServiceProvider);
 
       for (final projet in localProjets) {
-        await projetService.sync(projet);
+        await projetService.save(projet);
       }
 
-      // Act & Assert - Le provider doit retourner les données locales
-      final projectListAsync = container.read(projectListProvider);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
 
-      await expectLater(
-        projectListAsync.when(
-          data: (data) => data.length,
-          loading: () => 0,
-          error: (_, _) => -1,
-        ),
-        equals(2),
-      );
+      // Act & Assert - Le provider doit retourner les données locales
+      final projectListAsync = container.read(projetListProvider);
+      expect(projectListAsync.value?.length, equals(2));
     });
 
     test('should resolve conflicts during bidirectional sync', () async {
@@ -99,21 +115,15 @@ void main() {
         nom: 'Version Locale',
       ).copyWith(updatedAt: now);
 
-      final remoteProjet =
-          MockDataFactories.createProjet(
-            id: 'conflict_1',
-            nom: 'Version Remote',
-          ).copyWith(
-            updatedAt: now.add(const Duration(minutes: 10)),
-          ); // Plus récent
+      final remoteProjet = MockDataFactories.createProjet(
+        id: 'conflict_1',
+        nom: 'Version Remote',
+      ).copyWith(updatedAt: now.add(const Duration(minutes: 10)));
 
       // Setup mocks
       when(
         () => mockRemoteStorage.getAllRaw('projets'),
       ).thenAnswer((_) async => [remoteProjet.toJson()]);
-      when(
-        () => mockRemoteStorage.saveRaw('projets', any(), any()),
-      ).thenAnswer((_) async {});
 
       // Créer la version locale
       final projetService = container.read(projetServiceProvider);
@@ -123,8 +133,8 @@ void main() {
       await projetService.syncAllFromRemote();
 
       // Assert - La version remote (plus récente) doit être conservée
-      final finalProjet = projetService.watch('conflict_1');
-      expect(finalProjet.first, equals('Version Remote'));
+      final finalProjet = await projetService.get('conflict_1');
+      expect(finalProjet?.nom, equals('Version Remote'));
     });
   });
 }

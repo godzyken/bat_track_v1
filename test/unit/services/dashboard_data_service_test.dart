@@ -1,5 +1,5 @@
-import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:bat_track_v1/data/local/models/entities/index_entity_extention.dart';
+import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:bat_track_v1/models/services/dashboard_data_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -38,6 +38,9 @@ void main() {
     test('watchProjects should return a stream from service', () {
       when(
         () => mockProjetService.watchByOwner(any()),
+      ).thenAnswer((_) => Stream.value([]));
+      when(
+        () => mockProjetService.watchByTechnicien(any()),
       ).thenAnswer((_) => Stream.value([]));
 
       final stream = dashboardService.watchProjects();

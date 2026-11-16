@@ -36,7 +36,7 @@ mixin LoggedAction {
 
     logger.log(message);
 
-    debugPrint('LOGGED ACTION: ${jsonEncode(message)}');
+    debugPrint('LOGGED ACTION: ${message.formatted}');
 
     if (captureToSentry) {
       Sentry.captureEvent(

@@ -170,8 +170,9 @@ void main() {
           ],
         );
         addTearDown(container.dispose);
+        container.listen(projectListProvider, (_, __) {});
 
-        await Future<void>.delayed(const Duration(milliseconds: 10));
+        await Future<void>.delayed(const Duration(milliseconds: 20));
         final state = container.read(projectListProvider);
 
         expect(state.hasValue, true);

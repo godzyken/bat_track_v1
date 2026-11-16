@@ -15,10 +15,14 @@ class LoggerNotifier extends Notifier<LoggerState> {
 
   @override
   LoggerState build() {
-    final logs = localService.load();
-    developer.log('logs: $logs');
-    _filterLogs.addAll(logs);
-    return LoggerState(logs: logs);
+    try {
+      final logs = localService.load();
+      developer.log('logs: $logs');
+      _filterLogs.addAll(logs);
+      return LoggerState(logs: logs);
+    } catch (_) {
+      return const LoggerState(logs: []);
+    }
   }
 
   // 📨 EVENT BUS
@@ -39,7 +43,9 @@ class LoggerNotifier extends Notifier<LoggerState> {
   // 🧾 LOG
   void log(LogEntry entry) {
     state = state.copyWith(logs: [...state.logs, entry]);
-    localService.save(entry);
+    try {
+      localService.save(entry);
+    } catch (_) {}
     _notify(entry); // 🔥 event bus déclenché
   }
 

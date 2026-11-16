@@ -2,7 +2,7 @@ import 'package:hive_ce/hive.dart';
 
 part 'log_entry_hive.g.dart';
 
-@HiveType(typeId: 1)
+@HiveType(typeId: 20)
 class LogEntryHive extends HiveObject {
   @HiveField(0)
   String action;
