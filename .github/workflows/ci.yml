@@ -61,9 +61,11 @@ jobs:
             git@github.com:godzyken/shared_models.git \
             packages/shared_models
 
-          if [ -f pubspec_overrides.yaml ]; then
-            sed -i 's|\.\.[/\\]shared_models|packages/shared_models|g' pubspec_overrides.yaml
-          fi
+          for file in pubspec.yaml pubspec_overrides.yaml; do
+            if [ -f "$file" ]; then
+              sed -i 's|\.\.[/\\]shared_models|packages/shared_models|g' "$file"
+            fi
+          done
 
           echo "shared_models installed successfully"
 
