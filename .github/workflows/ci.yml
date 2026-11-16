@@ -99,6 +99,7 @@ jobs:
           echo "import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;" > lib/firebase_options.dart
           echo "import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;" >> lib/firebase_options.dart
           echo "class DefaultFirebaseOptions { static FirebaseOptions get currentPlatform => const FirebaseOptions(apiKey: 'dummy', appId: 'dummy', messagingSenderId: 'dummy', projectId: 'dummy'); }" >> lib/firebase_options.dart
+          dart format lib/firebase_options.dart
           mkdir -p android/app
           echo '{"project_info": {"project_number": "123", "project_id": "dummy"}, "client": [{"client_info": {"mobilesdk_app_id": "123", "android_client_info": {"package_name": "com.godzy.bat_track_v1"}}}]}' > android/app/google-services.json
 
