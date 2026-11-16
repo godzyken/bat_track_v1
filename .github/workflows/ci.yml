@@ -96,6 +96,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get -v
 
+      - name: Build runner
+        run: dart run build_runner build --delete-conflicting-outputs
+
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib/ test/
 
