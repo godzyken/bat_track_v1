@@ -1,9 +1,9 @@
 import 'dart:developer' as developer;
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:bat_track_v1/data/remote/services/base_storage_service.dart';
 import 'package:bat_track_v1/models/data/adapter/no_such_methode_logger.dart';
-import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 

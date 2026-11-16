@@ -251,15 +251,10 @@ class ChantierDetailScreen extends ConsumerWidget {
 
   /// Calcule le budget total toutes catégories confondues
   Map<String, double> computeTotalBudget(List<ChantierEtape> etapes) {
-    return etapes
-        .map<Map<String, double>>(
-          (e) => (e.budget ?? {}) as Map<String, double>,
-        )
-        .fold<Map<String, double>>({}, (acc, map) {
-          map.forEach((key, value) {
-            acc.update(key, (v) => v + value, ifAbsent: () => value);
-          });
-          return acc;
-        });
+    final Map<String, double> result = {};
+    for (final e in etapes) {
+      result.update(e.titre, (v) => v + e.budget, ifAbsent: () => e.budget);
+    }
+    return result;
   }
 }

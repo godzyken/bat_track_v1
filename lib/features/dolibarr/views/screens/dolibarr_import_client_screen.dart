@@ -1,4 +1,3 @@
-import 'package:bat_track_v1/data/remote/notifiers/auto_sync_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,10 +22,7 @@ class _DolibarrImportScreenState extends ConsumerState<DolibarrImportScreen> {
       _log = 'Démarrage de l’importation...';
     });
 
-    final importer = DolibarrImporter(
-      ref.read(dolibarrApiProvider),
-      ref.refresh(autoSyncProvider.notifier).ref,
-    );
+    final importer = DolibarrImporter(ref.read(dolibarrApiProvider), ref.read);
 
     try {
       await importer.api.fetch('/explorer');

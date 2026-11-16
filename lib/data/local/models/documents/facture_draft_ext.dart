@@ -1,5 +1,4 @@
 import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
-import 'package:shared_models/shared_models.dart';
 import 'package:uuid/uuid.dart';
 
 extension FactureDraftBuilder on FactureDraft {
@@ -43,10 +42,10 @@ extension FactureDraftBuilder on FactureDraft {
         CustomLigneFacture(
           ctlId: const Uuid().v4(),
           description:
-              'Intervention : ${intervention.titre ?? intervention.description}',
+              'Intervention : ${intervention.titre.isNotEmpty ? intervention.titre : (intervention.description ?? '')}',
           montant: montant?.totalHT ?? 0,
           quantite: 1,
-          total: montant?.totalTTC ?? 0,
+          total: montant == null ? 0 : montant.totalTTC,
           ctlUpdatedAt: DateTime.now(),
         ),
       );

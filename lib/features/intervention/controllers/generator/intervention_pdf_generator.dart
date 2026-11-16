@@ -1,4 +1,5 @@
 import 'package:shared_models/shared_models.dart';
+
 import '../../../documents/controllers/generator/facture_pdf_generator.dart';
 import '../../../documents/controllers/generator/pdf_generator_interface.dart';
 
@@ -13,10 +14,9 @@ class InterventionPdfGenerator implements PdfGenerator<Intervention> {
 
   @override
   String getFileName(Intervention intervention) {
-    final sanitized = (intervention.titre ?? 'intervention').replaceAll(
-      RegExp(r'[^\w\s-]'),
-      '_',
-    );
+    final sanitized =
+        (intervention.titre.isNotEmpty ? intervention.titre : 'intervention')
+            .replaceAll(RegExp(r'[^\w\s-]'), '_');
     final suffix = intervention.facture?.isFinalized == true
         ? 'final'
         : 'brouillon';

@@ -1,10 +1,9 @@
-import 'package:shared_models/shared_models.dart';
 import 'package:bat_track_v1/data/local/models/entities/projet_entity.dart';
 import 'package:bat_track_v1/data/local/providers/hive_provider.dart';
-import 'package:bat_track_v1/models/data/hive_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_models/shared_models.dart';
 
 import '../../mocks/mock_data_factories.dart';
 import '../../mocks/mock_services.dart';
@@ -24,15 +23,18 @@ void main() {
       ).thenAnswer((_) => Stream.value(testProjets));
     });
 
-    test('projectListProvider should emit list of projets', () async {
+    test('allProjectsProvider returns list of projets', () async {
       final container = ProviderContainer(
         overrides: [projetServiceProvider.overrideWith((ref) => mockService)],
       );
       addTearDown(container.dispose);
+      container.listen(allProjectsProvider, (_, __) {});
 
-      // Note: projectListProvider implementation in your code uses firestoreProvider
-      // directly, which might need separate mocking if you want to test that specific provider.
-      // If projectListProvider was defined to use projetServiceProvider, this override would work.
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      final state = container.read(allProjectsProvider);
+
+      expect(state.hasValue, true);
+      expect(state.value, testProjets);
     });
   });
 }

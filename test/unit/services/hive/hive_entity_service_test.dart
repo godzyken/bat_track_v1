@@ -9,14 +9,13 @@ import '../../../mocks/mock_data_factories.dart';
 void main() {
   group('HiveEntityService<Projet>', () {
     late HiveEntityService<Projet> service;
-    late Box<dynamic> testBox;
 
     setUpAll(() async {
       await HiveTestSetup.setupHive();
     });
 
     setUp(() async {
-      testBox = await HiveTestSetup.openTestBox<dynamic>('test_projets');
+      await HiveTestSetup.openTestBox<dynamic>('test_projets');
       service = HiveEntityService<Projet>(
         boxName: 'test_projets',
         fromJson: (json) => Projet.fromJson(json),
@@ -109,7 +108,7 @@ void main() {
 
         final future = expectLater(
           service.watchAll(),
-          emitsThrough(predicate<List<Projet>>((list) => list.length >= 1)),
+          emitsThrough(predicate<List<Projet>>((list) => list.isNotEmpty)),
         );
 
         await service.create(projet1);

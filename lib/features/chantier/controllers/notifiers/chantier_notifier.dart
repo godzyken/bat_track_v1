@@ -256,7 +256,7 @@ class ChantierNotifier extends BaseEntityNotifier<Chantier> {
         signature: Uint8List(0),
         isFinalized: false,
         remise: chantier.remiseParDefaut ?? 0,
-        tauxTVA: chantier.tauxTVAParDefaut ?? 1.20,
+        tauxTVA: chantier.tauxTVAParDefaut,
         dateDerniereModification: DateTime.now(),
       ),
     );

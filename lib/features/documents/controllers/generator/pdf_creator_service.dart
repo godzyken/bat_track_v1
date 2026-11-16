@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hive_ce/hive.dart';
-import 'package:shared_models/shared_models.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../data/local/models/index_model_extention.dart';
@@ -55,7 +54,9 @@ class PdfCreatorService {
 
     final fileName = _buildFileName(
       prefix: 'facture_intervention',
-      label: intervention.titre ?? 'intervention',
+      label: intervention.titre.isNotEmpty
+          ? intervention.titre
+          : 'intervention',
       isFinal: intervention.facture?.isFinalized ?? false,
     );
 

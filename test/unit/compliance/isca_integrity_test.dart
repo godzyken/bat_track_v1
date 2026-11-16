@@ -1,5 +1,4 @@
 import 'package:bat_track_v1/core/compliance/iscal_audit_service.dart';
-import 'package:bat_track_v1/data/local/models/index_model_extention.dart';
 import 'package:bat_track_v1/models/services/remote/remote_storage_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -29,6 +28,7 @@ void main() {
               'f63e620573e8e19e798e9b6a9829b3a41906b4a8a25ccd5190ea58996931d2b9', // Dummy hash for example
         },
       ];
+      expect(logs, isNotEmpty);
       // Note: In real test, recalculate correct hash to match SHA-256 logic of service
 
       // We skip actual hash computation here to simplify, but in a real ISCA test we'd match the algo.
@@ -39,7 +39,6 @@ void main() {
       // Arrange
       final date = DateTime(2026, 8, 13);
       final companyId = 'TEST_CO';
-      final dayKey = '2026-08-13';
 
       when(
         () => mockStorage.watchCollectionRaw(

@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_models/shared_models.dart';
 
 import '../../core/services/unified_entity_service.dart';
-import '../../data/local/services/service_type.dart';
 import '../data/hive_model.dart';
 import '../data/maperror/logged_action.dart';
 

@@ -4,8 +4,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shared_models/shared_models.dart';
 import 'package:uuid/uuid.dart';
 
-import '../extensions/budget_extentions.dart';
-
 part 'facture_draft.freezed.dart';
 part 'facture_draft.g.dart';
 

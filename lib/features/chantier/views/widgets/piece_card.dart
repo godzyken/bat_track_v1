@@ -93,8 +93,8 @@ class PieceCard extends ConsumerWidget {
                   (m) => _buildBullet(
                     const Icon(Icons.paid_outlined, semanticLabel: ''),
                     '${m.nom} - ${m.prixUnitaire} €/ ${m.unite}'
-                    '${m.coefficientSurface != null ? ', coef: ${m.coefficientSurface}' : ''}'
-                    '${m.quantiteFixe != null ? ', fixe: ${m.quantiteFixe}' : ''}',
+                    '${m.coefficientSurface != 1.0 ? ', coef: ${m.coefficientSurface}' : ''}'
+                    '${m.quantiteFixe ? ', fixe' : ''}',
                   ),
                 ),
 
@@ -104,8 +104,8 @@ class PieceCard extends ConsumerWidget {
                 ...piece.materiels!.map(
                   (m) => _buildBullet(
                     const Icon(Icons.paid_sharp),
-                    '${m.nom} - ${m.prixUnitaire} € x ${m.quantiteFixe}'
-                    '${m.joursLocation != null ? ', ${m.joursLocation}j loc. à ${m.prixLocation} €' : ''}',
+                    '${m.nom} - ${m.prixUnitaire} € x ${m.quantite}'
+                    '${m.joursLocation > 0 ? ', ${m.joursLocation}j loc. à ${m.prixLocation} €' : ''}',
                   ),
                 ),
 

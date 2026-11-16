@@ -10,7 +10,7 @@ import '../../providers/synchrones/facture_sync_provider.dart';
 
 class DolibarrImporter {
   final DolibarrApiService api;
-  final Ref ref;
+  final dynamic ref;
 
   DolibarrImporter(this.api, this.ref);
 
@@ -22,8 +22,8 @@ class DolibarrImporter {
     bool importInvoices = true,
     bool importIntervenants = true,
   }) async {
-    final log = ref.read(errorLoggerProvider);
-    final user = ref.read(currentUserProvider);
+    final log = ref(errorLoggerProvider);
+    final user = ref(currentUserProvider) as AsyncValue<AppUser?>;
     final Map<String, int> summary = {};
 
     Future<void> safeImport(
@@ -94,7 +94,7 @@ class DolibarrImporter {
   Future<int> _importClients() async {
     final list = await api.fetchClients();
     final items = list.map((e) => Client.fromJson(e)).toList();
-    final service = ref.read(clientSyncServiceProvider);
+    final service = ref(clientSyncServiceProvider);
     for (final item in items) {
       await service.save(item);
     }
@@ -105,7 +105,7 @@ class DolibarrImporter {
   Future<int> _importProducts() async {
     final list = await api.fetchProducts();
     final items = list.map((e) => Materiau.fromJson(e)).toList();
-    final service = ref.read(materiauSyncServiceProvider);
+    final service = ref(materiauSyncServiceProvider);
     for (final item in items) {
       await service.save(item);
     }
@@ -116,7 +116,7 @@ class DolibarrImporter {
   Future<int> _importChantiers() async {
     final list = await api.fetch('chantiers');
     final items = list.map((e) => Chantier.fromJson(e)).toList();
-    final service = ref.read(chantierSyncServiceProvider);
+    final service = ref(chantierSyncServiceProvider);
     for (final item in items) {
       await service.save(item);
     }
@@ -127,7 +127,7 @@ class DolibarrImporter {
   Future<int> _importProjects() async {
     final list = await api.fetchProjects();
     final items = list.map((e) => Projet.fromJson(e)).toList();
-    final service = ref.read(projetSyncServiceProvider);
+    final service = ref(projetSyncServiceProvider);
     for (final item in items) {
       await service.save(item);
     }
@@ -138,7 +138,7 @@ class DolibarrImporter {
   Future<int> _importInvoices() async {
     final list = await api.fetchInvoices();
     final items = list.map((e) => Facture.fromJson(e)).toList();
-    final service = ref.read(factureSyncServiceProvider);
+    final service = ref(factureSyncServiceProvider);
     for (final item in items) {
       await service.save(item);
     }
@@ -149,7 +149,7 @@ class DolibarrImporter {
   Future<int> _importIntervenants() async {
     final list = await api.fetchIntervenants();
     final items = list.map((e) => Technicien.fromJson(e)).toList();
-    final service = ref.read(techSyncServiceProvider);
+    final service = ref(techSyncServiceProvider);
     for (final item in items) {
       await service.save(item);
     }

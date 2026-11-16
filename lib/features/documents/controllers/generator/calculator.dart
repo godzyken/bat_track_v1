@@ -69,16 +69,14 @@ class BudgetGen {
     return materiaux.fold(0.0, (sum, m) {
       // quantiteFixe est bool dans shared_models v2 :
       // true = quantité fixe unitaire (1.0), false = basée sur surface * coefficient
-      final quantite = m.quantiteFixe
-          ? 1.0
-          : (m.coefficientSurface ?? 0.0) * surface;
+      final quantite = m.quantiteFixe ? 1.0 : m.coefficientSurface * surface;
       return sum + (quantite * m.prixUnitaire);
     });
   }
 
   static double calculerCoutMateriels(List<Materiel> materiels) {
     return materiels.fold(0.0, (sum, m) {
-      final joursLoc = m.joursLocation ?? 0;
+      final joursLoc = m.joursLocation;
       if (joursLoc == 0) {
         // quantiteFixe bool → si true, 1 unité, sinon 0
         final qty = m.quantiteFixe ? 1.0 : 0.0;
@@ -91,7 +89,7 @@ class BudgetGen {
   static double calculerCoutLocationMateriels(List<Materiel> materiels) {
     return materiels.fold(
       0.0,
-      (sum, m) => sum + ((m.prixLocation ?? 0.0) * (m.joursLocation ?? 0)),
+      (sum, m) => sum + (m.prixLocation * m.joursLocation),
     );
   }
 

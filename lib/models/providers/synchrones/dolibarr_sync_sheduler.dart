@@ -51,7 +51,7 @@ class DolibarrSyncScheduler {
 
       final importer = DolibarrImporter(
         DolibarrApiService(baseUrl: instance.baseUrl, token: instance.apiKey),
-        ref,
+        ref.read,
       );
 
       logger.logInfo('⏳ Synchro automatique Dolibarr lancée...');
