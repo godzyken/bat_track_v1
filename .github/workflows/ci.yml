@@ -63,6 +63,7 @@ jobs:
 
           for file in pubspec.yaml pubspec_overrides.yaml; do
             if [ -f "$file" ]; then
+              tr -d '\r' < "$file" > "$file.tmp" && mv "$file.tmp" "$file"
               sed -i 's|\.\.[/\\]shared_models|packages/shared_models|g' "$file"
             fi
           done
