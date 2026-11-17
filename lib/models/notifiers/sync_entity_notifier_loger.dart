@@ -46,7 +46,7 @@ class SyncEntityNotifierLogger<T extends UnifiedModel>
   }
 
   @override
-  noSuchMethod(Invocation invocation) {
+  dynamic noSuchMethod(Invocation invocation) {
     final methodName = invocation.memberName.toString();
     _log(methodName, invocation.positionalArguments);
     final result = Function.apply(_inner.noSuchMethod, [invocation]);

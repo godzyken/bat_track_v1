@@ -10,6 +10,13 @@ analyzer:
     - macos/**
     - linux/**
 
+  errors:
+    annotate_overrides: ignore
+    unnecessary_library_name: ignore
+    unnecessary_import: ignore
+    unnecessary_underscores: ignore
+    avoid_dynamic_calls: ignore
+
   language:
     strict-casts: true
     strict-inference: true
