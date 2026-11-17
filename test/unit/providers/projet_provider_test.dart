@@ -28,7 +28,7 @@ void main() {
         overrides: [projetServiceProvider.overrideWith((ref) => mockService)],
       );
       addTearDown(container.dispose);
-      container.listen(allProjectsProvider, (_, __) {});
+      container.listen(allProjectsProvider, (_, _) {});
 
       await Future<void>.delayed(const Duration(milliseconds: 20));
       final state = container.read(allProjectsProvider);

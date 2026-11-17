@@ -46,7 +46,7 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
-    container.listen(projetListProvider, (_, __) {});
+    container.listen(projetListProvider, (_, _) {});
 
     final notifier = container.read(projetListProvider.notifier);
     await notifier.addProject(projet);

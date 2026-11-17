@@ -69,7 +69,7 @@ void main() {
           (_) async => remoteProjets.map((p) => p.toJson()).toList(),
         );
 
-        container.listen(projetListProvider, (_, __) {});
+        container.listen(projetListProvider, (_, _) {});
 
         // Act - Déclencher la synchronisation via le service
         final projetService = container.read(projetServiceProvider);
