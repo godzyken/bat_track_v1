@@ -27,3 +27,10 @@
 - **Context:** Le package `shared_models` a évolué (refactoring de `Equipement`, `Intervention`, `MainOeuvre`, `Materiau`, `Materiel`, `Piece`, `Projet`) sans mise à jour correspondante des entités Hive CE dans `bat_track_v1`. Résultat : 30+ erreurs de compilation.
 - **Decision:** Alignement manuel des 13 entités Hive (`*_entity.dart`) sur les nouveaux champs des modèles domain. Aucune régression de fonctionnalité — seule la couche de mapping Hive↔Domain est modifiée. Les champs supprimés du modèle domain (ex: `technicienId`, `localisation`, `homologation`) sont remplacés par leurs équivalents (`technicienIds`, nouveaux champs `Equipement`).
 - **Consequence:** Les entités Hive restent rétro-compatibles avec les données stockées localement grâce aux valeurs par défaut (`?? ''`, `?? []`, `?? 0.0`). Toute future évolution de `shared_models` devra être accompagnée d'une mise à jour synchrone des entités.
+
+## ADR 005: Signature d'APK Release et Pipeline CI/CD GitHub Actions
+- **Date:** 2026-03-02
+- **Status:** Accepted
+- **Context:** Nécessité d'automatiser la construction et la signature des builds de production (APK release) de manière sécurisée via GitHub Actions, sans exposer les clés de signature dans le dépôt Git.
+- **Decision:** Configuration des `signingConfigs` dans Gradle (`android/app/build.gradle.kts`) dynamiquement basées sur des variables d'environnement (`KEYSTORE_PATH`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`). Création d'un workflow GitHub Actions (`.github/workflows/build_and_release_apk.yml`) décodant un secret Base64 (`KEYSTORE_BASE64`) à la volée et publiant l'APK sous forme d'artifact.
+- **Consequence:** Les builds locaux non signés continuent d'utiliser la configuration debug, tandis que les builds CI sur la branche `main` sont signés de manière sécurisée en production et archivés automatiquement.

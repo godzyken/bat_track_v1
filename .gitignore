@@ -56,3 +56,8 @@ app.*.map.json
 sentry.properties
 /shared_models_ci
 /shared_models_ci.pub
+
+# Keystores & sensitive properties
+key.properties
+*.jks
+*.keystore
