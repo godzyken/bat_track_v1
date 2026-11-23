@@ -17,10 +17,12 @@ class UpdateService {
     if (!Platform.isAndroid) return;
 
     try {
-      final response = await http.get(
-        Uri.parse(_repoUrl),
-        headers: {'Accept': 'application/vnd.github.v3+json'},
-      ).timeout(const Duration(seconds: 5));
+      final response = await http
+          .get(
+            Uri.parse(_repoUrl),
+            headers: {'Accept': 'application/vnd.github.v3+json'},
+          )
+          .timeout(const Duration(seconds: 5));
 
       if (response.statusCode != 200) return;
 
@@ -45,8 +47,9 @@ class UpdateService {
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version; // ex: "1.1.0"
 
-      final remoteVersion =
-          tagName.startsWith('v') ? tagName.substring(1) : tagName;
+      final remoteVersion = tagName.startsWith('v')
+          ? tagName.substring(1)
+          : tagName;
 
       if (_isNewerVersion(remoteVersion, currentVersion)) {
         if (!context.mounted) return;
@@ -60,10 +63,16 @@ class UpdateService {
 
   bool _isNewerVersion(String remote, String current) {
     try {
-      final remoteParts =
-          remote.split('+')[0].split('.').map(int.parse).toList();
-      final currentParts =
-          current.split('+')[0].split('.').map(int.parse).toList();
+      final remoteParts = remote
+          .split('+')[0]
+          .split('.')
+          .map(int.parse)
+          .toList();
+      final currentParts = current
+          .split('+')[0]
+          .split('.')
+          .map(int.parse)
+          .toList();
 
       for (int i = 0; i < remoteParts.length; i++) {
         final r = i < remoteParts.length ? remoteParts[i] : 0;
@@ -76,14 +85,18 @@ class UpdateService {
   }
 
   void _showUpdateDialog(
-      BuildContext context, String tagName, String downloadUrl) {
+    BuildContext context,
+    String tagName,
+    String downloadUrl,
+  ) {
     showDialog<void>(
       context: context,
       barrierDismissible: true,
       builder: (dialogContext) => AlertDialog(
         title: Text('Mise à jour disponible ($tagName)'),
         content: const Text(
-            'Une nouvelle version de BatTrack est disponible. Souhaitez-vous la télécharger et l\'installer dès maintenant ?'),
+          'Une nouvelle version de BatTrack est disponible. Souhaitez-vous la télécharger et l\'installer dès maintenant ?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
@@ -102,7 +115,9 @@ class UpdateService {
   }
 
   Future<void> _downloadAndInstall(
-      BuildContext context, String downloadUrl) async {
+    BuildContext context,
+    String downloadUrl,
+  ) async {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Téléchargement de la mise à jour...')),
@@ -110,7 +125,8 @@ class UpdateService {
     }
 
     try {
-      final dir = await getExternalStorageDirectory() ??
+      final dir =
+          await getExternalStorageDirectory() ??
           await getApplicationDocumentsDirectory();
       final filePath = '${dir.path}/bat_track_update.apk';
 
@@ -122,8 +138,10 @@ class UpdateService {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text(
-                    'Téléchargement terminé. Lancement de l\'installation...')),
+              content: Text(
+                'Téléchargement terminé. Lancement de l\'installation...',
+              ),
+            ),
           );
         }
 
@@ -131,8 +149,10 @@ class UpdateService {
         if (result.type != ResultType.done && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(
-                    'Impossible d\'ouvrir l\'installateur : ${result.message}')),
+              content: Text(
+                'Impossible d\'ouvrir l\'installateur : ${result.message}',
+              ),
+            ),
           );
         }
       }
