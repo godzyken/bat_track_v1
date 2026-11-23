@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/responsive/wrapper/responsive_layout.dart';
+import '../../../../core/services/update_service.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/home_content.dart';
 import '../widgets/side_menu.dart';
@@ -29,10 +30,11 @@ class HomeScreen extends ConsumerWidget {
     // Accès rapide aux infos responsive
     final info = context.responsiveInfo(ref);
 
-    // Lance la synchronisation au build initial
+    // Lance la synchronisation et la vérification des mises à jour au build initial
     Future.microtask(() {
       if (context.mounted) {
         _syncProviders(context, ref);
+        ref.read(updateServiceProvider).checkForUpdates(context);
       }
     });
 

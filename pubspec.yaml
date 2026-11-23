@@ -71,6 +71,7 @@ dependencies:
   # Réseau / utilitaires
   http: ^1.4.0
   dio: ^5.8.0+1
+  package_info_plus: ^10.2.2
   async: ^2.13.0
   logger: ^2.6.1
   googleapis_auth: ^2.3.3
