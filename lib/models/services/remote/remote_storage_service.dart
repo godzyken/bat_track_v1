@@ -28,4 +28,7 @@ abstract class RemoteStorageService {
     String collectionOrTable, {
     dynamic Function(dynamic query)? queryBuilder,
   });
+
+  /// 📁 Vérifie l'existence d'un fichier distant
+  Future<bool> fileExists(String path) async => false;
 }

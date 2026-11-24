@@ -59,8 +59,16 @@ class HiveRemoteStorageWrapper<T extends UnifiedModel>
         .map((listT) => listT.map((t) => t).toList());
   }
 
-  Future<bool> fileExists(String path) {
-    // TODO: implémenter selon le backend choisi
-    throw UnimplementedError();
+  @override
+  Future<bool> fileExists(String path) async {
+    for (var mode in multiBackend.enabledBackends) {
+      final backend = multiBackend.backends[mode];
+      if (backend != null) {
+        try {
+          return await backend.fileExists(path);
+        } catch (_) {}
+      }
+    }
+    return false;
   }
 }

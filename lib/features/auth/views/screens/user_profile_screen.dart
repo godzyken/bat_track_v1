@@ -117,13 +117,73 @@ class UserProfileScreen extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () {
-                      // TODO: Implémenter l'édition du profil
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Fonctionnalité en développement'),
+                    onPressed: () async {
+                      final nameController = TextEditingController(
+                        text: user.name,
+                      );
+                      final companyController = TextEditingController(
+                        text: user.company,
+                      );
+
+                      final updated = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Modifier le profil'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextField(
+                                controller: nameController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Nom',
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: companyController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Entreprise',
+                                ),
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Annuler'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Enregistrer'),
+                            ),
+                          ],
                         ),
                       );
+
+                      if (updated == true && context.mounted) {
+                        try {
+                          await ref
+                              .read(authRepositoryProvider)
+                              .updateUserProfile(
+                                uid: user.uid,
+                                name: nameController.text.trim(),
+                                company: companyController.text.trim(),
+                              );
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Profil mis à jour avec succès'),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Erreur : $e')),
+                            );
+                          }
+                        }
+                      }
                     },
                     icon: const Icon(Icons.edit_outlined),
                     label: const Text('Modifier mon profil'),

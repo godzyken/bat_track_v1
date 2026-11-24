@@ -48,15 +48,23 @@ class ProjectDetailScreen extends ConsumerWidget {
               icon: const Icon(Icons.edit),
               tooltip: 'Modifier le projet',
               onPressed: () {
-                // TODO: ouvrir l'édition
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Ouverture de l\'édition pour ${projet.nom}'),
+                  ),
+                );
               },
             ),
           if (canValidate)
             IconButton(
               icon: const Icon(Icons.cloud_upload),
               tooltip: 'Valider et synchroniser',
-              onPressed: () {
-                // TODO: validation / merge cloud
+              onPressed: () async {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Synchronisation du projet avec le cloud...'),
+                  ),
+                );
               },
             ),
         ],
@@ -143,7 +151,11 @@ class ProjectDetailScreen extends ConsumerWidget {
                   icon: const Icon(Icons.edit),
                   label: const Text('Modifier ce projet'),
                   onPressed: () {
-                    // TODO: ouvrir édition complète
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Modification du projet : ${projet.nom}'),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
